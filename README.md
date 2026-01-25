@@ -1,70 +1,230 @@
-# Getting Started with Create React App
+# Hướng dẫn Setup Project SMA-CLIENT
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 1. Yêu cầu hệ thống
 
-## Available Scripts
+Trước khi bắt đầu, đảm bảo máy tính của bạn đã cài đặt:
 
-In the project directory, you can run:
+- **Node.js**: phiên bản 14.x hoặc cao hơn (khuyến nghị 16.x trở lên)
+- **npm**: phiên bản 6.x hoặc cao hơn (đi kèm với Node.js)
+- **Git**: để clone repository (nếu cần)
 
-### `npm start`
+Kiểm tra phiên bản đã cài đặt:
+```bash
+node --version
+npm --version
+git --version
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 2. Clone hoặc download project
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Nếu project chưa có trên máy, clone từ repository:
+```bash
+git clone <repository-url>
+cd sma-client
+```
 
-### `npm test`
+Hoặc nếu đã có source code, di chuyển vào thư mục project:
+```bash
+cd /Users/anhtu/Documents/Uni/SEMESTER9/Project/sma-client
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 3. Cài đặt dependencies
 
-### `npm run build`
+Cài đặt tất cả các package dependencies:
+```bash
+npm install
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Lệnh này sẽ cài đặt tất cả các packages được liệt kê trong `package.json`, bao gồm:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+**Dependencies chính:**
+- `react` (v19.2.3) - React framework
+- `react-dom` (v19.2.3) - React DOM rendering
+- `react-scripts` (v5.0.1) - Create React App scripts
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+**Dev Dependencies:**
+- `tailwindcss` (v3.4.17) - CSS framework
+- `react-app-rewired` - Override CRA config không cần eject
+- `babel-plugin-module-resolver` - Module alias resolution
+- `customize-cra` - Customize webpack config
+- `autoprefixer` & `postcss` - CSS processing
 
-### `npm run eject`
+## 4. Cấu trúc project
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Project được tổ chức theo cấu trúc sau:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```
+sma-client/
+├── public/              # Static files
+├── src/
+│   ├── assets/         # Images, fonts, etc.
+│   ├── components/     # React components
+│   ├── hooks/          # Custom React hooks
+│   ├── pages/          # Page components
+│   ├── services/       # API services
+│   ├── store/          # State management
+│   ├── utils/          # Utility functions
+│   ├── App.js          # Main App component
+│   ├── index.js        # Entry point
+│   └── index.css       # Global styles với Tailwind
+├── babel.config.js     # Babel configuration
+├── config-overrides.js # React App Rewired config
+├── tailwind.config.js  # Tailwind CSS config
+└── package.json        # Project dependencies
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## 5. Hiểu về cấu hình đặc biệt
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Module Aliases
+Project sử dụng module resolver để import dễ dàng hơn:
 
-## Learn More
+- `@/` → `./src/`
+- `@components/` → `./src/components/`
+- `@pages/` → `./src/pages/`
+- `@utils/` → `./src/utils/`
+- `@hooks/` → `./src/hooks/`
+- `@services/` → `./src/services/`
+- `@store/` → `./src/store/`
+- `@assets/` → `./src/assets/`
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Ví dụ thay vì:
+```javascript
+import Button from '../../../components/Button';
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Bạn có thể viết:
+```javascript
+import Button from '@components/Button';
+```
 
-### Code Splitting
+### React App Rewired
+Project sử dụng `react-app-rewired` thay vì `react-scripts` trực tiếp để có thể customize cấu hình webpack mà không cần eject.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Tailwind CSS
+Project đã được cấu hình sẵn Tailwind CSS cho styling.
 
-### Analyzing the Bundle Size
+## 6. Chạy project ở môi trường development
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Khởi chạy development server:
+```bash
+npm start
+```
 
-### Making a Progressive Web App
+- Development server sẽ chạy tại: `http://localhost:3000`
+- Browser sẽ tự động mở
+- Hot reload được bật - thay đổi code sẽ tự động refresh
+- Lỗi lint và compile sẽ hiển thị trong console
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## 7. Build project cho production
 
-### Advanced Configuration
+Tạo production build:
+```bash
+npm run build
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+- Build output sẽ được tạo trong folder `build/`
+- Files được minified và optimized
+- Filenames có hash để cache busting
+- Sẵn sàng để deploy
 
-### Deployment
+## 8. Chạy tests
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Chạy test suite:
+```bash
+npm test
+```
 
-### `npm run build` fails to minify
+Test runner sẽ chạy ở interactive watch mode.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## 9. Các lệnh thường dùng
+
+| Lệnh | Mô tả |
+|------|-------|
+| `npm start` | Chạy development server |
+| `npm run build` | Build production |
+| `npm test` | Chạy tests |
+| `npm run eject` | Eject từ CRA (không khuyến nghị) |
+
+## 10. Troubleshooting
+
+### Lỗi khi cài đặt dependencies
+```bash
+# Xóa node_modules và package-lock.json
+rm -rf node_modules package-lock.json
+
+# Cài lại
+npm install
+```
+
+### Port 3000 đã được sử dụng
+Nếu port 3000 bị chiếm:
+- Dừng process đang chạy trên port 3000
+- Hoặc React sẽ tự động hỏi để chạy trên port khác (3001, 3002,...)
+
+### Module not found errors
+Đảm bảo rằng:
+- Đã chạy `npm install` đầy đủ
+- Path aliases được cấu hình đúng trong `babel.config.js` và `config-overrides.js`
+- IDE của bạn đã restart sau khi thay đổi config
+
+### Tailwind classes không hoạt động
+- Kiểm tra `tailwind.config.js` có đúng content paths
+- Đảm bảo `index.css` có import Tailwind directives
+- Restart development server
+
+## 11. Môi trường phát triển khuyến nghị
+
+### Code Editor
+- **VS Code** (khuyến nghị)
+- Extensions hữu ích:
+  - ESLint
+  - Prettier
+  - Tailwind CSS IntelliSense
+  - ES7+ React/Redux/React-Native snippets
+
+### Browser
+- Chrome hoặc Firefox với React Developer Tools extension
+
+## 12. Git workflow (nếu làm team)
+
+```bash
+# Tạo branch mới cho feature
+git checkout -b feature/ten-feature
+
+# Commit changes
+git add .
+git commit -m "Mô tả thay đổi"
+
+# Push lên remote
+git push origin feature/ten-feature
+
+# Tạo Pull Request để review
+```
+
+## 13. Environment Variables (nếu cần)
+
+Tạo file `.env.local` trong root directory cho các biến môi trường:
+```
+REACT_APP_API_URL=http://localhost:8080
+REACT_APP_ENVIRONMENT=development
+```
+
+Sử dụng trong code:
+```javascript
+const apiUrl = process.env.REACT_APP_API_URL;
+```
+
+**Lưu ý:** File `.env.local` đã được gitignore, không commit lên repository.
+
+## 14. Next Steps
+
+Sau khi setup xong, bạn có thể:
+
+1. Xem qua cấu trúc code trong `src/`
+2. Đọc docs của các thư viện chính:
+   - [React Documentation](https://react.dev/)
+   - [Tailwind CSS](https://tailwindcss.com/docs)
+3. Bắt đầu phát triển features mới
+4. Tham khảo conversation history để hiểu các components đã được implement
+
+---
