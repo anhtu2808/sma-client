@@ -1,0 +1,83 @@
+// Import shared variables
+@import '../../styles/variables';
+
+.checkbox-wrapper {
+    display: flex;
+    align-items: center;
+
+    .checkbox-input {
+        width: 1rem;
+        height: 1rem;
+        color: $primary;
+        background-color: $neutral-100;
+        border: 1px solid $neutral-300;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        appearance: none;
+        position: relative;
+        flex-shrink: 0;
+
+        &:hover:not(:disabled) {
+            border-color: $primary;
+        }
+
+        &:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.2);
+            border-color: $primary;
+        }
+
+        &:checked {
+            background-color: $primary;
+            border-color: $primary;
+
+            &::after {
+                content: '';
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                width: 0.375rem;
+                height: 0.625rem;
+                border: solid $white;
+                border-width: 0 2px 2px 0;
+                transform: translate(-50%, -60%) rotate(45deg);
+            }
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    }
+
+    .checkbox-label {
+        margin-left: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: $neutral-900;
+        cursor: pointer;
+        user-select: none;
+        font-family: 'Interdisplay', Arial, sans-serif;
+    }
+}
+
+// Dark Mode
+.dark {
+    .checkbox-wrapper {
+        .checkbox-input {
+            background-color: $neutral-700;
+            border-color: $neutral-600;
+
+            &:checked {
+                background-color: $primary;
+                border-color: $primary;
+            }
+        }
+
+        .checkbox-label {
+            color: $neutral-300;
+        }
+    }
+}

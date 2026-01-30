@@ -1,0 +1,211 @@
+// Import shared variables
+@import '../../styles/variables';
+
+.btn-root {
+    display: inline-block;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: 550;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+    outline: none;
+    min-width: fit-content;
+
+    &:focus-visible {
+        outline: 2px solid $primary;
+        outline-offset: 2px;
+    }
+
+    // Icon spacing
+    .btn-icon-left {
+        display: flex;
+        align-items: center;
+    }
+
+    .btn-icon-right {
+        display: flex;
+        align-items: center;
+    }
+
+    // ========== MODES ==========
+
+    // Primary Button
+    &.btn-primary {
+        background: $primary;
+        color: $white;
+
+        &:hover:not(:disabled) {
+            background: $primary-dark;
+            transform: scale(1.02);
+        }
+
+        &:active:not(:disabled) {
+            background: $primary-dark;
+            transform: scale(0.98);
+        }
+
+        &:disabled {
+            background: $neutral-300;
+            color: $neutral-500;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+    }
+
+    // Glow effect (optional)
+    &.btn-glow {
+        box-shadow: 0 0 15px rgba(255, 107, 53, 0.3);
+
+        &:active:not(:disabled) {
+            box-shadow: none;
+        }
+    }
+
+    // Secondary Button
+    &.btn-secondary {
+        background: transparent;
+        color: $neutral-700;
+        border: 1px solid $neutral-300;
+
+        &:hover:not(:disabled) {
+            border-color: $primary;
+            color: $primary;
+        }
+
+        &:active:not(:disabled) {
+            border-color: $primary-dark;
+            color: $primary-dark;
+            background: $primary-bg;
+        }
+
+        &:disabled {
+            background: transparent;
+            color: $neutral-400;
+            border-color: $neutral-200;
+            cursor: not-allowed;
+        }
+    }
+
+    // Ghost Button
+    &.btn-ghost {
+        background: transparent;
+        color: $neutral-600;
+        border: none;
+
+        &:hover:not(:disabled) {
+            color: $primary;
+            background: $neutral-100;
+        }
+
+        &:active:not(:disabled) {
+            color: $primary-dark;
+            background: $neutral-200;
+        }
+
+        &:disabled {
+            color: $neutral-400;
+            cursor: not-allowed;
+        }
+    }
+
+    // ========== SIZES ==========
+
+    // Small
+    &.btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.75rem;
+        line-height: 1rem;
+    }
+
+    // Medium (default)
+    &.btn-md {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+    }
+
+    // Large
+    &.btn-lg {
+        padding: 0.875rem 2rem;
+        font-size: 1rem;
+        line-height: 1.5rem;
+    }
+
+    // ========== SHAPES ==========
+
+    // Pill (default)
+    &.btn-pill {
+        border-radius: 9999px;
+    }
+
+    // Rounded
+    &.btn-rounded {
+        border-radius: 0.75rem;
+    }
+
+    // ========== ICON ONLY ==========
+
+    &.btn-icon-only {
+        padding: 0;
+        
+        &.btn-sm {
+            width: 2rem;
+            height: 2rem;
+        }
+
+        &.btn-md {
+            width: 2.5rem;
+            height: 2.5rem;
+        }
+
+        &.btn-lg {
+            width: 3rem;
+            height: 3rem;
+        }
+    }
+
+    // ========== FULL WIDTH ==========
+
+    &.w-full {
+        width: 100%;
+    }
+}
+
+// Dark mode support
+.dark {
+    .btn {
+        &.btn-secondary {
+            color: $white;
+            border-color: $neutral-600;
+
+            &:hover:not(:disabled) {
+                border-color: $primary;
+                color: $primary;
+            }
+
+            &:disabled {
+                color: $neutral-500;
+                border-color: $neutral-700;
+            }
+        }
+
+        &.btn-ghost {
+            color: $neutral-300;
+
+            &:hover:not(:disabled) {
+                color: $primary;
+                background: $neutral-800;
+            }
+
+            &:active:not(:disabled) {
+                background: $neutral-700;
+            }
+        }
+    }
+}

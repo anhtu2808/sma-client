@@ -1,20 +1,16 @@
-import { override, addBabelPlugin } from 'customize-cra';
+const { override, addWebpackAlias } = require('customize-cra');
+const path = require('path');
 
-export default override(
-  addBabelPlugin([
-    'module-resolver',
-    {
-      root: ['./src'],
-      alias: {
-        '@': './src',
-        '@components': './src/components',
-        '@pages': './src/pages',
-        '@utils': './src/utils',
-        '@hooks': './src/hooks',
-        '@services': './src/services',
-        '@store': './src/store',
-        '@assets': './src/assets',
-      },
-    },
-  ])
+module.exports = override(
+  addWebpackAlias({
+    '@': path.resolve(__dirname, 'src'),
+    '@components': path.resolve(__dirname, 'src/components'),
+    '@pages': path.resolve(__dirname, 'src/pages'),
+    '@utils': path.resolve(__dirname, 'src/utils'),
+    '@hooks': path.resolve(__dirname, 'src/hooks'),
+    '@services': path.resolve(__dirname, 'src/services'),
+    '@store': path.resolve(__dirname, 'src/store'),
+    '@assets': path.resolve(__dirname, 'src/assets'),
+    '@routes': path.resolve(__dirname, 'src/routes'),
+  })
 );

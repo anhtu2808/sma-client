@@ -1,0 +1,275 @@
+@import '../../styles/variables';
+
+
+.input-wrapper {
+    width: 100%;
+    margin-bottom: 0;
+
+    // Label
+    .input-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: $neutral-900;
+        font-family: 'Interdisplay', Arial, sans-serif;
+
+        &.input-label-error {
+            color: $red-600;
+        }
+    }
+
+    // Helper Text
+    .input-helper {
+        margin-top: 0.5rem;
+        font-size: 0.75rem;
+        color: $neutral-500;
+
+        &.input-helper-error {
+            color: $red-600;
+
+            .font-medium {
+                font-weight: 500;
+            }
+        }
+    }
+}
+
+// Custom Input Styles
+.custom-input {
+    &.ant-input,
+    &.ant-input-password,
+    &.ant-input-search,
+    & .ant-input {
+        background: $neutral-50;
+        border: 1px solid $neutral-300;
+        color: $neutral-900;
+        font-size: 0.875rem;
+        border-radius: 0.5rem;
+        padding: 0.625rem;
+        transition: all 0.2s ease;
+        font-family: 'Interdisplay', Arial, sans-serif;
+
+        &::placeholder {
+            color: $neutral-400;
+        }
+
+        &:hover {
+            border-color: $neutral-400;
+        }
+
+        &:focus,
+        &.ant-input-focused {
+            border-color: $primary;
+            box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.1);
+            outline: none;
+        }
+    }
+
+    // Error State
+    &.custom-input-error {
+        &.ant-input,
+        &.ant-input-password,
+        &.ant-input-search,
+        & .ant-input {
+            background: $red-50;
+            border-color: $red-500;
+            color: $red-900;
+
+            &::placeholder {
+                color: $red-700;
+            }
+
+            &:focus,
+            &.ant-input-focused {
+                border-color: $red-500;
+                box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.1);
+            }
+        }
+    }
+
+    // Password Input
+    &.ant-input-password {
+        .ant-input-suffix {
+            color: $neutral-400;
+
+            .anticon {
+                color: $neutral-400;
+                transition: color 0.2s ease;
+
+                &:hover {
+                    color: $primary;
+                }
+            }
+        }
+    }
+
+    // Search Input
+    &.custom-input-search {
+        &.ant-input-search {
+            &.ant-input-group-wrapper {
+                .ant-input-group {
+                    display: flex;
+                    
+                    .ant-input-affix-wrapper {
+                        border-right: none;
+                        
+                        &:focus,
+                        &.ant-input-affix-wrapper-focused {
+                            border-color: $primary;
+                            box-shadow: none;
+                            z-index: 1;
+                        }
+                        
+                        .ant-input {
+                            &:focus {
+                                box-shadow: none;
+                            }
+                        }
+                    }
+                }
+            }
+
+            .ant-input-group-addon {
+                background: transparent;
+                border: none;
+
+                .ant-btn {
+                    background: $primary;
+                    border: 1px solid $primary;
+                    color: $white;
+                    border-radius: 0 0.5rem 0.5rem 0;
+                    height: 100%;
+                    padding: 0.625rem 1rem;
+                    transition: all 0.2s ease;
+                    box-shadow: none;
+
+                    &:hover,
+                    &:focus {
+                        background: $primary-dark;
+                        border-color: $primary-dark;
+                        box-shadow: none;
+                    }
+
+                    .anticon {
+                        color: $white;
+                    }
+                }
+            }
+
+            &.ant-input-search-large {
+                .ant-input-group {
+                    .ant-input-affix-wrapper {
+                        border-radius: 9999px 0 0 9999px;
+                        padding: 0.75rem 1rem;
+                        
+                        .ant-input {
+                            padding: 0;
+                        }
+                    }
+                }
+
+                .ant-input-group-addon .ant-btn {
+                    border-radius: 0 9999px 9999px 0;
+                    padding: 0.75rem 1.5rem;
+                }
+            }
+
+            // Focus state for entire search
+            &.ant-input-group-wrapper-focused {
+                .ant-input-affix-wrapper {
+                    border-color: $primary;
+                    box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.1);
+                }
+                
+                .ant-input-group-addon .ant-btn {
+                    border-color: $primary;
+                }
+            }
+        }
+    }
+
+    // TextArea
+    &.ant-input-textarea {
+        textarea.ant-input {
+            min-height: 80px;
+            resize: vertical;
+        }
+    }
+
+    // Prefix/Suffix Icons
+    .ant-input-prefix,
+    .ant-input-suffix {
+        color: $neutral-400;
+
+        .anticon,
+        .material-icons-round {
+            font-size: 1.25rem;
+        }
+    }
+}
+
+// Dark Mode Support
+.dark {
+    .input-wrapper {
+        .input-label {
+            color: $white;
+
+            &.input-label-error {
+                color: #FCA5A5;
+            }
+        }
+
+        .input-helper {
+            color: $neutral-400;
+
+            &.input-helper-error {
+                color: #FCA5A5;
+            }
+        }
+    }
+
+    .custom-input {
+        &.ant-input,
+        &.ant-input-password,
+        &.ant-input-search,
+        & .ant-input {
+            background: $neutral-800;
+            border-color: $neutral-600;
+            color: $white;
+
+            &::placeholder {
+                color: $neutral-400;
+            }
+
+            &:hover {
+                border-color: $neutral-500;
+            }
+
+            &:focus,
+            &.ant-input-focused {
+                border-color: $primary;
+            }
+        }
+
+        &.custom-input-error {
+            &.ant-input,
+            &.ant-input-password,
+            &.ant-input-search,
+            & .ant-input {
+                background: $neutral-800;
+                border-color: $red-500;
+                color: #FCA5A5;
+
+                &::placeholder {
+                    color: #FCA5A5;
+                }
+            }
+        }
+
+        .ant-input-prefix,
+        .ant-input-suffix {
+            color: $neutral-400;
+        }
+    }
+}
