@@ -3,6 +3,8 @@
 
 .btn-root {
     display: inline-block;
+    line-height: 0;
+    vertical-align: middle;
 }
 
 .btn {
@@ -69,7 +71,7 @@
 
     // Secondary Button
     &.btn-secondary {
-        background: transparent;
+        background: $white;
         color: $neutral-700;
         border: 1px solid $neutral-300;
 
@@ -85,7 +87,7 @@
         }
 
         &:disabled {
-            background: transparent;
+            background: $white;
             color: $neutral-400;
             border-color: $neutral-200;
             cursor: not-allowed;
