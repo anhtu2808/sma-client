@@ -29,7 +29,6 @@ const Button: ButtonComponentType = ({
       className={clsx(
         'btn-root',
         fullWidth && 'w-full',
-        className,
         tooltip && 'group'
       )}
       style={{ position: 'relative', display: fullWidth ? 'block' : 'inline-block' }}
@@ -44,6 +43,7 @@ const Button: ButtonComponentType = ({
           iconClass,
           glow && 'btn-glow',
           fullWidth && 'w-full',
+          className,
         )}
         disabled={disabled}
         {...props}
