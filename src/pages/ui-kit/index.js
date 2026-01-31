@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from '@/components/Button/index.tsx';
+import Button from '@/components/Button';
 import SectionHeader from '@/components/SectionHeader';
 import ColorSwatch from '@/components/ColorSwatch';
 import Card from '@/components/Card';
@@ -7,6 +7,7 @@ import Input from '@/components/Input';
 import SearchInput from '@/components/SearchInput';
 import Checkbox from '@/components/Checkbox';
 import Switch from '@/components/Switch';
+import JobCard from '@/components/JobCard';
 
 const UiKit = () => {
     return (
@@ -331,92 +332,47 @@ const UiKit = () => {
                     <SectionHeader number="05" title="Job Card Component" />
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                        {/* Standard Job Card */}
-                        <div className="bg-white dark:bg-surface-dark rounded-xl border border-neutral-200 dark:border-neutral-700 p-6 hover:shadow-lg hover:border-primary/50 transition-all duration-300 group cursor-pointer relative overflow-hidden">
-                            <div className="absolute top-0 left-0 w-1 h-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="flex gap-4">
-                                    <div className="w-12 h-12 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-                                        <span className="material-icons-round text-2xl">code</span>
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-neutral-900 dark:text-white text-lg group-hover:text-primary transition-colors font-heading">
-                                            Senior Frontend Engineer
-                                        </h3>
-                                        <p className="text-sm text-neutral-500 dark:text-neutral-400">TechCorp Inc.</p>
-                                    </div>
-                                </div>
-                                <button className="text-neutral-400 hover:text-primary transition-colors">
-                                    <span className="material-icons-round">bookmark_border</span>
-                                </button>
-                            </div>
-                            <div className="flex flex-wrap gap-2 mb-6">
-                                <span className="px-2.5 py-1 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 text-xs font-medium">Remote</span>
-                                <span className="px-2.5 py-1 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 text-xs font-medium">Full-time</span>
-                                <span className="px-2.5 py-1 rounded bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 text-xs font-medium">Senior Level</span>
-                            </div>
-                            <div className="flex items-center justify-between pt-4 border-t border-neutral-100 dark:border-neutral-700">
-                                <div className="text-sm font-semibold text-neutral-900 dark:text-white">
-                                    $120k - $160k
-                                    <span className="text-neutral-400 font-normal ml-1 text-xs">/ year</span>
-                                </div>
-                                <span className="text-xs text-neutral-400">Posted 2d ago</span>
-                            </div>
-                        </div>
+                        {/* Hot Job Card */}
+                        <JobCard
+                            title="Senior UX/UI Designer"
+                            company="TechFlow Systems"
+                            location="San Francisco, CA (Remote)"
+                            salary="$110k - $140k/yr"
+                            tags={['Full-time', 'React', 'Figma', 'Mid-Level']}
+                            postedTime="3h ago"
+                            isHot={true}
+                            companyLogo="https://lh3.googleusercontent.com/aida-public/AB6AXuASs1kam8Zm-9wgV7a1UuN933U9Dd-eS1mrzcCHt3Cl2D4QrO5aaAqzRWERdSuGcasBFTSeYGQ59uWH6HA35yFjoNa4dQnUcQi_-0b1MgXdjqp1XuD0thYZUJS1WrTClq4JDjiKYxvCnoPYmQuyl3tkTJUtvVr6z154nu2-h0LFlG9VIboEGgprJXZnddQOzYeEz-po9imG0x84b9_ZHc8yaSOjtDIUYKQQMnC8UiMYhFnXtGxuTJWXrak6GxfyzxI-zSx6zZbRxDU"
+                            variant="primary"
+                            onBookmark={() => console.log('Bookmarked')}
+                            onApply={() => console.log('Applied')}
+                        />
 
-                        {/* Featured Job Card */}
-                        <div className="bg-white dark:bg-surface-dark rounded-xl border-2 border-primary/20 p-6 hover:shadow-lg hover:border-primary transition-all duration-300 group cursor-pointer relative">
-                            <div className="absolute -top-3 left-6 bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide">
-                                Featured
-                            </div>
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="flex gap-4">
-                                    <div className="w-12 h-12 rounded-lg bg-green-50 dark:bg-green-900/20 flex items-center justify-center text-green-600 dark:text-green-400">
-                                        <span className="material-icons-round text-2xl">design_services</span>
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-neutral-900 dark:text-white text-lg group-hover:text-primary transition-colors font-heading">
-                                            Product Designer
-                                        </h3>
-                                        <p className="text-sm text-neutral-500 dark:text-neutral-400">DesignStudio</p>
-                                    </div>
-                                </div>
-                                <button className="text-neutral-400 hover:text-primary transition-colors">
-                                    <span className="material-icons-round">bookmark_border</span>
-                                </button>
-                            </div>
-                            <div className="flex flex-wrap gap-2 mb-6">
-                                <span className="px-2.5 py-1 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 text-xs font-medium">New York, NY</span>
-                                <span className="px-2.5 py-1 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 text-xs font-medium">Contract</span>
-                            </div>
-                            <div className="flex items-center justify-between pt-4 border-t border-neutral-100 dark:border-neutral-700">
-                                <div className="text-sm font-semibold text-neutral-900 dark:text-white">
-                                    $80 - $120
-                                    <span className="text-neutral-400 font-normal ml-1 text-xs">/ hour</span>
-                                </div>
-                                <button className="text-sm font-medium text-primary hover:text-primary-dark transition-colors">
-                                    Apply Now
-                                </button>
-                            </div>
-                        </div>
+                        {/* Secondary Job Card */}
+                        <JobCard
+                            title="Backend Engineer"
+                            company="Nebula Corp"
+                            location="Austin, TX (Hybrid)"
+                            salary="$130k - $160k/yr"
+                            tags={['Go', 'PostgreSQL']}
+                            postedTime="1d ago"
+                            companyLogo="https://lh3.googleusercontent.com/aida-public/AB6AXuDlGPyk9Str7aKT5PXOqo1nSq7OqQ50U0WjM5T8QSoxMgVuzJ1mX5Mw1nuPz2HoJFUyq3mqp1uGXSkncgyfB-o1_XT_Z-7ctxeOQDr7KiKwiJp60tnFYFuTZpYsHiv8krSpU_K6wwbPq_PWMv5lKP2i14feB3TSzGE8Sinh0mUqPaCuw8Bx9SPbiZsOPbNQRudlpQUFFYbOYYVWhZpuwi87uEedLMQ8yWh8m24-d_elMghXIBTesp3LZtlpoupcfse4jANxDoPsr9Y"
+                            variant="secondary"
+                            onBookmark={() => console.log('Bookmarked')}
+                            onApply={() => console.log('View Details')}
+                        />
 
-                        {/* Compact Job Card */}
-                        <div className="bg-white dark:bg-surface-dark rounded-xl border border-neutral-200 dark:border-neutral-700 p-5 hover:border-neutral-300 dark:hover:border-neutral-600 transition-colors flex flex-col justify-center h-full">
-                            <div className="flex items-center gap-4 mb-4">
-                                <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center text-purple-600 dark:text-purple-400 text-sm font-bold">
-                                    N
-                                </div>
-                                <div className="flex-1">
-                                    <h4 className="font-semibold text-neutral-900 dark:text-white text-base font-heading">Backend Developer</h4>
-                                    <p className="text-xs text-neutral-500">NexusAI • Remote</p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-2 mt-auto">
-                                <span className="px-2 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-500 text-[10px] font-medium border border-neutral-200 dark:border-neutral-700">Python</span>
-                                <span className="px-2 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-500 text-[10px] font-medium border border-neutral-200 dark:border-neutral-700">Django</span>
-                                <span className="px-2 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-500 text-[10px] font-medium border border-neutral-200 dark:border-neutral-700">AWS</span>
-                            </div>
-                        </div>
+                        {/* Another Job Card */}
+                        <JobCard
+                            title="Frontend Developer"
+                            company="StartupXYZ"
+                            location="New York, NY (On-site)"
+                            salary="$90k - $120k/yr"
+                            tags={['React', 'TypeScript', 'Tailwind']}
+                            postedTime="2d ago"
+                            variant="primary"
+                            onBookmark={() => console.log('Bookmarked')}
+                            onApply={() => console.log('Applied')}
+                        />
                     </div>
                 </section>
             </main>
