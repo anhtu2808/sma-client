@@ -1,10 +1,11 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 
 import Logo from '@/components/Logo';
 
 const Navbar = () => {
+    const navigate = useNavigate();
     return (
         <nav className="fixed w-full z-50 top-0 start-0 border-b border-gray-100 dark:border-gray-800 bg-white/80 dark:bg-background-dark/80 backdrop-blur-lg">
             <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between px-6 py-4">
@@ -16,8 +17,9 @@ const Navbar = () => {
                         mode="secondary"
                         size="md"
                         className=" md:inline-flex"
+                        onClick={() => navigate('/login')}
                     >
-                        Sign in
+                        Login
                     </Button>
                     <Button
                         mode="primary"
