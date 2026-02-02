@@ -1,15 +1,44 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { message } from 'antd';
 import Logo from '@/components/Logo';
 import Input from '@/components/Input';
 import Button from '@/components/Button';
 import SideDecorator from '@/pages/login/side-decorator';
 import googleIcon from '@/assets/svg/google-icon.svg';
+import authService from '@/services/authService';
 
 const Register = () => {
-    const handleSubmit = (e) => {
+    const [fullName, setFullName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Handle register logic here
+        
+        if (password !== confirmPassword) {
+            message.error('Passwords do not match');
+            return;
+        }
+        
+        try {
+            setLoading(true);
+            const response = await authService.register({ email, password, fullName });
+            
+            if (response.data.code === 200) {
+                message.success(response.data.message || 'Registration successful');
+                navigate('/');
+            } else {
+                message.error(response.data.message || 'Registration failed');
+            }
+        } catch (error) {
+            message.error(error.response?.data?.message || 'An error occurred during registration');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleGoogleRegister = () => {
@@ -53,22 +82,30 @@ const Register = () => {
                         <Input
                             type="text"
                             placeholder="Enter your name"
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
                             required
                         />
 
                         <Input
                             type="email"
                             placeholder="Email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             required
                         />
 
                         <Input.Password
                             placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             required
                         />
 
                         <Input.Password
                             placeholder="Confirm Password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
                             required
                         />
 
@@ -78,8 +115,10 @@ const Register = () => {
                                 mode="primary"
                                 size="lg"
                                 fullWidth
+                                disabled={loading}
+                                loading={loading}
                             >
-                                Create Account
+                                {loading ? 'Creating Account...' : 'Create Account'}
                             </Button>
                         </div>
                     </form>

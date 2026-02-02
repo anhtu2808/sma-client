@@ -1,15 +1,37 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { message } from 'antd';
 import Logo from '@/components/Logo';
 import Input from '@/components/Input';
 import Button from '@/components/Button';
 import SideDecorator from '@/pages/login/side-decorator';
 import googleIcon from '@/assets/svg/google-icon.svg';
+import authService from '@/services/authService';
 
 const Login = () => {
-    const handleSubmit = (e) => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Handle login logic here
+        
+        try {
+            setLoading(true);
+            const response = await authService.login({ email, password });
+            
+            if (response.data.code === 200) {
+                message.success(response.data.message || 'Login successfully');
+                navigate('/');
+            } else {
+                message.error(response.data.message || 'Login failed');
+            }
+        } catch (error) {
+            message.error(error.response.data.message || 'An error occurred during login');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleGoogleLogin = () => {
@@ -54,11 +76,15 @@ const Login = () => {
                         <Input
                             type="email"
                             placeholder="Email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             required
                         />
 
                         <Input.Password
                             placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             required
                         />
 
@@ -76,8 +102,10 @@ const Login = () => {
                             mode="primary"
                             size="lg"
                             fullWidth
+                            disabled={loading}
+                            loading={loading}
                         >
-                            Log in
+                            {loading ? 'Logging in...' : 'Log in'}
                         </Button>
                     </form>
 
