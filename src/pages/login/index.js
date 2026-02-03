@@ -7,6 +7,8 @@ import Button from '@/components/Button';
 import SideDecorator from '@/pages/login/side-decorator';
 import googleIcon from '@/assets/svg/google-icon.svg';
 import authService from '@/services/authService';
+import { GoogleLogin } from '@react-oauth/google';
+
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -34,9 +36,7 @@ const Login = () => {
         }
     };
 
-    const handleGoogleLogin = () => {
-        // Handle Google login logic here
-    };
+
 
     return (
         <div className="flex h-screen w-full overflow-hidden">
@@ -52,18 +52,32 @@ const Login = () => {
                         Find the job made for you!
                     </p>
 
-                    <Button
-                        type="button"
-                        mode="secondary"
-                        size="md"
-                        fullWidth
-                        shape="pill"
-                        className="mb-5"
-                        iconLeft={<img src={googleIcon} alt="Google" className="w-5 h-5" />}
-                        onClick={handleGoogleLogin}
-                    >
-                        Log in with Google
-                    </Button>
+                    <div className="flex justify-center mb-5">
+                        <GoogleLogin
+                            onSuccess={async (credentialResponse) => {
+                                try {
+                                    console.log(credentialResponse);
+                                    setLoading(true);
+                                    const res = await authService.loginWithGoogle(credentialResponse.credential);
+                                    
+                                    if (res.data.code === 200) {
+                                        message.success(res.data.message || 'Login successfully');
+                                        navigate('/');
+                                    } else {
+                                        message.error(res.data.message || 'Login failed');
+                                    }
+                                } catch (error) {
+                                    message.error(error.response?.data?.message || 'Google login failed');
+                                } finally {
+                                    setLoading(false);
+                                }
+                            }}
+                            onError={() => {
+                                message.error('Google login failed');
+                            }}
+                            useOneTap
+                        />
+                    </div>
 
                     <div className="flex items-center gap-4 mb-6">
                         <div className="h-px bg-gray-200 dark:bg-gray-700 flex-1"></div>

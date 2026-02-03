@@ -25,6 +25,7 @@ const Navbar = () => {
                         mode="primary"
                         size="md"
                         glow
+                        onClick={() => navigate('/register')}
                     >
                         Sign up
                     </Button>

@@ -26,7 +26,7 @@ const Register = () => {
         
         try {
             setLoading(true);
-            const response = await authService.register({ email, password, fullName });
+            const response = await authService.registerAsCandidate({ email, password, fullName });
             
             if (response.data.code === 200) {
                 message.success(response.data.message || 'Registration successful');
