@@ -17,6 +17,7 @@ const authService = {
             
             if (response.data?.data?.accessToken) {
                 localStorage.setItem('accessToken', response.data.data.accessToken);
+                localStorage.setItem('refreshToken', response.data.data.refreshToken);
             }
             
             return response;
@@ -25,12 +26,13 @@ const authService = {
         }
     },
 
-    register: async (userData) => {
+    registerAsCandidate: async (userData) => {
         try {
-            const response = await AuthAPI.post('/auth/candidate/register', userData);
+            const response = await AuthAPI.post('/candidate/auth/register', userData);
             
             if (response.data?.data?.accessToken) {
                 localStorage.setItem('accessToken', response.data.data.accessToken);
+                localStorage.setItem('refreshToken', response.data.data.refreshToken);
             }
             
             return response;
@@ -39,17 +41,58 @@ const authService = {
         }
     },
 
-    logout: () => {
-        localStorage.removeItem('accessToken');
-        window.location.href = '/login';
+    loginWithGoogle: async (idToken) => {
+        try {
+            const response = await AuthAPI.post('/candidate/auth/google-login', { idToken });
+            console.log(response);
+            if (response.data?.data?.accessToken) {
+                localStorage.setItem('accessToken', response.data.data.accessToken);
+                localStorage.setItem('refreshToken', response.data.data.refreshToken);
+            }
+            
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    logout: async () => {
+        try {
+            const refreshToken = localStorage.getItem('refreshToken');
+            const response = await AuthAPI.post('/auth/logout', refreshToken);
+            if (response.data?.data === true && response.data.code === 200) {
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+            }
+            window.location.href = '/login';
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    refreshToken: async () => {
+        try {
+            const refreshToken = localStorage.getItem('refreshToken');
+            const response = await AuthAPI.post('/auth/refresh-token', refreshToken);
+            if (response.data?.data?.accessToken) {
+                localStorage.setItem('accessToken', response.data.data.accessToken);
+            }
+            return response;
+        } catch (error) {
+            throw error;
+        }
     },
 
     isAuthenticated: () => {
         return !!localStorage.getItem('accessToken');
     },
 
-    getToken: () => {
+    getAccessToken: () => {
         return localStorage.getItem('accessToken');
+    },
+
+    getRefreshToken: () => {
+        return localStorage.getItem('refreshToken');
     }
 };
 
