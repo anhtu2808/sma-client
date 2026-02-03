@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 
 import Logo from '@/components/Logo';
@@ -33,36 +33,56 @@ const Navbar = () => {
                 <div className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1">
                     <ul className="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-transparent dark:bg-gray-800 md:dark:bg-transparent dark:border-gray-700">
                         <li>
-                            <Link
+                            <NavLink
                                 to="/"
-                                className="block py-2 px-3 text-white bg-primary rounded md:bg-transparent md:text-primary md:p-0"
+                                className={({ isActive }) =>
+                                    `block py-2 px-3 rounded md:p-0 transition-colors ${isActive
+                                        ? 'text-white bg-primary md:bg-transparent md:text-primary'
+                                        : 'text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-primary dark:text-white dark:hover:text-primary dark:hover:bg-gray-700 md:dark:hover:bg-transparent'
+                                    }`
+                                }
                             >
-                                Find Jobs
-                            </Link>
+                                Home
+                            </NavLink>
                         </li>
                         <li>
-                            <Link
-                                to="/talent"
-                                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-primary md:p-0 dark:text-white dark:hover:text-primary dark:hover:bg-gray-700 md:dark:hover:bg-transparent transition-colors"
+                            <NavLink
+                                to="/jobs"
+                                className={({ isActive }) =>
+                                    `block py-2 px-3 rounded md:p-0 transition-colors ${isActive
+                                        ? 'text-white bg-primary md:bg-transparent md:text-primary'
+                                        : 'text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-primary dark:text-white dark:hover:text-primary dark:hover:bg-gray-700 md:dark:hover:bg-transparent'
+                                    }`
+                                }
                             >
-                                For Talent
-                            </Link>
+                                For Jobs
+                            </NavLink>
                         </li>
                         <li>
-                            <Link
+                            <NavLink
                                 to="/companies"
-                                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-primary md:p-0 dark:text-white dark:hover:text-primary dark:hover:bg-gray-700 md:dark:hover:bg-transparent transition-colors"
+                                className={({ isActive }) =>
+                                    `block py-2 px-3 rounded md:p-0 transition-colors ${isActive
+                                        ? 'text-white bg-primary md:bg-transparent md:text-primary'
+                                        : 'text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-primary dark:text-white dark:hover:text-primary dark:hover:bg-gray-700 md:dark:hover:bg-transparent'
+                                    }`
+                                }
                             >
                                 For Companies
-                            </Link>
+                            </NavLink>
                         </li>
                         <li>
-                            <Link
+                            <NavLink
                                 to="/pricing"
-                                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-primary md:p-0 dark:text-white dark:hover:text-primary dark:hover:bg-gray-700 md:dark:hover:bg-transparent transition-colors"
+                                className={({ isActive }) =>
+                                    `block py-2 px-3 rounded md:p-0 transition-colors ${isActive
+                                        ? 'text-white bg-primary md:bg-transparent md:text-primary'
+                                        : 'text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-primary dark:text-white dark:hover:text-primary dark:hover:bg-gray-700 md:dark:hover:bg-transparent'
+                                    }`
+                                }
                             >
                                 Pricing
-                            </Link>
+                            </NavLink>
                         </li>
                     </ul>
                 </div>
