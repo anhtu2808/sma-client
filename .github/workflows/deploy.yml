@@ -26,7 +26,7 @@ jobs:
 
       - name: Build SMA Client
         env:
-          REACT_APP_API_URL: ${{ vars.DOMAIN }}/api/
+          REACT_APP_API_URL: ${{ vars.DOMAIN }}
         run: |
           echo "Building with API URL: $REACT_APP_API_URL"
           CI=false npm run build
