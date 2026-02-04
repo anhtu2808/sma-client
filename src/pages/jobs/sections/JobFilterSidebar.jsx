@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import Button from '@/components/Button';
 
 // Custom Dropdown Component
 const CustomDropdown = ({ options, value, onChange, placeholder = "Select option" }) => {
@@ -28,18 +29,21 @@ const CustomDropdown = ({ options, value, onChange, placeholder = "Select option
 
     return (
         <div className="relative" ref={dropdownRef}>
-            <button
-                type="button"
+            <Button
+                fullWidth
+                mode="secondary" // Base style options
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-full text-left bg-slate-50 dark:bg-[#3d241b] border border-slate-200 dark:border-[#4b2c20] py-3 px-4 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium flex items-center justify-between ${isOpen ? 'ring-2 ring-primary/20 border-primary' : ''}`}
+                className={`!justify-between !px-4 !py-3 h-auto !bg-slate-50 dark:!bg-[#3d241b] !border-slate-200 dark:!border-[#4b2c20] !rounded-xl transition-all font-medium ${isOpen ? '!ring-2 !ring-primary/20 !border-primary' : ''}`}
+                iconRight={
+                    <span className={`material-icons-round text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
+                        keyboard_arrow_down
+                    </span>
+                }
             >
-                <span className={`truncate ${!value ? 'text-slate-700 dark:text-gray-300' : 'text-slate-900 dark:text-white'}`}>
+                <span className={`truncate text-base normal-case font-medium ${!value ? 'text-slate-700 dark:text-gray-300' : 'text-slate-900 dark:text-white'}`}>
                     {displayLabel || placeholder}
                 </span>
-                <span className={`material-icons-round text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
-                    keyboard_arrow_down
-                </span>
-            </button>
+            </Button>
 
             {isOpen && (
                 <div className="absolute z-50 w-full mt-2 bg-white dark:bg-[#2c1a14] border border-slate-100 dark:border-[#4b2c20] rounded-xl shadow-xl max-h-60 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-100">
@@ -48,23 +52,22 @@ const CustomDropdown = ({ options, value, onChange, placeholder = "Select option
                             const isSelected = opt.value === value || (value === '' && opt.label.startsWith('All'));
                             return (
                                 <li key={opt.label}>
-                                    <button
-                                        type="button"
+                                    <Button
+                                        fullWidth
+                                        mode="ghost"
                                         onClick={() => {
                                             onChange(opt.value);
                                             setIsOpen(false);
                                         }}
-                                        className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center justify-between group rounded-lg
+                                        className={`!justify-between !px-4 !py-2.5 !h-auto !text-sm !font-normal !rounded-lg group
                                             ${isSelected
-                                                ? 'bg-primary text-white font-medium'
-                                                : 'text-slate-700 dark:text-gray-200 hover:bg-orange-50 dark:hover:bg-[#3d241b] hover:text-primary'
+                                                ? '!bg-primary !text-white !font-medium'
+                                                : 'text-slate-700 dark:text-gray-200 hover:!bg-orange-50 dark:hover:!bg-[#3d241b] hover:!text-primary'
                                             }`}
+                                        iconRight={isSelected && <span className="material-icons-round text-sm">check</span>}
                                     >
-                                        <span>{opt.label}</span>
-                                        {isSelected && (
-                                            <span className="material-icons-round text-sm">check</span>
-                                        )}
-                                    </button>
+                                        <span className="truncate">{opt.label}</span>
+                                    </Button>
                                 </li>
                             );
                         })}
@@ -131,12 +134,14 @@ const JobFilterSidebar = ({ filters, onFilterChange, onReset }) => {
                         <span className="material-icons-round text-primary">filter_list</span>
                         Filters
                     </h2>
-                    <button
+                    <Button
+                        mode="ghost"
+                        size="sm"
                         onClick={onReset}
-                        className="text-sm text-primary font-medium hover:underline"
+                        className="!text-sm !text-primary !font-medium hover:!underline !p-0 !min-h-0 !h-auto hover:!bg-transparent"
                     >
                         Reset
-                    </button>
+                    </Button>
                 </div>
 
                 {/* Location - Dropdown Style */}

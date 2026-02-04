@@ -1,14 +1,15 @@
 import React from 'react';
+import Button from '@/components/Button';
 import './SearchInput.scss';
 
-const SearchInput = ({ 
-    placeholder = 'Search...', 
+const SearchInput = ({
+    placeholder = 'Search...',
     value = '',
-    onChange = () => {},
-    onSearch = () => {},
+    onChange = () => { },
+    onSearch = () => { },
     className = '',
     size = 'md',
-    ...props 
+    ...props
 }) => {
     const handleKeyPress = (e) => {
         if (e.key === 'Enter') {
@@ -33,14 +34,16 @@ const SearchInput = ({
                     onKeyPress={handleKeyPress}
                     {...props}
                 />
-                <button 
-                    type="button"
-                    className="search-button"
+                <Button
+                    mode="primary"
+                    shape="pill"
+                    size={size}
+                    className="search-button !m-1"
                     onClick={handleSearchClick}
                     aria-label="Search"
                 >
                     <span className="material-icons-round">search</span>
-                </button>
+                </Button>
             </div>
         </div>
     );
