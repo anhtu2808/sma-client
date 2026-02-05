@@ -11,10 +11,17 @@ export const jobApi = api.injectEndpoints({
             }),
             providesTags: ["Jobs"]
         }),
+
+        getJobById: builder.query({
+            query: (id) => `${API_VERSION}/jobs/${id}`,
+            providesTags: ["Jobs"]
+        }),
     })
 });
 
 export const {
     useGetJobsQuery,
     useLazyGetJobsQuery,
+    useGetJobByIdQuery,
+    useLazyGetJobByIdQuery,
 } = jobApi;
