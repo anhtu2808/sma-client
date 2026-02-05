@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import Button from '@/components/Button';
 
 const JobCard = ({
     title,
@@ -57,13 +58,16 @@ const JobCard = ({
                 </div>
 
                 {/* Bookmark Action */}
-                <button
-                    className="shrink-0 p-2 rounded-full text-slate-400 dark:text-[#8c6b5d] hover:bg-slate-100 dark:hover:bg-[#4b2c20] hover:text-primary transition-colors"
+                <Button
+                    btnIcon
+                    mode="ghost"
+                    shape="pill"
                     onClick={onBookmark}
+                    className="shrink-0 !p-2 !text-slate-400 dark:!text-[#8c6b5d] hover:!bg-slate-100 dark:hover:!bg-[#4b2c20] hover:!text-primary"
                     aria-label="Bookmark job"
                 >
                     <span className="material-icons-round text-[24px]">bookmark_border</span>
-                </button>
+                </Button>
             </div>
 
             {/* Tags & Salary */}
@@ -94,20 +98,24 @@ const JobCard = ({
                 </div>
 
                 {variant === 'primary' ? (
-                    <button
-                        className="flex items-center justify-center gap-2 h-10 px-6 rounded-full bg-primary text-white text-sm font-bold shadow-md hover:scale-105 transition-transform duration-200"
+                    <Button
+                        mode="primary"
+                        shape="pill"
                         onClick={onApply}
+                        className="!h-10 !px-6 !text-sm !font-bold shadow-md hover:!scale-105"
+                        iconRight={<span className="material-icons-round text-[18px]">arrow_outward</span>}
                     >
-                        <span>Apply Now</span>
-                        <span className="material-icons-round text-[18px]">arrow_outward</span>
-                    </button>
+                        Apply Now
+                    </Button>
                 ) : (
-                    <button
-                        className="flex items-center justify-center gap-2 h-10 px-6 rounded-full bg-transparent border border-slate-200 dark:border-[#4b2c20] text-slate-900 dark:text-white text-sm font-bold hover:bg-slate-50 dark:hover:bg-[#3d241b] transition-colors"
+                    <Button
+                        mode="secondary"
+                        shape="pill"
                         onClick={onApply}
+                        className="!h-10 !px-6 !text-sm !font-bold bg-transparent border-slate-200 dark:border-[#4b2c20] dark:text-white hover:bg-slate-50 dark:hover:bg-[#3d241b]"
                     >
-                        <span>View Details</span>
-                    </button>
+                        View Details
+                    </Button>
                 )}
             </div>
         </article>
