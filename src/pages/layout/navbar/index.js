@@ -1,33 +1,44 @@
 import React from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
+import UserMenuDropdown from './UserMenuDropdown';
 
 import Logo from "@/components/Logo";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const token = localStorage.getItem('accessToken');
+
+  const isLoggedIn = Boolean(token);
+
   return (
     <nav className="fixed w-full z-50 top-0 start-0 border-b border-gray-100 dark:border-gray-800 bg-white/80 dark:bg-background-dark/80 backdrop-blur-lg">
       <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between px-6 py-4">
         <Logo />
 
         <div className="flex md:order-2 space-x-3 md:space-x-4 items-center">
-          <Button
-            mode="secondary"
-            size="md"
-            className=" md:inline-flex"
-            onClick={() => navigate("/login")}
-          >
-            Login
-          </Button>
-          <Button
-            mode="primary"
-            size="md"
-            glow
-            onClick={() => navigate("/register")}
-          >
-            Sign up
-          </Button>
+          {!isLoggedIn ? (
+            <>
+              <Button
+                mode="secondary"
+                size="md"
+                className=" md:inline-flex"
+                onClick={() => navigate("/login")}
+              >
+                Login
+              </Button>
+              <Button
+                mode="primary"
+                size="md"
+                glow
+                onClick={() => navigate("/register")}
+              >
+                Sign up
+              </Button>
+            </>
+          ) : (
+            <UserMenuDropdown />
+          )}
         </div>
 
                 <div className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1">
