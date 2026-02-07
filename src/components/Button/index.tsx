@@ -51,7 +51,7 @@ const Button: ButtonComponentType = ({
         {iconLeft && (
           <span className="btn-icon-left">{iconLeft}</span>
         )}
-        <span>{children}</span>
+        {children}
         {iconRight && (
           <span className="btn-icon-right">{iconRight}</span>
         )}
