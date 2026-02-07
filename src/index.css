@@ -39,3 +39,24 @@ h1, h2, h3, h4, h5, h6 {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
+
+/* Ant Design Tabs - Custom Styling */
+.ant-tabs .ant-tabs-tab {
+  @apply text-neutral-500 font-medium;
+}
+
+.ant-tabs .ant-tabs-tab:hover {
+  @apply text-primary;
+}
+
+.ant-tabs .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  @apply text-primary;
+}
+
+.ant-tabs .ant-tabs-ink-bar {
+  @apply bg-primary;
+}
+
+.ant-tabs .ant-tabs-tab .material-icons-round {
+  color: inherit;
+}

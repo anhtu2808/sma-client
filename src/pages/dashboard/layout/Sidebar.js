@@ -4,7 +4,7 @@ import { NavLink } from "react-router-dom";
 const sidebarItems = [
     { to: "/dashboard", icon: "grid_view", label: "Overview", end: true },
     { to: "/dashboard/profile", icon: "person", label: "Profile" },
-    { to: "/dashboard/resumes", icon: "description", label: "Resumes" },
+    { to: "/dashboard/resumes", icon: <i className="fa-solid fa-file-lines"></i>, label: "Resumes" },
     { to: "/dashboard/jobs", icon: "work_history", label: "Job" },
     {
         to: "/dashboard/notification",
@@ -49,7 +49,7 @@ const Sidebar = ({ displayName }) => {
                                         }`}
                                 >
                                     <span
-                                        className={`material-icons-round text-[20px] transition-colors ${isActive
+                                        className={`${typeof item.icon === 'string' ? 'material-icons-round' : ''} text-[20px] transition-colors ${isActive
                                             ? "text-white"
                                             : "text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300"
                                             }`}
