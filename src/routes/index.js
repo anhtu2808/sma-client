@@ -5,6 +5,7 @@ import Home from '@/pages/home';
 import Login from '@/pages/login';
 import Register from '@/pages/register';
 import Jobs from '@/pages/jobs';
+import JobDetail from '@/pages/job-detail';
 import DashboardLayout from '@/pages/dashboard/layout';
 import DashboardOverview from '@/pages/dashboard/overview';
 import DashboardJobs from '@/pages/dashboard/jobs';
@@ -24,6 +25,7 @@ export const routes = createBrowserRouter(
                 <Route index element={<Home />} />
                 <Route path="ui-kit" element={<UiKit />} />
                 <Route path="jobs" element={<Jobs />} />
+                <Route path="jobs/:id" element={<JobDetail />} />
             </Route>
             <Route path="dashboard" element={<DashboardLayout />}>
                 <Route index element={<DashboardOverview />} />

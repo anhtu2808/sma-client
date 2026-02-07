@@ -47,6 +47,7 @@ const JobList = ({ jobs, isLoading, isError, onBookmark }) => {
                     <JobCard
                         key={job.id}
                         {...job}
+                        onClick={() => navigate(`/jobs/${job.id}`)}
                         onApply={() => navigate(`/jobs/${job.id}`)}
                         onBookmark={() => onBookmark && onBookmark(job.id)}
                     />

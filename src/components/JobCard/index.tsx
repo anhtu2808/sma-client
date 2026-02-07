@@ -12,10 +12,14 @@ const JobCard = ({
     companyLogo,
     onBookmark,
     onApply,
+    onClick, // New prop for card click
     variant = 'primary' // 'primary' or 'secondary'
 }) => {
     return (
-        <article className="group relative flex flex-col gap-6 p-6 md:p-8 rounded-2xl bg-white dark:bg-[#2c1a14] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.4)] border border-transparent hover:border-primary/30 transition-all duration-300 hover:-translate-y-1">
+        <article
+            onClick={onClick}
+            className="group relative flex flex-col gap-6 p-6 md:p-8 rounded-2xl bg-white dark:bg-[#2c1a14] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.4)] border border-transparent hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+        >
             {/* Header Section: Logo, Title, Badge */}
             <div className="flex items-start justify-between gap-4">
                 <div className="flex gap-4 items-start">
@@ -62,7 +66,10 @@ const JobCard = ({
                     btnIcon
                     mode="ghost"
                     shape="pill"
-                    onClick={onBookmark}
+                    onClick={(e) => {
+                        e.stopPropagation(); // Prevent card click
+                        onBookmark && onBookmark();
+                    }}
                     className="shrink-0 !p-2 !text-slate-400 dark:!text-[#8c6b5d] hover:!bg-slate-100 dark:hover:!bg-[#4b2c20] hover:!text-primary"
                     aria-label="Bookmark job"
                 >
@@ -101,7 +108,10 @@ const JobCard = ({
                     <Button
                         mode="primary"
                         shape="pill"
-                        onClick={onApply}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onApply && onApply();
+                        }}
                         className="!h-10 !px-6 !text-sm !font-bold shadow-md hover:!scale-105"
                         iconRight={<span className="material-icons-round text-[18px]">arrow_outward</span>}
                     >
@@ -111,7 +121,10 @@ const JobCard = ({
                     <Button
                         mode="secondary"
                         shape="pill"
-                        onClick={onApply}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onApply && onApply();
+                        }}
                         className="!h-10 !px-6 !text-sm !font-bold bg-transparent border-slate-200 dark:border-[#4b2c20] dark:text-white hover:bg-slate-50 dark:hover:bg-[#3d241b]"
                     >
                         View Details
@@ -133,6 +146,7 @@ JobCard.propTypes = {
     companyLogo: PropTypes.string,
     onBookmark: PropTypes.func,
     onApply: PropTypes.func,
+    onClick: PropTypes.func, // Added prop type
     variant: PropTypes.oneOf(['primary', 'secondary'])
 };
 
