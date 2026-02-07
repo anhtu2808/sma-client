@@ -5,6 +5,13 @@ import UserMenuDropdown from './UserMenuDropdown';
 
 import Logo from "@/components/Logo";
 
+const navItems = [
+  { to: '/', label: 'Home', end: true },
+  { to: '/jobs', label: 'Jobs' },
+  { to: '/companies', label: 'Top Companies' },
+  { to: '/pricing', label: 'Pricing' },
+];
+
 const Navbar = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem('accessToken');
@@ -13,93 +20,77 @@ const Navbar = () => {
 
   return (
     <nav className="fixed w-full z-50 top-0 start-0 border-b border-gray-100 dark:border-gray-800 bg-white/80 dark:bg-background-dark/80 backdrop-blur-lg">
-      <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between px-6 py-4">
-        <Logo />
+      <div className="w-full px-6 lg:px-8 h-16 flex items-center">
+        <div className="flex items-center gap-10 min-w-0">
+          <Logo />
+          <ul className="hidden lg:flex items-center gap-8">
+            {navItems.map((item) => (
+              <li key={item.to}>
+                <NavLink
+                  to={item.to}
+                  end={item.end}
+                  className={({ isActive }) =>
+                    `text-sm font-semibold transition-colors ${
+                      isActive
+                        ? 'text-primary'
+                        : 'text-gray-700 hover:text-primary dark:text-gray-200 dark:hover:text-primary'
+                    }`
+                  }
+                >
+                  {item.label}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </div>
 
-        <div className="flex md:order-2 space-x-3 md:space-x-4 items-center">
+        <div className="ml-auto flex items-center">
+          {!isLoggedIn && <Button
+            mode="ghost"
+            size="md"
+            className="hidden sm:inline-flex mr-2 md:mr-4"
+            onClick={() => {
+              window.location.href = 'https://employer.smartrecruit.tech';
+            }}
+          >
+            For Employers
+          </Button>}
+
           {!isLoggedIn ? (
-            <>
+            <div className="flex items-center gap-2">
               <Button
                 mode="secondary"
                 size="md"
-                className=" md:inline-flex"
-                onClick={() => navigate("/login")}
+                className="hidden sm:inline-flex"
+                onClick={() => navigate('/register')}
               >
-                Login
+                Sign up
               </Button>
               <Button
                 mode="primary"
                 size="md"
                 glow
-                onClick={() => navigate("/register")}
+                onClick={() => navigate('/login')}
               >
-                Sign up
+                Sign in
               </Button>
-            </>
+            </div>
           ) : (
-            <UserMenuDropdown />
+            <div className="flex items-center gap-4">
+              <button
+                className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+                onClick={() => navigate('/dashboard/invitations')}
+              >
+                <span className="material-icons-round text-gray-600 dark:text-gray-300 text-2xl">notifications</span>
+                <span className="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-white dark:border-gray-900"></span>
+              </button>
+              <UserMenuDropdown />
+            </div>
           )}
         </div>
-
-                <div className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1">
-                    <ul className="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-transparent dark:bg-gray-800 md:dark:bg-transparent dark:border-gray-700">
-                        <li>
-                            <NavLink
-                                to="/"
-                                className={({ isActive }) =>
-                                    `block py-2 px-3 rounded md:p-0 transition-colors ${isActive
-                                        ? 'text-white bg-primary md:bg-transparent md:text-primary'
-                                        : 'text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-primary dark:text-white dark:hover:text-primary dark:hover:bg-gray-700 md:dark:hover:bg-transparent'
-                                    }`
-                                }
-                            >
-                                Home
-                            </NavLink>
-                        </li>
-                        <li>
-                            <NavLink
-                                to="/jobs"
-                                className={({ isActive }) =>
-                                    `block py-2 px-3 rounded md:p-0 transition-colors ${isActive
-                                        ? 'text-white bg-primary md:bg-transparent md:text-primary'
-                                        : 'text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-primary dark:text-white dark:hover:text-primary dark:hover:bg-gray-700 md:dark:hover:bg-transparent'
-                                    }`
-                                }
-                            >
-                                For Jobs
-                            </NavLink>
-                        </li>
-                        <li>
-                            <NavLink
-                                to="/companies"
-                                className={({ isActive }) =>
-                                    `block py-2 px-3 rounded md:p-0 transition-colors ${isActive
-                                        ? 'text-white bg-primary md:bg-transparent md:text-primary'
-                                        : 'text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-primary dark:text-white dark:hover:text-primary dark:hover:bg-gray-700 md:dark:hover:bg-transparent'
-                                    }`
-                                }
-                            >
-                                For Companies
-                            </NavLink>
-                        </li>
-                        <li>
-                            <NavLink
-                                to="/pricing"
-                                className={({ isActive }) =>
-                                    `block py-2 px-3 rounded md:p-0 transition-colors ${isActive
-                                        ? 'text-white bg-primary md:bg-transparent md:text-primary'
-                                        : 'text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-primary dark:text-white dark:hover:text-primary dark:hover:bg-gray-700 md:dark:hover:bg-transparent'
-                                    }`
-                                }
-                            >
-                                Pricing
-                            </NavLink>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    );
+      </div>
+    </nav>
+  );
 };
 
 export default Navbar;
