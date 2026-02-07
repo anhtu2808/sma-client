@@ -10,9 +10,9 @@ const stripNullish = (obj) => {
 };
 
 const rawBaseQuery = fetchBaseQuery({
-    baseUrl: process.env.REACT_APP_API_URL,
+    baseUrl: "https://api.smartrecruit.tech",
     prepareHeaders: (headers) => {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("accessToken");
         if (token) {
             headers.set('Authorization', `Bearer ${token}`);
         }
@@ -23,30 +23,43 @@ const rawBaseQuery = fetchBaseQuery({
         try {
             return JSON.parse(text);
         } catch (e) {
-            return text; 
+            return text;
         }
     },
 });
 
 const customBaseQuery = (args, api, extra) => {
-    if (typeof args === "object") {
-        const { params, body, ...rest } = args;
-        return rawBaseQuery(
-            {
-                ...rest,
-                params: stripNullish(params),
-                body
-            },
-            api,
-            extra
-        );
+    const normalizedArgs =
+        typeof args === "object"
+            ? {
+                ...args,
+                params: stripNullish(args.params),
+            }
+            : args;
+
+    const result = rawBaseQuery(normalizedArgs, api, extra);
+
+    if (result && typeof result.then === "function") {
+        return result.then((response) => {
+            if (response?.error?.status === 401) {
+                localStorage.removeItem("accessToken");
+                localStorage.removeItem("refreshToken");
+            }
+            return response;
+        });
     }
-    return rawBaseQuery(args, api, extra);
+
+    if (result?.error?.status === 401) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+    }
+
+    return result;
 };
 
 export const api = createApi({
     reducerPath: "api",
     baseQuery: customBaseQuery,
-    tagTypes: ["Users", "Jobs", "Applications", "Companies"],
+    tagTypes: ["Users", "Jobs", "Applications", "Companies", "Resumes"],
     endpoints: () => ({})
 });

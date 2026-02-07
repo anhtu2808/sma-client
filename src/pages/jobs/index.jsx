@@ -5,7 +5,8 @@ import { useGetJobsQuery } from '@/apis/jobApi';
 import JobHero from './sections/JobHero';
 import JobFilterSidebar from './sections/JobFilterSidebar';
 import JobList from './sections/JobList';
-import { MOCK_JOBS } from '@/mocks/jobData';
+
+
 
 const Jobs = () => {
     const [filters, setFilters] = useState({
@@ -17,15 +18,26 @@ const Jobs = () => {
     });
 
     // API Call
-    const { data: jobData, isLoading, isError } = useGetJobsQuery({
+    // Filter out empty params
+    const queryParams = {
         page: 0,
         size: 10,
-        name: filters.name,
-        location: filters.location,
-        jobLevel: filters.jobLevel, // Updated param key
-        salary: filters.salaryStart,
-        skillId: filters.skillId
-    });
+        ...(filters.name && { name: filters.name }),
+        ...(filters.location && { location: filters.location }),
+        ...(filters.jobLevel && { jobLevel: filters.jobLevel }),
+        ...(filters.salaryStart && { salary: filters.salaryStart }),
+        ...(filters.skillId?.length && { skillId: filters.skillId }),
+    };
+
+    // API Call
+    const { data: jobData, isLoading, isError } = useGetJobsQuery(queryParams);
+
+    // Debug log
+    React.useEffect(() => {
+        console.log("Filters:", filters);
+        console.log("Query Params:", queryParams);
+        console.log("API Response JobData:", jobData);
+    }, [filters, queryParams, jobData]);
 
     // Handlers
     const handleFilterChange = (key, value) => {
@@ -41,22 +53,26 @@ const Jobs = () => {
 
     // Data Transformation (Mapping API response to UI props)
     const formattedJobs = useMemo(() => {
-        // if (!jobData?.content) return []; 
-        // return jobData.content.map(job => ({
-        const dataToMap = (jobData?.content && jobData.content.length > 0) ? jobData.content : MOCK_JOBS;
+        const dataToMap = jobData?.data?.content || jobData?.content || [];
 
-        return dataToMap.map(job => ({
-            id: job.id,
-            title: job.name,
-            company: job.companyName || "Unknown Company",
-            companyLogo: job.companyLogo,
-            location: job.location || "Remote",
-            salary: job.salaryMin && job.salaryMax ? `$${job.salaryMin} - $${job.salaryMax}` : "Negotiable",
-            tags: job.skills ? job.skills.map(s => s.name) : [],
-            postedTime: new Date(job.createdDate).toLocaleDateString(),
-            isHot: job.isHot,
-            variant: 'primary'
-        }));
+        return dataToMap.map(job => {
+            const salary = job.salaryStart && job.salaryEnd
+                ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} ${job.currency || 'VND'}`
+                : "Negotiable";
+
+            return {
+                id: job.id,
+                title: job.name,
+                company: job.company?.name || "Unknown Company",
+                companyLogo: job.company?.logo,
+                location: job.location || job.workingModel || job.company?.country || "Remote",
+                salary,
+                tags: job.skills ? job.skills.map(s => s.name) : [],
+                postedTime: job.uploadTime ? new Date(job.uploadTime).toLocaleDateString() : "Recently",
+                isHot: job.jobLevel === "SENIOR" || job.hot, // Map isHot if available, or infer
+                variant: 'primary'
+            };
+        });
     }, [jobData]);
 
     return (

@@ -32,8 +32,8 @@ const HeroSection = () => {
                 </p>
 
                 {/* Search Box */}
-                <div className="bg-white dark:bg-surface-dark p-2 rounded-full shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-gray-700 max-w-3xl mx-auto flex flex-col sm:flex-row gap-2 mb-10 transform transition hover:-translate-y-1 duration-300">
-                    <div className="flex-1 flex items-center px-4  border-b sm:border-b-0 sm:border-r border-gray-100 dark:border-gray-700">
+                <div className="bg-white dark:bg-surface-dark p-3 sm:p-2 rounded-2xl sm:rounded-full shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-gray-700 max-w-3xl mx-auto flex flex-col sm:flex-row gap-3 sm:gap-2 mb-10 transform transition hover:-translate-y-1 duration-300">
+                    <div className="flex-1 h-12 flex items-center px-4 border-b sm:border-b-0 sm:border-r border-gray-100 dark:border-gray-700">
                         <span className="material-icons-round text-gray-400 mr-2">search</span>
                         <input
                             className="w-full bg-transparent border-none focus:ring-0 text-gray-800 dark:text-white placeholder-gray-400 text-sm outline-none"
@@ -41,7 +41,7 @@ const HeroSection = () => {
                             type="text"
                         />
                     </div>
-                    <div className="flex-1 flex items-center px-4 ">
+                    <div className="flex-1 h-12 flex items-center px-4">
                         <span className="material-icons-round text-gray-400 mr-2">location_on</span>
                         <input
                             className="w-full bg-transparent border-none focus:ring-0 text-gray-800 dark:text-white placeholder-gray-400 text-sm outline-none"
@@ -52,7 +52,7 @@ const HeroSection = () => {
                     <Button
                         mode="primary"
                         size="md"
-                        className="h-full"
+                        className="h-12 px-8 shrink-0 w-full sm:w-auto rounded-xl sm:rounded-full"
                         glow={true}
 
                     >

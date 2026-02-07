@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { MOCK_JOBS } from '@/mocks/jobData';
+import { useGetJobByIdQuery } from '@/apis/jobApi';
 import Button from '@/components/Button';
 import JobCard from '@/components/JobCard';
 
@@ -8,16 +8,73 @@ const JobDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    // In a real app, this would be an API call
+    const { data: jobData, isLoading, isError } = useGetJobByIdQuery(id);
+
     const job = useMemo(() => {
-        return MOCK_JOBS.find(j => j.id === id) || MOCK_JOBS[0]; // Fallback to first job if not found
-    }, [id]);
+        if (!jobData?.data) return null;
+        const apiJob = jobData.data;
 
-    const similarJobs = useMemo(() => {
-        return MOCK_JOBS.filter(j => j.id !== job.id).slice(0, 3);
-    }, [job.id]);
+        // Helper to parse list items (bullet points) from string or return array
+        const parseList = (content) => {
+            if (Array.isArray(content)) return content;
+            if (typeof content === 'string') {
+                // Split by newline or just return as single item array if no newlines
+                return content.split('\n').filter(item => item.trim().length > 0);
+            }
+            return [];
+        };
 
-    if (!job) return <div>Job not found</div>;
+        return {
+            id: apiJob.id,
+            name: apiJob.name,
+            companyName: apiJob.company?.name || "Unknown Company",
+            companyLogo: apiJob.company?.logo,
+            location: apiJob.location || apiJob.workingModel || apiJob.company?.country || "Remote",
+            salaryMin: apiJob.salaryStart,
+            salaryMax: apiJob.salaryEnd,
+            salaryFormatted: apiJob.salaryStart && apiJob.salaryEnd
+                ? `${new Intl.NumberFormat('vi-VN').format(apiJob.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(apiJob.salaryEnd)} ${apiJob.currency || 'VND'}`
+                : "Negotiable",
+            overview: {
+                experience: apiJob.experienceTime ? `${apiJob.experienceTime} years` : "Not specified",
+                level: apiJob.jobLevel,
+                salary: apiJob.salaryStart && apiJob.salaryEnd
+                    ? `${new Intl.NumberFormat('vi-VN').format(apiJob.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(apiJob.salaryEnd)} ${apiJob.currency || 'VND'}`
+                    : "Negotiable",
+                posted: apiJob.uploadTime ? new Date(apiJob.uploadTime).toLocaleDateString() : "Recently",
+                type: apiJob.workingModel,
+                deadline: apiJob.expDate ? `Closes on ${new Date(apiJob.expDate).toLocaleDateString()}` : null
+            },
+            skills: apiJob.skills || [],
+            description: apiJob.about || "No description available.",
+            responsibilities: parseList(apiJob.responsibilities),
+            requirements: parseList(apiJob.requirement), // Note: API property seems to be 'requirement' (singular based on user prompt)
+            benefits: apiJob.benefits?.map(b => ({
+                text: b.name,
+                icon: 'check_circle' // Default icon
+            })) || [],
+            companyInfo: {
+                description: apiJob.company?.description // Assuming company might have description later
+            }
+        };
+    }, [jobData]);
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen pt-24 flex justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+        );
+    }
+
+    if (isError || !job) {
+        return (
+            <div className="min-h-screen pt-24 text-center">
+                <h2 className="text-xl font-bold text-red-500">Job not found or failed to load.</h2>
+                <Button mode="secondary" onClick={() => navigate('/jobs')} className="mt-4">Back to Jobs</Button>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-[#1a100c] pt-24 pb-20">
@@ -27,11 +84,17 @@ const JobDetail = () => {
                 <header className="bg-white dark:bg-[#2c1a14] rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 dark:border-[#3d241b] mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                     <div className="flex gap-6 items-start">
                         <div className="size-20 md:size-24 rounded-2xl bg-white p-2 shadow-sm shrink-0 border border-slate-100 dark:border-[#3d241b]">
-                            <img
-                                src={job.companyLogo}
-                                alt={job.companyName}
-                                className="w-full h-full object-contain rounded-xl"
-                            />
+                            {job.companyLogo ? (
+                                <img
+                                    src={job.companyLogo}
+                                    alt={job.companyName}
+                                    className="w-full h-full object-contain rounded-xl"
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-slate-100 rounded-xl text-slate-400 font-bold text-3xl">
+                                    {job.companyName.charAt(0)}
+                                </div>
+                            )}
                         </div>
                         <div>
                             <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-2">
@@ -47,7 +110,7 @@ const JobDetail = () => {
                                     {job.overview?.type || 'Full-time'}
                                 </span>
                                 <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold">
-                                    {job.overview?.salary || `$${job.salaryMin} - $${job.salaryMax}`}
+                                    {job.salaryFormatted}
                                 </span>
                                 {job.skills.map((skill, idx) => (
                                     <span key={idx} className="px-3 py-1 rounded-full bg-slate-100 dark:bg-[#3d241b] text-slate-600 dark:text-[#e0c4b7] text-sm font-medium">
@@ -94,39 +157,43 @@ const JobDetail = () => {
                         {/* Job Description */}
                         <section>
                             <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Job Description</h2>
-                            <p className="text-slate-600 dark:text-[#e0c4b7] leading-relaxed mb-6">
+                            <p className="text-slate-600 dark:text-[#e0c4b7] leading-relaxed mb-6 whitespace-pre-line">
                                 {job.description}
                             </p>
                         </section>
 
                         {/* Responsibilities */}
-                        <section>
-                            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Responsibilities</h2>
-                            <ul className="space-y-3">
-                                {job.responsibilities?.map((item, idx) => (
-                                    <li key={idx} className="flex items-start gap-3 text-slate-600 dark:text-[#e0c4b7]">
-                                        <span className="mt-1.5 size-1.5 rounded-full bg-orange-500 shrink-0"></span>
-                                        <span className="leading-relaxed">{item}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </section>
+                        {job.responsibilities && job.responsibilities.length > 0 && (
+                            <section>
+                                <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Responsibilities</h2>
+                                <ul className="space-y-3">
+                                    {job.responsibilities.map((item, idx) => (
+                                        <li key={idx} className="flex items-start gap-3 text-slate-600 dark:text-[#e0c4b7]">
+                                            <span className="mt-1.5 size-1.5 rounded-full bg-orange-500 shrink-0"></span>
+                                            <span className="leading-relaxed">{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </section>
+                        )}
 
                         {/* Requirements */}
-                        <section>
-                            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Requirements</h2>
-                            <ul className="space-y-3">
-                                {job.requirements?.map((item, idx) => (
-                                    <li key={idx} className="flex items-start gap-3 text-slate-600 dark:text-[#e0c4b7]">
-                                        <span className="mt-1.5 size-1.5 rounded-full bg-orange-500 shrink-0"></span>
-                                        <span className="leading-relaxed">{item}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </section>
+                        {job.requirements && job.requirements.length > 0 && (
+                            <section>
+                                <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Requirements</h2>
+                                <ul className="space-y-3">
+                                    {job.requirements.map((item, idx) => (
+                                        <li key={idx} className="flex items-start gap-3 text-slate-600 dark:text-[#e0c4b7]">
+                                            <span className="mt-1.5 size-1.5 rounded-full bg-orange-500 shrink-0"></span>
+                                            <span className="leading-relaxed">{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </section>
+                        )}
 
                         {/* Perks & Benefits */}
-                        {job.benefits && (
+                        {job.benefits && job.benefits.length > 0 && (
                             <section className="bg-white dark:bg-[#2c1a14] rounded-3xl p-8 shadow-sm border border-slate-100 dark:border-[#3d241b]">
                                 <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Perks & Benefits</h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -155,7 +222,7 @@ const JobDetail = () => {
                                 <div>
                                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">SALARY</span>
                                     <div className="text-xl font-bold text-slate-900 dark:text-white">
-                                        {job.overview?.salary || `$${job.salaryMin} - $${job.salaryMax}`}
+                                        {job.salaryFormatted}
                                     </div>
                                 </div>
                                 <div className="text-right">
@@ -180,7 +247,7 @@ const JobDetail = () => {
 
                             <div className="flex items-center justify-center gap-2 text-xs font-medium text-slate-500">
                                 <span className="material-icons-round text-sm">schedule</span>
-                                {job.overview?.applicationDeadline || "Application closes in 5 days"}
+                                {job.overview?.deadline || "Application closes soon"}
                             </div>
                         </div>
 
@@ -188,7 +255,13 @@ const JobDetail = () => {
                         <div className="bg-white dark:bg-[#2c1a14] rounded-3xl p-6 shadow-sm border border-slate-100 dark:border-[#3d241b]">
                             <div className="flex items-center gap-4 mb-4">
                                 <div className="size-12 rounded-xl bg-slate-100 dark:bg-[#3d241b] p-1">
-                                    <img src={job.companyLogo} alt={job.companyName} className="w-full h-full object-contain rounded-lg" />
+                                    {job.companyLogo ? (
+                                        <img src={job.companyLogo} alt={job.companyName} className="w-full h-full object-contain rounded-lg" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-slate-400 font-bold">
+                                            {job.companyName.charAt(0)}
+                                        </div>
+                                    )}
                                 </div>
                                 <div>
                                     <h4 className="font-bold text-slate-900 dark:text-white">{job.companyName}</h4>
@@ -196,35 +269,18 @@ const JobDetail = () => {
                                 </div>
                             </div>
                             <p className="text-sm text-slate-600 dark:text-[#e0c4b7] leading-relaxed mb-6">
-                                {job.companyInfo?.description || `${job.companyName} is a great place to work.`}
+                                {job.companyInfo?.description || `${job.companyName} is a great place to work. Check out their profile for more information.`}
                             </p>
                             <Button mode="secondary" shape="pill" className="!w-full !bg-slate-100 dark:!bg-[#3d241b] !border-none">
                                 View Company Profile
                             </Button>
                         </div>
 
-                        {/* 3. Similar Jobs */}
-                        <div className="bg-white dark:bg-[#2c1a14] rounded-3xl p-6 shadow-sm border border-slate-100 dark:border-[#3d241b]">
+                        {/* 3. Similar Jobs - REMOVED/HIDDEN AS PER CORTEX PLAN */}
+                        {/* <div className="bg-white dark:bg-[#2c1a14] rounded-3xl p-6 shadow-sm border border-slate-100 dark:border-[#3d241b]">
                             <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Similar Jobs</h3>
-                            <div className="flex flex-col gap-4">
-                                {similarJobs.map(similarJob => (
-                                    <div key={similarJob.id} className="group p-4 rounded-2xl bg-slate-50 dark:bg-[#1a100c] hover:bg-orange-50 dark:hover:bg-[#3d241b] transition-colors cursor-pointer" onClick={() => navigate(`/jobs/${similarJob.id}`)}>
-                                        <h4 className="font-bold text-slate-900 dark:text-white mb-1 group-hover:text-orange-500 transition-colors">
-                                            {similarJob.name}
-                                        </h4>
-                                        <p className="text-xs text-slate-500 dark:text-[#ce9e8d] mb-2">
-                                            {similarJob.companyName} • {similarJob.location}
-                                        </p>
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-xs font-bold text-green-600">
-                                                {similarJob.overview?.salary || `$${similarJob.salaryMin} - $${similarJob.salaryMax}`}
-                                            </span>
-                                            <span className="text-[10px] text-slate-400">{similarJob.overview?.posted || "Recently"}</span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                             ...
+                        </div> */}
 
                     </div>
                 </div>
