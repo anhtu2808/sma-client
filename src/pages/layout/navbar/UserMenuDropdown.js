@@ -6,7 +6,7 @@ import authService from '@/services/authService';
 
 const UserMenuDropdown = () => {
   const navigate = useNavigate();
-  const { data: meResponse, isFetching } = useCandidateProfileQuery();
+  const { data: meResponse } = useCandidateProfileQuery();
 
   const user = useMemo(() => meResponse?.data?.user ?? null, [meResponse]);
   const displayName = user?.fullName || user?.email || 'Candidate';
@@ -24,18 +24,50 @@ const UserMenuDropdown = () => {
     }
   };
 
-  const handleNavigateProfile = () => {
-    navigate('/');
-  };
-
   const avatarInitial = (displayName?.[0] || 'U').toUpperCase();
 
   const userMenuItems = [
     {
+      key: 'overview',
+      label: 'Overview',
+      icon: <span className="material-icons-round text-lg">grid_view</span>,
+      onClick: () => navigate('/dashboard'),
+    },
+    {
+      key: 'resumes',
+      label: 'Resumes',
+      icon: <span className="material-icons-round text-lg">description</span>,
+      onClick: () => navigate('/dashboard/resumes'),
+    },
+    {
       key: 'profile',
-      label: 'Manage Profile',
-      icon: <span className="material-icons-round text-lg">person_outline</span>,
-      onClick: handleNavigateProfile,
+      label: 'Profile',
+      icon: <span className="material-icons-round text-lg">person</span>,
+      onClick: () => navigate('/dashboard/profile'),
+    },
+    {
+      key: 'job',
+      label: 'Job',
+      icon: <span className="material-icons-round text-lg">work_history</span>,
+      onClick: () => navigate('/dashboard/jobs'),
+    },
+    {
+      key: 'invitation',
+      label: 'Job Invitation',
+      icon: <span className="material-icons-round text-lg">mail</span>,
+      onClick: () => navigate('/dashboard/notification'),
+    },
+    {
+      key: 'notifications',
+      label: 'Notifications',
+      icon: <span className="material-icons-round text-lg">notifications</span>,
+      onClick: () => navigate('/dashboard/notification'),
+    },
+    {
+      key: 'settings',
+      label: 'Settings',
+      icon: <span className="material-icons-round text-lg">settings</span>,
+      onClick: () => navigate('/dashboard/setting'),
     },
     {
       type: 'divider',
@@ -50,19 +82,11 @@ const UserMenuDropdown = () => {
   ];
 
   return (
-    <Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">
+    <Dropdown menu={{ items: userMenuItems }} trigger={['hover']} placement="bottomRight">
       <button
         type="button"
-        className="flex items-center gap-3 text-sm rounded-full transition-all px-2 py-1 cursor-pointer bg-transparent border-none outline-none ring-0 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
+        className="flex items-center gap-2 text-sm rounded-full transition-all px-1 py-1 cursor-pointer bg-transparent border-none outline-none ring-0 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
       >
-        <div className="hidden md:flex flex-col items-end">
-          <span className="font-medium text-gray-900 dark:text-white">
-            {isFetching ? 'Loading...' : displayName}
-          </span>
-          <span className="text-xs text-gray-500 dark:text-gray-400">
-            Candidate
-          </span>
-        </div>
         <Avatar
           size={36}
           src={avatar || undefined}
@@ -70,7 +94,7 @@ const UserMenuDropdown = () => {
         >
           {!avatar ? avatarInitial : null}
         </Avatar>
-        <span className="material-icons-round text-gray-500 text-lg hidden md:block">expand_more</span>
+        <span className="material-icons-round text-gray-500 text-lg">expand_more</span>
       </button>
     </Dropdown>
   );
