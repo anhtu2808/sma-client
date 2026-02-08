@@ -76,7 +76,7 @@ const Jobs = () => {
     }, [jobData]);
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#1a100c] pt-20">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#1a100c]">
             {/* 1. Hero Search Section */}
             <JobHero
                 searchValue={filters.name}

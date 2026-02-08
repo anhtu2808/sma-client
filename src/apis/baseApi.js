@@ -3,6 +3,7 @@ import omitBy from "lodash/omitBy";
 import isNil from "lodash/isNil";
 
 export const API_VERSION = "/v1";
+export const BASE_URL = process.env.REACT_APP_API_URL || "https://api.smartrecruit.tech";
 
 const stripNullish = (obj) => {
     if (!obj || typeof obj !== "object") return obj;
@@ -10,7 +11,7 @@ const stripNullish = (obj) => {
 };
 
 const rawBaseQuery = fetchBaseQuery({
-    baseUrl: "https://api.smartrecruit.tech",
+    baseUrl: BASE_URL,
     prepareHeaders: (headers) => {
         const token = localStorage.getItem("accessToken");
         if (token) {

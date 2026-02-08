@@ -43,7 +43,7 @@ const Resumes = () => {
   );
 
   return (
-    <div className="max-w-6xl mx-auto px-3 md:px-0">
+    <div>
       <Row gutter={[24, 24]}>
         <Col span={24}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
