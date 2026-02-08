@@ -7,7 +7,7 @@ const Layout = () => {
     return (
         <div className="bg-background-light dark:bg-background-dark text-gray-900 dark:text-gray-100 font-sans antialiased selection:bg-primary selection:text-white transition-colors duration-300 min-h-screen flex flex-col">
             <Navbar />
-            <main className="flex-1">
+            <main className="flex-1 pt-16">
                 <Outlet />
             </main>
             <Footer />

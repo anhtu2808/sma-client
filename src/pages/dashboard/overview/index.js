@@ -32,7 +32,7 @@ const DashboardOverview = () => {
   const avatarLetter = displayName.charAt(0).toUpperCase();
 
   return (
-    <Row gutter={[24, 24]} className="max-w-6xl mx-auto px-3 md:px-0">
+    <Row gutter={[24, 24]}>
       <Col span={24}>
         <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
         <Row gutter={[24, 24]} align="middle">
@@ -67,12 +67,10 @@ const DashboardOverview = () => {
       </Col>
 
       <Col span={24}>
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Activity Summary</h3>
         <Row gutter={[24, 24]}>
-          <Col span={24}>
-            <h3 className="text-lg font-bold text-gray-900">Activity Summary</h3>
-          </Col>
           {summaryCards.map((card) => (
-            <Col xs={24} md={12} key={card.title}>
+            <Col xs={24} lg={12} key={card.title}>
               <div
                 className={`bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between h-full relative overflow-hidden group transition-all ${card.hover}`}
               >

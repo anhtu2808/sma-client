@@ -9,7 +9,15 @@ export const candidateApi = api.injectEndpoints({
             }),
             providesTags: ["Users"],
         }),
+        candidateDashboardProfile: builder.query({
+            query: () => ({
+                url: `${API_VERSION}/candidate/profile`,
+                method: "GET",
+            }),
+            transformResponse: (response) => response?.data ?? null,
+            providesTags: ["Users"],
+        }),
     }),
 });
 
-export const { useCandidateProfileQuery } = candidateApi;
+export const { useCandidateProfileQuery, useCandidateDashboardProfileQuery } = candidateApi;
