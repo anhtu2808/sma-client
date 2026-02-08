@@ -2,11 +2,9 @@ import React, { useState, useMemo } from 'react';
 import { useGetJobsQuery } from '@/apis/jobApi';
 
 // Import các components con
-import JobHero from './sections/JobHero';
+import SearchHero from '@/components/SearchHero';
 import JobFilterSidebar from './sections/JobFilterSidebar';
 import JobList from './sections/JobList';
-
-
 
 const Jobs = () => {
     const [filters, setFilters] = useState({
@@ -78,7 +76,9 @@ const Jobs = () => {
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-[#1a100c]">
             {/* 1. Hero Search Section */}
-            <JobHero
+            <SearchHero
+                title="Find Your Dream Job"
+                subtitle="Browse thousands of job openings from top companies and startups."
                 searchValue={filters.name}
                 onSearchChange={(val) => handleFilterChange('name', val)}
             />
