@@ -64,10 +64,11 @@ const CompanyCard = ({
             {/* Footer: Action */}
             <div className="mt-auto">
                 <Button
-                    mode="secondary"
+                    mode="primary"
                     fullWidth
                     onClick={onViewDetails}
                     className="!py-2.5 !text-sm !font-bold border-slate-200 dark:border-[#4b2c20] text-primary hover:text-white hover:bg-primary hover:border-primary dark:hover:border-primary transition-all"
+                    iconRight={<span className="material-icons-round text-[20px]">arrow_forward</span>}
                 >
                     View Company
                 </Button>

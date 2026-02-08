@@ -14,6 +14,7 @@ import Notification from '@/pages/dashboard/notification';
 import Resumes from '@/pages/dashboard/resumes';
 import Profile from '@/pages/dashboard/profile';
 import CompanyList from '@/pages/company/CompanyList';
+import CompanyDetail from '@/pages/company-detail';
 
 export const routes = createBrowserRouter(
     createRoutesFromElements(
@@ -27,7 +28,10 @@ export const routes = createBrowserRouter(
                 <Route path="ui-kit" element={<UiKit />} />
                 <Route path="jobs" element={<Jobs />} />
                 <Route path="jobs/:id" element={<JobDetail />} />
-                <Route path="companies" element={<CompanyList />} />
+                <Route path="companies">
+                    <Route index element={<CompanyList />} />
+                    <Route path=":id" element={<CompanyDetail />} />
+                </Route>
             </Route>
             <Route path="dashboard" element={<DashboardLayout />}>
                 <Route index element={<DashboardOverview />} />

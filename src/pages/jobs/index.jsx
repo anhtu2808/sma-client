@@ -3,8 +3,8 @@ import { useGetJobsQuery } from '@/apis/jobApi';
 
 // Import các components con
 import SearchHero from '@/components/SearchHero';
-import JobFilterSidebar from './sections/JobFilterSidebar';
-import JobList from './sections/JobList';
+import JobFilterSidebar from './components/JobFilterSidebar';
+import JobList from './components/JobList';
 
 const Jobs = () => {
     const [filters, setFilters] = useState({

@@ -4,8 +4,10 @@ import Pagination from '@/components/Pagination';
 import SearchHero from '@/components/SearchHero';
 import DataList from '@/components/DataList';
 import { useGetCompaniesQuery } from '@/apis/companyApi';
+import { useNavigate } from 'react-router-dom';
 
 const CompanyList = () => {
+    const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     const ITEMS_PER_PAGE = 8;
@@ -67,7 +69,7 @@ const CompanyList = () => {
                                 location={company.country || "Unknown Location"}
                                 followers={company.followerNumber || 0}
                                 isApproved={company.companyStatus === "APPROVED"}
-                                onViewDetails={() => console.log('View', company.id)}
+                                onViewDetails={() => navigate(`/companies/${company.id}`)}
                             />
                         ))}
                     </div>
