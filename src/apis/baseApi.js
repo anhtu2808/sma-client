@@ -10,7 +10,7 @@ const stripNullish = (obj) => {
 };
 
 const rawBaseQuery = fetchBaseQuery({
-    baseUrl: process.env.REACT_APP_API_URL,
+    baseUrl: "https://api.smartrecruit.tech",
     prepareHeaders: (headers) => {
         const token = localStorage.getItem("accessToken");
         if (token) {
@@ -23,7 +23,7 @@ const rawBaseQuery = fetchBaseQuery({
         try {
             return JSON.parse(text);
         } catch (e) {
-            return text; 
+            return text;
         }
     },
 });
@@ -32,9 +32,9 @@ const customBaseQuery = (args, api, extra) => {
     const normalizedArgs =
         typeof args === "object"
             ? {
-                  ...args,
-                  params: stripNullish(args.params),
-              }
+                ...args,
+                params: stripNullish(args.params),
+            }
             : args;
 
     const result = rawBaseQuery(normalizedArgs, api, extra);
