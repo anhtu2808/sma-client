@@ -10,10 +10,16 @@ export const companyApi = api.injectEndpoints({
             }),
             providesTags: ["Companies"]
         }),
+
+        getCompanyById: builder.query({
+            query: (id) => `${API_VERSION}/companies/${id}`,
+            providesTags: (result, error, id) => [{ type: "Companies", id }]
+        }),
     })
 });
 
 export const {
     useGetCompaniesQuery,
     useLazyGetCompaniesQuery,
+    useGetCompanyByIdQuery,
 } = companyApi;
