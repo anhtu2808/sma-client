@@ -7,12 +7,12 @@ const sidebarItems = [
     { to: "/dashboard/resumes", icon: <i className="fa-solid fa-file-lines"></i>, label: "Resumes" },
     { to: "/dashboard/jobs", icon: "work_history", label: "Job" },
     {
-        to: "/dashboard/notification",
+        to: "/dashboard/invitations",
         icon: "mail",
         label: "Job Invitation",
         badge: 3,
     },
-    { to: "/dashboard/notification", icon: "notifications", label: "Notifications" },
+    { to: "/dashboard/notifications", icon: "notifications", label: "Notifications" },
     { to: "/dashboard/setting", icon: "settings", label: "Settings" },
 ];
 

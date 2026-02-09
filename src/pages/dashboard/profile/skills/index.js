@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from "react";
-import { message } from "antd";
+import { Popconfirm, message } from "antd";
 import { useCandidateDashboardProfileQuery } from "@/apis/candidateApi";
 import {
   useCreateResumeSkillMutation,
+  useDeleteResumeSkillMutation,
   useUpdateResumeSkillMutation,
 } from "@/apis/resumeApi";
 import SkillFormModal from "@/pages/dashboard/profile/skills/SkillFormModal";
@@ -11,81 +12,147 @@ import { formatYearsOfExperience } from "@/utils/profileUtils";
 const Skills = () => {
   const { data: profile } = useCandidateDashboardProfileQuery();
   const profileResumeId = profile?.profileResumeId;
-  const skills = useMemo(() => profile?.skills ?? [], [profile?.skills]);
+  const skillGroups = useMemo(
+    () => (profile?.skillGroups ?? []).filter((group) => (group?.skills ?? []).length > 0),
+    [profile?.skillGroups]
+  );
 
-  const [editingSkill, setEditingSkill] = useState(null);
+  const [editingGroup, setEditingGroup] = useState(null);
+  const [modalInitialValues, setModalInitialValues] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [createSkill, { isLoading: isCreating }] = useCreateResumeSkillMutation();
   const [updateSkill, { isLoading: isUpdating }] = useUpdateResumeSkillMutation();
-  const isSaving = isCreating || isUpdating;
-
-  const groupedSkills = useMemo(
-    () =>
-      skills.reduce((acc, skill) => {
-        const key = skill?.skillCategoryName || "Other";
-        if (!acc[key]) acc[key] = [];
-        acc[key].push(skill);
-        return acc;
-      }, {}),
-    [skills]
-  );
+  const [deleteSkill, { isLoading: isDeleting }] = useDeleteResumeSkillMutation();
+  const isSaving = isCreating || isUpdating || isDeleting;
 
   const openCreateModal = () => {
-    setEditingSkill(null);
+    setEditingGroup(null);
+    setModalInitialValues(null);
     setIsModalOpen(true);
   };
 
-  const openEditModal = (skill) => {
-    setEditingSkill(skill);
+  const openEditModal = (group) => {
+    setEditingGroup(group);
+    // Snapshot initial values so the modal won't "reset" while we patch profile cache during saves.
+    setModalInitialValues({
+      groupId: group?.id,
+      groupName: group?.name,
+      skills: [...(group?.skills ?? [])],
+    });
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     if (isSaving) return;
     setIsModalOpen(false);
-    setEditingSkill(null);
+    setEditingGroup(null);
+    setModalInitialValues(null);
   };
 
-  const handleSubmit = async ({ entries }) => {
+  const handleSubmit = async ({ groupName, entries }) => {
     if (!profileResumeId) {
       message.error("No PROFILE resume found.");
       return;
     }
 
     try {
-      if (editingSkill?.id) {
-        const target = entries?.[0];
-        if (!target) {
-          message.error("Please add one skill before saving.");
-          return;
+      if (editingGroup?.id) {
+        const currentSkills = editingGroup?.skills ?? [];
+        const currentBySkillId = new Map(currentSkills.map((item) => [item?.skillId, item]));
+        const nextBySkillId = new Map(entries.map((item) => [item?.skillId, item]));
+
+        const ops = [];
+
+        // Deletes (skills removed from group).
+        for (const existing of currentSkills) {
+          if (!existing?.skillId || !existing?.id) continue;
+          if (!nextBySkillId.has(existing.skillId)) {
+            ops.push(
+              deleteSkill({
+                resumeId: profileResumeId,
+                resumeSkillId: existing.id,
+              }).unwrap()
+            );
+          }
         }
 
-        await updateSkill({
-          resumeId: profileResumeId,
-          resumeSkillId: editingSkill.id,
-          payload: {
-            skillId: target.skillId,
-            yearsOfExperience: target.yearsOfExperience,
-          },
-        }).unwrap();
-        message.success("Skill updated successfully.");
-      } else {
-        for (const entry of entries) {
-          await createSkill({
-            resumeId: profileResumeId,
-            payload: {
-              skillId: entry.skillId,
-              yearsOfExperience: entry.yearsOfExperience,
-            },
-          }).unwrap();
+        // Updates + creates.
+        for (const next of entries) {
+          if (!next?.skillId) continue;
+          const existing = currentBySkillId.get(next.skillId);
+          if (existing?.id) {
+            ops.push(
+              updateSkill({
+                resumeId: profileResumeId,
+                resumeSkillId: existing.id,
+                payload: {
+                  skillId: next.skillId,
+                  yearsOfExperience: next.yearsOfExperience,
+                  groupName,
+                },
+              }).unwrap()
+            );
+          } else {
+            ops.push(
+              createSkill({
+                resumeId: profileResumeId,
+                payload: {
+                  skillId: next.skillId,
+                  yearsOfExperience: next.yearsOfExperience,
+                  groupName,
+                },
+              }).unwrap()
+            );
+          }
         }
-        message.success("Skills added successfully.");
+
+        await Promise.all(ops);
+        message.success("Skill group updated successfully.");
+      } else {
+        await Promise.all(
+          entries.map((entry) =>
+            createSkill({
+              resumeId: profileResumeId,
+              payload: {
+                skillId: entry.skillId,
+                yearsOfExperience: entry.yearsOfExperience,
+                groupName,
+              },
+            }).unwrap()
+          )
+        );
+        message.success("Skill group added successfully.");
       }
 
       closeModal();
     } catch (error) {
-      message.error(error?.data?.message || "Failed to save skill.");
+      message.error(error?.data?.message || "Failed to save skill group.");
+    }
+  };
+
+  const handleDeleteGroup = async (group) => {
+    if (!profileResumeId) {
+      message.error("No PROFILE resume found.");
+      return;
+    }
+    const skills = group?.skills ?? [];
+    if (skills.length === 0) return;
+
+    try {
+      await Promise.all(
+        skills
+          .filter((skill) => !!skill?.id)
+          .map((skill) =>
+            deleteSkill({
+              resumeId: profileResumeId,
+              resumeSkillId: skill.id,
+            }).unwrap()
+          )
+      );
+      message.success("Skill group deleted successfully.");
+    } catch (error) {
+      message.error(error?.data?.message || "Failed to delete skill group.");
     }
   };
 
@@ -106,12 +173,12 @@ const Skills = () => {
           <span className="material-icons-round text-[18px] border border-current rounded-full p-[1px]">
             add
           </span>
-          Add Skill
+          Add Group
         </button>
       </div>
 
       <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-        {Object.keys(groupedSkills).length === 0 ? (
+        {skillGroups.length === 0 ? (
           <div className="md:col-span-2 rounded-xl border border-dashed border-primary/40 bg-primary/[0.04] p-5">
             <p className="text-sm italic text-gray-500 dark:text-gray-400 mb-3">
               List skills that align with your target roles and domain expertise.
@@ -124,27 +191,53 @@ const Skills = () => {
               <span className="material-icons-round text-[18px] border border-current rounded-full p-[1px]">
                 add
               </span>
-              Add Skill
+              Add Group
             </button>
           </div>
         ) : (
-          Object.entries(groupedSkills).map(([categoryName, categorySkills]) => (
-            <div key={categoryName}>
-              <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-blue-500" /> {categoryName}
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {categorySkills.map((skill) => (
+          skillGroups.map((group) => (
+            <div key={group?.id || group?.name}>
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-blue-500" /> {group?.name || "Ungrouped"}
+                </h3>
+                <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    key={skill?.id}
-                    onClick={() => openEditModal(skill)}
-                    className="px-3 py-1.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full text-sm flex items-center gap-2 hover:border-primary/40 transition-colors"
+                    onClick={() => openEditModal(group)}
+                    className="text-gray-400 hover:text-primary transition-colors"
+                    title="Edit group"
                   >
-                    <span className="font-semibold">{skill?.skillName || "Unknown Skill"}</span>
-                    <span className="text-gray-500">({formatYearsOfExperience(skill?.yearsOfExperience)})</span>
-                    <span className="material-icons-round text-[14px] text-gray-400">edit</span>
+                    <span className="material-icons-round text-[18px]">edit</span>
                   </button>
+                  <Popconfirm
+                    title="Delete this group?"
+                    description="This will remove all skills inside the group."
+                    okText="Delete"
+                    okButtonProps={{ danger: true }}
+                    onConfirm={() => handleDeleteGroup(group)}
+                  >
+                    <button
+                      type="button"
+                      className="text-gray-400 hover:text-red-500 transition-colors"
+                      title="Delete group"
+                    >
+                      <span className="material-icons-round text-[18px]">delete</span>
+                    </button>
+                  </Popconfirm>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {(group?.skills ?? []).map((skill) => (
+                  <span
+                    key={skill?.id}
+                    className="px-3 py-1.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full text-sm flex items-baseline gap-2"
+                  >
+                    <span className="font-semibold leading-none">{skill?.skillName || "Unknown Skill"}</span>
+                    {skill?.yearsOfExperience != null ? (
+                      <span className="text-gray-500 leading-none">({formatYearsOfExperience(skill.yearsOfExperience)})</span>
+                    ) : null}
+                  </span>
                 ))}
               </div>
             </div>
@@ -154,16 +247,9 @@ const Skills = () => {
 
       <SkillFormModal
         open={isModalOpen}
-        isEdit={!!editingSkill}
+        mode={editingGroup?.id ? "edit" : "create"}
         initialValues={
-          editingSkill
-            ? {
-                id: editingSkill?.id,
-                skillId: editingSkill?.skillId,
-                skillName: editingSkill?.skillName,
-                yearsOfExperience: editingSkill?.yearsOfExperience,
-              }
-            : null
+          modalInitialValues
         }
         loading={isSaving}
         onCancel={closeModal}

@@ -1,11 +1,14 @@
-import React from "react";
-import { Col, Row } from "antd";
+import React, { useMemo, useState } from "react";
+import { Col, Row, message } from "antd";
 import Button from "@/components/Button";
-import { useCandidateDashboardProfileQuery } from "@/apis/candidateApi";
+import { useCandidateDashboardProfileQuery, useUpdateCandidateDashboardProfileMutation } from "@/apis/candidateApi";
 import { getValidLink, getHostLabel } from "@/utils/profileUtils";
+import EditProfileModal from "@/pages/dashboard/profile/profile-header/EditProfileModal";
 
 const ProfileHeader = () => {
   const { data: profile } = useCandidateDashboardProfileQuery();
+  const [updateProfile, { isLoading: isSaving }] = useUpdateCandidateDashboardProfileMutation();
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   const displayName = profile?.fullName || profile?.email || "Candidate";
   const avatarLetter = displayName.charAt(0).toUpperCase();
@@ -13,9 +16,38 @@ const ProfileHeader = () => {
     ? `${profile.jobTitle} profile synced from your PROFILE resume.`
     : "Profile information synced from your PROFILE resume.";
 
+  const modalInitialValues = useMemo(
+    () => ({
+      fullName: profile?.fullName ?? "",
+      jobTitle: profile?.jobTitle ?? "",
+      address: profile?.address ?? "",
+      githubUrl: profile?.githubUrl ?? "",
+      linkedinUrl: profile?.linkedinUrl ?? "",
+      websiteUrl: profile?.websiteUrl ?? "",
+      avatar: profile?.avatar ?? "",
+    }),
+    [profile]
+  );
+
+  const openEdit = () => setIsEditOpen(true);
+  const closeEdit = () => {
+    if (isSaving) return;
+    setIsEditOpen(false);
+  };
+
+  const handleSubmit = async (payload) => {
+    try {
+      await updateProfile(payload).unwrap();
+      message.success("Profile updated successfully.");
+      closeEdit();
+    } catch (error) {
+      message.error(error?.data?.message || "Failed to update profile.");
+    }
+  };
+
   return (
     <div className="bg-white dark:bg-surface-dark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 relative">
-      <div className="absolute top-6 right-6 flex gap-2">
+      <div className="absolute top-6 right-6 flex gap-2 z-10">
         <button
           type="button"
           className="text-gray-400 hover:text-primary p-2 rounded-full hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
@@ -29,6 +61,7 @@ const ProfileHeader = () => {
           shape="rounded"
           className="!border-gray-200 dark:!border-gray-600 dark:!text-gray-200"
           iconLeft={<span className="material-icons-round text-[18px]">edit</span>}
+          onClick={openEdit}
         >
           Edit Profile
         </Button>
@@ -47,7 +80,7 @@ const ProfileHeader = () => {
           </div>
         </Col>
         <Col xs={24} md={18} lg={20}>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{displayName}</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-1 md:pr-40">{displayName}</h1>
           <p className="text-lg font-semibold text-gray-500 dark:text-gray-400 mb-4">
             {profile?.jobTitle || "Not updated yet"}
           </p>
@@ -99,6 +132,14 @@ const ProfileHeader = () => {
       <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-600 rounded-r-md p-4">
         <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{aboutMe}</p>
       </div>
+
+      <EditProfileModal
+        open={isEditOpen}
+        loading={isSaving}
+        initialValues={modalInitialValues}
+        onCancel={closeEdit}
+        onSubmit={handleSubmit}
+      />
     </div>
   );
 };
