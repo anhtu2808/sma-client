@@ -15,7 +15,7 @@ const ProfileSectionModal = ({
   return (
     <Modal open={open} onCancel={onCancel} footer={null} centered destroyOnClose width={width}>
       <div className="-mx-6 -mt-2 border-b border-gray-100 px-6 pb-4">
-        <h3 className="text-[34px] leading-[42px] font-bold text-gray-900">{title}</h3>
+        <h3 className="text-[20px] leading-7 font-bold text-gray-900">{title}</h3>
       </div>
 
       <div className="pt-6">{children}</div>

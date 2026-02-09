@@ -7,21 +7,22 @@ import {
   useUpdateResumeExperienceDetailMutation,
   useUpdateResumeExperienceMutation,
 } from "@/apis/resumeApi";
-import { formatRange, toMonthInputValue } from "@/utils/profileUtils";
+import { enumToLabel, formatRange, toMonthInputValue } from "@/utils/profileUtils";
 import ExperienceFormModal from "@/pages/dashboard/profile/work-experience/ExperienceFormModal";
 
-const sortByDateDesc = (items = []) => {
+const sortByOrderIndex = (items = []) => {
   return [...items].sort((a, b) => {
-    const aDate = a?.startDate ? new Date(a.startDate).getTime() : 0;
-    const bDate = b?.startDate ? new Date(b.startDate).getTime() : 0;
-    return bDate - aDate;
+    const aOrder = Number.isFinite(Number(a?.orderIndex)) ? Number(a.orderIndex) : Number.MAX_SAFE_INTEGER;
+    const bOrder = Number.isFinite(Number(b?.orderIndex)) ? Number(b.orderIndex) : Number.MAX_SAFE_INTEGER;
+    if (aOrder !== bOrder) return aOrder - bOrder;
+    return (a?.id ?? 0) - (b?.id ?? 0);
   });
 };
 
 const WorkExperience = () => {
   const { data: profile } = useCandidateDashboardProfileQuery();
   const profileResumeId = profile?.profileResumeId;
-  const experiences = useMemo(() => sortByDateDesc(profile?.experiences ?? []), [profile?.experiences]);
+  const experiences = useMemo(() => sortByOrderIndex(profile?.experiences ?? []), [profile?.experiences]);
 
   const [editingExperience, setEditingExperience] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -74,7 +75,6 @@ const WorkExperience = () => {
       for (const detail of details) {
         const payload = {
           title: detail.title,
-          position: detail.position,
           description: detail.description,
           startDate: detail.startDate,
           endDate: detail.endDate,
@@ -143,7 +143,7 @@ const WorkExperience = () => {
           </div>
         ) : (
           experiences.map((experience) => {
-            const sortedDetails = sortByDateDesc(experience?.details ?? []);
+            const sortedDetails = sortByOrderIndex(experience?.details ?? []);
 
             return (
               <div key={experience?.id} className="rounded-xl border border-gray-200 dark:border-gray-700 p-5">
@@ -153,6 +153,18 @@ const WorkExperience = () => {
                     <p className="text-sm text-gray-500 dark:text-gray-400">
                       {formatRange(experience?.startDate, experience?.endDate, experience?.isCurrent)}
                     </p>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {experience?.workingModel ? (
+                        <span className="text-xs px-2 py-1 rounded bg-gray-100 text-gray-600">
+                          {enumToLabel(experience.workingModel)}
+                        </span>
+                      ) : null}
+                      {experience?.employmentType ? (
+                        <span className="text-xs px-2 py-1 rounded bg-blue-50 text-blue-700 border border-blue-100">
+                          {enumToLabel(experience.employmentType)}
+                        </span>
+                      ) : null}
+                    </div>
                   </div>
                   <button
                     type="button"
@@ -178,7 +190,7 @@ const WorkExperience = () => {
                         ) : null}
 
                         <h4 className="text-lg font-semibold text-gray-900">
-                          {detail?.title || detail?.position || "Untitled role"}
+                          {detail?.title || "Untitled role"}
                         </h4>
                         <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
                           {formatRange(detail?.startDate, detail?.endDate, detail?.isCurrent)}
@@ -217,13 +229,14 @@ const WorkExperience = () => {
           editingExperience
             ? {
                 company: editingExperience?.company ?? "",
+                workingModel: editingExperience?.workingModel ?? undefined,
+                employmentType: editingExperience?.employmentType ?? undefined,
                 startMonth: toMonthInputValue(editingExperience?.startDate),
                 endMonth: toMonthInputValue(editingExperience?.endDate),
                 isCurrent: !!editingExperience?.isCurrent,
-                roles: sortByDateDesc(editingExperience?.details ?? []).map((detail) => ({
+                roles: sortByOrderIndex(editingExperience?.details ?? []).map((detail) => ({
                   id: detail?.id ?? null,
                   title: detail?.title ?? "",
-                  position: detail?.position ?? "",
                   description: detail?.description ?? "",
                   startMonth: toMonthInputValue(detail?.startDate),
                   endMonth: toMonthInputValue(detail?.endDate),

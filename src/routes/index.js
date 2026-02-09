@@ -13,6 +13,7 @@ import Setting from '@/pages/dashboard/setting';
 import Notification from '@/pages/dashboard/notification';
 import Resumes from '@/pages/dashboard/resumes';
 import Profile from '@/pages/dashboard/profile';
+import Invitations from '@/pages/dashboard/invitations';
 import CompanyList from '@/pages/company/CompanyList';
 import CompanyDetail from '@/pages/company-detail';
 
@@ -37,7 +38,8 @@ export const routes = createBrowserRouter(
                 <Route index element={<DashboardOverview />} />
                 <Route path="jobs" element={<DashboardJobs />} />
                 <Route path="setting" element={<Setting />} />
-                <Route path="notification" element={<Notification />} />
+                <Route path="invitations" element={<Invitations />} />
+                <Route path="notifications" element={<Notification />} />
                 <Route path="resumes" element={<Resumes />} />
                 <Route path="profile" element={<Profile />} />
             </Route>

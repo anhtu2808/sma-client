@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Checkbox, DatePicker, Form, Input } from "antd";
+import { Checkbox, DatePicker, Form, Input, Select } from "antd";
 import dayjs from "dayjs";
 import ProfileSectionModal from "@/components/ProfileSectionModal";
 
@@ -8,7 +8,6 @@ const FORM_ID = "experience-form";
 const emptyRole = {
   id: null,
   title: "",
-  position: "",
   description: "",
   startMonth: null,
   endMonth: null,
@@ -29,6 +28,8 @@ const ExperienceFormModal = ({
     if (!open) return;
     const merged = {
       company: "",
+      workingModel: undefined,
+      employmentType: undefined,
       startMonth: null,
       endMonth: null,
       isCurrent: false,
@@ -56,6 +57,8 @@ const ExperienceFormModal = ({
   const handleFinish = (values) => {
     const experiencePayload = {
       company: values.company?.trim() || null,
+      workingModel: values.workingModel || null,
+      employmentType: values.employmentType || null,
       startDate: values.startMonth ? values.startMonth.format("YYYY-MM-01") : null,
       endDate: values.isCurrent || !values.endMonth ? null : values.endMonth.format("YYYY-MM-01"),
       isCurrent: !!values.isCurrent,
@@ -65,7 +68,6 @@ const ExperienceFormModal = ({
       .map((role) => ({
         id: role?.id ?? null,
         title: role?.title?.trim() || null,
-        position: role?.position?.trim() || null,
         description: role?.description?.trim() || null,
         startDate: role?.startMonth ? role.startMonth.format("YYYY-MM-01") : null,
         endDate: role?.isCurrent || !role?.endMonth ? null : role.endMonth.format("YYYY-MM-01"),
@@ -74,7 +76,6 @@ const ExperienceFormModal = ({
       .filter((role) =>
         Boolean(
           role.title ||
-            role.position ||
             role.description ||
             role.startDate ||
             role.endDate ||
@@ -104,6 +105,37 @@ const ExperienceFormModal = ({
         onFinish={handleFinish}
         className="max-h-[60vh] overflow-y-auto pr-4 custom-scrollbar"
       >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Form.Item label="Working Model" name="workingModel">
+            <Select
+              size="large"
+              placeholder="Select working model"
+              options={[
+                { value: "REMOTE", label: "Remote" },
+                { value: "ONSITE", label: "Onsite" },
+                { value: "HYBRID", label: "Hybrid" },
+              ]}
+            />
+          </Form.Item>
+
+          <Form.Item label="Employment Type" name="employmentType">
+            <Select
+              size="large"
+              placeholder="Select employment type"
+              options={[
+                { value: "FULL_TIME", label: "Full-time" },
+                { value: "PART_TIME", label: "Part-time" },
+                { value: "SELF_EMPLOYED", label: "Self-employed" },
+                { value: "FREELANCE", label: "Freelance" },
+                { value: "CONTRACT", label: "Contract" },
+                { value: "INTERNSHIP", label: "Internship" },
+                { value: "APPRENTICESHIP", label: "Apprenticeship" },
+                { value: "SEASONAL", label: "Seasonal" },
+              ]}
+            />
+          </Form.Item>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Form.Item
             label="Company"
@@ -202,17 +234,13 @@ const ExperienceFormModal = ({
                       </Form.Item>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                       <Form.Item
                         label="Job Title"
                         name={[field.name, "title"]}
                         rules={[{ required: true, message: "Please enter role title." }]}
                       >
                         <Input size="large" placeholder="Technical Lead" />
-                      </Form.Item>
-
-                      <Form.Item label="Position" name={[field.name, "position"]}>
-                        <Input size="large" placeholder="Team Leader" />
                       </Form.Item>
                     </div>
 

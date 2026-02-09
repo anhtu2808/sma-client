@@ -1,11 +1,12 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Form, Select, message } from "antd";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Form, Input, Select, message } from "antd";
 import ProfileSectionModal from "@/components/ProfileSectionModal";
 import { useGetSkillsQuery } from "@/apis/skillApi";
 import { formatYearsOfExperience } from "@/utils/profileUtils";
 import Button from "@/components/Button";
 
 const FORM_ID = "skill-form";
+const MAX_SKILLS_PER_GROUP = 20;
 
 const YEARS_OPTIONS = Array.from({ length: 21 }, (_, value) => ({
   value,
@@ -14,8 +15,8 @@ const YEARS_OPTIONS = Array.from({ length: 21 }, (_, value) => ({
 
 const SkillFormModal = ({
   open,
-  isEdit = false,
   initialValues,
+  mode = "create", // "create" | "edit"
   loading = false,
   onCancel,
   onSubmit,
@@ -24,6 +25,7 @@ const SkillFormModal = ({
   const [searchText, setSearchText] = useState("");
   const [debouncedSearchText, setDebouncedSearchText] = useState("");
   const [pendingSkills, setPendingSkills] = useState([]);
+  const didInitRef = useRef(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -44,48 +46,68 @@ const SkillFormModal = ({
       label: skill?.name,
     }));
 
-    if (initialValues?.skillId && initialValues?.skillName) {
-      const exists = mapped.some((item) => item.value === initialValues.skillId);
+    const initialSkillItems = initialValues?.skills ?? [];
+    for (const item of initialSkillItems) {
+      if (!item?.skillId || !item?.skillName) continue;
+      const exists = mapped.some((option) => option.value === item.skillId);
       if (!exists) {
-        mapped.unshift({
-          value: initialValues.skillId,
-          label: initialValues.skillName,
-        });
+        mapped.unshift({ value: item.skillId, label: item.skillName });
       }
     }
 
     return mapped;
-  }, [initialValues?.skillId, initialValues?.skillName, skillOptionsData]);
+  }, [initialValues?.skills, skillOptionsData]);
 
   useEffect(() => {
+    if (!open) {
+      didInitRef.current = false;
+      return;
+    }
+    if (didInitRef.current) {
+      return;
+    }
+    didInitRef.current = true;
+
     if (!open) return;
 
     form.setFieldsValue({
+      groupName: "",
       selectedSkillId: undefined,
       selectedYearsOfExperience: undefined,
     });
     setSearchText("");
     setDebouncedSearchText("");
 
-    if (isEdit && initialValues?.skillId) {
-      setPendingSkills([
-        {
-          skillId: initialValues.skillId,
-          skillName: initialValues.skillName || "Unknown Skill",
-          yearsOfExperience: initialValues.yearsOfExperience ?? 0,
-        },
-      ]);
+    if (mode === "edit" && initialValues?.groupName) {
+      form.setFieldValue("groupName", initialValues.groupName);
+      setPendingSkills(
+        (initialValues?.skills ?? []).map((skill) => ({
+          resumeSkillId: skill?.id ?? null,
+          skillId: skill?.skillId,
+          skillName: skill?.skillName || "Unknown Skill",
+          yearsOfExperience: skill?.yearsOfExperience ?? null,
+        }))
+      );
     } else {
       setPendingSkills([]);
     }
-  }, [form, initialValues, isEdit, open]);
+  }, [form, initialValues, mode, open]);
 
   const addPendingSkill = () => {
+    const groupName = `${form.getFieldValue("groupName") ?? ""}`.trim().replace(/\s+/g, " ");
     const selectedSkillId = form.getFieldValue("selectedSkillId");
     const selectedYearsOfExperience = form.getFieldValue("selectedYearsOfExperience");
 
+    if (!groupName) {
+      message.error("Please enter group name.");
+      return;
+    }
     if (!selectedSkillId || selectedYearsOfExperience == null) {
       message.error("Please select skill and experience.");
+      return;
+    }
+    if (pendingSkills.length >= MAX_SKILLS_PER_GROUP) {
+      message.error(`Maximum ${MAX_SKILLS_PER_GROUP} skills per group.`);
       return;
     }
 
@@ -98,7 +120,6 @@ const SkillFormModal = ({
     };
 
     setPendingSkills((prev) => {
-      if (isEdit) return [entry];
       const existing = prev.find((item) => item.skillId === entry.skillId);
       if (!existing) return [...prev, entry];
       return prev.map((item) => (item.skillId === entry.skillId ? entry : item));
@@ -115,25 +136,54 @@ const SkillFormModal = ({
   };
 
   const submitForm = () => {
+    const groupName = `${form.getFieldValue("groupName") ?? ""}`.trim().replace(/\s+/g, " ");
+    if (!groupName) {
+      message.error("Please enter group name.");
+      return;
+    }
     if (pendingSkills.length === 0) {
       message.error("Please add at least one skill.");
       return;
     }
-    onSubmit({ entries: pendingSkills });
+    onSubmit({ groupName, entries: pendingSkills });
   };
 
   return (
     <ProfileSectionModal
       open={open}
-      title={isEdit ? "Update Skill" : "Add Skills"}
+      title={mode === "edit" ? "Edit Skill Group" : "Add Skill Group"}
       onCancel={onCancel}
       loading={loading}
       formId={FORM_ID}
       width={980}
     >
       <Form id={FORM_ID} form={form} layout="vertical" onFinish={submitForm}>
+        <div className="rounded-lg bg-orange-50 border border-orange-100 p-4 mb-4">
+          <div className="flex items-start gap-3">
+            <span className="material-icons-round text-primary mt-[2px]">lightbulb</span>
+            <div className="text-sm text-gray-700">
+              <span className="font-semibold">Tips:</span> Organize your skills into groups to help recruiters scan faster.
+            </div>
+          </div>
+        </div>
+
+        <Form.Item
+          label={
+            <span>
+              Group name <span className="text-red-500">*</span>
+            </span>
+          }
+          name="groupName"
+          rules={[{ required: true, message: "Group name is required." }]}
+        >
+          <Input size="large" placeholder="Core Skills" maxLength={80} />
+        </Form.Item>
+
+        <div className="text-sm font-semibold text-gray-800 mb-2">
+          List skills ({pendingSkills.length}/{MAX_SKILLS_PER_GROUP})
+        </div>
         <div className="rounded-lg bg-gray-50 border border-gray-100 p-4">
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_260px_auto] gap-3 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_220px_auto] gap-3 items-start">
             <Form.Item name="selectedSkillId" className="!mb-0">
               <Select
                 size="large"
@@ -170,13 +220,15 @@ const SkillFormModal = ({
           {pendingSkills.map((item) => (
             <span
               key={item.skillId}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300 bg-gray-50 text-base text-gray-800"
+              className="inline-flex items-baseline gap-2 px-4 py-2 rounded-full border border-gray-300 bg-gray-50 text-base text-gray-800"
             >
-              <span className="font-semibold">{item.skillName}</span>
-              <span>({formatYearsOfExperience(item.yearsOfExperience)})</span>
+              <span className="font-semibold leading-none">{item.skillName}</span>
+              {item.yearsOfExperience != null ? (
+                <span className="leading-none">({formatYearsOfExperience(item.yearsOfExperience)})</span>
+              ) : null}
               <button
                 type="button"
-                className="text-gray-500 hover:text-red-500"
+                className="text-gray-500 hover:text-red-500 self-center"
                 onClick={() => removePendingSkill(item.skillId)}
                 title="Remove"
               >
