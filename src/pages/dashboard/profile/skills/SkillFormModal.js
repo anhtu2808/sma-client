@@ -220,19 +220,19 @@ const SkillFormModal = ({
           {pendingSkills.map((item) => (
             <span
               key={item.skillId}
-              className="inline-flex items-baseline gap-2 px-4 py-2 rounded-full border border-gray-300 bg-gray-50 text-base text-gray-800"
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-gray-300 bg-gray-50 text-sm text-gray-800"
             >
-              <span className="font-semibold leading-none">{item.skillName}</span>
+              <span className="font-medium">{item.skillName}</span>
               {item.yearsOfExperience != null ? (
-                <span className="leading-none">({formatYearsOfExperience(item.yearsOfExperience)})</span>
+                <span>({formatYearsOfExperience(item.yearsOfExperience)})</span>
               ) : null}
               <button
                 type="button"
-                className="text-gray-500 hover:text-red-500 self-center"
+                className="text-gray-400 hover:text-red-500 flex items-center justify-center transition-colors"
                 onClick={() => removePendingSkill(item.skillId)}
                 title="Remove"
               >
-                <span className="material-icons-round text-[18px]">close</span>
+                <span className="material-icons-round text-[16px]">close</span>
               </button>
             </span>
           ))}

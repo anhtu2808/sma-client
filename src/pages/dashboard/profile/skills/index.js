@@ -231,11 +231,11 @@ const Skills = () => {
                 {(group?.skills ?? []).map((skill) => (
                   <span
                     key={skill?.id}
-                    className="px-3 py-1.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full text-sm flex items-baseline gap-2"
+                    className="px-3 py-1.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full text-sm flex items-center gap-2"
                   >
-                    <span className="font-semibold leading-none">{skill?.skillName || "Unknown Skill"}</span>
+                    <span className="font-semibold">{skill?.skillName || "Unknown Skill"}</span>
                     {skill?.yearsOfExperience != null ? (
-                      <span className="text-gray-500 leading-none">({formatYearsOfExperience(skill.yearsOfExperience)})</span>
+                      <span className="text-gray-500">({formatYearsOfExperience(skill.yearsOfExperience)})</span>
                     ) : null}
                   </span>
                 ))}
