@@ -59,6 +59,9 @@ const JobDetail = () => {
             requirements: parseList(apiJob.requirement),
             benefits: apiJob.benefits || [],
             questions: apiJob.questions || [],
+            appliedAttempt: apiJob.appliedAttempt,
+            lastApplicationStatus: apiJob.lastApplicationStatus,
+            canApply: apiJob.canApply,
         };
     }, [jobData]);
 
@@ -103,12 +106,12 @@ const JobDetail = () => {
                                 </p>
 
                                 <MetaInfo job={job} />
-                                <SkillsAndDomains 
-                                    skills={job.skills} 
-                                    expertise={job.expertise} 
-                                    domains={job.domains} 
+                                <SkillsAndDomains
+                                    skills={job.skills}
+                                    expertise={job.expertise}
+                                    domains={job.domains}
                                 />
-                                <CTAButtons jobId={job.id} />
+                                <CTAButtons job={job} />
                             </div>
 
                             <About description={job.description} />
