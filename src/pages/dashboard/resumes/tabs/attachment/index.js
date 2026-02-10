@@ -1,9 +1,11 @@
 import React, { useMemo, useRef, useState } from "react";
 import { message } from "antd";
 import Button from "@/components/Button";
+import ProfileSectionModal from "@/components/ProfileSectionModal";
 import {
   useDeleteCandidateResumeMutation,
   useGetCandidateResumesQuery,
+  useSetResumeAsProfileMutation,
   useUploadCandidateResumeMutation,
   useUploadFilesMutation,
 } from "@/apis/resumeApi";
@@ -19,6 +21,12 @@ const AttachmentsTab = () => {
   const [uploadFiles, { isLoading: isUploadingFile }] = useUploadFilesMutation();
   const [uploadCandidateResume, { isLoading: isSavingResume }] = useUploadCandidateResumeMutation();
   const [deleteCandidateResume] = useDeleteCandidateResumeMutation();
+  const [setResumeAsProfile, { isLoading: isSettingProfile }] = useSetResumeAsProfileMutation();
+  const [settingProfileId, setSettingProfileId] = useState(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [confirmValue, setConfirmValue] = useState("");
+  const [confirmResumeId, setConfirmResumeId] = useState(null);
+  const [isConfirmLoading, setIsConfirmLoading] = useState(false);
 
   const files = useMemo(
     () =>
@@ -86,7 +94,39 @@ const AttachmentsTab = () => {
     }
   };
 
+  const openSetProfileConfirm = (resumeId) => {
+    setConfirmResumeId(resumeId);
+    setConfirmValue("");
+    setIsConfirmOpen(true);
+  };
+
+  const closeSetProfileConfirm = () => {
+    if (isSettingProfile) return;
+    setIsConfirmOpen(false);
+    setConfirmResumeId(null);
+    setConfirmValue("");
+  };
+
+  const handleConfirmSetProfile = async () => {
+    if (!confirmResumeId) return;
+    try {
+      setIsConfirmLoading(true);
+      setSettingProfileId(confirmResumeId);
+      const delay = new Promise((resolve) => setTimeout(resolve, 800));
+      await Promise.all([setResumeAsProfile({ resumeId: confirmResumeId }).unwrap(), delay]);
+      message.success("Set profile resume successfully");
+      closeSetProfileConfirm();
+    } catch (error) {
+      message.error(getErrorMessage(error, "Set profile resume failed"));
+    } finally {
+      setIsConfirmLoading(false);
+      setSettingProfileId(null);
+    }
+  };
+
   const isUploading = isUploadingFile || isSavingResume;
+
+  const canConfirm = confirmValue.trim().toLowerCase() === "continue";
 
   return (
     <section className="space-y-6">
@@ -166,6 +206,7 @@ const AttachmentsTab = () => {
                   size="sm"
                   shape="rounded"
                   btnIcon
+                  tooltip="Download"
                   disabled={!file.url}
                   onClick={() => file.url && window.open(file.url, "_blank", "noopener,noreferrer")}
                 >
@@ -176,6 +217,18 @@ const AttachmentsTab = () => {
                   size="sm"
                   shape="rounded"
                   btnIcon
+                  tooltip="Set as profile"
+                  disabled={isSettingProfile || settingProfileId === file.id}
+                  onClick={() => openSetProfileConfirm(file.id)}
+                >
+                  <i className="material-icons-round text-[18px]">account_circle</i>
+                </Button>
+                <Button
+                  mode="ghost"
+                  size="sm"
+                  shape="rounded"
+                  btnIcon
+                  tooltip="Delete"
                   disabled={deletingId === file.id}
                   onClick={() => handleDeleteResume(file.id)}
                 >
@@ -187,6 +240,48 @@ const AttachmentsTab = () => {
         </div>
         )}
       </div>
+
+      <ProfileSectionModal
+        open={isConfirmOpen}
+        title="Set resume as profile"
+        onCancel={closeSetProfileConfirm}
+        loading={isSettingProfile || isConfirmLoading}
+        loadingText="Processing..."
+        submitText="Continue"
+        submitDisabled={!canConfirm || isSettingProfile || isConfirmLoading}
+        cancelText="Cancel"
+        width={520}
+        formId="set-profile-confirm-form"
+      >
+        <div className="space-y-4">
+          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            This action will override all of your current profile information.
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Type <span className="font-semibold">continue</span> to confirm
+            </label>
+            <form
+              id="set-profile-confirm-form"
+              onSubmit={(event) => {
+                event.preventDefault();
+                if (canConfirm && !isSettingProfile) {
+                  handleConfirmSetProfile();
+                }
+              }}
+            >
+              <input
+                type="text"
+                value={confirmValue}
+                onChange={(event) => setConfirmValue(event.target.value)}
+                disabled={isSettingProfile}
+                placeholder="continue"
+                className="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+            </form>
+          </div>
+        </div>
+      </ProfileSectionModal>
     </section>
   );
 };

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from "react";
-import { Checkbox, Form, Input, Select } from "antd";
+import { Checkbox, DatePicker, Form, Input, Select } from "antd";
+import dayjs from "dayjs";
 import ProfileSectionModal from "@/components/ProfileSectionModal";
-import { monthValueToApiDate } from "@/utils/profileUtils";
 
 const FORM_ID = "project-form";
 
@@ -28,18 +28,23 @@ const ProjectFormModal = ({
 
   useEffect(() => {
     if (!open) return;
-    form.setFieldsValue({
+    const merged = {
       title: "",
       position: "",
       teamSize: "",
       projectType: undefined,
       projectUrl: "",
       description: "",
-      startMonth: "",
-      endMonth: "",
+      startMonth: null,
+      endMonth: null,
       isCurrent: false,
       ...initialValues,
-    });
+    };
+
+    merged.startMonth = merged.startMonth ? dayjs(merged.startMonth) : null;
+    merged.endMonth = merged.endMonth ? dayjs(merged.endMonth) : null;
+
+    form.setFieldsValue(merged);
   }, [form, initialValues, open]);
 
   const handleFinish = (values) => {
@@ -49,8 +54,9 @@ const ProjectFormModal = ({
       position: values.position?.trim() || null,
       description: values.description?.trim() || null,
       projectType: values.projectType || null,
-      startDate: monthValueToApiDate(values.startMonth),
-      endDate: values.isCurrent ? null : monthValueToApiDate(values.endMonth),
+      startDate: values.startMonth ? values.startMonth.format("YYYY-MM-01") : null,
+      endDate:
+        values.isCurrent || !values.endMonth ? null : values.endMonth.format("YYYY-MM-01"),
       isCurrent: !!values.isCurrent,
       projectUrl: values.projectUrl?.trim() || null,
     });
@@ -100,7 +106,13 @@ const ProjectFormModal = ({
             name="startMonth"
             rules={[{ required: true, message: "Please select a start date." }]}
           >
-            <Input size="large" type="month" />
+            <DatePicker
+              picker="month"
+              size="large"
+              className="w-full"
+              format="MM/YYYY"
+              placeholder="Select month"
+            />
           </Form.Item>
 
           <Form.Item shouldUpdate noStyle>
@@ -114,7 +126,14 @@ const ProjectFormModal = ({
                     : [{ required: true, message: "Please select an end date." }]
                 }
               >
-                <Input size="large" type="month" disabled={getFieldValue("isCurrent")} />
+                <DatePicker
+                  picker="month"
+                  size="large"
+                  className="w-full"
+                  format="MM/YYYY"
+                  placeholder="Select month"
+                  disabled={getFieldValue("isCurrent")}
+                />
               </Form.Item>
             )}
           </Form.Item>

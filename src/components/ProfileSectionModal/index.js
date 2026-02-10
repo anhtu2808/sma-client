@@ -6,7 +6,9 @@ const ProfileSectionModal = ({
   title,
   onCancel,
   loading = false,
+  loadingText = "Saving...",
   submitText = "Save",
+  submitDisabled = false,
   cancelText = "Cancel",
   width = 860,
   formId,
@@ -33,10 +35,10 @@ const ProfileSectionModal = ({
         <button
           type={formId ? "submit" : "button"}
           form={formId}
-          disabled={loading}
+          disabled={loading || submitDisabled}
           className="px-5 h-10 rounded-lg bg-primary text-white hover:opacity-90 disabled:opacity-50"
         >
-          {loading ? "Saving..." : submitText}
+          {loading ? loadingText : submitText}
         </button>
       </div>
     </Modal>

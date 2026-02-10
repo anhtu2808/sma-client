@@ -144,6 +144,19 @@ export const resumeApi = api.injectEndpoints({
             ],
         }),
 
+        setResumeAsProfile: builder.mutation({
+            query: ({ resumeId }) => ({
+                url: `${API_VERSION}/resumes/${resumeId}/set-profile`,
+                method: "POST",
+            }),
+            transformResponse: (response) => response?.data ?? response,
+            invalidatesTags: [
+                "Users",
+                { type: "Resumes", id: RESUME_TYPES.PROFILE },
+                { type: "Resumes", id: "ALL" },
+            ],
+        }),
+
         createResumeSkill: builder.mutation({
             query: ({ resumeId, payload }) => ({
                 url: `${API_VERSION}/resumes/${resumeId}/skills`,
@@ -400,6 +413,7 @@ export const {
     useUploadFilesMutation,
     useUploadCandidateResumeMutation,
     useDeleteCandidateResumeMutation,
+    useSetResumeAsProfileMutation,
     useCreateResumeSkillMutation,
     useUpdateResumeSkillMutation,
     useDeleteResumeSkillMutation,
