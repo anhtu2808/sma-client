@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import MapEmbed from '../map-embed';
+import MapEmbed from '../components/map-embed';
 
 export const AboutSection = ({ company }) => {
     return (

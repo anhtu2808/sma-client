@@ -3,9 +3,9 @@ import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useGetCompanyByIdQuery } from '@/apis/companyApi';
 import Loading from '@/components/Loading';
-import CompanyHeader from './components/company-header';
-import CompanySidebar from './components/company-sidebar';
-import { AboutSection, LifeAtSection, LocationsSection } from './components/content-sections';
+import CompanyHeader from './company-header';
+import CompanySidebar from './company-sidebar';
+import { AboutSection, LifeAtSection, LocationsSection } from './content-sections';
 
 const CompanyDetail = () => {
     const { id } = useParams();
