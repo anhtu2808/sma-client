@@ -16,8 +16,8 @@ import Profile from '@/pages/dashboard/profile';
 import Invitations from '@/pages/dashboard/invitations';
 import CompanyList from '@/pages/company/CompanyList';
 import CompanyDetail from '@/pages/company-detail';
-import ApplyJobPage from "@/pages/application/applyJobPage";
-import ApplicationSuccess from "@/pages/application/applySuccess";
+import Application from "@/pages/application";
+import ApplicationSuccess from "@/pages/application/sucess";
 
 export const routes = createBrowserRouter(
     createRoutesFromElements(
@@ -35,11 +35,10 @@ export const routes = createBrowserRouter(
                     <Route index element={<CompanyList />} />
                     <Route path=":id" element={<CompanyDetail />} />
                 </Route>
-                <Route path="applications">
-                    <Route path="apply/:id" element={<ApplyJobPage />} />
-                    <Route path="success" element={<ApplicationSuccess />} />
-                </Route>
+                <Route path="jobs/:id/application" element={<Application />} />
+                <Route path="jobs/:id/application/success" element={<ApplicationSuccess />} />
             </Route>
+
             <Route path="dashboard" element={<DashboardLayout />}>
                 <Route index element={<DashboardOverview />} />
                 <Route path="jobs" element={<DashboardJobs />} />

@@ -1,6 +1,12 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
+import { useGetJobByIdQuery } from '@/apis/jobApi';
 
-const Benefits = ({ benefits }) => {
+const Benefits = () => {
+    const { id } = useParams();
+    const { data: jobData } = useGetJobByIdQuery(id);
+    const benefits = jobData?.data?.benefits;
+
     if (!benefits || benefits.length === 0) return null;
 
     return (

@@ -4,70 +4,74 @@ import { Link } from 'react-router-dom';
 
 const Footer = () => {
     return (
-        <footer className="bg-white dark:bg-surface-dark border-t border-gray-100 dark:border-gray-800 pt-8 pb-8">
+        <footer className="bg-[#101827] border-t border-gray-800 pt-16 pb-8 font-poppins text-white">
             <div className="max-w-7xl mx-auto px-6 lg:px-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
                     {/* Brand */}
                     <div className="lg:col-span-2">
-                        <div className='mb-3'>
-                            <Logo />
+                        <div className='mb-6'>
+                            <Logo variant="white" />
                         </div>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
-                            Transforming the chaotic world of tech recruitment into an elegant, intuitive experience.
+                        <p className="text-gray-400 text-sm mb-8 leading-relaxed max-w-sm">
+                            The world's first fully autonomous AI recruitment platform. We help you build the team of your dreams.
                         </p>
                         <div className="flex gap-4">
-                            <Link to="#" className="text-gray-400 hover:text-primary transition">
-                                <i className="fa-brands fa-facebook text-xl"></i>
-                            </Link>
-                            <Link to="#" className="text-gray-400 hover:text-primary transition">
-                                <i className="fa-brands fa-linkedin text-xl"></i>
-                            </Link>
-                            <Link to="#" className="text-gray-400 hover:text-primary transition">
-                                <i className="fa-brands fa-twitter text-xl"></i>
-                            </Link>
+                            {[
+                                { icon: "fa-twitter", link: "#" },
+                                { icon: "fa-facebook", link: "#" },
+                                { icon: "fa-linkedin", link: "#" }
+                            ].map((social, index) => (
+                                <Link
+                                    key={index}
+                                    to={social.link}
+                                    className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-primary hover:text-white transition-all duration-300"
+                                >
+                                    <i className={`fa-brands ${social.icon} text-lg`}></i>
+                                </Link>
+                            ))}
                         </div>
                     </div>
 
                     {/* Product */}
                     <div>
-                        <h4 className="font-bold text-gray-900 dark:text-white mb-4">Product</h4>
-                        <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
-                            <li><Link to="#" className="hover:text-primary transition">Features</Link></li>
-                            <li><Link to="#" className="hover:text-primary transition">Solutions</Link></li>
-                            <li><Link to="#" className="hover:text-primary transition">Pricing</Link></li>
-                            <li><Link to="#" className="hover:text-primary transition">Mobile Apps</Link></li>
-                        </ul>
-                    </div>
-
-                    {/* Resources */}
-                    <div>
-                        <h4 className="font-bold text-gray-900 dark:text-white mb-4">Resources</h4>
-                        <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
-                            <li><Link to="#" className="hover:text-primary transition">Help Center</Link></li>
-                            <li><Link to="#" className="hover:text-primary transition">Video Tutorials</Link></li>
-                            <li><Link to="#" className="hover:text-primary transition">Community</Link></li>
-                            <li><Link to="#" className="hover:text-primary transition">Templates</Link></li>
+                        <h4 className="font-bold text-white text-lg mb-6">Product</h4>
+                        <ul className="space-y-4 text-sm text-gray-400">
+                            <li><Link to="#" className="hover:text-primary transition-colors">Features</Link></li>
+                            <li><Link to="#" className="hover:text-primary transition-colors">Pricing</Link></li>
+                            <li><Link to="#" className="hover:text-primary transition-colors">AI Engine</Link></li>
+                            <li><Link to="#" className="hover:text-primary transition-colors">Case Studies</Link></li>
                         </ul>
                     </div>
 
                     {/* Company */}
                     <div>
-                        <h4 className="font-bold text-gray-900 dark:text-white mb-4">Company</h4>
-                        <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
-                            <li><Link to="#" className="hover:text-primary transition">About Us</Link></li>
-                            <li><Link to="#" className="hover:text-primary transition">Careers</Link></li>
-                            <li><Link to="#" className="hover:text-primary transition">Blog</Link></li>
-                            <li><Link to="#" className="hover:text-primary transition">Contact</Link></li>
+                        <h4 className="font-bold text-white text-lg mb-6">Company</h4>
+                        <ul className="space-y-4 text-sm text-gray-400">
+                            <li><Link to="#" className="hover:text-primary transition-colors">About Us</Link></li>
+                            <li><Link to="#" className="hover:text-primary transition-colors">Careers</Link></li>
+                            <li><Link to="#" className="hover:text-primary transition-colors">Press</Link></li>
+                            <li><Link to="#" className="hover:text-primary transition-colors">Contact</Link></li>
+                        </ul>
+                    </div>
+
+                    {/* Resources */}
+                    <div>
+                        <h4 className="font-bold text-white text-lg mb-6">Resources</h4>
+                        <ul className="space-y-4 text-sm text-gray-400">
+                            <li><Link to="#" className="hover:text-primary transition-colors">Blog</Link></li>
+                            <li><Link to="#" className="hover:text-primary transition-colors">Help Center</Link></li>
+                            <li><Link to="#" className="hover:text-primary transition-colors">API Documentation</Link></li>
+                            <li><Link to="#" className="hover:text-primary transition-colors">Status</Link></li>
                         </ul>
                     </div>
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="border-t border-gray-100 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">© 2024 SmartRecruit Inc. All rights reserved.</p>
-                    <div className="flex gap-6 text-sm text-gray-500 dark:text-gray-400">
-                        <Link to="#" className="hover:text-gray-900 dark:hover:text-white">Privacy Policy</Link>
-                        <Link to="#" className="hover:text-gray-900 dark:hover:text-white">Terms of Use</Link>
+                <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p className="text-sm text-gray-500">© 2024 SmartRecruit Inc. All rights reserved.</p>
+                    <div className="flex gap-8 text-sm text-gray-500">
+                        <Link to="#" className="hover:text-white transition-colors">Privacy Policy</Link>
+                        <Link to="#" className="hover:text-white transition-colors">Terms of Use</Link>
                     </div>
                 </div>
             </div>
