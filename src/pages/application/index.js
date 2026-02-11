@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
 import { useGetJobByIdQuery, useGetJobQuestionsQuery } from '@/apis/jobApi';
 import { useGetCandidateResumesQuery, useUploadFilesMutation } from '@/apis/resumeApi';
 import { useApplyJobMutation } from '@/apis/applicationApi';
 import Card from '@/components/Card';
+import Loading from '@/components/Loading';
 import { toast } from 'react-hot-toast';
 import { APPLICATION_ERROR_CODE } from '@/constant';
 
@@ -197,9 +197,7 @@ const Application = () => {
 
     const isLoading = jobLoading || resumesLoading || questionsLoading;
     if (isLoading) return (
-        <div className="flex justify-center items-center min-h-screen bg-[#F3F4F6]">
-            <Loader2 className="animate-spin text-primary" size={40} />
-        </div>
+        <Loading fullScreen className="bg-[#F3F4F6]" />
     );
 
     return (

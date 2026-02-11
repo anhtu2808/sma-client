@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useState } from "react";
 import { message } from "antd";
 import Button from "@/components/Button";
+import Loading from "@/components/Loading";
 import ProfileSectionModal from "@/components/ProfileSectionModal";
 import {
   useDeleteCandidateResumeMutation,
@@ -168,7 +169,7 @@ const AttachmentsTab = () => {
         </div>
 
         {isLoadingResumes ? (
-          <p className="text-sm text-gray-500 dark:text-gray-400">Loading resumes...</p>
+          <Loading size={90} className="py-4" />
         ) : files.length === 0 ? (
           <p className="text-sm text-gray-500 dark:text-gray-400">No attached resume yet.</p>
         ) : (

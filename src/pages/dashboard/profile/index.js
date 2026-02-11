@@ -1,6 +1,7 @@
 import React from "react";
-import { Alert, Col, Row, Spin } from "antd";
+import { Alert, Col, Row } from "antd";
 import { useCandidateDashboardProfileQuery } from "@/apis/candidateApi";
+import Loading from "@/components/Loading";
 import ProfileHeader from "@/pages/dashboard/profile/profile-header";
 import WorkExperience from "@/pages/dashboard/profile/work-experience";
 import Education from "@/pages/dashboard/profile/education";
@@ -13,9 +14,7 @@ const Profile = () => {
 
   if (isLoading || isFetching) {
     return (
-      <div className="h-[50vh] flex items-center justify-center">
-        <Spin size="large" />
-      </div>
+      <Loading className="h-[50vh]" />
     );
   }
 
@@ -62,4 +61,3 @@ const Profile = () => {
 };
 
 export default Profile;
-

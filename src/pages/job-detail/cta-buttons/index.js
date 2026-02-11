@@ -3,13 +3,16 @@ import Button from '@/components/Button';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AlertCircle } from 'lucide-react';
 import { useGetJobByIdQuery } from '@/apis/jobApi';
+import Loading from '@/components/Loading';
 
 const CTAButtons = () => {
     const navigate = useNavigate();
     const { id } = useParams();
     const { data: jobData } = useGetJobByIdQuery(id);
 
-    if (!jobData) return <div className="animate-spin h-12 bg-gray-200 rounded-xl mt-6" />;
+    if (!jobData) {
+        return <Loading size={64} className="py-6" />;
+    }
 
     const attempt = jobData.appliedAttempt || 0;
     const canApply = jobData.canApply;

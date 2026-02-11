@@ -1,6 +1,7 @@
 import React from 'react';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import Button from '@/components/Button';
+import Loading from '@/components/Loading';
 
 const SubmitCTA = ({ isApplying }) => {
     return (
@@ -18,7 +19,10 @@ const SubmitCTA = ({ isApplying }) => {
                 disabled={isApplying}
             >
                 {isApplying ? (
-                    <span className="flex items-center gap-2"><Loader2 className="animate-spin" /> Submitting...</span>
+                    <span className="flex items-center gap-2">
+                        <Loading inline size={24} />
+                        Submitting...
+                    </span>
                 ) : "Submit Application"}
             </Button>
         </div>

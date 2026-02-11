@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useGetCompanyByIdQuery } from '@/apis/companyApi';
+import Loading from '@/components/Loading';
 import CompanyHeader from './components/CompanyHeader';
 import CompanySidebar from './components/CompanySidebar';
 import { AboutSection, LifeAtSection, LocationsSection } from './components/ContentSections';
@@ -14,9 +15,10 @@ const CompanyDetail = () => {
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-slate-50 dark:bg-[#1a100c]">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-            </div>
+            <Loading
+                fullScreen
+                className="bg-slate-50 dark:bg-[#1a100c]"
+            />
         );
     }
 

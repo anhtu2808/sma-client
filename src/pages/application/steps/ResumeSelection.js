@@ -1,5 +1,6 @@
 import React from 'react';
-import { FileText, CheckCircle2, Upload, Loader2, Briefcase } from 'lucide-react';
+import { FileText, CheckCircle2, Upload, Briefcase } from 'lucide-react';
+import Loading from '@/components/Loading';
 import StepWrapper from './StepWrapper';
 
 const ResumeSelection = ({
@@ -70,7 +71,11 @@ const ResumeSelection = ({
                 )}
 
                 <label className="flex items-center justify-center gap-3 p-4 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:bg-gray-50 hover:border-orange-200 transition-all group">
-                    {isUploading ? <Loader2 className="animate-spin text-orange-500" /> : <Upload size={18} className="text-gray-500 group-hover:text-orange-500" />}
+                    {isUploading ? (
+                        <Loading inline size={24} />
+                    ) : (
+                        <Upload size={18} className="text-gray-500 group-hover:text-orange-500" />
+                    )}
                     <span className="text-sm font-semibold text-gray-600 group-hover:text-orange-500">Upload New CV</span>
                     <input type="file" className="hidden" onChange={onUpload} accept=".pdf,.doc,.docx" />
                 </label>
