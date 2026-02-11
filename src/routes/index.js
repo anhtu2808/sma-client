@@ -15,7 +15,7 @@ import Resumes from '@/pages/dashboard/resumes';
 import Profile from '@/pages/dashboard/profile';
 import Invitations from '@/pages/dashboard/invitations';
 import BillingPlans from '@/pages/dashboard/billings';
-import CompanyList from '@/pages/company/CompanyList';
+import CompanyList from '@/pages/company';
 import CompanyDetail from '@/pages/company-detail';
 import PricingPage from "@/pages/pricing";
 import Application from "@/pages/application";
