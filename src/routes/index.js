@@ -14,8 +14,10 @@ import Notification from '@/pages/dashboard/notification';
 import Resumes from '@/pages/dashboard/resumes';
 import Profile from '@/pages/dashboard/profile';
 import Invitations from '@/pages/dashboard/invitations';
+import BillingPlans from '@/pages/dashboard/billings';
 import CompanyList from '@/pages/company/CompanyList';
 import CompanyDetail from '@/pages/company-detail';
+import PricingPage from "@/pages/pricing";
 import Application from "@/pages/application";
 import ApplicationSuccess from "@/pages/application/sucess";
 
@@ -31,6 +33,7 @@ export const routes = createBrowserRouter(
                 <Route path="ui-kit" element={<UiKit />} />
                 <Route path="jobs" element={<Jobs />} />
                 <Route path="jobs/:id" element={<JobDetail />} />
+                <Route path="pricing" element={<PricingPage />} />
                 <Route path="companies">
                     <Route index element={<CompanyList />} />
                     <Route path=":id" element={<CompanyDetail />} />
@@ -47,6 +50,7 @@ export const routes = createBrowserRouter(
                 <Route path="notifications" element={<Notification />} />
                 <Route path="resumes" element={<Resumes />} />
                 <Route path="profile" element={<Profile />} />
+                <Route path="billing-plans" element={<BillingPlans />} />
             </Route>
         </>
     )

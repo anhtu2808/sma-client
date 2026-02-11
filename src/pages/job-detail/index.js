@@ -2,6 +2,7 @@ import React from 'react';
 import { useParams, useNavigate, Link, Outlet } from 'react-router-dom';
 import { useGetJobByIdQuery } from '@/apis/jobApi';
 import Button from '@/components/Button';
+import Loading from '@/components/Loading';
 
 import Header from './header';
 import MetaInfo from './meta-info';
@@ -23,9 +24,7 @@ const JobDetail = () => {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex justify-center items-center bg-[#F3F4F6]">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-            </div>
+            <Loading fullScreen className="bg-[#F3F4F6]" />
         );
     }
 

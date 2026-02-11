@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { Col, Row } from "antd";
 import Button from "@/components/Button";
+import Loading from "@/components/Loading";
 import { ResumeCard, CreateResumeCard, ResumeListItem } from "../../resume-card";
 import { useGetCandidateResumesQuery } from "@/apis/resumeApi";
 import { RESUME_TYPES } from "@/constant";
@@ -55,7 +56,7 @@ const ResumeBuilderTab = ({ viewMode, onChangeViewMode, onCreateResume }) => {
 
       <div className="bg-white dark:bg-surface-dark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
         {isLoading ? (
-          <p className="text-sm text-gray-500 dark:text-gray-400">Loading template resumes...</p>
+          <Loading size={90} className="py-4" />
         ) : viewMode === "list" ? (
           <Row gutter={[24, 16]}>
             {resumeItems.map((resume) => (

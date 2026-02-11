@@ -1,6 +1,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import Loading from '@/components/Loading';
 
 const DataList = ({
     isLoading,
@@ -14,9 +15,7 @@ const DataList = ({
     // 1. Loading State
     if (isLoading) {
         return (
-            <div className={`flex items-center justify-center py-20 ${className}`}>
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-            </div>
+            <Loading className={className} size={110} />
         );
     }
 

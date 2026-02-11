@@ -5,7 +5,7 @@ const sidebarItems = [
     { to: "/dashboard", icon: "grid_view", label: "Overview", end: true },
     { to: "/dashboard/profile", icon: "person", label: "Profile" },
     { to: "/dashboard/resumes", icon: <i className="fa-solid fa-file-lines"></i>, label: "Resumes" },
-    { to: "/dashboard/jobs", icon: "work_history", label: "Job" },
+    { to: "/dashboard/jobs", icon: "work_history", label: "My Jobs" },
     {
         to: "/dashboard/invitations",
         icon: "mail",
@@ -13,6 +13,7 @@ const sidebarItems = [
         badge: 3,
     },
     { to: "/dashboard/notifications", icon: "notifications", label: "Notifications" },
+    { to: "/dashboard/billing-plans", icon: "credit_card", label: "Billing & Plans" },
     { to: "/dashboard/setting", icon: "settings", label: "Settings" },
 ];
 
