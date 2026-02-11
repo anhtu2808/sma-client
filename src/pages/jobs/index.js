@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useGetJobsQuery } from '@/apis/jobApi';
 
 // Import các components con
@@ -17,7 +17,7 @@ const Jobs = () => {
 
     // API Call
     // Filter out empty params
-    const queryParams = {
+    const queryParams = useMemo(() => ({
         page: 0,
         size: 10,
         ...(filters.name && { name: filters.name }),
@@ -25,13 +25,13 @@ const Jobs = () => {
         ...(filters.jobLevel && { jobLevel: filters.jobLevel }),
         ...(filters.salaryStart && { salary: filters.salaryStart }),
         ...(filters.skillId?.length && { skillId: filters.skillId }),
-    };
+    }), [filters]);
 
     // API Call
     const { data: jobData, isLoading, isError } = useGetJobsQuery(queryParams);
 
     // Debug log
-    React.useEffect(() => {
+    useEffect(() => {
         console.log("Filters:", filters);
         console.log("Query Params:", queryParams);
         console.log("API Response JobData:", jobData);
