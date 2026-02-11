@@ -1,6 +1,23 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
+import { useGetJobByIdQuery } from '@/apis/jobApi';
 
-const Requirements = ({ requirements }) => {
+const Requirements = () => {
+    const { id } = useParams();
+    const { data: jobData } = useGetJobByIdQuery(id);
+    const requirementsRaw = jobData?.data?.requirement;
+
+    // Parse list logic
+    const parseList = (content) => {
+        if (Array.isArray(content)) return content;
+        if (typeof content === 'string') {
+            return content.split('\n').filter(item => item.trim().length > 0);
+        }
+        return [];
+    };
+
+    const requirements = parseList(requirementsRaw);
+
     if (!requirements || requirements.length === 0) return null;
 
     return (

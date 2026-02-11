@@ -1,14 +1,19 @@
 import React from 'react';
 import Button from '@/components/Button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { AlertCircle } from 'lucide-react';
+import { useGetJobByIdQuery } from '@/apis/jobApi';
 
-const CTAButtons = ({ job }) => {
+const CTAButtons = () => {
     const navigate = useNavigate();
-    console.log("Dữ liệu job tại UI:", job);
-    const attempt = job?.appliedAttempt || 0;
-    const canApply = job?.canApply;
-    const lastStatus = job?.lastApplicationStatus;
+    const { id } = useParams();
+    const { data: jobData } = useGetJobByIdQuery(id);
+
+    if (!jobData) return <div className="animate-spin h-12 bg-gray-200 rounded-xl mt-6" />;
+
+    const attempt = jobData.appliedAttempt || 0;
+    const canApply = jobData.canApply;
+    const lastStatus = jobData.lastApplicationStatus;
 
     const getButtonConfig = () => {
         if (attempt >= 2 || canApply === false) {
@@ -36,8 +41,6 @@ const CTAButtons = ({ job }) => {
 
     const config = getButtonConfig();
 
-    if (!job?.id) return <div className="animate-spin h-12 bg-gray-200 rounded-xl mt-6" />;
-
     return (
         <div className="mt-6 pt-6 border-t border-gray-100 font-body space-y-3">
             {attempt === 1 && !config.disabled && (
@@ -60,7 +63,7 @@ const CTAButtons = ({ job }) => {
                         fullWidth
                         disabled={config.disabled}
                         shape='rounded'
-                        onClick={() => navigate(`/applications/apply/${job.id}`)}
+                        onClick={() => navigate(`/jobs/${id}/application`)}
                         iconRight={!config.disabled && <span className="material-icons-round text-[20px]">arrow_outward</span>}
                     >
                         {config.text}

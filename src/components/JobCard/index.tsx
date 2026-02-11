@@ -1,5 +1,5 @@
-import PropTypes from 'prop-types';
 import Button from '@/components/Button';
+import PropTypes from 'prop-types';
 
 const JobCard = ({
     title,
@@ -18,7 +18,7 @@ const JobCard = ({
     return (
         <article
             onClick={onClick}
-            className="group relative flex flex-col gap-6 p-6 md:p-8 rounded-2xl bg-white dark:bg-[#2c1a14] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.4)] border border-transparent hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+            className="group relative flex flex-col gap-6 p-6 md:p-8 rounded-2xl bg-white dark:bg-[#2c1a14] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.4)] border border-transparent hover:border-primary/30 transition-all duration-300 cursor-pointer"
         >
             {/* Header Section: Logo, Title, Badge */}
             <div className="flex items-start justify-between gap-4">

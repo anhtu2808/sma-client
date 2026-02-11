@@ -3,8 +3,8 @@ import { useGetJobsQuery } from '@/apis/jobApi';
 
 // Import các components con
 import SearchHero from '@/components/SearchHero';
-import JobFilterSidebar from './components/JobFilterSidebar';
-import JobList from './components/JobList';
+import Sidebar from './sidebar';
+import JobList from './list';
 
 const Jobs = () => {
     const [filters, setFilters] = useState({
@@ -87,7 +87,7 @@ const Jobs = () => {
                 <div className="flex flex-col lg:flex-row gap-8">
 
                     {/* 2. Sidebar Filter Section */}
-                    <JobFilterSidebar
+                    <Sidebar
                         filters={filters}
                         onFilterChange={handleFilterChange}
                         onReset={handleResetFilters}

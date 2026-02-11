@@ -1,6 +1,18 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
+import { useGetJobByIdQuery } from '@/apis/jobApi';
 
-const SkillsAndDomains = ({ skills, expertise, domains }) => {
+const SkillsAndDomains = () => {
+    const { id } = useParams();
+    const { data: jobData } = useGetJobByIdQuery(id);
+    const job = jobData?.data;
+
+    if (!job) return null;
+
+    const skills = job.skills || [];
+    const expertise = job.expertise;
+    const domains = job.domains || [];
+
     return (
         <>
             {/* Skills */}

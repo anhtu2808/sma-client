@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom'; // Thêm useLocation
+import { useNavigate, useLocation } from 'react-router-dom';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
 

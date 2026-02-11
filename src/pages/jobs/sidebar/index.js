@@ -2,7 +2,7 @@ import React from 'react';
 import Select from '@/components/Select';
 import FilterSidebar from '@/components/FilterSidebar';
 
-const JobFilterSidebar = ({ filters, onFilterChange, onReset }) => {
+const Sidebar = ({ filters, onFilterChange, onReset }) => {
     // Static data transformed for CustomDropdown
     const locationOptions = [
         { label: "All Cities", value: "" },
@@ -105,4 +105,4 @@ const JobFilterSidebar = ({ filters, onFilterChange, onReset }) => {
     );
 };
 
-export default JobFilterSidebar;
+export default Sidebar;

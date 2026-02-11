@@ -1,6 +1,22 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
+import { useGetJobByIdQuery } from '@/apis/jobApi';
 
-const CompanyInfoCard = ({ company }) => {
+const CompanyInfoCard = () => {
+    const { id } = useParams();
+    const { data: jobData } = useGetJobByIdQuery(id);
+    const apiJob = jobData?.data;
+
+    if (!apiJob) return null; // Or skeleton
+
+    const company = {
+        name: apiJob.company?.name || "Unknown Company",
+        logo: apiJob.company?.logo,
+        link: apiJob.company?.link,
+        country: apiJob.company?.country,
+        industry: apiJob.company?.companyIndustry,
+    };
+
     return (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <div className="flex items-center gap-4 mb-4">
