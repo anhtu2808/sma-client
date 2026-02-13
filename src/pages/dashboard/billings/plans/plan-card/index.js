@@ -40,7 +40,12 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
                 </span>
               ) : null}
             </div>
-            <p className="text-sm text-gray-500 leading-relaxed">{plan.description}</p>
+            <p
+              className="text-sm text-gray-500 leading-relaxed line-clamp-2 min-h-[42px]"
+              title={plan.description}
+            >
+              {plan.description}
+            </p>
           </div>
 
           <div className="mb-6 pb-6 border-b border-gray-100">
@@ -66,19 +71,9 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
             {plan.cta}
           </button>
 
-          <div className="space-y-4 flex-1">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{plan.featuresTitle}</p>
-            <ul className="space-y-3">
-              {plan.features.map((feature) => (
-                <li className="flex items-start gap-3 text-sm text-gray-600" key={`${plan.code}-${feature}`}>
-                  <span className={`material-icons-round text-[20px] ${isCurrent ? "text-gray-400" : "text-primary"}`}>
-                    {isCurrent ? "check" : "check_circle"}
-                  </span>
-                  <span>{feature}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {plan.detailsHtml ? (
+            <div className="flex-1" dangerouslySetInnerHTML={{ __html: plan.detailsHtml }} />
+          ) : null}
         </>
       ) : (
         <div className="flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-300">
