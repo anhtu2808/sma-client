@@ -7,6 +7,8 @@ const getSaveClass = (save) => {
 };
 
 const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSelectDuration }) => {
+  const isCurrent = plan.current;
+
   return (
     <article
       className={`relative rounded-2xl border p-8 shadow-sm flex flex-col h-full md:h-[690px] transition-all ${
@@ -25,7 +27,12 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
         <>
           <div className="mb-8">
             <h3 className="text-xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-            <p className="text-sm text-gray-500">{plan.description}</p>
+            <p
+              className="text-sm text-gray-500 line-clamp-2 min-h-[42px]"
+              title={plan.description}
+            >
+              {plan.description}
+            </p>
             <div className="mt-6 flex items-baseline gap-1">
               <span className="text-4xl font-extrabold text-gray-900">{plan.price}</span>
               <span className="text-gray-500 font-medium">{plan.unit}</span>
@@ -34,9 +41,12 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
 
           <button
             type="button"
-            onClick={() => (plan.durations.length ? onExpand() : null)}
+            disabled={isCurrent}
+            onClick={() => (!isCurrent && plan.durations.length ? onExpand() : null)}
             className={`w-full py-3 px-4 font-semibold rounded-lg mb-8 transition-all ${
-              plan.popular || plan.code === "PREMIUM"
+              isCurrent
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : plan.popular || plan.code === "PREMIUM"
                 ? "bg-primary text-white hover:bg-primary-dark"
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
@@ -44,23 +54,9 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
             {plan.cta}
           </button>
 
-          <div className="space-y-4 flex-1">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{plan.featuresTitle}</p>
-            <ul className="space-y-3">
-              {plan.features.map((feature) => (
-                <li className="flex items-start gap-3 text-sm text-gray-600" key={`${plan.code}-${feature}`}>
-                  <span
-                    className={`material-icons-round text-[20px] ${
-                      plan.code === "FREE" ? "text-primary" : "text-primary"
-                    }`}
-                  >
-                    {plan.code === "FREE" ? "check" : "check_circle"}
-                  </span>
-                  <span>{feature}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {plan.detailsHtml ? (
+            <div className="flex-1" dangerouslySetInnerHTML={{ __html: plan.detailsHtml }} />
+          ) : null}
         </>
       ) : (
         <div className="flex flex-col h-full">
@@ -113,9 +109,14 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
           <Button
             mode="primary"
             shape="rounded"
-            className="w-full py-4 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-all shadow-lg text-sm tracking-wide"
+            className={`w-full py-4 font-bold rounded-xl transition-all shadow-lg text-sm tracking-wide ${
+              isCurrent
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "bg-primary text-white hover:bg-primary-dark"
+            }`}
+            disabled={isCurrent}
           >
-            Subscribe Now
+            {isCurrent ? "Current Plan" : "Subscribe Now"}
           </Button>
         </div>
       )}
