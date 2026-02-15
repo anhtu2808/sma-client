@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Button from '@/components/Button';
 import SectionHeader from '@/components/SectionHeader';
 import ColorSwatch from '@/components/ColorSwatch';
@@ -8,8 +8,40 @@ import SearchInput from '@/components/SearchInput';
 import Checkbox from '@/components/Checkbox';
 import Switch from '@/components/Switch';
 import JobCard from '@/components/JobCard';
+import SimpleTextEditor from '@/components/SimpleTextEditor';
 
 const UiKit = () => {
+    const templateHtml = `
+        <ul>
+            <li><strong>Description:</strong> Write a short description of your project</li>
+            <li><strong>Role:</strong> Your role in this project</li>
+            <li>
+                <strong>Responsibilities:</strong>
+                <ul>
+                    <li>First responsibility</li>
+                    <li>Second responsibility</li>
+                </ul>
+            </li>
+            <li><strong>Tech stack:</strong> List technologies used</li>
+            <li><strong>Team size:</strong> x members</li>
+        </ul>
+    `;
+    const insertHtml = `
+        <p><strong>Everything in Free, plus</strong></p>
+        <ul>
+            <li>50 AI Resume scans/mo</li>
+            <li>Priority Application</li>
+            <li>AI Interview Coaching</li>
+        </ul>
+        <p><strong>What's included</strong></p>
+        <ul>
+            <li>3 AI Resume scans/mo</li>
+            <li>Basic Job Search</li>
+            <li>Public Profile</li>
+        </ul>
+    `;
+    const [editorValue, setEditorValue] = useState(templateHtml);
+
     return (
         <div className="min-h-screen bg-surface-light dark:bg-background-dark">
             <header className="text-center max-w-3xl mx-auto py-16 px-6">
@@ -374,6 +406,28 @@ const UiKit = () => {
                             onApply={() => console.log('Applied')}
                         />
                     </div>
+                </section>
+
+                {/* 06. Text Editor */}
+                <section id="text-editor">
+                    <SectionHeader number="06" title="Text Editor" />
+
+                    <Card className="!p-8">
+                        <SimpleTextEditor
+                            value={editorValue}
+                            onChange={(html) => setEditorValue(html)}
+                            bulletLevelMap={['check_circle_orange', 'check_orange']}
+                            showInsertHtml
+                            insertHtml={insertHtml}
+                            insertHtmlLabel="Insert HTML"
+                            showInsertTemplate
+                            templateHtml={templateHtml}
+                            onInsertTemplate={() => setEditorValue(templateHtml)}
+                            showCount
+                            maxLength={2500}
+                            placeholder="Write your project details..."
+                        />
+                    </Card>
                 </section>
             </main>
 
