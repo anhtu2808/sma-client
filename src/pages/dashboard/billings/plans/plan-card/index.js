@@ -12,6 +12,7 @@ const getSaveBadgeStyle = (savePercent) => {
 
 const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSelectDuration }) => {
   const isCurrent = plan.current;
+  const canExpand = !isCurrent && plan.durations.length > 0;
 
   return (
     <article
@@ -58,10 +59,10 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
 
           <button
             type="button"
-            disabled={isCurrent}
-            onClick={() => !isCurrent && onExpand()}
+            disabled={!canExpand}
+            onClick={() => (canExpand ? onExpand() : null)}
             className={`w-full py-3 px-4 rounded-lg font-semibold transition-all mb-8 ${
-              isCurrent
+              !canExpand
                 ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                 : plan.popular
                 ? "bg-primary hover:bg-primary-dark text-white shadow-md"

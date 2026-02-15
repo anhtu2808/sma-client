@@ -141,6 +141,21 @@ const Projects = () => {
                 {project?.description || "N/A"}
               </p>
 
+              {(project?.position || project?.teamSize) && (
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  {project?.position ? (
+                    <span className="text-xs px-2 py-1 rounded bg-orange-50 text-orange-700">
+                      Role: {project.position}
+                    </span>
+                  ) : null}
+                  {project?.teamSize ? (
+                    <span className="text-xs px-2 py-1 rounded bg-gray-100 text-gray-600">
+                      Team size: {project.teamSize}
+                    </span>
+                  ) : null}
+                </div>
+              )}
+
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs font-mono text-primary bg-primary/5 px-2 py-1 rounded">
                   {formatRange(project?.startDate, project?.endDate, project?.isCurrent)}
