@@ -13,15 +13,18 @@ const formatCurrency = (amount, currency) => {
 };
 
 
+const isLifetimeUnit = (unit) => String(unit || "").toUpperCase() === "LIFETIME";
+
 const toMonths = (duration, unit) => {
   if (!duration || !unit) return 0;
+  if (isLifetimeUnit(unit)) return 0;
   return unit === "YEAR" ? duration * 12 : duration;
 };
 
 const mapPlanToCard = (plan, currentPlanId) => {
   const planPrices = Array.isArray(plan?.planPrices) ? plan.planPrices : [];
   const lifetimePrice = planPrices.find(
-    (price) => price?.isActive !== false && price?.unit === "LIFETIME"
+    (price) => price?.isActive !== false && isLifetimeUnit(price?.unit)
   );
   const name = plan?.name || "Plan";
   const code = name ? name.toUpperCase().replace(/\s+/g, "_") : `PLAN_${plan?.id ?? ""}`;
@@ -44,7 +47,7 @@ const mapPlanToCard = (plan, currentPlanId) => {
       current: isCurrent,
       popular: isPopular,
       basePriceLabel: priceLabel,
-      baseUnit: "forever",
+      baseUnit: "",
       note,
       cta: isCurrent ? "Current Plan" : `Upgrade to ${name}`,
       detailsHtml,
@@ -116,10 +119,51 @@ const Plans = ({ plans = [], currentPlanId = null }) => {
   const [expandedPlanCode, setExpandedPlanCode] = useState(null);
   const [selectedDurationByPlan, setSelectedDurationByPlan] = useState({});
 
-  const mappedPlans = useMemo(() => {
+  const sortedPlans = useMemo(() => {
     if (!Array.isArray(plans)) return [];
-    return plans.map((plan) => mapPlanToCard(plan, currentPlanId));
-  }, [plans, currentPlanId]);
+    const getBaseMonthly = (plan) => {
+      const prices = Array.isArray(plan?.planPrices) ? plan.planPrices : [];
+      const activePrices = prices.filter((price) => price?.isActive !== false);
+      const lifetime = activePrices.find((price) => isLifetimeUnit(price?.unit));
+      if (lifetime) {
+        return {
+          price: Number(lifetime.salePrice ?? lifetime.originalPrice ?? 0),
+          hasPrice: true,
+        };
+      }
+      const priced = activePrices
+        .map((price) => ({
+          months: toMonths(price.duration, price.unit),
+          total: Number(price.salePrice ?? price.originalPrice ?? 0),
+        }))
+        .filter((price) => price.months > 0)
+        .sort((a, b) => a.months - b.months);
+      if (priced.length === 0) {
+        return { price: Number.POSITIVE_INFINITY, hasPrice: false };
+      }
+      const base = priced[0];
+      return {
+        price: base.total / base.months,
+        hasPrice: true,
+      };
+    };
+    return [...plans].sort((a, b) => {
+      const aDefault = Boolean(a?.isDefault);
+      const bDefault = Boolean(b?.isDefault);
+      if (aDefault !== bDefault) return aDefault ? -1 : 1;
+      const aPrice = getBaseMonthly(a);
+      const bPrice = getBaseMonthly(b);
+      if (aPrice.price !== bPrice.price) return aPrice.price - bPrice.price;
+      const aName = String(a?.name || "");
+      const bName = String(b?.name || "");
+      return aName.localeCompare(bName);
+    });
+  }, [plans]);
+
+  const mappedPlans = useMemo(() => {
+    if (!Array.isArray(sortedPlans)) return [];
+    return sortedPlans.map((plan) => mapPlanToCard(plan, currentPlanId));
+  }, [sortedPlans, currentPlanId]);
 
   useEffect(() => {
     if (mappedPlans.length === 0) return;
