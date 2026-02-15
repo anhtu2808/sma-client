@@ -20,6 +20,35 @@ const toMonths = (duration, unit) => {
 
 const mapPlanToCard = (plan) => {
   const planPrices = Array.isArray(plan?.planPrices) ? plan.planPrices : [];
+  const lifetimePrice = planPrices.find(
+    (price) => price?.isActive !== false && price?.unit === "LIFETIME"
+  );
+  const name = plan?.name || "Plan";
+  const code = name ? name.toUpperCase().replace(/\s+/g, "_") : `PLAN_${plan?.id ?? ""}`;
+  const isCurrent = Boolean(plan?.isCurrent);
+  const description = plan?.description || "";
+  const detailsHtml = typeof plan?.planDetails === "string" ? plan.planDetails.trim() : "";
+  const isPopular = Boolean(plan?.isPopular);
+
+  if (lifetimePrice) {
+    const total = Number(lifetimePrice.salePrice ?? lifetimePrice.originalPrice ?? 0);
+    const currency = lifetimePrice.currency || plan.currency || "VND";
+    const priceLabel = total === 0 ? "Free" : formatCurrency(total, currency);
+    const cta = isCurrent ? "Current Plan" : total === 0 ? "Get Started" : `Upgrade to ${name}`;
+    return {
+      id: plan?.id,
+      code,
+      name,
+      description,
+      price: priceLabel,
+      unit: "forever",
+      cta,
+      current: isCurrent,
+      popular: isPopular,
+      detailsHtml,
+      durations: [],
+    };
+  }
   const pricesWithMonths = planPrices
     .filter((price) => price?.isActive !== false)
     .map((price) => ({
@@ -55,22 +84,19 @@ const mapPlanToCard = (plan) => {
     mostPopular: item.save === maxSave && maxSave > 0,
   }));
 
-  const name = plan?.name || "Plan";
-  const code = name ? name.toUpperCase().replace(/\s+/g, "_") : `PLAN_${plan?.id ?? ""}`;
-  const isCurrent = Boolean(plan?.isCurrent);
   const cta = isCurrent ? "Current Plan" : baseMonthly === 0 ? "Get Started" : `Upgrade to ${name}`;
 
   return {
     id: plan?.id,
     code,
     name,
-    description: plan?.description || "",
+    description,
     price: basePrice ? formatCurrency(baseMonthly, basePrice.currency) : "-",
     unit: "/ month",
     cta,
     current: isCurrent,
-    popular: Boolean(plan?.isPopular),
-    detailsHtml: typeof plan?.planDetails === "string" ? plan.planDetails.trim() : "",
+    popular: isPopular,
+    detailsHtml,
     durations: durationsWithPopular,
   };
 };

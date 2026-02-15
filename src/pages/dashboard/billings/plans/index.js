@@ -20,6 +20,37 @@ const toMonths = (duration, unit) => {
 
 const mapPlanToCard = (plan, currentPlanId) => {
   const planPrices = Array.isArray(plan?.planPrices) ? plan.planPrices : [];
+  const lifetimePrice = planPrices.find(
+    (price) => price?.isActive !== false && price?.unit === "LIFETIME"
+  );
+  const name = plan?.name || "Plan";
+  const code = name ? name.toUpperCase().replace(/\s+/g, "_") : `PLAN_${plan?.id ?? ""}`;
+  const isCurrent =
+    currentPlanId != null ? plan?.id === currentPlanId : Boolean(plan?.isCurrent);
+  const description = plan?.description || "";
+  const detailsHtml = typeof plan?.planDetails === "string" ? plan.planDetails.trim() : "";
+  const isPopular = Boolean(plan?.isPopular);
+
+  if (lifetimePrice) {
+    const total = Number(lifetimePrice.salePrice ?? lifetimePrice.originalPrice ?? 0);
+    const currency = lifetimePrice.currency || plan.currency || "VND";
+    const priceLabel = total === 0 ? "Free" : formatCurrency(total, currency);
+    const note = total === 0 ? "Lifetime access" : "Billed once";
+    return {
+      id: plan?.id,
+      code,
+      name,
+      description,
+      current: isCurrent,
+      popular: isPopular,
+      basePriceLabel: priceLabel,
+      baseUnit: "forever",
+      note,
+      cta: isCurrent ? "Current Plan" : `Upgrade to ${name}`,
+      detailsHtml,
+      durations: [],
+    };
+  }
   const pricesWithMonths = planPrices
     .filter((price) => price?.isActive !== false)
     .map((price) => ({
@@ -56,10 +87,6 @@ const mapPlanToCard = (plan, currentPlanId) => {
     mostPopular: item.savePercent === maxSave && maxSave > 0,
   }));
 
-  const name = plan?.name || "Plan";
-  const code = name ? name.toUpperCase().replace(/\s+/g, "_") : `PLAN_${plan?.id ?? ""}`;
-  const isCurrent =
-    currentPlanId != null ? plan?.id === currentPlanId : Boolean(plan?.isCurrent);
   const note =
     durationsWithPopular.length > 1
       ? "Billed monthly or save on longer terms"
@@ -73,14 +100,14 @@ const mapPlanToCard = (plan, currentPlanId) => {
     id: plan?.id,
     code,
     name,
-    description: plan?.description || "",
+    description,
     current: isCurrent,
-    popular: Boolean(plan?.isPopular),
+    popular: isPopular,
     basePriceLabel: basePrice ? formatCurrency(baseMonthly, basePrice.currency) : "-",
     baseUnit: "/ month",
     note,
     cta: isCurrent ? "Current Plan" : `Upgrade to ${name}`,
-    detailsHtml: typeof plan?.planDetails === "string" ? plan.planDetails.trim() : "",
+    detailsHtml,
     durations: durationsWithPopular,
   };
 };

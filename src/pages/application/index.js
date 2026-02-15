@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGetJobByIdQuery, useGetJobQuestionsQuery } from '@/apis/jobApi';
-import { useGetCandidateResumesQuery, useUploadFilesMutation } from '@/apis/resumeApi';
+import { useGetCandidateResumesQuery, useUploadCandidateResumeMutation, useUploadFilesMutation } from '@/apis/resumeApi';
 import { useApplyJobMutation } from '@/apis/applicationApi';
 import Card from '@/components/Card';
 import Loading from '@/components/Loading';
@@ -20,7 +20,8 @@ const Application = () => {
     const { id: jobId } = useParams();
     const navigate = useNavigate();
 
-    const [uploadFiles, { isLoading: isUploading }] = useUploadFilesMutation();
+    const [uploadFiles, { isLoading: isUploadingFile }] = useUploadFilesMutation();
+    const [uploadCandidateResume, { isLoading: isSavingResume }] = useUploadCandidateResumeMutation();
     const [applyJob, { isLoading: isApplying }] = useApplyJobMutation();
 
     const { data: jobData, isLoading: jobLoading } = useGetJobByIdQuery(jobId, {
@@ -82,18 +83,26 @@ const Application = () => {
 
         try {
             const uploadRes = await uploadFiles(formData).unwrap();
+            const uploadedFile = Array.isArray(uploadRes) ? uploadRes[0] : null;
 
-            const mockResumeResponse = {
-                id: 34, 
-                fileName: uploadRes[0].originalFileName,
-                status: "DRAFT"
-            };
+            if (!uploadedFile?.downloadUrl) {
+                throw new Error("Upload file failed.");
+            }
 
-            setNewlyUploadedResume(mockResumeResponse);
-            setSelectedResumeId(mockResumeResponse.id);
+            const createdResume = await uploadCandidateResume({
+                resumeName: file.name,
+                fileName: uploadedFile.originalFileName || file.name,
+                resumeUrl: uploadedFile.downloadUrl,
+            }).unwrap();
+
+            setNewlyUploadedResume(createdResume);
+            setSelectedResumeId(createdResume?.id ?? null);
             toast.success("Resume uploaded and selected successfully!");
         } catch (err) {
-            toast.error("Failed to upload file.");
+            const message = err?.data?.message || err?.message || "Failed to upload resume.";
+            toast.error(message);
+        } finally {
+            e.target.value = "";
         }
     };
 
@@ -189,12 +198,14 @@ const Application = () => {
     };
 
     useEffect(() => {
+        if (selectedResumeId) return;
         if (resumes && resumes.length > 0) {
             const defaultResume = resumes.find(r => r.isDefault) || resumes[0];
             setSelectedResumeId(defaultResume.id);
         }
-    }, [resumes]);
+    }, [resumes, selectedResumeId]);
 
+    const isUploading = isUploadingFile || isSavingResume;
     const isLoading = jobLoading || resumesLoading || questionsLoading;
     if (isLoading) return (
         <Loading fullScreen className="bg-[#F3F4F6]" />
