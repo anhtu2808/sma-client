@@ -19,6 +19,17 @@ const CTAButtons = () => {
     const lastStatus = jobData.lastApplicationStatus;
 
     const getButtonConfig = () => {
+        const jobStatus = jobData?.data?.status;
+
+        if (jobStatus === 'CLOSED') {
+            return {
+                text: "Job Closed",
+                disabled: true,
+                mode: "secondary",
+                note: "This job is no longer accepting applications."
+            };
+        }
+
         if (attempt >= 2 || canApply === false) {
             return {
                 text: "Max Attempts Reached",
