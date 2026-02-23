@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Select from '@/components/Select';
 import FilterSidebar from '@/components/FilterSidebar';
+import { useGetSkillsQuery } from '@/apis/skillApi';
 
 const Sidebar = ({ filters, onFilterChange, onReset }) => {
     // Static data transformed for CustomDropdown
@@ -22,19 +23,11 @@ const Sidebar = ({ filters, onFilterChange, onReset }) => {
         { label: "Manager", value: "MANAGER" }
     ];
 
-    // Mock Skills
-    const skills = [
-        { id: 1, name: "Java" },
-        { id: 2, name: "ReactJS" },
-        { id: 3, name: "NodeJS" },
-        { id: 4, name: "Python" },
-        { id: 5, name: ".NET" },
-        { id: 6, name: "Angular" },
-        { id: 7, name: "VueJS" },
-        { id: 8, name: "Go" },
-        { id: 9, name: "AWS" },
-        { id: 10, name: "Docker" },
-    ];
+    // Skill search
+    const [skillSearch, setSkillSearch] = useState('');
+
+    // Fetch skills from API
+    const { data: skills = [] } = useGetSkillsQuery({ name: skillSearch || undefined, page: 0, size: 100 });
 
     const handleSkillChange = (skillId) => {
         const currentSkills = filters.skillId || [];
@@ -79,6 +72,16 @@ const Sidebar = ({ filters, onFilterChange, onReset }) => {
             {/* Skills - Multi-select Checkboxes */}
             <div>
                 <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3">Skills</label>
+                <div className="relative mb-3">
+                    <span className="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+                    <input
+                        type="text"
+                        value={skillSearch}
+                        onChange={(e) => setSkillSearch(e.target.value)}
+                        placeholder="Search skills..."
+                        className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 dark:border-[#4b2c20] rounded-lg bg-white dark:bg-[#2c1a14] text-slate-700 dark:text-slate-300 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+                    />
+                </div>
                 <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                     {skills.map(skill => {
                         const isChecked = (filters.skillId || []).includes(skill.id);
