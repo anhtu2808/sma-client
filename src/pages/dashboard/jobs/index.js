@@ -76,8 +76,11 @@ const DashboardJobs = () => {
 
   // Sync tab with URL params
   useEffect(() => {
-    if (searchParams.get('saved')) {
+    const tabParam = searchParams.get('tab');
+    if (tabParam === 'saved') {
       setActiveTab('saved');
+    } else if (tabParam === 'applied') {
+      setActiveTab('applied');
     }
   }, [searchParams]);
 
