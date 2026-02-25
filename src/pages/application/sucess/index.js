@@ -38,7 +38,7 @@ const ApplicationSuccess = () => {
                         <Button
                             mode="primary"
                             fullWidth
-                            onClick={() => navigate('/dashboard/applications')}
+                            onClick={() => navigate('/dashboard/jobs')}
                         >
                             Track My Application
                         </Button>
