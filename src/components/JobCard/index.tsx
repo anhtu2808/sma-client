@@ -11,6 +11,8 @@ const JobCard = ({
     isHot = false,
     companyLogo,
     isApplied = false,
+    isBookmarked = false,
+    isBookmarkLoading = false,
     onBookmark,
     onApply,
     onClick, // New prop for card click
@@ -74,14 +76,21 @@ const JobCard = ({
                     btnIcon
                     mode="ghost"
                     shape="pill"
+                    disabled={isBookmarkLoading}
                     onClick={(e) => {
                         e.stopPropagation(); // Prevent card click
                         onBookmark && onBookmark();
                     }}
-                    className="shrink-0 !p-2 !text-slate-400 dark:!text-[#8c6b5d] hover:!bg-slate-100 dark:hover:!bg-[#4b2c20] hover:!text-primary"
+                    className={`shrink-0 !p-2 hover:!bg-slate-100 dark:hover:!bg-[#4b2c20] ${
+                        isBookmarked
+                            ? "!text-primary"
+                            : "!text-slate-400 dark:!text-[#8c6b5d] hover:!text-primary"
+                    }`}
                     aria-label="Bookmark job"
                 >
-                    <span className="material-icons-round text-[24px]">bookmark_border</span>
+                    <span className="material-icons-round text-[24px]">
+                        {isBookmarked ? "bookmark" : "bookmark_border"}
+                    </span>
                 </Button>
             </div>
 
@@ -152,6 +161,8 @@ JobCard.propTypes = {
     postedTime: PropTypes.string.isRequired,
     isHot: PropTypes.bool,
     isApplied: PropTypes.bool,
+    isBookmarked: PropTypes.bool,
+    isBookmarkLoading: PropTypes.bool,
     companyLogo: PropTypes.string,
     onBookmark: PropTypes.func,
     onApply: PropTypes.func,
