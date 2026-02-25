@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { message } from 'antd';
+import { message, Button as AntButton } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import { useGetJobsQuery, useGetMarkedJobsQuery, useToggleMarkJobMutation } from '@/apis/jobApi';
 
 // Import các components con
@@ -8,6 +9,7 @@ import Sidebar from './sidebar';
 import JobList from './list';
 
 const Jobs = () => {
+    const navigate = useNavigate();
     const [filters, setFilters] = useState({
         name: '',
         location: '',
@@ -71,7 +73,26 @@ const Jobs = () => {
 
         try {
             await toggleMarkJob(jobId).unwrap();
-            message.success(nextMarked ? 'Marked job successfully.' : 'Unmarked job successfully.');
+            if (nextMarked) {
+                message.success({
+                    content: (
+                        <div className="flex items-center gap-4">
+                            <span>This job has been added to your Saved jobs.</span>
+                            <AntButton
+                                type="link"
+                                size="small"
+                                className="!p-0 !h-auto font-bold text-primary hover:text-primary/80"
+                                onClick={() => navigate('/dashboard/jobs?saved')}
+                            >
+                                View now
+                            </AntButton>
+                        </div>
+                    ),
+                    duration: 5,
+                });
+            } else {
+                message.success('Job removed from Saved jobs.');
+            }
         } catch (error) {
             setBookmarkOverrides((prev) => ({ ...prev, [jobId]: currentMarked }));
             message.error(error?.data?.message || 'Failed to update marked job.');

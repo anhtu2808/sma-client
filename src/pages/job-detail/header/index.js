@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { message } from 'antd';
-import { useParams } from 'react-router-dom';
+import { message, Button as AntButton } from 'antd';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useGetJobByIdQuery, useGetMarkedJobsQuery, useToggleMarkJobMutation } from '@/apis/jobApi';
 
 const Header = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const jobId = Number(id);
     const hasAccessToken = Boolean(localStorage.getItem('accessToken'));
     const [bookmarkLoading, setBookmarkLoading] = useState(false);
@@ -42,7 +43,26 @@ const Header = () => {
 
         try {
             await toggleMarkJob(jobId).unwrap();
-            message.success(nextMarked ? 'Save job successfully' : 'Unsave job successfully');
+            if (nextMarked) {
+                message.success({
+                    content: (
+                        <div className="flex items-center gap-4">
+                            <span>This job has been added to your Saved jobs.</span>
+                            <AntButton
+                                type="link"
+                                size="small"
+                                className="!p-0 !h-auto font-bold text-primary hover:text-primary/80"
+                                onClick={() => navigate('/dashboard/jobs?saved')}
+                            >
+                                View now
+                            </AntButton>
+                        </div>
+                    ),
+                    duration: 5,
+                });
+            } else {
+                message.success('Job removed from Saved jobs.');
+            }
         } catch (error) {
             setOptimisticMarked(previousMarked);
             message.error(error?.data?.message || 'Failed to save job');

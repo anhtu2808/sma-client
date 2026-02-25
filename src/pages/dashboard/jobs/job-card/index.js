@@ -22,18 +22,9 @@ const DashboardJobCard = ({ job, activeTab }) => {
   const isPrimaryCta = activeTab !== "viewed" && !(isAppliedTab && job.expired);
 
   const handleNavigate = (e) => {
-    // Prevent navigation if clicking on potential future action buttons 
+    // Prevent navigation if clicking on potential future action buttons
     // but for now, we want the whole card to be the link
     navigate(`/jobs/${job.id}`);
-  };
-
-  const handleCtaClick = (event) => {
-    event.stopPropagation();
-    if (isAppliedTab && job.resumeUrl) {
-      window.open(job.resumeUrl, "_blank", "noopener,noreferrer");
-      return;
-    }
-    handleNavigate();
   };
 
   const handleToggleMark = async (e) => {
@@ -54,7 +45,7 @@ const DashboardJobCard = ({ job, activeTab }) => {
               className="!p-0 !h-auto font-bold text-primary hover:text-primary/80"
               onClick={() => toggleMark(job.id)}
             >
-              UNDO
+              Undo
             </AntButton>
           </div>
         ),

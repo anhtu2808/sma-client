@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Col, Row } from "antd";
+import { useSearchParams } from "react-router-dom";
 import { useGetAppliedJobsQuery, useGetMarkedJobsQuery } from "@/apis/jobApi";
 import AppliedJobs from "./applied";
 import SavedJobs from "./saved";
@@ -69,8 +70,16 @@ const mapAppliedJobFromApi = (job) => {
 };
 
 const DashboardJobs = () => {
-  const [activeTab, setActiveTab] = useState("applied");
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState('applied');
   const hasAccessToken = Boolean(localStorage.getItem("accessToken"));
+
+  // Sync tab with URL params
+  useEffect(() => {
+    if (searchParams.get('saved')) {
+      setActiveTab('saved');
+    }
+  }, [searchParams]);
 
   const {
     data: appliedJobData,
