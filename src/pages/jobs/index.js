@@ -1,5 +1,7 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { useGetJobsQuery } from '@/apis/jobApi';
+import React, { useMemo, useState } from 'react';
+import { message, Button as AntButton } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import { useGetJobsQuery, useGetMarkedJobsQuery, useToggleMarkJobMutation } from '@/apis/jobApi';
 
 // Import các components con
 import SearchHero from '@/components/SearchHero';
@@ -7,6 +9,7 @@ import Sidebar from './sidebar';
 import JobList from './list';
 
 const Jobs = () => {
+    const navigate = useNavigate();
     const [filters, setFilters] = useState({
         name: '',
         location: '',
@@ -14,6 +17,9 @@ const Jobs = () => {
         salaryStart: '',
         skillId: []
     });
+    const [bookmarkOverrides, setBookmarkOverrides] = useState({});
+    const [bookmarkLoadingById, setBookmarkLoadingById] = useState({});
+    const hasAccessToken = Boolean(localStorage.getItem('accessToken'));
 
     // API Call
     // Filter out empty params
@@ -29,13 +35,16 @@ const Jobs = () => {
 
     // API Call
     const { data: jobData, isLoading, isError } = useGetJobsQuery(queryParams);
+    const { data: markedJobData } = useGetMarkedJobsQuery(
+        { page: 0, size: 1000 },
+        { skip: !hasAccessToken }
+    );
+    const [toggleMarkJob] = useToggleMarkJobMutation();
 
-    // Debug log
-    useEffect(() => {
-        console.log("Filters:", filters);
-        console.log("Query Params:", queryParams);
-        console.log("API Response JobData:", jobData);
-    }, [filters, queryParams, jobData]);
+    const markedJobIds = useMemo(() => {
+        const markedJobs = markedJobData?.content || [];
+        return new Set(markedJobs.map((job) => Number(job.id)));
+    }, [markedJobData]);
 
     // Handlers
     const handleFilterChange = (key, value) => {
@@ -49,17 +58,62 @@ const Jobs = () => {
         setFilters({ name: '', location: '', jobLevel: '', salaryStart: '', skillId: [] });
     };
 
+    const handleBookmark = async (jobId) => {
+        if (!hasAccessToken) {
+            message.warning('Please log in to mark jobs.');
+            return;
+        }
+        if (bookmarkLoadingById[jobId]) return;
+
+        const currentMarked = bookmarkOverrides[jobId] ?? markedJobIds.has(Number(jobId));
+        const nextMarked = !currentMarked;
+
+        setBookmarkOverrides((prev) => ({ ...prev, [jobId]: nextMarked }));
+        setBookmarkLoadingById((prev) => ({ ...prev, [jobId]: true }));
+
+        try {
+            await toggleMarkJob(jobId).unwrap();
+            if (nextMarked) {
+                message.success({
+                    content: (
+                        <div className="flex items-center gap-4">
+                            <span>This job has been added to your Saved jobs.</span>
+                            <AntButton
+                                type="link"
+                                size="small"
+                                className="!p-0 !h-auto font-bold text-primary hover:text-primary/80"
+                                onClick={() => navigate('/dashboard/jobs?saved')}
+                            >
+                                View now
+                            </AntButton>
+                        </div>
+                    ),
+                    duration: 5,
+                });
+            } else {
+                message.success('Job removed from Saved jobs.');
+            }
+        } catch (error) {
+            setBookmarkOverrides((prev) => ({ ...prev, [jobId]: currentMarked }));
+            message.error(error?.data?.message || 'Failed to update marked job.');
+        } finally {
+            setBookmarkLoadingById((prev) => ({ ...prev, [jobId]: false }));
+        }
+    };
+
     // Data Transformation (Mapping API response to UI props)
     const formattedJobs = useMemo(() => {
         const dataToMap = jobData?.data?.content || jobData?.content || [];
 
         return dataToMap.map(job => {
+            const normalizedJobId = Number(job.id);
+            const isBookmarked = bookmarkOverrides[normalizedJobId] ?? markedJobIds.has(normalizedJobId);
             const salary = job.salaryStart && job.salaryEnd
                 ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} ${job.currency || 'VND'}`
                 : "Negotiable";
 
             return {
-                id: job.id,
+                id: normalizedJobId,
                 title: job.name,
                 company: job.company?.name || "Unknown Company",
                 companyLogo: job.company?.logo,
@@ -68,10 +122,13 @@ const Jobs = () => {
                 tags: job.skills ? job.skills.map(s => s.name) : [],
                 postedTime: job.uploadTime ? new Date(job.uploadTime).toLocaleDateString() : "Recently",
                 isHot: job.jobLevel === "SENIOR" || job.hot, // Map isHot if available, or infer
+                isApplied: job.isApplied, // Add isApplied flag
+                isBookmarked,
+                isBookmarkLoading: Boolean(bookmarkLoadingById[normalizedJobId]),
                 variant: 'primary'
             };
         });
-    }, [jobData]);
+    }, [jobData, bookmarkOverrides, bookmarkLoadingById, markedJobIds]);
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-[#1a100c]">
@@ -99,7 +156,7 @@ const Jobs = () => {
                             jobs={formattedJobs}
                             isLoading={isLoading}
                             isError={isError}
-                            onBookmark={(id) => console.log('Bookmark', id)}
+                            onBookmark={handleBookmark}
                         />
                     </main>
                 </div>

@@ -29,6 +29,53 @@ export const jobApi = api.injectEndpoints({
             },
             providesTags: (result, error, { jobId }) => [{ type: "JobQuestions", id: jobId }]
         }),
+
+        // Applied Jobs
+        getMyApplications: builder.query({
+            query: ({ page = 0, size = 10, status } = {}) => ({
+                url: `${API_VERSION}/applications/my-applications`,
+                method: "GET",
+                params: { page, size, status }
+            }),
+            transformResponse: (response) => {
+                return response?.data;
+            },
+            providesTags: ["Applications"]
+        }),
+
+        // Saved Jobs
+        getMarkedJobs: builder.query({
+            query: ({ page = 0, size = 10 } = {}) => ({
+                url: `${API_VERSION}/jobs/marked`,
+                method: "GET",
+                params: { page, size }
+            }),
+            transformResponse: (response) => {
+                return response?.data;
+            },
+            providesTags: ["Jobs"]
+        }),
+
+        // Applied Jobs (Candidate dashboard)
+        getAppliedJobs: builder.query({
+            query: ({ page = 0, size = 10 } = {}) => ({
+                url: `${API_VERSION}/jobs/applied`,
+                method: "GET",
+                params: { page, size }
+            }),
+            transformResponse: (response) => {
+                return response?.data;
+            },
+            providesTags: ["Jobs"]
+        }),
+
+        toggleMarkJob: builder.mutation({
+            query: (jobId) => ({
+                url: `${API_VERSION}/jobs/${jobId}/mark`,
+                method: "POST",
+            }),
+            invalidatesTags: ["Jobs"],
+        }),
     })
 });
 
@@ -39,4 +86,11 @@ export const {
     useLazyGetJobByIdQuery,
     useGetJobQuestionsQuery,
     useLazyGetJobQuestionsQuery,
+    useGetMyApplicationsQuery,
+    useLazyGetMyApplicationsQuery,
+    useGetMarkedJobsQuery,
+    useLazyGetMarkedJobsQuery,
+    useGetAppliedJobsQuery,
+    useLazyGetAppliedJobsQuery,
+    useToggleMarkJobMutation,
 } = jobApi;
