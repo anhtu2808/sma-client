@@ -26,7 +26,7 @@ const Requirements = () => {
             <ul className="space-y-3">
                 {requirements.map((item, idx) => (
                     <li key={idx} className="flex items-start gap-3 text-gray-600">
-                        <span className="material-icons-round text-green-500 text-[18px] mt-0.5">task_alt</span>
+                        <span className="material-icons-round text-primary text-[18px] mt-0.5">check_circle</span>
                         <span>{item}</span>
                     </li>
                 ))}

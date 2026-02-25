@@ -8,8 +8,11 @@ import SearchHero from '@/components/SearchHero';
 import Sidebar from './sidebar';
 import JobList from './list';
 
+const ITEMS_PER_PAGE = 10;
+
 const Jobs = () => {
     const navigate = useNavigate();
+    const [currentPage, setCurrentPage] = useState(1);
     const [filters, setFilters] = useState({
         name: '',
         location: '',
@@ -24,14 +27,14 @@ const Jobs = () => {
     // API Call
     // Filter out empty params
     const queryParams = useMemo(() => ({
-        page: 0,
-        size: 10,
+        page: currentPage - 1, // API is 0-indexed
+        size: ITEMS_PER_PAGE,
         ...(filters.name && { name: filters.name }),
         ...(filters.location && { location: filters.location }),
         ...(filters.jobLevel && { jobLevel: filters.jobLevel }),
         ...(filters.salaryStart && { salary: filters.salaryStart }),
         ...(filters.skillId?.length && { skillId: filters.skillId }),
-    }), [filters]);
+    }), [filters, currentPage]);
 
     // API Call
     const { data: jobData, isLoading, isError } = useGetJobsQuery(queryParams);
@@ -47,15 +50,21 @@ const Jobs = () => {
     }, [markedJobData]);
 
     // Handlers
+    // Pagination data
+    const totalPages = jobData?.data?.totalPages || jobData?.totalPages || 0;
+    const totalElements = jobData?.data?.totalElements || jobData?.totalElements || 0;
+
     const handleFilterChange = (key, value) => {
         setFilters(prev => ({
             ...prev,
             [key]: value
         }));
+        setCurrentPage(1); // Reset to page 1 on filter change
     };
 
     const handleResetFilters = () => {
         setFilters({ name: '', location: '', jobLevel: '', salaryStart: '', skillId: [] });
+        setCurrentPage(1);
     };
 
     const handleBookmark = async (jobId) => {
@@ -157,6 +166,10 @@ const Jobs = () => {
                             isLoading={isLoading}
                             isError={isError}
                             onBookmark={handleBookmark}
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            totalElements={totalElements}
+                            onPageChange={setCurrentPage}
                         />
                     </main>
                 </div>

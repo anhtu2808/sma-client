@@ -1,9 +1,10 @@
 import React from 'react';
 import JobCard from '@/components/JobCard';
 import DataList from '@/components/DataList';
+import Pagination from '@/components/Pagination';
 import { useNavigate } from 'react-router-dom';
 
-const JobList = ({ jobs, isLoading, isError, onBookmark }) => {
+const JobList = ({ jobs, isLoading, isError, onBookmark, currentPage, totalPages, totalElements, onPageChange }) => {
     const navigate = useNavigate();
 
     return (
@@ -16,7 +17,7 @@ const JobList = ({ jobs, isLoading, isError, onBookmark }) => {
         >
             <div className="mb-6 flex items-center justify-between">
                 <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    {jobs?.length} Jobs Found
+                    {totalElements || jobs?.length} Jobs Found
                 </h1>
             </div>
             <div className="space-y-4">
@@ -32,6 +33,16 @@ const JobList = ({ jobs, isLoading, isError, onBookmark }) => {
                     />
                 ))}
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={onPageChange}
+                    className="mt-8"
+                />
+            )}
         </DataList>
     );
 };
