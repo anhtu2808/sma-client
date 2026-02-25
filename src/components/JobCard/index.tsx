@@ -10,6 +10,7 @@ const JobCard = ({
     postedTime,
     isHot = false,
     companyLogo,
+    isApplied = false,
     onBookmark,
     onApply,
     onClick, // New prop for card click
@@ -50,6 +51,13 @@ const JobCard = ({
                                 <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider border border-primary/20">
                                     <span className="material-icons-round text-[14px] font-bold">local_fire_department</span>
                                     HOT
+                                </span>
+                            )}
+                            {/* Applied Badge */}
+                            {isApplied && (
+                                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 text-xs font-bold uppercase tracking-wider border border-green-500/20">
+                                    <span className="material-icons-round text-[14px] font-bold">check_circle</span>
+                                    Applied
                                 </span>
                             )}
                         </div>
@@ -143,6 +151,7 @@ JobCard.propTypes = {
     tags: PropTypes.arrayOf(PropTypes.string),
     postedTime: PropTypes.string.isRequired,
     isHot: PropTypes.bool,
+    isApplied: PropTypes.bool,
     companyLogo: PropTypes.string,
     onBookmark: PropTypes.func,
     onApply: PropTypes.func,

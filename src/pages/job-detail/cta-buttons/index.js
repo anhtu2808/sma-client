@@ -8,7 +8,9 @@ import Loading from '@/components/Loading';
 const CTAButtons = () => {
     const navigate = useNavigate();
     const { id } = useParams();
-    const { data: jobData } = useGetJobByIdQuery(id);
+    const { data } = useGetJobByIdQuery(id);
+    const jobData = data?.data;
+    console.log(jobData);
 
     if (!jobData) {
         return <Loading size={64} className="py-6" />;
@@ -19,7 +21,7 @@ const CTAButtons = () => {
     const lastStatus = jobData.lastApplicationStatus;
 
     const getButtonConfig = () => {
-        const jobStatus = jobData?.data?.status;
+        const jobStatus = jobData?.status;
 
         if (jobStatus === 'CLOSED') {
             return {
@@ -43,11 +45,11 @@ const CTAButtons = () => {
                 text: "APPLICATION IN PROCESSED",
                 disabled: true,
                 mode: "secondary",
-                note: "Your application is currently being processed and cannot be edited."
+                note: "Your application is currently being processed and cannot re-apply."
             };
         }
         if (attempt === 1) {
-            return { text: "Re-apply (2/2)", disabled: false, mode: "primary" };
+            return { text: "Re-apply (1/2)", disabled: false, mode: "primary" };
         }
 
         return { text: "Apply Now", disabled: false, mode: "primary" };
@@ -65,7 +67,7 @@ const CTAButtons = () => {
                             Re-application Notice
                         </h4>
                         <p className="text-[10px] text-amber-700 leading-relaxed font-medium italic">
-                            You have **01 final attempt** remaining for this position. Please note that frequent re-applications without significant profile updates may negatively impact the employer's perception of your candidacy. We highly recommend reviewing your resume and answers before proceeding.
+                            You have <strong>01 final attempt</strong> remaining for this position. Please note that frequent re-applications without significant profile updates may negatively impact the employer's perception of your candidacy. We highly recommend reviewing your resume and answers before proceeding.
                         </p>
                     </div>
                 </div>
