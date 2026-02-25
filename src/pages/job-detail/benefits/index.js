@@ -15,7 +15,7 @@ const Benefits = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {benefits.map((benefit) => (
                     <div key={benefit.id} className="flex items-start gap-3">
-                        <span className="material-icons-round text-primary text-[20px]">verified</span>
+                        <span className="material-icons-round text-primary text-[18px]">check_circle</span>
                         <div>
                             <p className="font-semibold text-gray-900">{benefit.name}</p>
                             {benefit.description && <p className="text-sm text-gray-500">{benefit.description}</p>}
