@@ -52,7 +52,7 @@ const Header = () => {
                                 type="link"
                                 size="small"
                                 className="!p-0 !h-auto font-bold text-primary hover:text-primary/80"
-                                onClick={() => navigate('/dashboard/jobs?saved')}
+                                onClick={() => navigate('/dashboard/jobs?tab=saved')}
                             >
                                 View now
                             </AntButton>
