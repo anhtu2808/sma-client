@@ -1,29 +1,58 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { message } from "antd";
-import Button from "@/components/Button";
-import Loading from "@/components/Loading";
-import ProfileSectionModal from "@/components/ProfileSectionModal";
 import {
   useDeleteCandidateResumeMutation,
   useGetCandidateResumesQuery,
+  useLazyGetResumeParseStatusQuery,
+  useParseCandidateResumeMutation,
   useSetResumeAsProfileMutation,
   useUploadCandidateResumeMutation,
   useUploadFilesMutation,
 } from "@/apis/resumeApi";
 import { RESUME_TYPES } from "@/constant";
+import FilesList from "./files-list";
+import ParseConsentModal from "./parse-consent-modal";
+import SetProfileConfirmModal from "./set-profile-confirm-modal";
+import UploadPanel from "./upload-panel";
+import {
+  POLL_INTERVAL_MS,
+  POLL_TIMEOUT_MS,
+  TERMINAL_PARSE_STATUSES,
+  getErrorMessage,
+  isPdfFile,
+  normalizeParseStatus,
+} from "@/constant/attachment";
 
 const AttachmentsTab = () => {
   const inputRef = useRef(null);
+  const pollingTimersRef = useRef({});
+  const pollingStartTimesRef = useRef({});
+
   const [deletingId, setDeletingId] = useState(null);
+  const [activeParsingResumeId, setActiveParsingResumeId] = useState(null);
+  const [pollingByResumeId, setPollingByResumeId] = useState({});
+
+  const [consentModal, setConsentModal] = useState({
+    open: false,
+    mode: null,
+    pendingUploadPayload: null,
+    resumeId: null,
+  });
+  const [isConsentChecked, setIsConsentChecked] = useState(false);
+  const [isConsentLoading, setIsConsentLoading] = useState(false);
 
   const { data: resumes = [], isLoading: isLoadingResumes } = useGetCandidateResumesQuery({
     type: RESUME_TYPES.ORIGINAL,
   });
   const [uploadFiles, { isLoading: isUploadingFile }] = useUploadFilesMutation();
   const [uploadCandidateResume, { isLoading: isSavingResume }] = useUploadCandidateResumeMutation();
+  const [parseCandidateResume] = useParseCandidateResumeMutation();
+  const [triggerResumeParseStatus] = useLazyGetResumeParseStatusQuery();
   const [deleteCandidateResume] = useDeleteCandidateResumeMutation();
   const [setResumeAsProfile, { isLoading: isSettingProfile }] = useSetResumeAsProfileMutation();
+
   const [settingProfileId, setSettingProfileId] = useState(null);
+  const [parseStatusOverrides, setParseStatusOverrides] = useState({});
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [confirmValue, setConfirmValue] = useState("");
   const [confirmResumeId, setConfirmResumeId] = useState(null);
@@ -33,30 +62,165 @@ const AttachmentsTab = () => {
     () =>
       resumes.map((resume) => {
         const timestamp = resume.resumeUrl?.split("/").pop()?.split("_")[0];
-        const uploadTime = timestamp && !isNaN(timestamp) 
-          ? new Date(parseInt(timestamp)).toLocaleString() 
-          : "Unknown";
-          
+        const uploadTime =
+          timestamp && !Number.isNaN(Number(timestamp))
+            ? new Date(Number.parseInt(timestamp, 10)).toLocaleString()
+            : "Unknown";
+        const fileName = resume.fileName || resume.resumeName || "";
+        const effectiveStatus = parseStatusOverrides[resume.id] || resume.parseStatus || "WAITING";
+
         return {
           id: resume.id,
-          name: resume.fileName || resume.resumeName || `Resume #${resume.id}`,
-          status: resume.parseStatus || "WAITING",
-          type: (resume.fileName || "").toLowerCase().endsWith(".pdf") ? "pdf" : "doc",
+          name: fileName || `Resume #${resume.id}`,
+          status: normalizeParseStatus(effectiveStatus),
+          type: isPdfFile(fileName) ? "pdf" : "doc",
           url: resume.resumeUrl,
           uploadTime,
         };
       }),
-    [resumes]
+    [parseStatusOverrides, resumes]
   );
 
-  const getErrorMessage = (error, fallbackMessage) =>
-    error?.data?.message || error?.message || fallbackMessage;
+  const stopPolling = useCallback((resumeId) => {
+    if (pollingTimersRef.current[resumeId]) {
+      clearInterval(pollingTimersRef.current[resumeId]);
+      delete pollingTimersRef.current[resumeId];
+    }
+
+    delete pollingStartTimesRef.current[resumeId];
+    setPollingByResumeId((prev) => {
+      if (!prev[resumeId]) return prev;
+      const next = { ...prev };
+      delete next[resumeId];
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    setParseStatusOverrides((prev) => {
+      const previousEntries = Object.entries(prev);
+      if (previousEntries.length === 0) return prev;
+
+      const resumeIdSet = new Set(resumes.map((resume) => resume.id));
+      let changed = false;
+      const next = {};
+
+      previousEntries.forEach(([resumeId, status]) => {
+        if (resumeIdSet.has(Number.parseInt(resumeId, 10))) {
+          next[resumeId] = status;
+        } else {
+          changed = true;
+        }
+      });
+
+      return changed ? next : prev;
+    });
+  }, [resumes]);
+
+  const startPolling = useCallback(
+    (resumeId) => {
+      if (!resumeId || pollingTimersRef.current[resumeId]) return;
+
+      pollingStartTimesRef.current[resumeId] = Date.now();
+      setPollingByResumeId((prev) => ({ ...prev, [resumeId]: true }));
+
+      const pollStatus = async () => {
+        const startedAt = pollingStartTimesRef.current[resumeId];
+        if (!startedAt) {
+          stopPolling(resumeId);
+          return;
+        }
+
+        if (Date.now() - startedAt >= POLL_TIMEOUT_MS) {
+          stopPolling(resumeId);
+          message.info("Resume parsing is still processing. Please check again in a moment.");
+          return;
+        }
+
+        try {
+          const status = normalizeParseStatus(await triggerResumeParseStatus({ resumeId }).unwrap());
+          setParseStatusOverrides((prev) => ({ ...prev, [resumeId]: status }));
+
+          if (TERMINAL_PARSE_STATUSES.has(status)) {
+            stopPolling(resumeId);
+            if (status === "FINISH") {
+              message.success("Resume parsed successfully.");
+            } else {
+              message.error("Resume parsing failed. Please try parsing again.");
+            }
+          }
+        } catch (error) {
+          stopPolling(resumeId);
+          message.error(getErrorMessage(error, "Unable to check parse status."));
+        }
+      };
+
+      void pollStatus();
+      pollingTimersRef.current[resumeId] = setInterval(() => {
+        void pollStatus();
+      }, POLL_INTERVAL_MS);
+    },
+    [stopPolling, triggerResumeParseStatus]
+  );
+
+  useEffect(() => {
+    const partialResumeIds = files
+      .filter((file) => file.status === "PARTIAL" || Boolean(pollingByResumeId[file.id]))
+      .map((file) => file.id);
+
+    partialResumeIds.forEach((resumeId) => startPolling(resumeId));
+
+    Object.keys(pollingTimersRef.current).forEach((idKey) => {
+      const resumeId = Number.parseInt(idKey, 10);
+      if (!partialResumeIds.includes(resumeId)) {
+        stopPolling(resumeId);
+      }
+    });
+  }, [files, pollingByResumeId, startPolling, stopPolling]);
+
+  useEffect(
+    () => () => {
+      Object.values(pollingTimersRef.current).forEach((timer) => clearInterval(timer));
+      pollingTimersRef.current = {};
+      pollingStartTimesRef.current = {};
+    },
+    []
+  );
+
+  const resetConsentModal = () => {
+    setConsentModal({
+      open: false,
+      mode: null,
+      pendingUploadPayload: null,
+      resumeId: null,
+    });
+    setIsConsentChecked(false);
+  };
+
+  const createUploadedResume = async (payload) => uploadCandidateResume(payload).unwrap();
+
+  const triggerResumeParsing = async (resumeId, { silentError = false } = {}) => {
+    if (!resumeId) return false;
+    setActiveParsingResumeId(resumeId);
+
+    try {
+      await parseCandidateResume({ resumeId }).unwrap();
+      setParseStatusOverrides((prev) => ({ ...prev, [resumeId]: "PARTIAL" }));
+      startPolling(resumeId);
+      return true;
+    } catch (error) {
+      if (!silentError) {
+        message.error(getErrorMessage(error, "Failed to start resume parsing."));
+      }
+      return false;
+    } finally {
+      setActiveParsingResumeId(null);
+    }
+  };
 
   const handleUploadFile = async (event) => {
     const selectedFile = event.target.files?.[0];
-    if (!selectedFile) {
-      return;
-    }
+    if (!selectedFile) return;
 
     try {
       const formData = new FormData();
@@ -69,13 +233,19 @@ const AttachmentsTab = () => {
         throw new Error("Upload file failed");
       }
 
-      await uploadCandidateResume({
+      const payload = {
         resumeName: selectedFile.name,
         fileName: uploadedFile.originalFileName || selectedFile.name,
         resumeUrl: uploadedFile.downloadUrl,
-      }).unwrap();
+      };
 
-      message.success("Upload resume successfully");
+      setConsentModal({
+        open: true,
+        mode: "upload",
+        pendingUploadPayload: payload,
+        resumeId: null,
+      });
+      setIsConsentChecked(false);
     } catch (error) {
       message.error(getErrorMessage(error, "Upload resume failed"));
     } finally {
@@ -83,9 +253,75 @@ const AttachmentsTab = () => {
     }
   };
 
+  const openParseConsent = (resumeId) => {
+    setConsentModal({
+      open: true,
+      mode: "manual",
+      pendingUploadPayload: null,
+      resumeId,
+    });
+    setIsConsentChecked(false);
+  };
+
+  const handleConsentSubmit = async () => {
+    if (!isConsentChecked || isConsentLoading) return;
+
+    try {
+      setIsConsentLoading(true);
+
+      if (consentModal.mode === "upload" && consentModal.pendingUploadPayload) {
+        const createdResume = await createUploadedResume(consentModal.pendingUploadPayload);
+        const parseStarted = await triggerResumeParsing(createdResume?.id, { silentError: true });
+        if (parseStarted) {
+          message.success("Upload completed. Resume parsing has started.");
+        } else {
+          message.warning("Upload completed, but parsing could not start. You can parse this resume manually later.");
+        }
+      } else if (consentModal.mode === "manual" && consentModal.resumeId) {
+        const parseStarted = await triggerResumeParsing(consentModal.resumeId);
+        if (parseStarted) {
+          message.success("Resume parsing has started.");
+        }
+      }
+
+      resetConsentModal();
+    } catch (error) {
+      message.error(getErrorMessage(error, "Unable to continue."));
+    } finally {
+      setIsConsentLoading(false);
+    }
+  };
+
+  const handleConsentCancel = async () => {
+    if (isConsentLoading) return;
+
+    if (consentModal.mode !== "upload" || !consentModal.pendingUploadPayload) {
+      resetConsentModal();
+      return;
+    }
+
+    try {
+      setIsConsentLoading(true);
+      await createUploadedResume(consentModal.pendingUploadPayload);
+      message.success("Upload completed. You can parse this resume later.");
+      resetConsentModal();
+    } catch (error) {
+      message.error(getErrorMessage(error, "Upload resume failed"));
+    } finally {
+      setIsConsentLoading(false);
+    }
+  };
+
   const handleDeleteResume = async (resumeId) => {
     try {
       setDeletingId(resumeId);
+      stopPolling(resumeId);
+      setParseStatusOverrides((prev) => {
+        if (prev[resumeId] == null) return prev;
+        const next = { ...prev };
+        delete next[resumeId];
+        return next;
+      });
       await deleteCandidateResume({ resumeId }).unwrap();
       message.success("Delete resume successfully");
     } catch (error) {
@@ -110,6 +346,7 @@ const AttachmentsTab = () => {
 
   const handleConfirmSetProfile = async () => {
     if (!confirmResumeId) return;
+
     try {
       setIsConfirmLoading(true);
       setSettingProfileId(confirmResumeId);
@@ -125,164 +362,54 @@ const AttachmentsTab = () => {
     }
   };
 
-  const isUploading = isUploadingFile || isSavingResume;
-
-  const canConfirm = confirmValue.trim().toLowerCase() === "continue";
+  const isUploading =
+    isUploadingFile || isSavingResume || (consentModal.mode === "upload" && isConsentLoading);
+  const canConfirmSetProfile = confirmValue.trim().toLowerCase() === "continue";
 
   return (
     <section className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Attached resume (PDF/DOCX)</h2>
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Attached resume (PDF/DOC/DOCX)</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Upload your latest CV for job applications.</p>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-surface-dark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-        <input
-          ref={inputRef}
-          type="file"
-          accept=".pdf,.doc,.docx"
-          className="hidden"
-          onChange={handleUploadFile}
-        />
-        <button
-          type="button"
-          disabled={isUploading}
-          onClick={() => inputRef.current?.click()}
-          className="w-full rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 px-6 py-14 text-center hover:border-primary transition-colors disabled:cursor-not-allowed disabled:opacity-70"
-        >
-          <div className="bg-blue-50 dark:bg-blue-900/20 w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="material-icons-round text-[28px] text-blue-500 dark:text-blue-400">cloud_upload</span>
-          </div>
-          <p className="text-sm font-medium text-gray-900 dark:text-white">
-            {isUploading ? "Uploading..." : "Click to upload or drag and drop"}
-          </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">PDF or DOCX up to 10MB</p>
-        </button>
-      </div>
+      <UploadPanel inputRef={inputRef} isUploading={isUploading} onUploadFile={handleUploadFile} />
 
-      <div className="bg-white dark:bg-surface-dark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base font-semibold text-gray-900 dark:text-white">Attached Files</h3>
-          <span className="text-xs text-gray-500 dark:text-gray-400">{files.length} file(s)</span>
-        </div>
+      <FilesList
+        files={files}
+        isLoadingResumes={isLoadingResumes}
+        pollingByResumeId={pollingByResumeId}
+        activeParsingResumeId={activeParsingResumeId}
+        deletingId={deletingId}
+        isSettingProfile={isSettingProfile}
+        settingProfileId={settingProfileId}
+        onOpenParseConsent={openParseConsent}
+        onOpenSetProfileConfirm={openSetProfileConfirm}
+        onDeleteResume={handleDeleteResume}
+      />
 
-        {isLoadingResumes ? (
-          <Loading size={90} className="py-4" />
-        ) : files.length === 0 ? (
-          <p className="text-sm text-gray-500 dark:text-gray-400">No attached resume yet.</p>
-        ) : (
-        <div className="space-y-3">
-          {files.map((file) => (
-            <div
-              key={file.id}
-              className="flex items-center justify-between gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700"
-            >
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="h-10 w-10 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center flex-none">
-                  <span className={`material-icons-round ${file.type === "pdf" ? "text-red-500" : "text-blue-500"}`}>
-                    {file.type === "pdf" ? "picture_as_pdf" : "description"}
-                  </span>
-                </div>
-                <div className="min-w-0">
-                  {file.url ? (
-                    <a 
-                      href={file.url} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="text-sm font-medium text-gray-900 dark:text-white truncate hover:text-primary hover:underline block cursor-pointer"
-                    >
-                      {file.name}
-                    </a>
-                  ) : (
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{file.name}</p>
-                  )}
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Uploaded: {file.uploadTime}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-1 flex-none">
-                <Button
-                  mode="ghost"
-                  size="sm"
-                  shape="rounded"
-                  btnIcon
-                  tooltip="Download"
-                  disabled={!file.url}
-                  onClick={() => file.url && window.open(file.url, "_blank", "noopener,noreferrer")}
-                >
-                 <i className="material-icons-round text-[18px]">download</i>
-                </Button>
-                <Button
-                  mode="ghost"
-                  size="sm"
-                  shape="rounded"
-                  btnIcon
-                  tooltip="Set as profile"
-                  disabled={isSettingProfile || settingProfileId === file.id}
-                  onClick={() => openSetProfileConfirm(file.id)}
-                >
-                  <i className="material-icons-round text-[18px]">account_circle</i>
-                </Button>
-                <Button
-                  mode="ghost"
-                  size="sm"
-                  shape="rounded"
-                  btnIcon
-                  tooltip="Delete"
-                  disabled={deletingId === file.id}
-                  onClick={() => handleDeleteResume(file.id)}
-                >
-                  <i className="material-icons-round text-[18px]">delete</i>
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
-        )}
-      </div>
+      <ParseConsentModal
+        open={consentModal.open}
+        mode={consentModal.mode}
+        isConsentChecked={isConsentChecked}
+        isConsentLoading={isConsentLoading}
+        onChangeConsentChecked={setIsConsentChecked}
+        onCancel={handleConsentCancel}
+        onSubmit={handleConsentSubmit}
+      />
 
-      <ProfileSectionModal
+      <SetProfileConfirmModal
         open={isConfirmOpen}
-        title="Set resume as profile"
+        confirmValue={confirmValue}
+        isSettingProfile={isSettingProfile}
+        isConfirmLoading={isConfirmLoading}
+        canConfirmSetProfile={canConfirmSetProfile}
+        onChangeConfirmValue={setConfirmValue}
         onCancel={closeSetProfileConfirm}
-        loading={isSettingProfile || isConfirmLoading}
-        loadingText="Processing..."
-        submitText="Continue"
-        submitDisabled={!canConfirm || isSettingProfile || isConfirmLoading}
-        cancelText="Cancel"
-        width={520}
-        formId="set-profile-confirm-form"
-      >
-        <div className="space-y-4">
-          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            This action will override all of your current profile information.
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Type <span className="font-semibold">continue</span> to confirm
-            </label>
-            <form
-              id="set-profile-confirm-form"
-              onSubmit={(event) => {
-                event.preventDefault();
-                if (canConfirm && !isSettingProfile) {
-                  handleConfirmSetProfile();
-                }
-              }}
-            >
-              <input
-                type="text"
-                value={confirmValue}
-                onChange={(event) => setConfirmValue(event.target.value)}
-                disabled={isSettingProfile}
-                placeholder="continue"
-                className="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-              />
-            </form>
-          </div>
-        </div>
-      </ProfileSectionModal>
+        onConfirm={handleConfirmSetProfile}
+      />
     </section>
   );
 };
