@@ -1,9 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { message } from "antd";
-import Button from "@/components/Button";
-import Checkbox from "@/components/Checkbox";
-import Loading from "@/components/Loading";
-import ProfileSectionModal from "@/components/ProfileSectionModal";
 import {
   useDeleteCandidateResumeMutation,
   useGetCandidateResumesQuery,
@@ -14,44 +10,18 @@ import {
   useUploadFilesMutation,
 } from "@/apis/resumeApi";
 import { RESUME_TYPES } from "@/constant";
-
-const POLL_INTERVAL_MS = 2000;
-const POLL_TIMEOUT_MS = 90_000;
-const TERMINAL_PARSE_STATUSES = new Set(["FINISH", "FAIL"]);
-
-const PARSE_STATUS_META = {
-  WAITING: {
-    label: "Not parsed",
-    className: "border-gray-200 bg-gray-100 text-gray-600",
-  },
-  PARTIAL: {
-    label: "Parsing...",
-    className: "border-amber-200 bg-amber-100 text-amber-700",
-  },
-  FINISH: {
-    label: "Parsed",
-    className: "border-emerald-200 bg-emerald-100 text-emerald-700",
-  },
-  FAIL: {
-    label: "Parse failed",
-    className: "border-red-200 bg-red-100 text-red-700",
-  },
-};
-
-const getErrorMessage = (error, fallbackMessage) =>
-  error?.data?.message || error?.message || fallbackMessage;
-
-const normalizeParseStatus = (status) =>
-  typeof status === "string" ? status.toUpperCase() : "WAITING";
-
-const isPdfFile = (fileName = "") => fileName.toLowerCase().endsWith(".pdf");
-
-const getParseStatusView = (status, isPolling) => {
-  if (isPolling) {
-    return PARSE_STATUS_META.PARTIAL;
-  }
-  return PARSE_STATUS_META[normalizeParseStatus(status)] || PARSE_STATUS_META.WAITING;
-};
+import FilesList from "./files-list";
+import ParseConsentModal from "./parse-consent-modal";
+import SetProfileConfirmModal from "./set-profile-confirm-modal";
+import UploadPanel from "./upload-panel";
+import {
+  POLL_INTERVAL_MS,
+  POLL_TIMEOUT_MS,
+  TERMINAL_PARSE_STATUSES,
+  getErrorMessage,
+  isPdfFile,
+  normalizeParseStatus,
+} from "@/constant/attachment";
 
 const AttachmentsTab = () => {
   const inputRef = useRef(null);
@@ -116,6 +86,7 @@ const AttachmentsTab = () => {
       clearInterval(pollingTimersRef.current[resumeId]);
       delete pollingTimersRef.current[resumeId];
     }
+
     delete pollingStartTimesRef.current[resumeId];
     setPollingByResumeId((prev) => {
       if (!prev[resumeId]) return prev;
@@ -231,6 +202,7 @@ const AttachmentsTab = () => {
   const triggerResumeParsing = async (resumeId, { silentError = false } = {}) => {
     if (!resumeId) return false;
     setActiveParsingResumeId(resumeId);
+
     try {
       await parseCandidateResume({ resumeId }).unwrap();
       setParseStatusOverrides((prev) => ({ ...prev, [resumeId]: "PARTIAL" }));
@@ -374,6 +346,7 @@ const AttachmentsTab = () => {
 
   const handleConfirmSetProfile = async () => {
     if (!confirmResumeId) return;
+
     try {
       setIsConfirmLoading(true);
       setSettingProfileId(confirmResumeId);
@@ -402,230 +375,41 @@ const AttachmentsTab = () => {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-surface-dark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-        <input
-          ref={inputRef}
-          type="file"
-          accept=".pdf,.doc,.docx"
-          className="hidden"
-          onChange={handleUploadFile}
-        />
-        <button
-          type="button"
-          disabled={isUploading}
-          onClick={() => inputRef.current?.click()}
-          className="w-full rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 px-6 py-14 text-center hover:border-primary transition-colors disabled:cursor-not-allowed disabled:opacity-70"
-        >
-          <div className="bg-blue-50 dark:bg-blue-900/20 w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="material-icons-round text-[28px] text-blue-500 dark:text-blue-400">cloud_upload</span>
-          </div>
-          <p className="text-sm font-medium text-gray-900 dark:text-white">
-            {isUploading ? "Uploading..." : "Click to upload or drag and drop"}
-          </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">PDF, DOC, or DOCX up to 10MB</p>
-        </button>
-      </div>
+      <UploadPanel inputRef={inputRef} isUploading={isUploading} onUploadFile={handleUploadFile} />
 
-      <div className="bg-white dark:bg-surface-dark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base font-semibold text-gray-900 dark:text-white">Attached Files</h3>
-          <span className="text-xs text-gray-500 dark:text-gray-400">{files.length} file(s)</span>
-        </div>
+      <FilesList
+        files={files}
+        isLoadingResumes={isLoadingResumes}
+        pollingByResumeId={pollingByResumeId}
+        activeParsingResumeId={activeParsingResumeId}
+        deletingId={deletingId}
+        isSettingProfile={isSettingProfile}
+        settingProfileId={settingProfileId}
+        onOpenParseConsent={openParseConsent}
+        onOpenSetProfileConfirm={openSetProfileConfirm}
+        onDeleteResume={handleDeleteResume}
+      />
 
-        {isLoadingResumes ? (
-          <Loading size={90} className="py-4" />
-        ) : files.length === 0 ? (
-          <p className="text-sm text-gray-500 dark:text-gray-400">No attached resume yet.</p>
-        ) : (
-          <div className="space-y-3">
-            {files.map((file) => {
-              const isPolling = Boolean(pollingByResumeId[file.id]);
-              const statusView = getParseStatusView(file.status, isPolling);
-              const normalizedStatus = normalizeParseStatus(file.status);
-              const isParseBusy = isPolling || normalizedStatus === "PARTIAL" || activeParsingResumeId === file.id;
-              const canSetAsProfile = normalizedStatus === "FINISH";
-              const parseActionLabel = normalizedStatus === "FINISH" ? "Re-parse" : "Parse resume";
-
-              return (
-                <div
-                  key={file.id}
-                  className="flex items-center justify-between gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="h-10 w-10 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center flex-none">
-                      <span className={`material-icons-round ${file.type === "pdf" ? "text-red-500" : "text-blue-500"}`}>
-                        {file.type === "pdf" ? "picture_as_pdf" : "description"}
-                      </span>
-                    </div>
-                    <div className="min-w-0">
-                      {file.url ? (
-                        <a
-                          href={file.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm font-medium text-gray-900 dark:text-white truncate hover:text-primary hover:underline block cursor-pointer"
-                        >
-                          {file.name}
-                        </a>
-                      ) : (
-                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{file.name}</p>
-                      )}
-                      <div className="mt-1 flex items-center gap-2">
-                        <p className="text-xs text-gray-500 dark:text-gray-400">Uploaded: {file.uploadTime}</p>
-                        <span
-                          className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium ${statusView.className}`}
-                        >
-                          {(isPolling || normalizedStatus === "PARTIAL") && (
-                            <i className="material-icons-round animate-spin text-[12px] leading-none">autorenew</i>
-                          )}
-                          {statusView.label}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 flex-none">
-                    <Button
-                      mode="ghost"
-                      size="sm"
-                      shape="rounded"
-                      btnIcon
-                      tooltip="Download"
-                      disabled={!file.url}
-                      onClick={() => file.url && window.open(file.url, "_blank", "noopener,noreferrer")}
-                    >
-                      <i className="material-icons-round text-[18px]">download</i>
-                    </Button>
-
-                    <Button
-                      mode="ghost"
-                      size="sm"
-                      shape="rounded"
-                      btnIcon
-                      tooltip={parseActionLabel}
-                      disabled={isParseBusy}
-                      onClick={() => openParseConsent(file.id)}
-                    >
-                      <i className="material-icons-round text-[18px]">psychology</i>
-                    </Button>
-
-                    <Button
-                      mode="ghost"
-                      size="sm"
-                      shape="rounded"
-                      btnIcon
-                      tooltip={canSetAsProfile ? "Set as profile" : "Only parsed resume can be set as profile"}
-                      disabled={!canSetAsProfile || isSettingProfile || settingProfileId === file.id}
-                      onClick={() => openSetProfileConfirm(file.id)}
-                    >
-                      <i className="material-icons-round text-[18px]">account_circle</i>
-                    </Button>
-                    <Button
-                      mode="ghost"
-                      size="sm"
-                      shape="rounded"
-                      btnIcon
-                      tooltip="Delete"
-                      disabled={deletingId === file.id}
-                      onClick={() => handleDeleteResume(file.id)}
-                    >
-                      <i className="material-icons-round text-[18px]">delete</i>
-                    </Button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      <ProfileSectionModal
+      <ParseConsentModal
         open={consentModal.open}
-        title="Parse resume with AI"
+        mode={consentModal.mode}
+        isConsentChecked={isConsentChecked}
+        isConsentLoading={isConsentLoading}
+        onChangeConsentChecked={setIsConsentChecked}
         onCancel={handleConsentCancel}
-        loading={isConsentLoading}
-        loadingText="Processing..."
-        submitText="Parse now"
-        submitDisabled={!isConsentChecked || isConsentLoading}
-        cancelText={consentModal.mode === "upload" ? "Skip for now" : "Cancel"}
-        width={620}
-        formId="parse-resume-consent-form"
-      >
-        <div className="space-y-4">
-          <p className="text-sm text-gray-700">Parsing your resume enables:</p>
-          <ul className="space-y-2 text-sm text-gray-700 list-disc pl-5">
-            <li>Using this resume as a profile source.</li>
-            <li>AI scoring for resume matching against job descriptions.</li>
-            <li>Importing data into CV Builder for faster editing.</li>
-          </ul>
+        onSubmit={handleConsentSubmit}
+      />
 
-          <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
-            <Checkbox
-              id="resume-parse-consent-checkbox"
-              checked={isConsentChecked}
-              onChange={(event) => setIsConsentChecked(Boolean(event?.target?.checked))}
-              label="I agree to let Smart Recruit AI access and use data in this resume file for parsing features."
-            />
-          </div>
-
-          {consentModal.mode === "upload" && (
-            <p className="text-xs text-gray-500">
-              You can skip now and parse later using the Parse resume action in this list.
-            </p>
-          )}
-
-          <form
-            id="parse-resume-consent-form"
-            onSubmit={(event) => {
-              event.preventDefault();
-              if (isConsentChecked && !isConsentLoading) {
-                void handleConsentSubmit();
-              }
-            }}
-          />
-        </div>
-      </ProfileSectionModal>
-
-      <ProfileSectionModal
+      <SetProfileConfirmModal
         open={isConfirmOpen}
-        title="Set resume as profile"
+        confirmValue={confirmValue}
+        isSettingProfile={isSettingProfile}
+        isConfirmLoading={isConfirmLoading}
+        canConfirmSetProfile={canConfirmSetProfile}
+        onChangeConfirmValue={setConfirmValue}
         onCancel={closeSetProfileConfirm}
-        loading={isSettingProfile || isConfirmLoading}
-        loadingText="Processing..."
-        submitText="Continue"
-        submitDisabled={!canConfirmSetProfile || isSettingProfile || isConfirmLoading}
-        cancelText="Cancel"
-        width={520}
-        formId="set-profile-confirm-form"
-      >
-        <div className="space-y-4">
-          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            This action will override all of your current profile information.
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Type <span className="font-semibold">continue</span> to confirm
-            </label>
-            <form
-              id="set-profile-confirm-form"
-              onSubmit={(event) => {
-                event.preventDefault();
-                if (canConfirmSetProfile && !isSettingProfile) {
-                  void handleConfirmSetProfile();
-                }
-              }}
-            >
-              <input
-                type="text"
-                value={confirmValue}
-                onChange={(event) => setConfirmValue(event.target.value)}
-                disabled={isSettingProfile}
-                placeholder="continue"
-                className="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-              />
-            </form>
-          </div>
-        </div>
-      </ProfileSectionModal>
+        onConfirm={handleConfirmSetProfile}
+      />
     </section>
   );
 };
