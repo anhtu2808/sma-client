@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGetJobByIdQuery, useGetJobQuestionsQuery } from '@/apis/jobApi';
-import { useGetCandidateResumesQuery, useUploadCandidateResumeMutation, useUploadFilesMutation } from '@/apis/resumeApi';
+import {
+    useGetCandidateResumesQuery,
+    useParseCandidateResumeMutation,
+    useUploadCandidateResumeMutation,
+    useUploadFilesMutation,
+} from '@/apis/resumeApi';
 import { useApplyJobMutation } from '@/apis/applicationApi';
 import Card from '@/components/Card';
 import Loading from '@/components/Loading';
@@ -16,12 +21,15 @@ import CoverLetter from '@/pages/application/steps/CoverLetter';
 import Header from '@/pages/application/header';
 import SubmitCTA from './submit-cta';
 
+const isSupportedResumeFile = (fileName = '') => /\.(pdf|doc|docx)$/i.test((fileName || '').trim());
+
 const Application = () => {
     const { id: jobId } = useParams();
     const navigate = useNavigate();
 
     const [uploadFiles, { isLoading: isUploadingFile }] = useUploadFilesMutation();
     const [uploadCandidateResume, { isLoading: isSavingResume }] = useUploadCandidateResumeMutation();
+    const [parseCandidateResume] = useParseCandidateResumeMutation();
     const [applyJob, { isLoading: isApplying }] = useApplyJobMutation();
 
     const { data: jobData, isLoading: jobLoading } = useGetJobByIdQuery(jobId, {
@@ -94,6 +102,14 @@ const Application = () => {
                 fileName: uploadedFile.originalFileName || file.name,
                 resumeUrl: uploadedFile.downloadUrl,
             }).unwrap();
+
+            const uploadedFileName = (uploadedFile.originalFileName || file.name || "").toLowerCase();
+            if (isSupportedResumeFile(uploadedFileName) && createdResume?.id) {
+                const parseResult = await parseCandidateResume({ resumeId: createdResume.id });
+                if ("error" in parseResult) {
+                    toast("Resume uploaded. AI parsing is currently unavailable; you can parse manually from Dashboard later.");
+                }
+            }
 
             setNewlyUploadedResume(createdResume);
             setSelectedResumeId(createdResume?.id ?? null);

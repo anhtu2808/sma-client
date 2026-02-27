@@ -110,6 +110,14 @@ export const resumeApi = api.injectEndpoints({
             ],
         }),
 
+        getResumeParseStatus: builder.query({
+            query: ({ resumeId }) => ({
+                url: `${API_VERSION}/resumes/${resumeId}/parse-status`,
+                method: "GET",
+            }),
+            transformResponse: (response) => response?.data ?? "WAITING",
+        }),
+
         uploadFiles: builder.mutation({
             query: (formData) => ({
                 url: "/files/upload",
@@ -123,6 +131,19 @@ export const resumeApi = api.injectEndpoints({
                 url: `${API_VERSION}/resumes/upload`,
                 method: "POST",
                 body: payload,
+            }),
+            transformResponse: (response) => response?.data ?? response,
+            invalidatesTags: [
+                { type: "Resumes", id: RESUME_TYPES.ORIGINAL },
+                { type: "Resumes", id: RESUME_TYPES.TEMPLATE },
+                { type: "Resumes", id: "ALL" },
+            ],
+        }),
+
+        parseCandidateResume: builder.mutation({
+            query: ({ resumeId }) => ({
+                url: `${API_VERSION}/resumes/${resumeId}/parse`,
+                method: "POST",
             }),
             transformResponse: (response) => response?.data ?? response,
             invalidatesTags: [
@@ -410,8 +431,10 @@ export const resumeApi = api.injectEndpoints({
 
 export const {
     useGetCandidateResumesQuery,
+    useLazyGetResumeParseStatusQuery,
     useUploadFilesMutation,
     useUploadCandidateResumeMutation,
+    useParseCandidateResumeMutation,
     useDeleteCandidateResumeMutation,
     useSetResumeAsProfileMutation,
     useCreateResumeSkillMutation,
