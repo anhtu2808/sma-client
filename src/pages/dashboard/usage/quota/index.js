@@ -8,8 +8,8 @@ const Quota = ({ quotas, isQuotaLoading, isQuotaError }) => {
           <span className="material-icons-round text-[22px]">pie_chart</span>
         </div>
         <div>
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white">Monthly Quota</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Remaining balance for current billing cycle.</p>
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white">Current Quotas</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Remaining feature limits for your account.</p>
         </div>
       </div>
 
