@@ -73,7 +73,7 @@ const Button: ButtonComponentType = ({
             </div>
           )}
 
-          <div className="px-3 py-2 bg-white rounded-xl font-medium text-neutral-600 text-sm whitespace-nowrap shadow-lg">
+          <div className="px-3 py-1.5 bg-white rounded-xl font-medium text-neutral-600 text-sm whitespace-nowrap shadow-lg flex items-center justify-center">
             {tooltip}
           </div>
 
