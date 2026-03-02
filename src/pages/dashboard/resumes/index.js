@@ -1,15 +1,9 @@
-import React, { useMemo, useState } from "react";
-import { Col, Row, Tabs, message } from "antd";
+import React, { useMemo } from "react";
+import { Col, Row, Tabs } from "antd";
 import ResumeBuilderTab from "./tabs/resume-buider";
 import AttachmentsTab from "./tabs/attachment";
 
 const Resumes = () => {
-  const [viewMode, setViewMode] = useState("grid");
-
-  const handleCreateResume = () => {
-    message.info("Create resume: coming soon");
-  };
-
   const tabItems = useMemo(
     () => [
       {
@@ -21,11 +15,7 @@ const Resumes = () => {
           </span>
         ),
         children: (
-          <ResumeBuilderTab
-            viewMode={viewMode}
-            onChangeViewMode={setViewMode}
-            onCreateResume={handleCreateResume}
-          />
+          <ResumeBuilderTab />
         ),
       },
       {
@@ -39,7 +29,7 @@ const Resumes = () => {
         children: <AttachmentsTab />,
       },
     ],
-    [viewMode]
+    []
   );
 
   return (
