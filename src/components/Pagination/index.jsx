@@ -47,10 +47,11 @@ const Pagination = ({
             {/* Previous Button */}
             <Button
                 mode="secondary"
-                shape="circle"
+                shape="rounded"
+                btnIcon={true}
                 disabled={currentPage === 1}
                 onClick={() => onPageChange(currentPage - 1)}
-                className="!p-2 !w-10 !h-10 !border-slate-200 dark:!border-[#4b2c20] hover:!bg-slate-50 dark:hover:!bg-[#3d241b]"
+                className="!border-slate-200 dark:!border-[#4b2c20] hover:!bg-slate-50 dark:hover:!bg-[#3d241b]"
             >
                 <span className="material-icons-round text-slate-500 dark:text-slate-400">chevron_left</span>
             </Button>
@@ -71,9 +72,10 @@ const Pagination = ({
                         <Button
                             key={page}
                             mode={isActive ? 'primary' : 'secondary'}
-                            shape="circle"
+                            shape="rounded"
+                            btnIcon={true}
                             onClick={() => onPageChange(page)}
-                            className={`!w-10 !h-10 !font-bold transition-all
+                            className={`!font-bold transition-all
                 ${isActive
                                     ? 'shadow-lg shadow-primary/30'
                                     : '!border-transparent !bg-transparent text-slate-600 dark:text-slate-400 hover:!bg-slate-100 dark:hover:!bg-[#3d241b]'
@@ -89,10 +91,11 @@ const Pagination = ({
             {/* Next Button */}
             <Button
                 mode="secondary"
-                shape="circle"
+                shape="rounded"
+                btnIcon={true}
                 disabled={currentPage === totalPages}
                 onClick={() => onPageChange(currentPage + 1)}
-                className="!p-2 !w-10 !h-10 !border-slate-200 dark:!border-[#4b2c20] hover:!bg-slate-50 dark:hover:!bg-[#3d241b]"
+                className="!border-slate-200 dark:!border-[#4b2c20] hover:!bg-slate-50 dark:hover:!bg-[#3d241b]"
             >
                 <span className="material-icons-round text-slate-500 dark:text-slate-400">chevron_right</span>
             </Button>

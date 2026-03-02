@@ -14,6 +14,7 @@ const sidebarItems = [
     },
     { to: "/dashboard/notifications", icon: "notifications", label: "Notifications" },
     { to: "/dashboard/billing-plans", icon: "credit_card", label: "Billing & Plans" },
+    { to: "/dashboard/usage", icon: "history", label: "Usage" },
     { to: "/dashboard/setting", icon: "settings", label: "Settings" },
 ];
 

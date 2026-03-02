@@ -15,6 +15,7 @@ import Resumes from '@/pages/dashboard/resumes';
 import Profile from '@/pages/dashboard/profile';
 import Invitations from '@/pages/dashboard/invitations';
 import BillingPlans from '@/pages/dashboard/billings';
+import Usage from '@/pages/dashboard/usage';
 import CompanyList from '@/pages/company';
 import CompanyDetail from '@/pages/company-detail';
 import PricingPage from "@/pages/pricing";
@@ -51,6 +52,7 @@ export const routes = createBrowserRouter(
                 <Route path="resumes" element={<Resumes />} />
                 <Route path="profile" element={<Profile />} />
                 <Route path="billing-plans" element={<BillingPlans />} />
+                <Route path="usage" element={<Usage />} />
             </Route>
         </>
     )

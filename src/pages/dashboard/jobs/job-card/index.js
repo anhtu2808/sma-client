@@ -22,8 +22,6 @@ const DashboardJobCard = ({ job, activeTab }) => {
   const isPrimaryCta = activeTab !== "viewed" && !(isAppliedTab && job.expired);
 
   const handleNavigate = (e) => {
-    // Prevent navigation if clicking on potential future action buttons
-    // but for now, we want the whole card to be the link
     navigate(`/jobs/${job.id}`);
   };
 

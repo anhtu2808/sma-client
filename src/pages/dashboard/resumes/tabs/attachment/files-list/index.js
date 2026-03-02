@@ -85,17 +85,19 @@ const FilesList = ({
                   <i className="material-icons-round text-[18px]">download</i>
                 </Button>
 
-                <Button
-                  mode="ghost"
-                  size="sm"
-                  shape="rounded"
-                  btnIcon
-                  tooltip={parseActionLabel}
-                  disabled={isParseBusy}
-                  onClick={() => onOpenParseConsent(file.id)}
-                >
-                  <i className="material-icons-round text-[18px]">psychology</i>
-                </Button>
+                {normalizedStatus !== "FINISH" && (
+                  <Button
+                    mode="ghost"
+                    size="sm"
+                    shape="rounded"
+                    btnIcon
+                    tooltip={parseActionLabel}
+                    disabled={isParseBusy}
+                    onClick={() => onOpenParseConsent(file.id)}
+                  >
+                    <i className="material-icons-round text-[18px]">psychology</i>
+                  </Button>
+                )}
 
                 <Button
                   mode="ghost"
