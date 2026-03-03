@@ -1,27 +1,20 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { message, Modal } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   useGetCandidateResumesQuery,
-  useLazyGetResumeParseStatusQuery,
   useParseCandidateResumeMutation,
   useUploadCandidateResumeMutation,
   useUploadFilesMutation,
 } from "@/apis/resumeApi";
 import Loading from "@/components/Loading";
 import { RESUME_TYPES } from "@/constant";
-import {
-  POLL_INTERVAL_MS,
-  POLL_TIMEOUT_MS,
-  TERMINAL_PARSE_STATUSES,
-  getErrorMessage,
-  normalizeParseStatus,
-} from "@/constant/attachment";
+import { getErrorMessage, normalizeParseStatus } from "@/constant/attachment";
 import ResumeOption from "./resume-option";
 
 const isSupportedResumeFile = (fileName = "") => /\.(pdf|doc|docx)$/i.test(`${fileName}`.trim());
 
-const mergeAndSortResumes = (profileResumes = [], originalResumes = [], overrides = {}) => {
+const mergeAndSortResumes = (profileResumes = [], originalResumes = []) => {
   const mergedMap = new Map();
 
   [...profileResumes, ...originalResumes].forEach((resume) => {
@@ -35,9 +28,13 @@ const mergeAndSortResumes = (profileResumes = [], originalResumes = [], override
   return [...mergedMap.values()]
     .map((resume) => ({
       ...resume,
-      parseStatus: normalizeParseStatus(overrides[resume.id] || resume.parseStatus || "WAITING"),
+      parseStatus: normalizeParseStatus(resume.parseStatus || "WAITING"),
     }))
     .sort((left, right) => {
+      const leftParsed = left.parseStatus === "FINISH";
+      const rightParsed = right.parseStatus === "FINISH";
+      if (leftParsed !== rightParsed) return leftParsed ? -1 : 1;
+
       if (left.type === "PROFILE" && right.type !== "PROFILE") return -1;
       if (left.type !== "PROFILE" && right.type === "PROFILE") return 1;
       return Number(right.id || 0) - Number(left.id || 0);
@@ -48,15 +45,10 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
   const { id: routeJobId } = useParams();
   const navigate = useNavigate();
   const inputRef = useRef(null);
-  const pollingTimersRef = useRef({});
-  const pollingStartTimesRef = useRef({});
 
   const effectiveJobId = jobId || routeJobId;
 
   const [selectedResumeId, setSelectedResumeId] = useState(null);
-  const [parseStatusOverrides, setParseStatusOverrides] = useState({});
-  const [parsingResumeId, setParsingResumeId] = useState(null);
-  const [pollingByResumeId, setPollingByResumeId] = useState({});
 
   const {
     data: profileResumes = [],
@@ -78,114 +70,27 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
 
   const [uploadFiles, { isLoading: isUploadingFile }] = useUploadFilesMutation();
   const [uploadCandidateResume, { isLoading: isSavingResume }] = useUploadCandidateResumeMutation();
-  const [parseCandidateResume] = useParseCandidateResumeMutation();
-  const [triggerResumeParseStatus] = useLazyGetResumeParseStatusQuery();
+  const [parseCandidateResume, { isLoading: isParsingResume }] = useParseCandidateResumeMutation();
 
   const isLoadingResumes = isProfileLoading || isOriginalLoading || isProfileFetching || isOriginalFetching;
 
   const resumes = useMemo(
-    () => mergeAndSortResumes(profileResumes, originalResumes, parseStatusOverrides),
-    [parseStatusOverrides, profileResumes, originalResumes]
-  );
-
-  const stopPolling = useCallback((resumeId) => {
-    if (pollingTimersRef.current[resumeId]) {
-      clearInterval(pollingTimersRef.current[resumeId]);
-      delete pollingTimersRef.current[resumeId];
-    }
-
-    delete pollingStartTimesRef.current[resumeId];
-    setPollingByResumeId((prev) => {
-      if (!prev[resumeId]) return prev;
-      const next = { ...prev };
-      delete next[resumeId];
-      return next;
-    });
-  }, []);
-
-  const stopAllPolling = useCallback(() => {
-    Object.values(pollingTimersRef.current).forEach((timer) => clearInterval(timer));
-    pollingTimersRef.current = {};
-    pollingStartTimesRef.current = {};
-    setPollingByResumeId({});
-  }, []);
-
-  const startPolling = useCallback(
-    (resumeId) => {
-      if (!resumeId || pollingTimersRef.current[resumeId]) return;
-
-      pollingStartTimesRef.current[resumeId] = Date.now();
-      setPollingByResumeId((prev) => ({ ...prev, [resumeId]: true }));
-
-      const pollStatus = async () => {
-        const startedAt = pollingStartTimesRef.current[resumeId];
-        if (!startedAt) {
-          stopPolling(resumeId);
-          return;
-        }
-
-        if (Date.now() - startedAt >= POLL_TIMEOUT_MS) {
-          stopPolling(resumeId);
-          message.info("Resume parsing is still processing. Please check again in a moment.");
-          return;
-        }
-
-        try {
-          const status = normalizeParseStatus(await triggerResumeParseStatus({ resumeId }).unwrap());
-          setParseStatusOverrides((prev) => ({ ...prev, [resumeId]: status }));
-
-          if (TERMINAL_PARSE_STATUSES.has(status)) {
-            stopPolling(resumeId);
-            if (status === "FINISH") {
-              message.success("Resume parsed successfully.");
-            } else {
-              message.error("Resume parsing failed. Please try again.");
-            }
-          }
-        } catch (error) {
-          stopPolling(resumeId);
-          message.error(getErrorMessage(error, "Unable to check parse status."));
-        }
-      };
-
-      void pollStatus();
-      pollingTimersRef.current[resumeId] = setInterval(() => {
-        void pollStatus();
-      }, POLL_INTERVAL_MS);
-    },
-    [stopPolling, triggerResumeParseStatus]
+    () => mergeAndSortResumes(profileResumes, originalResumes),
+    [profileResumes, originalResumes]
   );
 
   useEffect(() => {
     if (!open) {
-      stopAllPolling();
+      setSelectedResumeId(null);
       return;
     }
 
-    resumes
-      .filter((resume) => resume.parseStatus === "PARTIAL" || Boolean(pollingByResumeId[resume.id]))
-      .forEach((resume) => startPolling(resume.id));
-  }, [open, pollingByResumeId, resumes, startPolling, stopAllPolling]);
+    const selectableResumes = resumes.filter((resume) => resume.parseStatus === "FINISH");
 
-  useEffect(() => {
-    if (!open) return;
-
-    const selectableResumeIds = new Set(
-      resumes.filter((resume) => resume.parseStatus === "FINISH").map((resume) => resume.id)
-    );
-
-    if (!selectedResumeId || !selectableResumeIds.has(selectedResumeId)) {
-      const defaultResumeId = resumes.find((resume) => resume.parseStatus === "FINISH")?.id ?? null;
-      setSelectedResumeId(defaultResumeId);
+    if (selectableResumes.length > 0 && (!selectedResumeId || !selectableResumes.some((r) => r.id === selectedResumeId))) {
+      setSelectedResumeId(selectableResumes[0].id);
     }
-  }, [open, resumes, selectedResumeId]);
-
-  useEffect(
-    () => () => {
-      stopAllPolling();
-    },
-    [stopAllPolling]
-  );
+  }, [open, resumes]);
 
   const handleClose = () => {
     setSelectedResumeId(null);
@@ -220,7 +125,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
       }).unwrap();
 
       setSelectedResumeId(createdResume?.id ?? null);
-      message.success("Resume uploaded successfully. Parse this resume before AI matching.");
+      message.success("Resume uploaded successfully.");
     } catch (error) {
       message.error(getErrorMessage(error, "Upload resume failed"));
     } finally {
@@ -228,25 +133,19 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
     }
   };
 
-  const handleParseResume = async (resumeId) => {
-    if (!resumeId) return;
-    setParsingResumeId(resumeId);
-
-    try {
-      await parseCandidateResume({ resumeId }).unwrap();
-      setParseStatusOverrides((prev) => ({ ...prev, [resumeId]: "PARTIAL" }));
-      startPolling(resumeId);
-      message.success("Resume parsing has started.");
-    } catch (error) {
-      message.error(getErrorMessage(error, "Failed to start resume parsing."));
-    } finally {
-      setParsingResumeId(null);
-    }
-  };
-
   const selectedResume = resumes.find((resume) => resume.id === selectedResumeId) || null;
   const canSubmit = selectedResume?.parseStatus === "FINISH";
   const isUploading = isUploadingFile || isSavingResume;
+
+  const handleParseResume = async (resumeId) => {
+    if (!resumeId) return;
+    try {
+      await parseCandidateResume({ resumeId }).unwrap();
+      message.success("Resume parsing started. Please wait a moment.");
+    } catch (error) {
+      message.error(getErrorMessage(error, "Failed to start resume parsing."));
+    }
+  };
 
   const handleCheckMatch = () => {
     if (!canSubmit || !selectedResume || !effectiveJobId) {
@@ -264,7 +163,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
       onCancel={handleClose}
       footer={null}
       centered
-      destroyOnClose
+      destroyOnHidden
       width={860}
     >
       <div className="-mx-6 -mt-2 rounded-t-xl border-b border-gray-100 bg-gray-50/80 px-6 pb-5">
@@ -289,15 +188,15 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
           <div className="space-y-3">
             {resumes.map((resume) => {
               const isSelectable = resume.parseStatus === "FINISH";
-              const isPolling = Boolean(pollingByResumeId[resume.id]);
+              const isPartial = resume.parseStatus === "PARTIAL";
               return (
                 <ResumeOption
                   key={resume.id}
                   resume={resume}
                   isSelected={selectedResumeId === resume.id}
                   isSelectable={isSelectable}
-                  isPolling={isPolling}
-                  isParsing={parsingResumeId === resume.id}
+                  isPartial={isPartial}
+                  isParsing={isParsingResume}
                   onSelect={setSelectedResumeId}
                   onParse={handleParseResume}
                 />
