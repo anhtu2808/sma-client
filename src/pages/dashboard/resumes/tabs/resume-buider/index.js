@@ -1,5 +1,6 @@
 import React from "react";
 import { Col, Row } from "antd";
+import { useNavigate } from "react-router-dom";
 import { TemplateCard } from "../../resume-card";
 
 const CV_TEMPLATES = [
@@ -42,6 +43,8 @@ const CV_TEMPLATES = [
 ];
 
 const ResumeBuilderTab = () => {
+  const navigate = useNavigate();
+
   return (
     <section>
       <div className="flex items-center justify-between mb-4">
@@ -55,7 +58,7 @@ const ResumeBuilderTab = () => {
         <Row gutter={[24, 24]}>
           {CV_TEMPLATES.map((template) => (
             <Col xs={24} sm={24} lg={12} xl={12} key={template.id}>
-              <TemplateCard template={template} onSelect={(t) => console.log('Selected template', t)} />
+              <TemplateCard template={template} onSelect={(t) => navigate(`/dashboard/resumes/builder?template=${t.id}`)} />
             </Col>
           ))}
         </Row>
