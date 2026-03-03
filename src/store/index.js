@@ -3,6 +3,7 @@ import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import { combineReducers } from 'redux';
 import { api } from '@/apis/baseApi';
+import notificationReducer from '@/pages/dashboard/notification/components/notification-slice';
 
 // Import your slices here
 // import userReducer from './slices/userSlice';
@@ -12,7 +13,8 @@ const persistConfig = {
     key: 'root',
     storage,
     whitelist: [], // Add slice names to persist: ['user', 'exam']
-    blacklist: [api.reducerPath], // Don't persist RTK Query cache
+    blacklist: [api.reducerPath, 'notification'],  // Don't persist RTK Query cache
+
 };
 
 // Example: Individual slice persist configs
@@ -26,6 +28,7 @@ const rootReducer = combineReducers({
     // Add your reducers here
     // user: persistReducer(userPersistConfig, userReducer),
     // exam: examReducer,
+    notification: notificationReducer,
     [api.reducerPath]: api.reducer,
 });
 

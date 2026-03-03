@@ -4,6 +4,7 @@ import Navbar from "@/pages/layout/navbar";
 import { Col, Row } from "antd";
 import Sidebar from "@/pages/dashboard/layout/Sidebar";
 import { Link, Outlet } from "react-router-dom";
+import { useNotificationSocket } from '@/hooks/useNotificationSocket';
 
 
 
@@ -11,6 +12,7 @@ const DashboardLayout = () => {
   const { data } = useCandidateProfileQuery();
   const user = data?.data?.user;
   const displayName = user?.fullName || user?.email || "Candidate";
+  useNotificationSocket();
 
   return (
     <div className="bg-background-light dark:bg-background-dark text-gray-900 dark:text-gray-100 font-sans antialiased selection:bg-primary selection:text-white transition-colors duration-300 min-h-screen flex flex-col">
