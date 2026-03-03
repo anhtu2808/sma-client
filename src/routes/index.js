@@ -21,6 +21,7 @@ import CompanyDetail from '@/pages/company-detail';
 import PricingPage from "@/pages/pricing";
 import Application from "@/pages/application";
 import ApplicationSuccess from "@/pages/application/sucess";
+import MatchingScore from "@/pages/job-detail/matching-score";
 
 export const routes = createBrowserRouter(
     createRoutesFromElements(
@@ -41,6 +42,7 @@ export const routes = createBrowserRouter(
                 </Route>
                 <Route path="jobs/:id/application" element={<Application />} />
                 <Route path="jobs/:id/application/success" element={<ApplicationSuccess />} />
+                <Route path="jobs/:id/matching-score" element={<MatchingScore />} />
             </Route>
 
             <Route path="dashboard" element={<DashboardLayout />}>
