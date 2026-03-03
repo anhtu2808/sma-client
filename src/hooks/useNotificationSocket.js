@@ -20,8 +20,8 @@ export const useNotificationSocket = () => {
 
         console.log("Setting up WS with token:", token);
 
-        // const socket = new SockJS("https://api.smartrecruit.tech/ws-smartrecruit");
-        const socket = new SockJS("http://localhost:8080/ws-smartrecruit");
+        const socket = new SockJS("https://api.smartrecruit.tech/ws-smartrecruit");
+        // const socket = new SockJS("http://localhost:8080/ws-smartrecruit");
 
         const client = new Client({
             webSocketFactory: () => socket,
