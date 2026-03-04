@@ -60,3 +60,45 @@ code {
 .ant-tabs .ant-tabs-tab .material-icons-round {
   color: inherit;
 }
+
+/* Ant Design Slider - Primary color override */
+.ant-slider .ant-slider-track {
+  background-color: #FF6B35 !important;
+}
+
+.ant-slider .ant-slider-handle::after {
+  box-shadow: 0 0 0 2px #FF6B35 !important;
+}
+
+.ant-slider .ant-slider-handle:hover::after,
+.ant-slider .ant-slider-handle:focus::after {
+  box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.2) !important;
+}
+
+.ant-slider:hover .ant-slider-track {
+  background-color: #E55A2B !important;
+}
+
+/* Ant Design Select - Primary color override */
+.ant-select:not(.ant-select-disabled):hover .ant-select-selector,
+.ant-select-focused .ant-select-selector {
+  border-color: #FF6B35 !important;
+  box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.2) !important;
+}
+
+.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background-color: rgba(255, 107, 53, 0.1) !important;
+  color: #FF6B35 !important;
+}
+
+.ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background-color: rgba(255, 107, 53, 0.06) !important;
+}
+
+.ant-select .ant-select-selection-item-remove:hover {
+  color: #FF6B35 !important;
+}
+
+.ant-select .ant-select-clear:hover {
+  color: #FF6B35 !important;
+}
