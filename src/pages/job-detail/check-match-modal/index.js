@@ -90,7 +90,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
     if (selectableResumes.length > 0 && (!selectedResumeId || !selectableResumes.some((r) => r.id === selectedResumeId))) {
       setSelectedResumeId(selectableResumes[0].id);
     }
-  }, [open, resumes]);
+  }, [open, resumes, selectedResumeId]);
 
   const handleClose = () => {
     setSelectedResumeId(null);
@@ -154,7 +154,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
     }
 
     handleClose();
-    navigate(`/jobs/${effectiveJobId}/matching-score?resumeId=${selectedResume.id}`);
+    navigate(`/jobs/${effectiveJobId}/match-check?resumeId=${selectedResume.id}`);
   };
 
   return (
