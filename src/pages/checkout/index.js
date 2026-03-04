@@ -24,14 +24,13 @@ const Checkout = () => {
             const duration = plan.durations?.find((d) => d.key === selectedDuration);
             // We need a valid planId and planPriceId to send
             const planId = plan.id;
-            // The duration key typically matches the price id, except when fallback logic was used. Let's try duration.id if we had mapped it, otherwise duration.key might be the ID.
-            const planPriceId = duration ? duration.id : null;
+            // If there's a selected duration, use it; otherwise use the plan's base priceId (for lifetime plans)
+            const planPriceId = duration ? Number(selectedDuration) : Number(plan.priceId);
 
             try {
-                // Determine a payload. We'll default to the key for now since the mapping sets key to price.id
                 const payload = {
                     planId: planId,
-                    planPriceId: Number(selectedDuration)
+                    planPriceId: planPriceId
                 };
 
                 const res = await createSubscription(payload).unwrap();

@@ -1,7 +1,6 @@
 import axios from 'axios';
 
-// const BASE_HOST = process.env.REACT_APP_API_URL || 'http://localhost:8080';
-const BASE_HOST = 'https://api.smartrecruit.tech';
+const BASE_HOST = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
 const apiClient = axios.create({
     baseURL: BASE_HOST,

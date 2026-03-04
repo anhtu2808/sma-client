@@ -42,15 +42,6 @@ const OrderSummarySection = ({
                     <span className="text-2xl font-extrabold text-primary">{totalPrice}</span>
                 </div>
 
-                <Button
-                    mode="primary"
-                    className="w-full py-4 rounded-xl font-bold text-lg shadow-md hover:shadow-lg transition-all"
-                    onClick={onCompletePayment}
-                    isLoading={isSubmitting}
-                    disabled={isLoadingQR} // Prevent completing if QR hasn't loaded
-                >
-                    I have completed payment
-                </Button>
                 <p className="text-center text-xs text-gray-400 mt-4 flex items-center justify-center gap-1">
                     <span className="material-icons-round text-[14px]">lock</span>
                     Payments are secure and encrypted
