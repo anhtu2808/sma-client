@@ -119,6 +119,7 @@ const mapPlanToCard = (plan, currentPlanId) => {
 const Plans = ({ plans = [], currentPlanId = null }) => {
   const [expandedPlanCode, setExpandedPlanCode] = useState(null);
   const [selectedDurationByPlan, setSelectedDurationByPlan] = useState({});
+  const [selectedPlanCode, setSelectedPlanCode] = useState(null);
 
   const sortedPlans = useMemo(() => {
     if (!Array.isArray(plans)) return [];
@@ -195,6 +196,8 @@ const Plans = ({ plans = [], currentPlanId = null }) => {
           <PlanCard
             key={plan.code}
             plan={plan}
+            isSelected={selectedPlanCode === plan.code}
+            onClick={() => setSelectedPlanCode(plan.code)}
             isExpanded={expandedPlanCode === plan.code}
             onExpand={() => setExpandedPlanCode(plan.code)}
             onClose={() => setExpandedPlanCode(null)}

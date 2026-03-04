@@ -7,7 +7,7 @@ const getSaveClass = (save) => {
   return "text-gray-400";
 };
 
-const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSelectDuration }) => {
+const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSelectDuration, isSelected, onClick }) => {
   const navigate = useNavigate();
   const isCurrent = plan.current;
   const hasDurations = plan.durations && plan.durations.length > 0;
@@ -23,9 +23,10 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
 
   return (
     <article
-      className={`relative rounded-2xl border p-8 shadow-sm flex flex-col h-full md:h-[690px] transition-all ${plan.popular
-        ? "border-2 border-primary shadow-lg md:scale-[1.02] z-10"
-        : "border-gray-200 hover:border-gray-300"
+      onClick={onClick}
+      className={`relative rounded-2xl border p-8 shadow-sm flex flex-col h-full md:h-[690px] transition-all cursor-pointer ${isSelected
+          ? "border-2 border-primary shadow-lg md:scale-[1.02] z-10"
+          : "border-gray-200 hover:border-gray-300"
         }`}
     >
       {plan.popular ? (
@@ -53,7 +54,10 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
           <button
             type="button"
             disabled={isCurrent}
-            onClick={handleAction}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAction();
+            }}
             className={`w-full py-3 px-4 font-semibold rounded-lg mb-8 transition-all ${isCurrent
               ? "bg-gray-100 text-gray-400 cursor-not-allowed"
               : plan.popular || plan.code === "PREMIUM"
@@ -75,7 +79,10 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
             <Button
               mode="ghost"
               className="text-gray-400 hover:text-gray-600 p-1"
-              onClick={onClose}
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
               btnIcon
             >
               <span className="material-icons-round text-[20px]">close</span>
@@ -89,7 +96,10 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
                 <button
                   type="button"
                   key={duration.key}
-                  onClick={() => onSelectDuration(duration.key)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSelectDuration(duration.key);
+                  }}
                   className={`w-full text-left flex flex-col p-4 border rounded-xl transition-all bg-white shadow-sm relative ${selected ? "border-primary ring-2 ring-primary bg-orange-50/40" : "border-gray-100 hover:border-gray-200"
                     } ${duration.mostPopular ? "pt-6" : ""}`}
                 >
@@ -118,7 +128,8 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
           <Button
             mode="primary"
             shape="rounded"
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               if (!selectedDuration && plan.durations.length > 0) {
                 navigate('/dashboard/checkout', { state: { plan, selectedDuration: selectedDuration || plan.durations[0].key } });
               } else {
