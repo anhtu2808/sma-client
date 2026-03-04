@@ -17,7 +17,7 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
     if (hasDurations) {
       onExpand();
     } else {
-      navigate('/dashboard/checkout', { state: { plan } });
+      navigate('/checkout', { state: { plan } });
     }
   };
 
@@ -25,8 +25,8 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
     <article
       onClick={onClick}
       className={`relative rounded-2xl border p-8 shadow-sm flex flex-col h-full md:h-[690px] transition-all cursor-pointer ${isSelected
-          ? "border-2 border-primary shadow-lg md:scale-[1.02] z-10"
-          : "border-gray-200 hover:border-gray-300"
+        ? "border-2 border-primary shadow-lg md:scale-[1.02] z-10"
+        : "border-gray-200 hover:border-gray-300"
         }`}
     >
       {plan.popular ? (
@@ -131,9 +131,9 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
             onClick={(e) => {
               e.stopPropagation();
               if (!selectedDuration && plan.durations.length > 0) {
-                navigate('/dashboard/checkout', { state: { plan, selectedDuration: selectedDuration || plan.durations[0].key } });
+                navigate('/checkout', { state: { plan, selectedDuration: selectedDuration || plan.durations[0].key } });
               } else {
-                navigate('/dashboard/checkout', { state: { plan, selectedDuration } });
+                navigate('/checkout', { state: { plan, selectedDuration } });
               }
             }}
             className={`w-full py-4 font-bold rounded-xl transition-all shadow-lg text-sm tracking-wide ${isCurrent
