@@ -38,7 +38,6 @@ const AttachmentsTab = () => {
     pendingUploadPayload: null,
     resumeId: null,
   });
-  const [isConsentChecked, setIsConsentChecked] = useState(false);
   const [isConsentLoading, setIsConsentLoading] = useState(false);
 
   const { data: resumes = [], isLoading: isLoadingResumes } = useGetCandidateResumesQuery({
@@ -143,11 +142,6 @@ const AttachmentsTab = () => {
 
           if (TERMINAL_PARSE_STATUSES.has(status)) {
             stopPolling(resumeId);
-            if (status === "FINISH") {
-              message.success("Resume parsed successfully.");
-            } else {
-              message.error("Resume parsing failed. Please try parsing again.");
-            }
           }
         } catch (error) {
           stopPolling(resumeId);
@@ -194,7 +188,6 @@ const AttachmentsTab = () => {
       pendingUploadPayload: null,
       resumeId: null,
     });
-    setIsConsentChecked(false);
   };
 
   const createUploadedResume = async (payload) => uploadCandidateResume(payload).unwrap();
@@ -245,7 +238,6 @@ const AttachmentsTab = () => {
         pendingUploadPayload: payload,
         resumeId: null,
       });
-      setIsConsentChecked(false);
     } catch (error) {
       message.error(getErrorMessage(error, "Upload resume failed"));
     } finally {
@@ -260,11 +252,10 @@ const AttachmentsTab = () => {
       pendingUploadPayload: null,
       resumeId,
     });
-    setIsConsentChecked(false);
   };
 
   const handleConsentSubmit = async () => {
-    if (!isConsentChecked || isConsentLoading) return;
+    if (isConsentLoading) return;
 
     try {
       setIsConsentLoading(true);
@@ -283,11 +274,10 @@ const AttachmentsTab = () => {
           message.success("Resume parsing has started.");
         }
       }
-
-      resetConsentModal();
     } catch (error) {
       message.error(getErrorMessage(error, "Unable to continue."));
     } finally {
+      resetConsentModal();
       setIsConsentLoading(false);
     }
   };
@@ -303,11 +293,11 @@ const AttachmentsTab = () => {
     try {
       setIsConsentLoading(true);
       await createUploadedResume(consentModal.pendingUploadPayload);
-      message.success("Upload completed. You can parse this resume later.");
-      resetConsentModal();
+      message.success("Upload resume successfully");
     } catch (error) {
       message.error(getErrorMessage(error, "Upload resume failed"));
     } finally {
+      resetConsentModal();
       setIsConsentLoading(false);
     }
   };
@@ -393,9 +383,7 @@ const AttachmentsTab = () => {
       <ParseConsentModal
         open={consentModal.open}
         mode={consentModal.mode}
-        isConsentChecked={isConsentChecked}
         isConsentLoading={isConsentLoading}
-        onChangeConsentChecked={setIsConsentChecked}
         onCancel={handleConsentCancel}
         onSubmit={handleConsentSubmit}
       />
