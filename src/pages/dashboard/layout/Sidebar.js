@@ -1,24 +1,36 @@
 import React from 'react';
 import { NavLink } from "react-router-dom";
+import { useGetNotificationsQuery } from '@/apis/notificationApi';
 
-const sidebarItems = [
-    { to: "/dashboard", icon: "grid_view", label: "Overview", end: true },
-    { to: "/dashboard/profile", icon: "person", label: "Profile" },
-    { to: "/dashboard/resumes", icon: <i className="fa-solid fa-file-lines"></i>, label: "Resumes" },
-    { to: "/dashboard/jobs", icon: "work_history", label: "My Jobs" },
-    {
-        to: "/dashboard/invitations",
-        icon: "mail",
-        label: "Job Invitation",
-        badge: 3,
-    },
-    { to: "/dashboard/notifications", icon: "notifications", label: "Notifications" },
-    { to: "/dashboard/billing-plans", icon: "credit_card", label: "Billing & Plans" },
-    { to: "/dashboard/usage", icon: "history", label: "Usage" },
-    { to: "/dashboard/setting", icon: "settings", label: "Settings" },
-];
 
 const Sidebar = ({ displayName }) => {
+
+
+    const { data } = useGetNotificationsQuery({
+        page: 0,
+        size: 1,
+        isRead: false
+    });
+    const unreadCount = data?.data?.unreadCount || 0;
+
+    const sidebarItems = [
+
+        { to: "/dashboard", icon: "grid_view", label: "Overview", end: true },
+        { to: "/dashboard/profile", icon: "person", label: "Profile" },
+        { to: "/dashboard/resumes", icon: <i className="fa-solid fa-file-lines"></i>, label: "Resumes" },
+        { to: "/dashboard/jobs", icon: "work_history", label: "My Jobs" },
+        {
+            to: "/dashboard/invitations",
+            icon: "mail",
+            label: "Job Invitation",
+            badge: 3,
+        },
+        { to: "/dashboard/notifications", icon: "notifications", label: "Notifications", badge: unreadCount > 0 ? unreadCount : null },
+        { to: "/dashboard/billing-plans", icon: "credit_card", label: "Billing & Plans" },
+        { to: "/dashboard/usage", icon: "history", label: "Usage" },
+        { to: "/dashboard/setting", icon: "settings", label: "Settings" },
+    ];
+
     return (
         <aside className="h-full">
             <div className="bg-white dark:bg-surface-dark rounded-3xl shadow-lg border border-gray-100 dark:border-gray-800 flex flex-col">

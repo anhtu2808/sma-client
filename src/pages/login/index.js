@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useMemo, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { message } from "antd";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
@@ -8,11 +8,29 @@ import googleIcon from "@/assets/svg/google-icon.svg";
 import authService from "@/services/authService";
 import { GoogleLogin } from "@react-oauth/google";
 
+const sanitizeRedirectPath = (path) => {
+  if (!path || typeof path !== "string") {
+    return "/";
+  }
+
+  const trimmedPath = path.trim();
+  if (!trimmedPath.startsWith("/") || trimmedPath.startsWith("//")) {
+    return "/";
+  }
+
+  return trimmedPath;
+};
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectPath = useMemo(
+    () => sanitizeRedirectPath(searchParams.get("redirect")),
+    [searchParams]
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,7 +41,7 @@ const Login = () => {
 
       if (response.data.code === 200) {
         message.success(response.data.message || "Login successfully");
-        navigate("/");
+        navigate(redirectPath, { replace: true });
       } else {
         message.error(response.data.message || "Login failed");
       }
@@ -46,7 +64,7 @@ const Login = () => {
 
       if (res.data.code === 200) {
         message.success(res.data.message || "Login successfully");
-        navigate("/");
+        navigate(redirectPath, { replace: true });
       } else {
         message.error(res.data.message || "Login failed");
       }

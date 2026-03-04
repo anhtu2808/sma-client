@@ -101,12 +101,12 @@
 
         &:hover:not(:disabled) {
             color: $primary;
-            background: $neutral-100;
+            background: transparent;
         }
 
         &:active:not(:disabled) {
             color: $primary-dark;
-            background: $neutral-200;
+            background: transparent;
         }
 
         &:disabled {
@@ -201,11 +201,11 @@
 
             &:hover:not(:disabled) {
                 color: $primary;
-                background: $neutral-800;
+                background: transparent;
             }
 
             &:active:not(:disabled) {
-                background: $neutral-700;
+                background: transparent;
             }
         }
     }
