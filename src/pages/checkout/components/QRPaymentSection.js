@@ -10,7 +10,7 @@ const QRPaymentSection = ({
 }) => {
     return (
         <div className="lg:col-span-6 flex flex-col items-center justify-center text-center relative py-4 lg:py-8 lg:px-12">
-            <h2 className="text-[#111e3b] text-[1.35rem] font-extrabold mb-2 tracking-tight">Scan to Pay</h2>
+            <h2 className="text-[#111e3b] text-[1.35rem] font-extrabold mb-8 tracking-tight">Scan to Pay</h2>
             <p className="text-[#8492a6] text-[14px] mb-8 font-medium">
                 Open your banking or e-wallet app
             </p>
@@ -38,12 +38,6 @@ const QRPaymentSection = ({
                 </div>
             </div>
 
-            {/* Expire Timer */}
-            {/* <div className="flex items-center gap-1.5 text-[#ff7e5f] text-[13px] font-bold border border-[#ffeedd] bg-[#fff8f5] px-6 py-2 rounded-full mb-8">
-                <span className="material-icons-round text-[16px]">schedule</span>
-                <span>QR expires in 00:00</span>
-            </div> */}
-
             {/* Scan to Pay Target */}
             <div className="flex items-center gap-2 text-[#fc9c82] font-semibold bg-[#fff1ed] px-4 py-2 rounded-lg mb-8">
                 <span className="material-icons-round text-xl">qr_code_scanner</span>
@@ -53,11 +47,13 @@ const QRPaymentSection = ({
             {/* Back Button */}
             <Button
                 onClick={onBack}
-                mode="ghost"
+                mode="primary"
+                shape="round"
+                size="lg"
                 className="text-[#8492a6] hover:text-[#3b4356] text-[13.5px] font-semibold flex items-center gap-1.5 transition-colors mt-auto pt-6 mb-8"
             >
                 <span className="material-icons-round text-[16px]">arrow_back</span>
-                Cancel and go back
+                Cancel & Go back
             </Button>
 
             {/* Need Help Box */}
