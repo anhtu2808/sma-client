@@ -11,7 +11,7 @@ const getSaveBadgeStyle = (savePercent) => {
   return "bg-gray-100 text-gray-500";
 };
 
-const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSelectDuration }) => {
+const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSelectDuration, isSelected, onClick }) => {
   const navigate = useNavigate();
   const isCurrent = plan.current;
   const hasDurations = plan.durations && plan.durations.length > 0;
@@ -28,11 +28,12 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
 
   return (
     <article
-      className={`relative rounded-2xl border p-8 shadow-sm transition-all flex flex-col lg:h-[720px] ${isCurrent
-        ? "bg-white border-gray-200"
-        : plan.popular
+      onClick={onClick}
+      className={`relative rounded-2xl border p-8 shadow-sm transition-all flex flex-col lg:h-[720px] cursor-pointer ${isSelected
           ? "bg-white border-2 border-primary shadow-md"
-          : "bg-white border-gray-200 hover:border-gray-300"
+          : isCurrent
+            ? "bg-white border-gray-200 cursor-default"
+            : "bg-white border-gray-200 hover:border-gray-300"
         }`}
     >
       {plan.popular ? (
@@ -71,7 +72,10 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
           <button
             type="button"
             disabled={isCurrent}
-            onClick={handleAction}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAction();
+            }}
             className={`w-full py-3 px-4 rounded-lg font-semibold transition-all mb-8 ${isCurrent
               ? "bg-gray-100 text-gray-400 cursor-not-allowed"
               : plan.popular
@@ -96,7 +100,10 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
             <Button
               mode="ghost"
               className="p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors -mt-2 -mr-2"
-              onClick={onClose}
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
               btnIcon
             >
               <span className="material-icons-round text-[20px]">close</span>
@@ -110,7 +117,10 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
                 <button
                   type="button"
                   key={duration.key}
-                  onClick={() => onSelectDuration(duration.key)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSelectDuration(duration.key);
+                  }}
                   className={`text-left block p-4 bg-white border shadow-sm rounded-xl transition-all relative overflow-hidden ${selected ? "border-primary ring-1 ring-primary" : "border-gray-100 hover:border-gray-200"
                     }`}
                 >
@@ -146,7 +156,8 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
           <Button
             mode="primary"
             shape="rounded"
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               if (!selectedDuration && plan.durations.length > 0) {
                 // If nothing selected, maybe default to first? Or just pass currently selected.
                 navigate('/dashboard/checkout', { state: { plan, selectedDuration: selectedDuration || plan.durations[0].key } });

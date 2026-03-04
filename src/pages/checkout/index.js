@@ -76,25 +76,27 @@ const Checkout = () => {
     };
 
     return (
-        <div className="flex items-start justify-start w-full">
-            <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <QRPaymentSection
-                    planName={planName}
-                    totalPrice={totalPrice}
-                    isLoading={isApiLoading}
-                    qrCodeUrl={qrCodeUrl}
-                    onBack={() => navigate(-1)}
-                />
+        <div className="flex justify-center w-full min-h-screen pt-12 pb-24 px-4 bg-[#f8f9fa]">
+            <div className="w-full max-w-5xl bg-white rounded-[2rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] border border-[#f1f3f9] p-6 sm:p-10 lg:p-12">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-y-12 lg:gap-x-16 items-stretch">
+                    <OrderSummarySection
+                        planName={planName}
+                        planDescription={planDescription}
+                        totalPrice={totalPrice}
+                        durationMonths={duration?.months}
+                        isSubmitting={isSubmitting}
+                        onCompletePayment={handlePayment}
+                        isLoadingQR={isApiLoading}
+                    />
 
-                <OrderSummarySection
-                    planName={planName}
-                    planDescription={planDescription}
-                    totalPrice={totalPrice}
-                    durationMonths={duration?.months}
-                    isSubmitting={isSubmitting}
-                    onCompletePayment={handlePayment}
-                    isLoadingQR={isApiLoading}
-                />
+                    <QRPaymentSection
+                        planName={planName}
+                        totalPrice={totalPrice}
+                        isLoading={isApiLoading}
+                        qrCodeUrl={qrCodeUrl}
+                        onBack={() => navigate(-1)}
+                    />
+                </div>
             </div>
         </div>
     );
