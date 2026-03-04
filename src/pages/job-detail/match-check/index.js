@@ -25,7 +25,7 @@ const mergeResumes = (profileResumes = [], originalResumes = []) => {
   });
 };
 
-const MatchingScore = () => {
+const MatchCheck = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -258,4 +258,4 @@ const MatchingScore = () => {
   );
 };
 
-export default MatchingScore;
+export default MatchCheck;

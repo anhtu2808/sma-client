@@ -23,7 +23,8 @@ import PricingPage from "@/pages/pricing";
 import Application from "@/pages/application";
 import ApplicationSuccess from "@/pages/application/sucess";
 import Checkout from "@/pages/checkout";
-import MatchingScore from "@/pages/job-detail/matching-score";
+import MatchCheck from "@/pages/job-detail/match-check";
+import MatchReport from "@/pages/match-report";
 
 
 export const routes = createBrowserRouter(
@@ -45,8 +46,10 @@ export const routes = createBrowserRouter(
                 </Route>
                 <Route path="jobs/:id/application" element={<Application />} />
                 <Route path="jobs/:id/application/success" element={<ApplicationSuccess />} />
-                <Route path="jobs/:id/matching-score" element={<MatchingScore />} />
+                <Route path="jobs/:id/match-check" element={<MatchCheck />} />
             </Route>
+
+            <Route path="match-report" element={<MatchReport />} />
 
             <Route path="dashboard" element={<DashboardLayout />}>
                 <Route index element={<DashboardOverview />} />
