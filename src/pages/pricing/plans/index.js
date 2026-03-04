@@ -40,6 +40,7 @@ const mapPlanToCard = (plan) => {
     const cta = isCurrent ? "Current Plan" : total === 0 ? "Get Started" : `Upgrade to ${name}`;
     return {
       id: plan?.id,
+      priceId: lifetimePrice.id,
       code,
       name,
       description,

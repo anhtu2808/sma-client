@@ -41,6 +41,7 @@ const mapPlanToCard = (plan, currentPlanId) => {
     const note = total === 0 ? "Lifetime access" : "Billed once";
     return {
       id: plan?.id,
+      priceId: lifetimePrice.id,
       code,
       name,
       description,
@@ -94,10 +95,10 @@ const mapPlanToCard = (plan, currentPlanId) => {
     durationsWithPopular.length > 1
       ? "Billed monthly or save on longer terms"
       : basePrice
-      ? basePrice.unit === "YEAR"
-        ? "Billed yearly"
-        : "Billed monthly"
-      : "Pricing unavailable";
+        ? basePrice.unit === "YEAR"
+          ? "Billed yearly"
+          : "Billed monthly"
+        : "Pricing unavailable";
 
   return {
     id: plan?.id,

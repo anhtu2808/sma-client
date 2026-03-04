@@ -152,3 +152,94 @@ export const ResumeListItem = ({ resume }) => (
     </div>
   </div>
 );
+
+export const TemplateCard = ({ template, onSelect }) => (
+  <div className="group bg-white dark:bg-surface-dark rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden h-full flex flex-col hover:shadow-md transition-shadow relative cursor-pointer" onClick={() => onSelect(template)}>
+    <div className={`relative h-80 ${template.bgColor} border-b border-gray-100 dark:border-gray-700 p-6 flex justify-center items-center overflow-hidden`}>
+      <div className="w-[200px] h-[286px] bg-white rounded-md shadow-sm border border-gray-200 p-3 transform transition-transform duration-300 group-hover:scale-105 flex flex-col">
+        {template.layout === "modern" ? (
+          <>
+            <div className={`w-full h-8 ${template.themeColor} rounded-sm mb-3`} />
+            <div className="flex gap-2 flex-1">
+              <div className="w-1/3 h-full bg-gray-50 flex flex-col gap-1.5 p-1.5 rounded-sm">
+                <div className="w-8 h-8 rounded-full bg-gray-300 mx-auto mt-1" />
+                <div className="w-full h-1 bg-gray-300 mt-3" />
+                <div className="w-3/4 h-1 bg-gray-200 mt-1.5" />
+                <div className="w-full h-1 bg-gray-200 mt-1" />
+              </div>
+              <div className="w-2/3 h-full flex flex-col gap-1.5 p-1.5">
+                <div className="w-1/2 h-1.5 bg-gray-300 rounded" />
+                <div className="w-full h-1 bg-gray-200" />
+                <div className="w-full h-1 bg-gray-200" />
+                <div className="w-3/4 h-1 bg-gray-200" />
+                <div className="w-1/3 h-1.5 bg-gray-300 mt-2.5 rounded" />
+                <div className="w-full h-1 bg-gray-200" />
+                <div className="w-full h-1 bg-gray-200" />
+              </div>
+            </div>
+          </>
+        ) : template.layout === "professional" ? (
+          <>
+            <div className="flex items-center gap-3 mb-3 border-b border-gray-200 pb-2.5 mt-1.5">
+              <div className={`w-10 h-10 rounded-full ${template.themeColor}`} />
+              <div className="flex-1">
+                <div className="w-3/4 h-2 bg-gray-300 rounded mb-1.5" />
+                <div className="w-1/2 h-1 bg-gray-200" />
+              </div>
+            </div>
+            <div className="flex flex-col gap-1.5 flex-1 p-1.5">
+              <div className="w-1/4 h-1.5 bg-gray-300 rounded mt-1.5" />
+              <div className="w-full h-1 bg-gray-200" />
+              <div className="w-full h-1 bg-gray-200" />
+              <div className="w-5/6 h-1 bg-gray-200" />
+              <div className="w-1/4 h-1.5 bg-gray-300 mt-3 rounded" />
+              <div className="w-full h-1 bg-gray-200" />
+              <div className="w-full h-1 bg-gray-200" />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex h-full gap-2">
+              <div className={`w-1/3 h-full ${template.themeColor} rounded-l-sm flex flex-col items-center pt-3 gap-1.5`}>
+                <div className="w-8 h-8 rounded-full bg-white/80" />
+                <div className="w-3/4 h-1 bg-white/60 mt-3" />
+                <div className="w-1/2 h-1 bg-white/60" />
+              </div>
+              <div className="w-2/3 h-full flex flex-col gap-1.5 p-1.5 pt-3">
+                <div className="w-1/2 h-2.5 bg-gray-300 rounded" />
+                <div className="w-3/4 h-1 bg-gray-200 mb-2" />
+                <div className="w-1/3 h-1.5 bg-gray-300 rounded mt-1.5" />
+                <div className="w-full h-1 bg-gray-200" />
+                <div className="w-full h-1 bg-gray-200" />
+                <div className="w-1/3 h-1.5 bg-gray-300 mt-2.5 rounded" />
+                <div className="w-full h-1 bg-gray-200" />
+                <div className="w-4/5 h-1 bg-gray-200" />
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+
+      <div className="absolute inset-0 bg-gray-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm z-10">
+        <Button mode="primary" size="md" shape="rounded">
+          Use Template
+        </Button>
+      </div>
+
+      {template.isPremium && (
+        <div className="absolute top-3 right-3 text-amber-500 bg-white/80 dark:bg-gray-800/80 rounded-full p-1 shadow-sm backdrop-blur inline-flex items-center justify-center !w-8 !h-8 z-20">
+          <i className="material-icons-round text-[20px] drop-shadow-sm">workspace_premium</i>
+        </div>
+      )}
+    </div>
+
+    <div className="p-4 flex-1 flex flex-col justify-between">
+      <div>
+        <div className="flex items-center justify-between mb-1">
+          <h3 className="font-bold text-gray-900 dark:text-white text-base truncate pr-2">{template.name}</h3>
+        </div>
+        <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">{template.description}</p>
+      </div>
+    </div>
+  </div>
+);

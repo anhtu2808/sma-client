@@ -30,13 +30,13 @@ apiClient.interceptors.response.use(
     (error) => {
         if (error.response) {
             const { status, data } = error.response;
-            
+
             if (status === 401) {
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('refreshToken');
                 window.location.href = '/login';
             }
-            
+
             return Promise.reject(data);
         } else if (error.request) {
             return Promise.reject({ message: 'Network error. Please check your connection.' });

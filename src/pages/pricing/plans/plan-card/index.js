@@ -1,4 +1,5 @@
 import Button from "@/components/Button";
+import { useNavigate } from "react-router-dom";
 
 const getSaveClass = (save) => {
   if (save >= 40) return "text-primary";
@@ -7,15 +8,25 @@ const getSaveClass = (save) => {
 };
 
 const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSelectDuration }) => {
+  const navigate = useNavigate();
   const isCurrent = plan.current;
+  const hasDurations = plan.durations && plan.durations.length > 0;
+
+  const handleAction = () => {
+    if (isCurrent) return;
+    if (hasDurations) {
+      onExpand();
+    } else {
+      navigate('/dashboard/checkout', { state: { plan } });
+    }
+  };
 
   return (
     <article
-      className={`relative rounded-2xl border p-8 shadow-sm flex flex-col h-full md:h-[690px] transition-all ${
-        plan.popular
-          ? "border-2 border-primary shadow-lg md:scale-[1.02] z-10"
-          : "border-gray-200 hover:border-gray-300"
-      }`}
+      className={`relative rounded-2xl border p-8 shadow-sm flex flex-col h-full md:h-[690px] transition-all ${plan.popular
+        ? "border-2 border-primary shadow-lg md:scale-[1.02] z-10"
+        : "border-gray-200 hover:border-gray-300"
+        }`}
     >
       {plan.popular ? (
         <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] font-bold px-4 py-1 rounded-full uppercase tracking-widest shadow-sm">
@@ -42,14 +53,13 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
           <button
             type="button"
             disabled={isCurrent}
-            onClick={() => (!isCurrent && plan.durations.length ? onExpand() : null)}
-            className={`w-full py-3 px-4 font-semibold rounded-lg mb-8 transition-all ${
-              isCurrent
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : plan.popular || plan.code === "PREMIUM"
+            onClick={handleAction}
+            className={`w-full py-3 px-4 font-semibold rounded-lg mb-8 transition-all ${isCurrent
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : plan.popular || plan.code === "PREMIUM"
                 ? "bg-primary text-white hover:bg-primary-dark"
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-            }`}
+              }`}
           >
             {plan.cta}
           </button>
@@ -80,9 +90,8 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
                   type="button"
                   key={duration.key}
                   onClick={() => onSelectDuration(duration.key)}
-                  className={`w-full text-left flex flex-col p-4 border rounded-xl transition-all bg-white shadow-sm relative ${
-                    selected ? "border-primary ring-2 ring-primary bg-orange-50/40" : "border-gray-100 hover:border-gray-200"
-                  } ${duration.mostPopular ? "pt-6" : ""}`}
+                  className={`w-full text-left flex flex-col p-4 border rounded-xl transition-all bg-white shadow-sm relative ${selected ? "border-primary ring-2 ring-primary bg-orange-50/40" : "border-gray-100 hover:border-gray-200"
+                    } ${duration.mostPopular ? "pt-6" : ""}`}
                 >
                   {duration.mostPopular ? (
                     <div className="absolute top-0 right-4 bg-primary text-white text-[9px] font-bold px-2 py-0.5 rounded-b-md uppercase">
@@ -109,11 +118,17 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
           <Button
             mode="primary"
             shape="rounded"
-            className={`w-full py-4 font-bold rounded-xl transition-all shadow-lg text-sm tracking-wide ${
-              isCurrent
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : "bg-primary text-white hover:bg-primary-dark"
-            }`}
+            onClick={() => {
+              if (!selectedDuration && plan.durations.length > 0) {
+                navigate('/dashboard/checkout', { state: { plan, selectedDuration: selectedDuration || plan.durations[0].key } });
+              } else {
+                navigate('/dashboard/checkout', { state: { plan, selectedDuration } });
+              }
+            }}
+            className={`w-full py-4 font-bold rounded-xl transition-all shadow-lg text-sm tracking-wide ${isCurrent
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-primary text-white hover:bg-primary-dark"
+              }`}
             disabled={isCurrent}
           >
             {isCurrent ? "Current Plan" : "Subscribe Now"}

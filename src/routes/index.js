@@ -12,6 +12,7 @@ import DashboardJobs from '@/pages/dashboard/jobs';
 import Setting from '@/pages/dashboard/setting';
 import Notification from '@/pages/dashboard/notification';
 import Resumes from '@/pages/dashboard/resumes';
+import CvBuilder from '@/pages/dashboard/resumes/cv-builder';
 import Profile from '@/pages/dashboard/profile';
 import Invitations from '@/pages/dashboard/invitations';
 import BillingPlans from '@/pages/dashboard/billings';
@@ -21,7 +22,9 @@ import CompanyDetail from '@/pages/company-detail';
 import PricingPage from "@/pages/pricing";
 import Application from "@/pages/application";
 import ApplicationSuccess from "@/pages/application/sucess";
+import Checkout from "@/pages/checkout";
 import MatchingScore from "@/pages/job-detail/matching-score";
+
 
 export const routes = createBrowserRouter(
     createRoutesFromElements(
@@ -51,10 +54,14 @@ export const routes = createBrowserRouter(
                 <Route path="setting" element={<Setting />} />
                 <Route path="invitations" element={<Invitations />} />
                 <Route path="notifications" element={<Notification />} />
-                <Route path="resumes" element={<Resumes />} />
+                <Route path="resumes">
+                    <Route index element={<Resumes />} />
+                    <Route path="builder" element={<CvBuilder />} />
+                </Route>
                 <Route path="profile" element={<Profile />} />
                 <Route path="billing-plans" element={<BillingPlans />} />
                 <Route path="usage" element={<Usage />} />
+                <Route path="checkout" element={<Checkout />} />
             </Route>
         </>
     )

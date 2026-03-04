@@ -1,4 +1,5 @@
 import Button from "@/components/Button";
+import { useNavigate } from "react-router-dom";
 
 const getSaveBadgeStyle = (savePercent) => {
   if (savePercent >= 40) {
@@ -11,18 +12,28 @@ const getSaveBadgeStyle = (savePercent) => {
 };
 
 const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSelectDuration }) => {
+  const navigate = useNavigate();
   const isCurrent = plan.current;
-  const canExpand = !isCurrent && plan.durations.length > 0;
+  const hasDurations = plan.durations && plan.durations.length > 0;
+  const canExpand = !isCurrent && hasDurations;
+
+  const handleAction = () => {
+    if (isCurrent) return;
+    if (hasDurations) {
+      onExpand();
+    } else {
+      navigate('/dashboard/checkout', { state: { plan } });
+    }
+  };
 
   return (
     <article
-      className={`relative rounded-2xl border p-8 shadow-sm transition-all flex flex-col lg:h-[720px] ${
-        isCurrent
-          ? "bg-white border-gray-200"
-          : plan.popular
+      className={`relative rounded-2xl border p-8 shadow-sm transition-all flex flex-col lg:h-[720px] ${isCurrent
+        ? "bg-white border-gray-200"
+        : plan.popular
           ? "bg-white border-2 border-primary shadow-md"
           : "bg-white border-gray-200 hover:border-gray-300"
-      }`}
+        }`}
     >
       {plan.popular ? (
         <span className="absolute -top-3 right-4 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
@@ -59,15 +70,14 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
 
           <button
             type="button"
-            disabled={!canExpand}
-            onClick={() => (canExpand ? onExpand() : null)}
-            className={`w-full py-3 px-4 rounded-lg font-semibold transition-all mb-8 ${
-              !canExpand
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : plan.popular
+            disabled={isCurrent}
+            onClick={handleAction}
+            className={`w-full py-3 px-4 rounded-lg font-semibold transition-all mb-8 ${isCurrent
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : plan.popular
                 ? "bg-primary hover:bg-primary-dark text-white shadow-md"
                 : "bg-white border border-gray-300 hover:border-primary hover:text-primary text-gray-700"
-            }`}
+              }`}
           >
             {plan.cta}
           </button>
@@ -101,9 +111,8 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
                   type="button"
                   key={duration.key}
                   onClick={() => onSelectDuration(duration.key)}
-                  className={`text-left block p-4 bg-white border shadow-sm rounded-xl transition-all relative overflow-hidden ${
-                    selected ? "border-primary ring-1 ring-primary" : "border-gray-100 hover:border-gray-200"
-                  }`}
+                  className={`text-left block p-4 bg-white border shadow-sm rounded-xl transition-all relative overflow-hidden ${selected ? "border-primary ring-1 ring-primary" : "border-gray-100 hover:border-gray-200"
+                    }`}
                 >
                   {duration.mostPopular ? (
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] font-bold px-4 py-0.5 rounded-b-lg shadow-sm">
@@ -137,6 +146,14 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
           <Button
             mode="primary"
             shape="rounded"
+            onClick={() => {
+              if (!selectedDuration && plan.durations.length > 0) {
+                // If nothing selected, maybe default to first? Or just pass currently selected.
+                navigate('/dashboard/checkout', { state: { plan, selectedDuration: selectedDuration || plan.durations[0].key } });
+              } else {
+                navigate('/dashboard/checkout', { state: { plan, selectedDuration } });
+              }
+            }}
             className="w-full bg-primary hover:bg-primary-dark text-white font-bold rounded-xl transition-all shadow-md mt-auto text-sm tracking-wide"
           >
             Subscribe Now
