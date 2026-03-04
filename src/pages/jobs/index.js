@@ -18,7 +18,13 @@ const Jobs = () => {
         location: '',
         jobLevel: '',
         salaryStart: '',
-        skillId: []
+        salaryEnd: '',
+        minExperienceTime: '',
+        maxExperienceTime: '',
+        workingModel: '',
+        skillId: [],
+        expertiseId: [],
+        domainId: []
     });
     const [bookmarkOverrides, setBookmarkOverrides] = useState({});
     const [bookmarkLoadingById, setBookmarkLoadingById] = useState({});
@@ -32,8 +38,14 @@ const Jobs = () => {
         ...(filters.name && { name: filters.name }),
         ...(filters.location && { location: filters.location }),
         ...(filters.jobLevel && { jobLevel: filters.jobLevel }),
-        ...(filters.salaryStart && { salary: filters.salaryStart }),
+        ...(filters.salaryStart && { salaryStart: filters.salaryStart }),
+        ...(filters.salaryEnd && { salaryEnd: filters.salaryEnd }),
+        ...(filters.minExperienceTime && { minExperienceTime: filters.minExperienceTime }),
+        ...(filters.maxExperienceTime && { maxExperienceTime: filters.maxExperienceTime }),
+        ...(filters.workingModel && { workingModel: filters.workingModel }),
         ...(filters.skillId?.length && { skillId: filters.skillId }),
+        ...(filters.expertiseId?.length && { expertiseId: filters.expertiseId }),
+        ...(filters.domainId?.length && { domainId: filters.domainId }),
     }), [filters, currentPage]);
 
     // API Call
@@ -63,7 +75,19 @@ const Jobs = () => {
     };
 
     const handleResetFilters = () => {
-        setFilters({ name: '', location: '', jobLevel: '', salaryStart: '', skillId: [] });
+        setFilters({
+            name: '',
+            location: '',
+            jobLevel: '',
+            salaryStart: '',
+            salaryEnd: '',
+            minExperienceTime: '',
+            maxExperienceTime: '',
+            workingModel: '',
+            skillId: [],
+            expertiseId: [],
+            domainId: []
+        });
         setCurrentPage(1);
     };
 
@@ -157,6 +181,7 @@ const Jobs = () => {
                         filters={filters}
                         onFilterChange={handleFilterChange}
                         onReset={handleResetFilters}
+                        isLoading={isLoading}
                     />
 
                     {/* 3. Main Job List Section */}
