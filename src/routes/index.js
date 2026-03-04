@@ -22,6 +22,7 @@ import CompanyDetail from '@/pages/company-detail';
 import PricingPage from "@/pages/pricing";
 import Application from "@/pages/application";
 import ApplicationSuccess from "@/pages/application/sucess";
+import Checkout from "@/pages/checkout"; // Added Checkout
 
 export const routes = createBrowserRouter(
     createRoutesFromElements(
@@ -57,6 +58,7 @@ export const routes = createBrowserRouter(
                 <Route path="profile" element={<Profile />} />
                 <Route path="billing-plans" element={<BillingPlans />} />
                 <Route path="usage" element={<Usage />} />
+                <Route path="checkout" element={<Checkout />} />
             </Route>
         </>
     )
