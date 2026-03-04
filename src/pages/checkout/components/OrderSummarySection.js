@@ -12,7 +12,7 @@ const OrderSummarySection = ({
 }) => {
     return (
         <div className="lg:col-span-5">
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 sticky top-8">
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
                 <h2 className="text-xl font-bold text-gray-900 mb-6">Order Summary</h2>
 
                 <div className="flex justify-between items-start mb-4 pb-4 border-b border-gray-100">
