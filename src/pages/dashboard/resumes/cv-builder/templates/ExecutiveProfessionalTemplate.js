@@ -49,7 +49,7 @@ const ExecutiveProfessionalTemplate = ({
             <div className="px-14 pb-16 flex flex-col gap-8">
 
                 {/* Objective */}
-                <SectionWrapper title="TÓM TẮT NĂNG LỰC" sectionKey="objective" titleClassName="text-xl font-bold uppercase border-b-2 border-gray-800 pb-2 mb-4 text-gray-900">
+                <SectionWrapper title="PROFESSIONAL SUMMARY" sectionKey="objective" titleClassName="text-xl font-bold uppercase border-b-2 border-gray-800 pb-2 mb-4 text-gray-900">
                     <EditableText
                         as="p"
                         className="text-gray-700 leading-relaxed text-justify"
@@ -69,7 +69,7 @@ const ExecutiveProfessionalTemplate = ({
                             return (
                                 <SectionWrapper
                                     key={sectionKey}
-                                    title="KINH NGHIỆM LÀM VIỆC"
+                                    title="WORK EXPERIENCE"
                                     sectionKey="experience"
                                     index={index}
                                     isFirst={isFirst}
@@ -111,7 +111,7 @@ const ExecutiveProfessionalTemplate = ({
                             return (
                                 <SectionWrapper
                                     key={sectionKey}
-                                    title="HỌC VẤN"
+                                    title="EDUCATION"
                                     sectionKey="education"
                                     index={index}
                                     isFirst={isFirst}
@@ -157,7 +157,7 @@ const ExecutiveProfessionalTemplate = ({
                 <div className="grid grid-cols-2 gap-8 mt-4">
 
                     {/* Skills */}
-                    <SectionWrapper title="KỸ NĂNG" sectionKey="skills" onAdd={() => updateField('skills', ['Kỹ năng mới', ...cvData.skills])}>
+                    <SectionWrapper title="SKILLS" sectionKey="skills" onAdd={() => updateField('skills', ['Skill', ...cvData.skills])}>
                         <ul className="list-disc pl-5 text-gray-700 flex flex-col gap-2">
                             {cvData.skills.map((skill, index) => (
                                 <li key={index} className="group/skill relative">
@@ -176,7 +176,7 @@ const ExecutiveProfessionalTemplate = ({
                     </SectionWrapper>
 
                     {/* Languages */}
-                    <SectionWrapper title="NGOẠI NGỮ" sectionKey="languages" onAdd={() => addItem('languages', { name: "Ngôn ngữ", level: "Trình độ" })}>
+                    <SectionWrapper title="LANGUAGES" sectionKey="languages" onAdd={() => addItem('languages', { name: "Language", level: "Level" })}>
                         <div className="flex flex-col gap-3">
                             {cvData.languages.map((lang, index) => (
                                 <EditableItemWrapper key={lang.id} id={lang.id} section="languages" index={index} isFirst={index === 0} isLast={index === cvData.languages.length - 1}>

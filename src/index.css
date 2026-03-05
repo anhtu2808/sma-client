@@ -32,7 +32,12 @@ body {
   background: #4B5563;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: Roobert, sans-serif;
 }
 
@@ -101,4 +106,16 @@ code {
 
 .ant-select .ant-select-clear:hover {
   color: #FF6B35 !important;
+}
+
+/* Print Styles for CV Builder */
+@media print {
+  @page {
+    margin: 0;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
 }

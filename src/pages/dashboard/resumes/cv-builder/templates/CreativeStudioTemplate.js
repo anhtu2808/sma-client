@@ -41,7 +41,7 @@ const CreativeStudioTemplate = ({
                 </div>
 
                 {/* Contact */}
-                <SectionWrapper title="LIÊN HỆ" sectionKey="contact" titleClassName="text-sm border-b border-purple-500/50 pb-2 mb-4 font-bold text-white tracking-widest uppercase">
+                <SectionWrapper title="CONTACT" sectionKey="contact" titleClassName="text-sm border-b border-purple-500/50 pb-2 mb-4 font-bold text-white tracking-widest uppercase">
                     <div className="flex flex-col gap-4 text-sm text-purple-100">
                         <div className="flex gap-3 items-center">
                             <Mail size={16} className="text-purple-300 min-w-[16px]" />
@@ -59,7 +59,7 @@ const CreativeStudioTemplate = ({
                 </SectionWrapper>
 
                 {/* Skills */}
-                <SectionWrapper title="KỸ NĂNG" sectionKey="skills" titleClassName="text-sm border-b border-purple-500/50 pb-2 mb-4 font-bold text-white tracking-widest uppercase" onAdd={() => updateField('skills', ['Kỹ năng', ...cvData.skills])}>
+                <SectionWrapper title="SKILLS" sectionKey="skills" titleClassName="text-sm border-b border-purple-500/50 pb-2 mb-4 font-bold text-white tracking-widest uppercase" onAdd={() => updateField('skills', ['Skill', ...cvData.skills])}>
                     <div className="flex flex-col gap-3 text-sm text-purple-100">
                         {cvData.skills.map((skill, index) => (
                             <div key={index} className="flex items-center gap-2 group/skill relative">
@@ -79,7 +79,7 @@ const CreativeStudioTemplate = ({
                 </SectionWrapper>
 
                 {/* Languages */}
-                <SectionWrapper title="NGOẠI NGỮ" sectionKey="languages" titleClassName="text-sm border-b border-purple-500/50 pb-2 mb-4 font-bold text-white tracking-widest uppercase" onAdd={() => addItem('languages', { name: "Ngôn ngữ", level: "Cơ bản" })}>
+                <SectionWrapper title="LANGUAGES" sectionKey="languages" titleClassName="text-sm border-b border-purple-500/50 pb-2 mb-4 font-bold text-white tracking-widest uppercase" onAdd={() => addItem('languages', { name: "Language", level: "Basic" })}>
                     <div className="flex flex-col gap-3">
                         {cvData.languages.map((lang, index) => (
                             <EditableItemWrapper key={lang.id} id={lang.id} section="languages" index={index} isFirst={index === 0} isLast={index === cvData.languages.length - 1}>
@@ -101,7 +101,7 @@ const CreativeStudioTemplate = ({
             <div className="w-[65%] p-12 flex flex-col gap-8">
 
                 {/* Objective */}
-                <SectionWrapper title="MỤC TIÊU NGHỀ NGHIỆP" sectionKey="objective" titleClassName="text-xl font-bold uppercase text-purple-800 mb-4 tracking-wide pb-2 border-b-2 border-purple-100">
+                <SectionWrapper title="CAREER OBJECTIVE" sectionKey="objective" titleClassName="text-xl font-bold uppercase text-purple-800 mb-4 tracking-wide pb-2 border-b-2 border-purple-100">
                     <EditableText
                         as="p"
                         className="text-gray-600 leading-relaxed text-justify"
@@ -121,7 +121,7 @@ const CreativeStudioTemplate = ({
                             return (
                                 <SectionWrapper
                                     key={sectionKey}
-                                    title="KINH NGHIỆM LÀM VIỆC"
+                                    title="WORK EXPERIENCE"
                                     sectionKey="experience"
                                     index={index}
                                     isFirst={isFirst}
@@ -163,7 +163,7 @@ const CreativeStudioTemplate = ({
                             return (
                                 <SectionWrapper
                                     key={sectionKey}
-                                    title="HỌC VẤN"
+                                    title="EDUCATION"
                                     sectionKey="education"
                                     index={index}
                                     isFirst={isFirst}

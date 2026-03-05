@@ -49,7 +49,7 @@ const ModernMinimalistTemplate = ({
                     </div>
 
                     {/* Objective */}
-                    <SectionWrapper title="Mục Tiêu Nghề Nghiệp" sectionKey="objective">
+                    <SectionWrapper title="Career Objective" sectionKey="objective">
                         <EditableText
                             as="p"
                             className="text-sm text-gray-600 leading-relaxed text-justify"
@@ -60,7 +60,7 @@ const ModernMinimalistTemplate = ({
                     </SectionWrapper>
 
                     {/* Personal Details */}
-                    <SectionWrapper title="Thông Tin Cá Nhân" sectionKey="personalDetails">
+                    <SectionWrapper title="Personal Details" sectionKey="personalDetails">
                         <div className="flex flex-col gap-3 text-sm">
                             <div className="grid grid-cols-[110px_1fr] items-center">
                                 <span className="text-gray-500">Ngày sinh</span>
@@ -83,7 +83,7 @@ const ModernMinimalistTemplate = ({
 
                     {/* Languages */}
                     <SectionWrapper
-                        title="Ngoại Ngữ"
+                        title="Languages"
                         sectionKey="languages"
                         onAdd={() => addItem('languages', { name: "Ngôn ngữ mới", level: "Cơ bản" })}
                     >
@@ -104,10 +104,10 @@ const ModernMinimalistTemplate = ({
                     </SectionWrapper>
 
                     {/* Skills */}
-                    <SectionWrapper title="Kỹ Năng" sectionKey="skills" onAdd={() => {
+                    <SectionWrapper title="Skills" sectionKey="skills" onAdd={() => {
                         updateField('skills', ['Kỹ năng mới', ...cvData.skills]);
                     }}>
-                        <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-gray-700">
+                        <div className="flex flex-col gap-2 text-sm text-gray-700">
                             {cvData.skills.map((skill, index) => (
                                 <div key={index} className="flex items-center gap-1 group/skill relative">
                                     <EditableText value={skill} onChange={v => {
@@ -125,7 +125,7 @@ const ModernMinimalistTemplate = ({
                     </SectionWrapper>
 
                     {/* Contact */}
-                    <SectionWrapper title="Thông Tin Liên Hệ" sectionKey="contact">
+                    <SectionWrapper title="Contact Info" sectionKey="contact">
                         <div className="flex flex-col gap-3 text-sm text-gray-700">
                             <div className="flex gap-3">
                                 <Mail size={16} className="text-[#1F8A70] mt-0.5 min-w-[16px]" />
@@ -158,7 +158,7 @@ const ModernMinimalistTemplate = ({
                                 return (
                                     <SectionWrapper
                                         key={sectionKey}
-                                        title="Kinh Nghiệm Làm Việc"
+                                        title="Work Experience"
                                         sectionKey="experience"
                                         index={index}
                                         isFirst={isFirst}
@@ -198,7 +198,7 @@ const ModernMinimalistTemplate = ({
                                 return (
                                     <SectionWrapper
                                         key={sectionKey}
-                                        title="Học Vấn"
+                                        title="Education"
                                         sectionKey="education"
                                         index={index}
                                         isFirst={isFirst}
@@ -240,7 +240,7 @@ const ModernMinimalistTemplate = ({
                                 return (
                                     <SectionWrapper
                                         key={sectionKey}
-                                        title="Chứng Chỉ"
+                                        title="Certifications"
                                         sectionKey="certificates"
                                         index={index}
                                         isFirst={isFirst}
@@ -275,7 +275,7 @@ const ModernMinimalistTemplate = ({
                                 return (
                                     <SectionWrapper
                                         key={sectionKey}
-                                        title="Hoạt Động"
+                                        title="Activities"
                                         sectionKey="activities"
                                         index={index}
                                         isFirst={isFirst}
@@ -310,7 +310,7 @@ const ModernMinimalistTemplate = ({
                                 return (
                                     <SectionWrapper
                                         key={sectionKey}
-                                        title="Người Tham Khảo"
+                                        title="References"
                                         sectionKey="references"
                                         index={index}
                                         isFirst={isFirst}

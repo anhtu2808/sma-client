@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
-import { Col, Row, DatePicker } from "antd";
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useSearchParams, useParams, useNavigate } from "react-router-dom";
+import { Col, Row, DatePicker, message, Spin } from "antd";
 import {
     ArrowUp, ArrowDown, Trash2, Plus, GripVertical,
     Mail, Phone, MapPin, Download, Save
@@ -10,12 +10,42 @@ import ModernMinimalistTemplate from "./templates/ModernMinimalistTemplate";
 import ExecutiveProfessionalTemplate from "./templates/ExecutiveProfessionalTemplate";
 import CreativeStudioTemplate from "./templates/CreativeStudioTemplate";
 import TechInnovatorTemplate from "./templates/TechInnovatorTemplate";
+import Button from "@/components/Button";
+import { useCreateResumeBuilderMutation, useGetResumeQuery } from "@/apis/resumeApi";
 
-export default function CvBuilder() {
+export default function CvBuilder({ onBack }) {
+    const { id: resumeId } = useParams();
+    const navigate = useNavigate();
+    const pdfRef = useRef(null);
+
+    const [createResumeBuilder, { isLoading: isCreating }] = useCreateResumeBuilderMutation();
+
+    const { data: resumeData, isLoading: isFetchingResume } = useGetResumeQuery(
+        { resumeId },
+        { skip: !resumeId }
+    );
+
+    const handleDownloadPdf = () => {
+        // Trigger print dialog instead of using external library
+        // User can select "Save as PDF" in the print destination
+        window.print();
+    };
+
+    const handleSave = async () => {
+        try {
+            await createResumeBuilder({}).unwrap();
+            message.success("Tạo Resume Builder thành công!");
+            handleDownloadPdf();
+        } catch (error) {
+            console.error("Failed to create resume builder:", error);
+            message.error("Có lỗi xảy ra khi tạo Resume Builder!");
+        }
+    };
+
     // Initial State mimicking the provided screenshot
     const [cvData, setCvData] = useState({
         personalInfo: {
-            fullName: "NGUYỄN LÊ BẢO NGỌC",
+            fullName: "NGUYEN SI VAN HAO",
             title: "SENIOR PRODUCT MANAGER",
             experienceYears: "7 NĂM KINH NGHIỆM",
             avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d", // Replace with realistic image if needed
@@ -109,6 +139,38 @@ export default function CvBuilder() {
             }
         ]
     });
+
+    useEffect(() => {
+        if (resumeData) {
+            setCvData(prevData => ({
+                ...prevData,
+                personalInfo: {
+                    ...prevData.personalInfo,
+                    fullName: resumeData.fullName || prevData.personalInfo.fullName,
+                    avatar: resumeData.avatar || prevData.personalInfo.avatar,
+                },
+                contact: {
+                    ...prevData.contact,
+                    email: resumeData.emailInResume || prevData.contact.email,
+                    phone: resumeData.phoneInResume || prevData.contact.phone,
+                    address: resumeData.addressInResume || prevData.contact.address
+                },
+                // If the user hasn't added details yet, fallback to our dummy initial prevData
+                skills: resumeData.skillGroups && resumeData.skillGroups.length > 0
+                    ? resumeData.skillGroups.flatMap(g => g.skills?.map(s => s.name) || [])
+                    : prevData.skills,
+                experience: resumeData.experiences && resumeData.experiences.length > 0
+                    ? resumeData.experiences
+                    : prevData.experience,
+                education: resumeData.educations && resumeData.educations.length > 0
+                    ? resumeData.educations
+                    : prevData.education,
+                certificates: resumeData.certifications && resumeData.certifications.length > 0
+                    ? resumeData.certifications
+                    : prevData.certificates,
+            }));
+        }
+    }, [resumeData]);
 
     const [sectionOrder, setSectionOrder] = useState([
         "experience",
@@ -288,32 +350,47 @@ export default function CvBuilder() {
         LucideIcons
     };
 
+    if (isFetchingResume) {
+        return (
+            <div className="min-h-screen bg-[#F3F4F6] flex items-center justify-center">
+                <Spin size="large" tip="Đang tải dữ liệu hồ sơ..." />
+            </div>
+        );
+    }
+
     return (
-        <div className="min-h-screen bg-[#F3F4F6] pb-12">
+        <div className="min-h-screen print:min-h-0 print:h-auto print:block bg-transparent md:bg-[#F3F4F6] print:bg-white pb-12 print:pb-0 rounded-t-xl">
 
             {/* Top Toolbar (Mocked) */}
-            <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between sticky top-0 z-50">
+            <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between top-0 z-50 rounded-t-xl print:hidden">
                 <div className="flex items-center gap-6">
-                    <Link to="/dashboard/resumes" className="text-gray-500 hover:text-gray-700 font-medium text-sm flex items-center gap-1">
-                        ← Back
-                    </Link>
+                    <Button mode="ghost" onClick={onBack} className="text-gray-500 hover:text-gray-700 font-medium text-sm flex items-center gap-1">
+                        <span className="material-icons-round text-[16px]">arrow_back</span>
+                        Back
+                    </Button>
                 </div>
                 <div className="flex items-center gap-4">
-                    <button className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 text-sm font-medium hover:bg-gray-50 flex items-center gap-2">
-                        <Save size={16} /> Lưu & Xem trước
-                    </button>
-                    <button className="px-4 py-2 bg-[#1F8A70] text-white rounded-md text-sm font-medium hover:bg-[#19755f] flex items-center gap-2">
+                    <Button
+                        mode="secondary"
+                        shape="rounded"
+                        onClick={handleSave}
+                        disabled={isCreating}
+                        className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 text-sm font-medium hover:bg-gray-50 flex items-center gap-2">
+                        <Save size={16} /> Save
+                    </Button>
+                    <Button
+                        mode="primary"
+                        shape="rounded"
+                        onClick={handleDownloadPdf}
+                        className="px-4 py-2 bg-[#1F8A70] text-white rounded-md text-sm font-medium hover:bg-[#19755f] flex items-center gap-2">
                         <Download size={16} /> Tải PDF
-                    </button>
+                    </Button>
                 </div>
             </div>
 
-            {/* Selected Template Component */}
-            <TemplateComponent {...templateProps} />
-
-            {/* Page indicator (mocked) */}
-            <div className="w-[850px] mx-auto mt-2 text-right">
-                <span className="text-xs text-gray-400 font-medium tracking-wide">Trang 1</span>
+            {/* Selected Template Component wrapped in ref for PDF generation */}
+            <div ref={pdfRef} className="print-cv-section shadow-none">
+                <TemplateComponent {...templateProps} />
             </div>
         </div>
     );

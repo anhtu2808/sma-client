@@ -60,11 +60,11 @@ const TechInnovatorTemplate = ({
                 {/* Left Column (30%) */}
                 <div className="w-[30%] flex flex-col gap-8 border-r border-gray-200 pr-8">
 
-                    <SectionWrapper title="MỤC TIÊU" sectionKey="objective" titleClassName="text-lg font-bold text-teal-800 mb-4 uppercase tracking-wider">
+                    <SectionWrapper title="OBJECTIVE" sectionKey="objective" titleClassName="text-lg font-bold text-teal-800 mb-4 uppercase tracking-wider">
                         <EditableText as="p" className="text-sm text-gray-600 leading-relaxed text-justify" value={cvData.objective} onChange={(val) => updateField('objective', val)} multiline />
                     </SectionWrapper>
 
-                    <SectionWrapper title="KỸ NĂNG" sectionKey="skills" titleClassName="text-lg font-bold text-teal-800 mb-4 uppercase tracking-wider" onAdd={() => updateField('skills', ['Kỹ năng', ...cvData.skills])}>
+                    <SectionWrapper title="SKILLS" sectionKey="skills" titleClassName="text-lg font-bold text-teal-800 mb-4 uppercase tracking-wider" onAdd={() => updateField('skills', ['Skill', ...cvData.skills])}>
                         <div className="flex flex-col gap-2">
                             {cvData.skills.map((skill, index) => (
                                 <div key={index} className="group/skill relative bg-gray-50 px-3 py-1.5 rounded text-sm text-gray-700 font-medium border border-gray-100">
@@ -82,7 +82,7 @@ const TechInnovatorTemplate = ({
                         </div>
                     </SectionWrapper>
 
-                    <SectionWrapper title="NGOẠI NGỮ" sectionKey="languages" titleClassName="text-lg font-bold text-teal-800 mb-4 uppercase tracking-wider" onAdd={() => addItem('languages', { name: "Ngôn ngữ", level: "Cơ bản" })}>
+                    <SectionWrapper title="LANGUAGES" sectionKey="languages" titleClassName="text-lg font-bold text-teal-800 mb-4 uppercase tracking-wider" onAdd={() => addItem('languages', { name: "Language", level: "Basic" })}>
                         <div className="flex flex-col gap-4">
                             {cvData.languages.map((lang, index) => (
                                 <EditableItemWrapper key={lang.id} id={lang.id} section="languages" index={index} isFirst={index === 0} isLast={index === cvData.languages.length - 1}>
@@ -112,7 +112,7 @@ const TechInnovatorTemplate = ({
                                 return (
                                     <SectionWrapper
                                         key={sectionKey}
-                                        title="KINH NGHIỆM LÀM VIỆC"
+                                        title="WORK EXPERIENCE"
                                         sectionKey="experience"
                                         index={index}
                                         isFirst={isFirst}
@@ -157,7 +157,7 @@ const TechInnovatorTemplate = ({
                                 return (
                                     <SectionWrapper
                                         key={sectionKey}
-                                        title="HỌC VẤN"
+                                        title="EDUCATION"
                                         sectionKey="education"
                                         index={index}
                                         isFirst={isFirst}
