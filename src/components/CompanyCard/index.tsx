@@ -31,11 +31,7 @@ const CompanyCard = ({
                     )}
                 </div>
 
-                {isApproved && (
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-wider border border-emerald-100 dark:border-emerald-500/20">
-                        Approved
-                    </span>
-                )}
+
             </div>
 
             {/* Content */}

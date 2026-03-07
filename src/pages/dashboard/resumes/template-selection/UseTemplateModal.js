@@ -1,0 +1,177 @@
+import React, { useState } from "react";
+import { Modal, Spin } from "antd";
+import { useGetCandidateResumesQuery } from "@/apis/resumeApi";
+import { RESUME_TYPES } from "@/constant";
+
+const UseTemplateModal = ({ open, onCancel, template, onCreateNew, onSelectExisting, isCreating, isCloning }) => {
+    const [step, setStep] = useState("choose"); // "choose" | "select-cv"
+
+    const { data: resumes = [], isLoading: isLoadingResumes } = useGetCandidateResumesQuery(
+        { type: RESUME_TYPES.ORIGINAL },
+        { skip: !open || step !== "select-cv" }
+    );
+
+    const handleClose = () => {
+        setStep("choose");
+        onCancel();
+    };
+
+    const handleCreateNew = () => {
+        setStep("choose");
+        onCreateNew(template);
+    };
+
+    const handleSelectCV = (resume) => {
+        setStep("choose");
+        onSelectExisting(template, resume.id);
+    };
+
+    const handleGoBack = () => {
+        setStep("choose");
+    };
+
+    return (
+        <Modal
+            open={open}
+            onCancel={handleClose}
+            footer={null}
+            centered
+            width={560}
+            destroyOnClose
+            className="use-template-modal"
+            title={null}
+            closable
+        >
+            {step === "choose" ? (
+                <div className="py-2">
+                    {/* Header */}
+                    <div className="text-center mb-6">
+                        <h2 className="text-xl font-bold text-gray-900 mb-1">Sử dụng Template</h2>
+                        <p className="text-sm text-gray-500">
+                            Chọn cách bạn muốn bắt đầu với template <strong>{template?.name}</strong>
+                        </p>
+                    </div>
+
+                    {/* Options */}
+                    <div className="space-y-3">
+                        {/* Option 1: Create New CV */}
+                        <button
+                            type="button"
+                            onClick={handleCreateNew}
+                            disabled={isCreating}
+                            className={`w-full text-left p-5 rounded-xl border-2 border-gray-100 hover:border-orange-300 hover:bg-orange-50/50 transition-all duration-200 group cursor-pointer ${isCreating ? 'opacity-70 pointer-events-none' : ''}`}
+                        >
+                            <div className="flex items-start gap-4">
+                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all">
+                                    {isCreating ? <Spin size="small" /> : <span className="material-icons-round text-white text-[24px]">add_circle</span>}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                    <h3 className="font-semibold text-gray-900 text-base mb-1 group-hover:text-orange-600 transition-colors">
+                                        Tạo CV mới
+                                    </h3>
+                                    <p className="text-sm text-gray-500 leading-relaxed">
+                                        Bắt đầu từ đầu với template này. Bạn sẽ tự điền thông tin cá nhân, kinh nghiệm và kỹ năng.
+                                    </p>
+                                </div>
+                                <span className="material-icons-round text-gray-300 group-hover:text-orange-400 text-[20px] mt-1 transition-colors">
+                                    arrow_forward
+                                </span>
+                            </div>
+                        </button>
+
+                        {/* Option 2: Choose from uploaded CVs */}
+                        <button
+                            type="button"
+                            onClick={() => setStep("select-cv")}
+                            className="w-full text-left p-5 rounded-xl border-2 border-gray-100 hover:border-orange-300 hover:bg-orange-50/50 transition-all duration-200 group cursor-pointer"
+                        >
+                            <div className="flex items-start gap-4">
+                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all">
+                                    <span className="material-icons-round text-white text-[24px]">folder_open</span>
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                    <h3 className="font-semibold text-gray-900 text-base mb-1 group-hover:text-orange-600 transition-colors">
+                                        Chọn CV đã upload
+                                    </h3>
+                                    <p className="text-sm text-gray-500 leading-relaxed">
+                                        Sử dụng dữ liệu từ CV đã tải lên trong mục Attachments để tự động điền vào template.
+                                    </p>
+                                </div>
+                                <span className="material-icons-round text-gray-300 group-hover:text-orange-400 text-[20px] mt-1 transition-colors">
+                                    arrow_forward
+                                </span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            ) : (
+                /* Step 2: Select from uploaded CVs */
+                <div className="py-2">
+                    {/* Header with back button */}
+                    <div className="mb-5">
+                        <button
+                            type="button"
+                            onClick={handleGoBack}
+                            className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-3 transition-colors cursor-pointer"
+                        >
+                            <span className="material-icons-round text-[18px]">arrow_back</span>
+                            Quay lại
+                        </button>
+                        <h2 className="text-lg font-bold text-gray-900 mb-1">Chọn CV đã upload</h2>
+                        <p className="text-sm text-gray-500">Chọn một CV từ danh sách Attachments của bạn</p>
+                    </div>
+
+                    {/* CV List */}
+                    {isLoadingResumes ? (
+                        <div className="flex items-center justify-center py-12">
+                            <Spin size="default" />
+                        </div>
+                    ) : resumes.length === 0 ? (
+                        <div className="text-center py-10">
+                            <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                                <span className="material-icons-round text-gray-400 text-[32px]">inbox</span>
+                            </div>
+                            <p className="text-gray-500 font-medium mb-1">Chưa có CV nào</p>
+                            <p className="text-sm text-gray-400">Hãy upload CV trong mục Attachments trước.</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-2 max-h-[360px] overflow-y-auto pr-1" style={{ scrollbarWidth: "thin" }}>
+                            {resumes.map((resume) => {
+                                const fileName = resume.fileName || resume.resumeName || `Resume #${resume.id}`;
+                                const isPdf = fileName.toLowerCase().endsWith(".pdf");
+                                return (
+                                    <button
+                                        key={resume.id}
+                                        type="button"
+                                        onClick={() => handleSelectCV(resume)}
+                                        disabled={isCloning}
+                                        className={`w-full text-left p-4 rounded-xl border border-gray-100 hover:border-orange-300 hover:bg-orange-50/30 transition-all duration-200 group flex items-center gap-4 cursor-pointer ${isCloning ? 'opacity-70 pointer-events-none' : ''}`}
+                                    >
+                                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${isPdf ? "bg-red-50 text-red-500" : "bg-blue-50 text-blue-500"}`}>
+                                            <span className="material-icons-round text-[22px]">
+                                                {isPdf ? "picture_as_pdf" : "description"}
+                                            </span>
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <p className="font-medium text-gray-900 text-sm truncate group-hover:text-orange-600 transition-colors">
+                                                {fileName}
+                                            </p>
+                                            <p className="text-xs text-gray-400 mt-0.5">
+                                                ID: {resume.id}
+                                            </p>
+                                        </div>
+                                        <span className="material-icons-round text-gray-300 group-hover:text-orange-400 text-[18px] transition-colors">
+                                            arrow_forward
+                                        </span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+            )}
+        </Modal>
+    );
+};
+
+export default UseTemplateModal;

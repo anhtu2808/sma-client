@@ -112,10 +112,63 @@ code {
 @media print {
   @page {
     margin: 0;
+    size: A4;
   }
 
+  html,
   body {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Remove min-height that causes blank page gap */
+  .print-cv-section {
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .print-cv-section>div {
+    min-height: unset !important;
+    height: auto !important;
+    margin: 0 !important;
+    margin-top: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Prevent page breaks inside important elements */
+  .print-cv-section h1,
+  .print-cv-section h2,
+  .print-cv-section h3,
+  .print-cv-section h4 {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  .print-cv-section .group\/section {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .print-cv-section .group\/item {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Hide interactive elements */
+  .print-cv-section button {
+    display: none !important;
+  }
+
+  /* Reset editable borders */
+  .print-cv-section [contenteditable] {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
   }
 }

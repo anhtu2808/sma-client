@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, MapPin, Github, Linkedin, Globe, Eye, EyeOff } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 
 const CreativeStudioTemplate = ({
@@ -9,7 +9,10 @@ const CreativeStudioTemplate = ({
     addItem,
     EditableText,
     SectionWrapper,
-    EditableItemWrapper
+    EditableItemWrapper,
+    avatarInputRef,
+    contactVisibility,
+    toggleContactVisibility
 }) => {
     return (
         <div className="w-[850px] mx-auto mt-8 bg-white shadow-xl min-h-[1100px] relative font-sans flex">
@@ -20,7 +23,7 @@ const CreativeStudioTemplate = ({
                 <div className="flex justify-center">
                     <div className="relative group w-40 h-40">
                         <img src={cvData.personalInfo.avatar} alt="Avatar" className="w-full h-full rounded-full object-cover border-4 border-white/20 shadow-md" />
-                        <button className="absolute inset-0 m-auto w-10 h-10 bg-black/50 rounded-full shadow-sm flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onClick={() => avatarInputRef?.current?.click()} className="absolute inset-0 m-auto w-10 h-10 bg-black/50 rounded-full shadow-sm flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                             <LucideIcons.Camera size={18} />
                         </button>
                     </div>
@@ -45,15 +48,44 @@ const CreativeStudioTemplate = ({
                     <div className="flex flex-col gap-4 text-sm text-purple-100">
                         <div className="flex gap-3 items-center">
                             <Mail size={16} className="text-purple-300 min-w-[16px]" />
-                            <EditableText value={cvData.contact.email} onChange={v => updateField('contact.email', v)} />
+                            <EditableText value={cvData.contact.emailInResume} onChange={v => updateField('contact.emailInResume', v)} />
                         </div>
                         <div className="flex gap-3 items-center">
                             <Phone size={16} className="text-purple-300 min-w-[16px]" />
-                            <EditableText value={cvData.contact.phone} onChange={v => updateField('contact.phone', v)} />
+                            <EditableText value={cvData.contact.phoneInResume} onChange={v => updateField('contact.phoneInResume', v)} />
                         </div>
                         <div className="flex gap-3 items-start">
                             <MapPin size={16} className="text-purple-300 mt-1 min-w-[16px]" />
-                            <EditableText value={cvData.contact.address} onChange={v => updateField('contact.address', v)} />
+                            <EditableText value={cvData.contact.addressInResume} onChange={v => updateField('contact.addressInResume', v)} />
+                        </div>
+                        {contactVisibility.githubLink && (
+                            <div className="flex gap-3 items-center">
+                                <Github size={16} className="text-purple-300 min-w-[16px]" />
+                                <EditableText value={cvData.contact.githubLink} onChange={v => updateField('contact.githubLink', v)} />
+                            </div>
+                        )}
+                        {contactVisibility.linkedinLink && (
+                            <div className="flex gap-3 items-center">
+                                <Linkedin size={16} className="text-purple-300 min-w-[16px]" />
+                                <EditableText value={cvData.contact.linkedinLink} onChange={v => updateField('contact.linkedinLink', v)} />
+                            </div>
+                        )}
+                        {contactVisibility.portfolioLink && (
+                            <div className="flex gap-3 items-center">
+                                <Globe size={16} className="text-purple-300 min-w-[16px]" />
+                                <EditableText value={cvData.contact.portfolioLink} onChange={v => updateField('contact.portfolioLink', v)} />
+                            </div>
+                        )}
+                        <div className="flex flex-wrap gap-2 mt-2 print:hidden">
+                            <button onClick={() => toggleContactVisibility('githubLink')} className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${contactVisibility.githubLink ? 'bg-purple-600 text-white' : 'bg-purple-900 text-purple-400'}`}>
+                                {contactVisibility.githubLink ? <Eye size={12} /> : <EyeOff size={12} />} GitHub
+                            </button>
+                            <button onClick={() => toggleContactVisibility('linkedinLink')} className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${contactVisibility.linkedinLink ? 'bg-purple-600 text-white' : 'bg-purple-900 text-purple-400'}`}>
+                                {contactVisibility.linkedinLink ? <Eye size={12} /> : <EyeOff size={12} />} LinkedIn
+                            </button>
+                            <button onClick={() => toggleContactVisibility('portfolioLink')} className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${contactVisibility.portfolioLink ? 'bg-purple-600 text-white' : 'bg-purple-900 text-purple-400'}`}>
+                                {contactVisibility.portfolioLink ? <Eye size={12} /> : <EyeOff size={12} />} Portfolio
+                            </button>
                         </div>
                     </div>
                 </SectionWrapper>
@@ -203,7 +235,43 @@ const CreativeStudioTemplate = ({
                                     </div>
                                 </SectionWrapper>
                             );
-                        // Can add activities/certificates here similarly if they are in sectionOrder
+                        case 'certificates':
+                            return (
+                                <SectionWrapper
+                                    key={sectionKey}
+                                    title="CERTIFICATIONS"
+                                    sectionKey="certificates"
+                                    index={index}
+                                    isFirst={isFirst}
+                                    isLast={isLast}
+                                    onAdd={() => addItem('certificates', {
+                                        name: "Tên chứng chỉ", issuer: "Tổ chức", year: "Năm", link: "Link"
+                                    })}
+                                    titleClassName="text-xl font-bold uppercase text-purple-800 mb-4 tracking-wide pb-2 border-b-2 border-purple-100"
+                                >
+                                    <div className="flex flex-col gap-4">
+                                        {cvData.certificates.map((cert, itemIndex) => (
+                                            <EditableItemWrapper key={cert.id} id={cert.id} section="certificates" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.certificates.length - 1}>
+                                                <div className="flex flex-col gap-1 relative pl-4 border-l-2 border-purple-200 hover:border-purple-500 transition-colors">
+                                                    <div className="absolute left-[-5px] top-1.5 w-2 h-2 rounded-full bg-purple-500"></div>
+                                                    <EditableText as="h4" className="font-bold text-gray-900" value={cert.name} onChange={v => {
+                                                        const dt = [...cvData.certificates]; dt[itemIndex].name = v; updateField('certificates', dt);
+                                                    }} />
+                                                    <EditableText as="p" className="text-purple-700 text-sm" value={cert.issuer} onChange={v => {
+                                                        const dt = [...cvData.certificates]; dt[itemIndex].issuer = v; updateField('certificates', dt);
+                                                    }} />
+                                                    <EditableText as="p" className="text-gray-500 text-xs font-medium" value={cert.year} onChange={v => {
+                                                        const dt = [...cvData.certificates]; dt[itemIndex].year = v; updateField('certificates', dt);
+                                                    }} />
+                                                    <EditableText as="a" className="text-purple-500 hover:underline text-xs" value={cert.link} onChange={v => {
+                                                        const dt = [...cvData.certificates]; dt[itemIndex].link = v; updateField('certificates', dt);
+                                                    }} />
+                                                </div>
+                                            </EditableItemWrapper>
+                                        ))}
+                                    </div>
+                                </SectionWrapper>
+                            );
                         default:
                             return null;
                     }

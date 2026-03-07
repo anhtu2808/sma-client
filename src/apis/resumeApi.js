@@ -164,6 +164,18 @@ export const resumeApi = api.injectEndpoints({
             ],
         }),
 
+        cloneResumeBuilder: builder.mutation({
+            query: ({ resumeId }) => ({
+                url: `${API_VERSION}/resumes/${resumeId}/builder`,
+                method: "POST",
+            }),
+            transformResponse: (response) => response?.data ?? response,
+            invalidatesTags: [
+                { type: "Resumes", id: RESUME_TYPES.TEMPLATE },
+                { type: "Resumes", id: "ALL" },
+            ],
+        }),
+
         parseCandidateResume: builder.mutation({
             query: ({ resumeId }) => ({
                 url: `${API_VERSION}/resumes/${resumeId}/parse`,
@@ -460,6 +472,7 @@ export const {
     useUploadFilesMutation,
     useUploadCandidateResumeMutation,
     useCreateResumeBuilderMutation,
+    useCloneResumeBuilderMutation,
     useParseCandidateResumeMutation,
     useDeleteCandidateResumeMutation,
     useSetResumeAsProfileMutation,

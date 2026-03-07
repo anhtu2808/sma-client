@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, MapPin, Github, Linkedin, Globe, Eye, EyeOff } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 
 const TechInnovatorTemplate = ({
@@ -9,7 +9,10 @@ const TechInnovatorTemplate = ({
     addItem,
     EditableText,
     SectionWrapper,
-    EditableItemWrapper
+    EditableItemWrapper,
+    avatarInputRef,
+    contactVisibility,
+    toggleContactVisibility
 }) => {
     return (
         <div className="w-[850px] mx-auto mt-8 bg-white shadow-xl min-h-[1100px] relative font-sans">
@@ -33,26 +36,55 @@ const TechInnovatorTemplate = ({
                 {/* Avatar Box inside Header */}
                 <div className="ml-8 relative group w-28 h-28 shrink-0">
                     <img src={cvData.personalInfo.avatar} alt="Avatar" className="w-full h-full rounded border-2 border-teal-400 object-cover shadow-lg" />
-                    <button className="absolute inset-0 m-auto w-10 h-10 bg-black/50 rounded shadow-sm flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => avatarInputRef?.current?.click()} className="absolute inset-0 m-auto w-10 h-10 bg-black/50 rounded shadow-sm flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                         <LucideIcons.Camera size={18} />
                     </button>
                 </div>
             </div>
 
             {/* Contact Bar - Subheader */}
-            <div className="bg-teal-900 text-teal-100 px-12 py-3 flex gap-8 text-sm font-medium justify-center shadow-inner">
+            <div className="bg-teal-900 text-teal-100 px-12 py-3 flex flex-wrap gap-8 text-sm font-medium justify-center shadow-inner">
                 <div className="flex items-center gap-2">
                     <Mail size={16} className="text-teal-400" />
-                    <EditableText value={cvData.contact.email} onChange={v => updateField('contact.email', v)} />
+                    <EditableText value={cvData.contact.emailInResume} onChange={v => updateField('contact.emailInResume', v)} />
                 </div>
                 <div className="flex items-center gap-2">
                     <Phone size={16} className="text-teal-400" />
-                    <EditableText value={cvData.contact.phone} onChange={v => updateField('contact.phone', v)} />
+                    <EditableText value={cvData.contact.phoneInResume} onChange={v => updateField('contact.phoneInResume', v)} />
                 </div>
                 <div className="flex items-center gap-2">
                     <MapPin size={16} className="text-teal-400" />
-                    <EditableText value={cvData.contact.address} onChange={v => updateField('contact.address', v)} />
+                    <EditableText value={cvData.contact.addressInResume} onChange={v => updateField('contact.addressInResume', v)} />
                 </div>
+                {contactVisibility.githubLink && (
+                    <div className="flex items-center gap-2">
+                        <Github size={16} className="text-teal-400" />
+                        <EditableText value={cvData.contact.githubLink} onChange={v => updateField('contact.githubLink', v)} />
+                    </div>
+                )}
+                {contactVisibility.linkedinLink && (
+                    <div className="flex items-center gap-2">
+                        <Linkedin size={16} className="text-teal-400" />
+                        <EditableText value={cvData.contact.linkedinLink} onChange={v => updateField('contact.linkedinLink', v)} />
+                    </div>
+                )}
+                {contactVisibility.portfolioLink && (
+                    <div className="flex items-center gap-2">
+                        <Globe size={16} className="text-teal-400" />
+                        <EditableText value={cvData.contact.portfolioLink} onChange={v => updateField('contact.portfolioLink', v)} />
+                    </div>
+                )}
+            </div>
+            <div className="bg-teal-900 px-12 pb-3 flex justify-center gap-2 print:hidden">
+                <button onClick={() => toggleContactVisibility('githubLink')} className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${contactVisibility.githubLink ? 'bg-teal-700 text-teal-100' : 'bg-teal-950 text-teal-500'}`}>
+                    {contactVisibility.githubLink ? <Eye size={12} /> : <EyeOff size={12} />} GitHub
+                </button>
+                <button onClick={() => toggleContactVisibility('linkedinLink')} className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${contactVisibility.linkedinLink ? 'bg-teal-700 text-teal-100' : 'bg-teal-950 text-teal-500'}`}>
+                    {contactVisibility.linkedinLink ? <Eye size={12} /> : <EyeOff size={12} />} LinkedIn
+                </button>
+                <button onClick={() => toggleContactVisibility('portfolioLink')} className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${contactVisibility.portfolioLink ? 'bg-teal-700 text-teal-100' : 'bg-teal-950 text-teal-500'}`}>
+                    {contactVisibility.portfolioLink ? <Eye size={12} /> : <EyeOff size={12} />} Portfolio
+                </button>
             </div>
 
             {/* Main Content Split */}
@@ -60,11 +92,11 @@ const TechInnovatorTemplate = ({
                 {/* Left Column (30%) */}
                 <div className="w-[30%] flex flex-col gap-8 border-r border-gray-200 pr-8">
 
-                    <SectionWrapper title="OBJECTIVE" sectionKey="objective" titleClassName="text-lg font-bold text-teal-800 mb-4 uppercase tracking-wider">
+                    <SectionWrapper title="OBJECTIVE" sectionKey="objective" titleClassName="text-lg font-bold text-green-700 mb-4 uppercase tracking-wider">
                         <EditableText as="p" className="text-sm text-gray-600 leading-relaxed text-justify" value={cvData.objective} onChange={(val) => updateField('objective', val)} multiline />
                     </SectionWrapper>
 
-                    <SectionWrapper title="SKILLS" sectionKey="skills" titleClassName="text-lg font-bold text-teal-800 mb-4 uppercase tracking-wider" onAdd={() => updateField('skills', ['Skill', ...cvData.skills])}>
+                    <SectionWrapper title="SKILLS" sectionKey="skills" titleClassName="text-lg font-bold text-green-700 mb-4 uppercase tracking-wider" onAdd={() => updateField('skills', ['Skill', ...cvData.skills])}>
                         <div className="flex flex-col gap-2">
                             {cvData.skills.map((skill, index) => (
                                 <div key={index} className="group/skill relative bg-gray-50 px-3 py-1.5 rounded text-sm text-gray-700 font-medium border border-gray-100">
@@ -82,7 +114,7 @@ const TechInnovatorTemplate = ({
                         </div>
                     </SectionWrapper>
 
-                    <SectionWrapper title="LANGUAGES" sectionKey="languages" titleClassName="text-lg font-bold text-teal-800 mb-4 uppercase tracking-wider" onAdd={() => addItem('languages', { name: "Language", level: "Basic" })}>
+                    <SectionWrapper title="LANGUAGES" sectionKey="languages" titleClassName="text-lg font-bold text-green-700 mb-4 uppercase tracking-wider" onAdd={() => addItem('languages', { name: "Language", level: "Basic" })}>
                         <div className="flex flex-col gap-4">
                             {cvData.languages.map((lang, index) => (
                                 <EditableItemWrapper key={lang.id} id={lang.id} section="languages" index={index} isFirst={index === 0} isLast={index === cvData.languages.length - 1}>
@@ -120,7 +152,7 @@ const TechInnovatorTemplate = ({
                                         onAdd={() => addItem('experience', {
                                             role: "Vị trí", company: "Tên công ty", dateRange: "MM/YYYY - MM/YYYY", duration: "(... năm)", description: "Mô tả công việc"
                                         })}
-                                        titleClassName="text-xl font-bold text-teal-800 border-b-2 border-teal-100 pb-2 mb-4 uppercase tracking-wider"
+                                        titleClassName="text-xl font-bold text-green-700 border-b-2 border-green-100 pb-2 mb-4 uppercase tracking-wider"
                                     >
                                         <div className="flex flex-col gap-6">
                                             {cvData.experience.map((exp, itemIndex) => (
@@ -165,7 +197,7 @@ const TechInnovatorTemplate = ({
                                         onAdd={() => addItem('education', {
                                             degree: "Bằng cấp", school: "Trường", dateRange: "MM/YYYY - MM/YYYY", duration: "(... năm)"
                                         })}
-                                        titleClassName="text-xl font-bold text-teal-800 border-b-2 border-teal-100 pb-2 mb-4 uppercase tracking-wider"
+                                        titleClassName="text-xl font-bold text-green-700 border-b-2 border-green-100 pb-2 mb-4 uppercase tracking-wider"
                                     >
                                         <div className="flex flex-col gap-6">
                                             {cvData.education.map((edu, itemIndex) => (
@@ -191,6 +223,48 @@ const TechInnovatorTemplate = ({
                                                                 const dt = [...cvData.education]; dt[itemIndex].description = v; updateField('education', dt);
                                                             }} />
                                                         )}
+                                                    </div>
+                                                </EditableItemWrapper>
+                                            ))}
+                                        </div>
+                                    </SectionWrapper>
+                                );
+                            case 'certificates':
+                                return (
+                                    <SectionWrapper
+                                        key={sectionKey}
+                                        title="CERTIFICATIONS"
+                                        sectionKey="certificates"
+                                        index={index}
+                                        isFirst={isFirst}
+                                        isLast={isLast}
+                                        onAdd={() => addItem('certificates', {
+                                            name: "Tên chứng chỉ", issuer: "Tổ chức", year: "Năm", link: "Link"
+                                        })}
+                                        titleClassName="text-xl font-bold text-green-700 border-b-2 border-green-100 pb-2 mb-4 uppercase tracking-wider"
+                                    >
+                                        <div className="flex flex-col gap-4">
+                                            {cvData.certificates.map((cert, itemIndex) => (
+                                                <EditableItemWrapper key={cert.id} id={cert.id} section="certificates" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.certificates.length - 1}>
+                                                    <div className="flex flex-col gap-1">
+                                                        <div className="flex justify-between items-start">
+                                                            <div>
+                                                                <EditableText as="h4" className="font-bold text-gray-900" value={cert.name} onChange={v => {
+                                                                    const dt = [...cvData.certificates]; dt[itemIndex].name = v; updateField('certificates', dt);
+                                                                }} />
+                                                                <EditableText as="p" className="text-teal-700 font-medium text-sm" value={cert.issuer} onChange={v => {
+                                                                    const dt = [...cvData.certificates]; dt[itemIndex].issuer = v; updateField('certificates', dt);
+                                                                }} />
+                                                            </div>
+                                                            <div className="text-right bg-teal-50 px-2 py-1 rounded">
+                                                                <EditableText className="text-xs font-bold text-teal-800 block" value={cert.year} onChange={v => {
+                                                                    const dt = [...cvData.certificates]; dt[itemIndex].year = v; updateField('certificates', dt);
+                                                                }} />
+                                                            </div>
+                                                        </div>
+                                                        <EditableText as="a" className="text-teal-500 hover:underline text-xs" value={cert.link} onChange={v => {
+                                                            const dt = [...cvData.certificates]; dt[itemIndex].link = v; updateField('certificates', dt);
+                                                        }} />
                                                     </div>
                                                 </EditableItemWrapper>
                                             ))}

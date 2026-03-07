@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link, useSearchParams, useParams, useNavigate } from "react-router-dom";
-import { Col, Row, DatePicker, message, Spin } from "antd";
+import { useSearchParams, useParams, useNavigate } from "react-router-dom";
+import { Spin, message } from "antd";
 import {
-    ArrowUp, ArrowDown, Trash2, Plus, GripVertical,
-    Mail, Phone, MapPin, Download, Save
+    ArrowUp, ArrowDown, Trash2, Plus,
+    Mail, Phone, MapPin, Download,
+    Github, Linkedin, Globe, Eye, EyeOff
 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import ModernMinimalistTemplate from "./templates/ModernMinimalistTemplate";
@@ -11,14 +12,17 @@ import ExecutiveProfessionalTemplate from "./templates/ExecutiveProfessionalTemp
 import CreativeStudioTemplate from "./templates/CreativeStudioTemplate";
 import TechInnovatorTemplate from "./templates/TechInnovatorTemplate";
 import Button from "@/components/Button";
-import { useCreateResumeBuilderMutation, useGetResumeQuery } from "@/apis/resumeApi";
+import { useGetResumeQuery, useUploadFilesMutation } from "@/apis/resumeApi";
 
 export default function CvBuilder({ onBack }) {
-    const { id: resumeId } = useParams();
+    const { id: paramResumeId } = useParams();
+    const [searchParams] = useSearchParams();
+    const resumeId = paramResumeId || searchParams.get("resumeId");
     const navigate = useNavigate();
     const pdfRef = useRef(null);
+    const avatarInputRef = useRef(null);
 
-    const [createResumeBuilder, { isLoading: isCreating }] = useCreateResumeBuilderMutation();
+    const [uploadFiles] = useUploadFilesMutation();
 
     const { data: resumeData, isLoading: isFetchingResume } = useGetResumeQuery(
         { resumeId },
@@ -29,17 +33,6 @@ export default function CvBuilder({ onBack }) {
         // Trigger print dialog instead of using external library
         // User can select "Save as PDF" in the print destination
         window.print();
-    };
-
-    const handleSave = async () => {
-        try {
-            await createResumeBuilder({}).unwrap();
-            message.success("Tạo Resume Builder thành công!");
-            handleDownloadPdf();
-        } catch (error) {
-            console.error("Failed to create resume builder:", error);
-            message.error("Có lỗi xảy ra khi tạo Resume Builder!");
-        }
     };
 
     // Initial State mimicking the provided screenshot
@@ -58,8 +51,8 @@ export default function CvBuilder({ onBack }) {
             gender: "Nam"
         },
         languages: [
-            { id: 'lang_1', name: "Tiếng Anh", level: "Trung Cấp" },
-            { id: 'lang_2', name: "Tiếng Thổ Nhĩ Kỳ", level: "Bản Địa" }
+            { id: 'lang_1', name: "English", level: "Ielts 6.0" },
+            { id: 'lang_2', name: "Chinese", level: "HSK 6" }
         ],
         skills: [
             "Product management",
@@ -67,9 +60,12 @@ export default function CvBuilder({ onBack }) {
             "Content Writing"
         ],
         contact: {
-            email: "haonsvse172181@fpt.edu.vn",
-            phone: "+84-975052978",
-            address: "11 Doan Van Bo, Quận 4, Hồ Chí Minh, Việt Nam"
+            emailInResume: "haonsvse172181@fpt.edu.vn",
+            phoneInResume: "+84-975052978",
+            addressInResume: "11 Doan Van Bo, Quận 4, Hồ Chí Minh, Việt Nam",
+            githubLink: "github.com/username",
+            linkedinLink: "linkedin.com/in/username",
+            portfolioLink: "portfolio.dev"
         },
         experience: [
             {
@@ -151,9 +147,12 @@ export default function CvBuilder({ onBack }) {
                 },
                 contact: {
                     ...prevData.contact,
-                    email: resumeData.emailInResume || prevData.contact.email,
-                    phone: resumeData.phoneInResume || prevData.contact.phone,
-                    address: resumeData.addressInResume || prevData.contact.address
+                    emailInResume: resumeData.emailInResume || prevData.contact.emailInResume,
+                    phoneInResume: resumeData.phoneInResume || prevData.contact.phoneInResume,
+                    addressInResume: resumeData.addressInResume || prevData.contact.addressInResume,
+                    githubLink: resumeData.githubLink || prevData.contact.githubLink,
+                    linkedinLink: resumeData.linkedinLink || prevData.contact.linkedinLink,
+                    portfolioLink: resumeData.portfolioLink || prevData.contact.portfolioLink
                 },
                 // If the user hasn't added details yet, fallback to our dummy initial prevData
                 skills: resumeData.skillGroups && resumeData.skillGroups.length > 0
@@ -175,13 +174,21 @@ export default function CvBuilder({ onBack }) {
     const [sectionOrder, setSectionOrder] = useState([
         "experience",
         "education",
-        "certificates",
-        "activities",
-        "references"
+        "certificates"
     ]);
 
     const [hoveredSection, setHoveredSection] = useState(null);
     const [hoveredItem, setHoveredItem] = useState(null);
+
+    const [contactVisibility, setContactVisibility] = useState({
+        githubLink: true,
+        linkedinLink: true,
+        portfolioLink: true
+    });
+
+    const toggleContactVisibility = (key) => {
+        setContactVisibility(prev => ({ ...prev, [key]: !prev[key] }));
+    };
 
     // --- Actions ---
     const updateField = (path, value) => {
@@ -300,9 +307,6 @@ export default function CvBuilder({ onBack }) {
         <div
             className="group/item relative rounded-lg border border-transparent hover:border-gray-200 hover:shadow-sm transition-all -mx-4 px-4 py-2 mb-2"
         >
-            {/* Outline indicator on the left simulating the diamond line */}
-            <div className="absolute left-[-17px] top-4 w-2 h-2 rounded-sm border border-[#1F8A70] bg-white rotate-45 z-10" />
-
             {children}
 
             {/* Action Toolbar */}
@@ -331,13 +335,43 @@ export default function CvBuilder({ onBack }) {
         </div>
     );
 
-    const [searchParams] = useSearchParams();
     const templateId = searchParams.get('template') || 'tpl_modern_1';
 
     let TemplateComponent = ModernMinimalistTemplate;
     if (templateId === 'tpl_prof_1') TemplateComponent = ExecutiveProfessionalTemplate;
     if (templateId === 'tpl_creative_1') TemplateComponent = CreativeStudioTemplate;
     if (templateId === 'tpl_modern_2') TemplateComponent = TechInnovatorTemplate;
+
+    const handleAvatarUpload = async (event) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            message.error('Chỉ hỗ trợ file ảnh (PNG, JPG, JPEG, GIF).');
+            event.target.value = '';
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('files', file);
+
+            const uploadedFiles = await uploadFiles(formData).unwrap();
+            const uploadedFile = Array.isArray(uploadedFiles) ? uploadedFiles[0] : null;
+
+            if (!uploadedFile?.downloadUrl) {
+                throw new Error('Upload failed');
+            }
+
+            updateField('personalInfo.avatar', uploadedFile.downloadUrl);
+            message.success('Cập nhật ảnh đại diện thành công!');
+        } catch (error) {
+            console.error('Avatar upload error:', error);
+            message.error('Có lỗi xảy ra khi tải ảnh lên.');
+        } finally {
+            event.target.value = '';
+        }
+    };
 
     const templateProps = {
         cvData,
@@ -347,7 +381,10 @@ export default function CvBuilder({ onBack }) {
         EditableText,
         SectionWrapper,
         EditableItemWrapper,
-        LucideIcons
+        LucideIcons,
+        avatarInputRef,
+        contactVisibility,
+        toggleContactVisibility,
     };
 
     if (isFetchingResume) {
@@ -364,20 +401,12 @@ export default function CvBuilder({ onBack }) {
             {/* Top Toolbar (Mocked) */}
             <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between top-0 z-50 rounded-t-xl print:hidden">
                 <div className="flex items-center gap-6">
-                    <Button mode="ghost" onClick={onBack} className="text-gray-500 hover:text-gray-700 font-medium text-sm flex items-center gap-1">
+                    <Button mode="ghost" onClick={() => navigate('/dashboard/resumes')} className="text-gray-500 hover:text-gray-700 font-medium text-sm flex items-center gap-1">
                         <span className="material-icons-round text-[16px]">arrow_back</span>
                         Back
                     </Button>
                 </div>
                 <div className="flex items-center gap-4">
-                    <Button
-                        mode="secondary"
-                        shape="rounded"
-                        onClick={handleSave}
-                        disabled={isCreating}
-                        className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 text-sm font-medium hover:bg-gray-50 flex items-center gap-2">
-                        <Save size={16} /> Save
-                    </Button>
                     <Button
                         mode="primary"
                         shape="rounded"
@@ -392,6 +421,15 @@ export default function CvBuilder({ onBack }) {
             <div ref={pdfRef} className="print-cv-section shadow-none">
                 <TemplateComponent {...templateProps} />
             </div>
+
+            {/* Hidden file input for avatar upload */}
+            <input
+                ref={avatarInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarUpload}
+            />
         </div>
     );
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, MapPin, Github, Linkedin, Globe, Eye, EyeOff } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 
 const ExecutiveProfessionalTemplate = ({
@@ -9,7 +9,9 @@ const ExecutiveProfessionalTemplate = ({
     addItem,
     EditableText,
     SectionWrapper,
-    EditableItemWrapper
+    EditableItemWrapper,
+    contactVisibility,
+    toggleContactVisibility
 }) => {
     return (
         <div className="w-[850px] mx-auto mt-8 bg-white shadow-xl min-h-[1100px] relative font-serif text-gray-800">
@@ -30,16 +32,45 @@ const ExecutiveProfessionalTemplate = ({
                 <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-gray-600">
                     <div className="flex items-center gap-2">
                         <Mail size={14} />
-                        <EditableText value={cvData.contact.email} onChange={v => updateField('contact.email', v)} />
+                        <EditableText value={cvData.contact.emailInResume} onChange={v => updateField('contact.emailInResume', v)} />
                     </div>
                     <div className="flex items-center gap-2">
                         <Phone size={14} />
-                        <EditableText value={cvData.contact.phone} onChange={v => updateField('contact.phone', v)} />
+                        <EditableText value={cvData.contact.phoneInResume} onChange={v => updateField('contact.phoneInResume', v)} />
                     </div>
                     <div className="flex items-center gap-2">
                         <MapPin size={14} />
-                        <EditableText value={cvData.contact.address} onChange={v => updateField('contact.address', v)} />
+                        <EditableText value={cvData.contact.addressInResume} onChange={v => updateField('contact.addressInResume', v)} />
                     </div>
+                    {contactVisibility.githubLink && (
+                        <div className="flex items-center gap-2">
+                            <Github size={14} />
+                            <EditableText value={cvData.contact.githubLink} onChange={v => updateField('contact.githubLink', v)} />
+                        </div>
+                    )}
+                    {contactVisibility.linkedinLink && (
+                        <div className="flex items-center gap-2">
+                            <Linkedin size={14} />
+                            <EditableText value={cvData.contact.linkedinLink} onChange={v => updateField('contact.linkedinLink', v)} />
+                        </div>
+                    )}
+                    {contactVisibility.portfolioLink && (
+                        <div className="flex items-center gap-2">
+                            <Globe size={14} />
+                            <EditableText value={cvData.contact.portfolioLink} onChange={v => updateField('contact.portfolioLink', v)} />
+                        </div>
+                    )}
+                </div>
+                <div className="flex justify-center gap-2 mt-4 print:hidden">
+                    <button onClick={() => toggleContactVisibility('githubLink')} className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${contactVisibility.githubLink ? 'bg-gray-200 text-gray-700' : 'bg-gray-100 text-gray-400'}`}>
+                        {contactVisibility.githubLink ? <Eye size={12} /> : <EyeOff size={12} />} GitHub
+                    </button>
+                    <button onClick={() => toggleContactVisibility('linkedinLink')} className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${contactVisibility.linkedinLink ? 'bg-gray-200 text-gray-700' : 'bg-gray-100 text-gray-400'}`}>
+                        {contactVisibility.linkedinLink ? <Eye size={12} /> : <EyeOff size={12} />} LinkedIn
+                    </button>
+                    <button onClick={() => toggleContactVisibility('portfolioLink')} className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${contactVisibility.portfolioLink ? 'bg-gray-200 text-gray-700' : 'bg-gray-100 text-gray-400'}`}>
+                        {contactVisibility.portfolioLink ? <Eye size={12} /> : <EyeOff size={12} />} Portfolio
+                    </button>
                 </div>
             </div>
 
@@ -49,7 +80,7 @@ const ExecutiveProfessionalTemplate = ({
             <div className="px-14 pb-16 flex flex-col gap-8">
 
                 {/* Objective */}
-                <SectionWrapper title="PROFESSIONAL SUMMARY" sectionKey="objective" titleClassName="text-xl font-bold uppercase border-b-2 border-gray-800 pb-2 mb-4 text-gray-900">
+                <SectionWrapper title="CAREER OBJECTIVE" sectionKey="objective" titleClassName="text-xl font-bold uppercase border-b-2 border-gray-800 pb-2 mb-4 text-gray-900">
                     <EditableText
                         as="p"
                         className="text-gray-700 leading-relaxed text-justify"
@@ -74,6 +105,7 @@ const ExecutiveProfessionalTemplate = ({
                                     index={index}
                                     isFirst={isFirst}
                                     isLast={isLast}
+                                    titleClassName="text-xl font-bold uppercase border-b-2 border-gray-800 pb-2 mb-4 text-gray-900"
                                     onAdd={() => addItem('experience', {
                                         role: "Vị trí", company: "Tên công ty", dateRange: "MM/YYYY - MM/YYYY", duration: "(... năm)", description: "Mô tả công việc"
                                     })}
@@ -116,6 +148,7 @@ const ExecutiveProfessionalTemplate = ({
                                     index={index}
                                     isFirst={isFirst}
                                     isLast={isLast}
+                                    titleClassName="text-xl font-bold uppercase border-b-2 border-gray-800 pb-2 mb-4 text-gray-900"
                                     onAdd={() => addItem('education', {
                                         degree: "Bằng cấp", school: "Trường", dateRange: "MM/YYYY - MM/YYYY", duration: "(... năm)"
                                     })}
@@ -149,6 +182,42 @@ const ExecutiveProfessionalTemplate = ({
                                 </SectionWrapper>
                             );
                         // Implement other standard cases here if needed, or rely on the smaller sections below
+                        case 'certificates':
+                            return (
+                                <SectionWrapper
+                                    key={sectionKey}
+                                    title="CERTIFICATIONS"
+                                    sectionKey="certificates"
+                                    index={index}
+                                    isFirst={isFirst}
+                                    isLast={isLast}
+                                    titleClassName="text-xl font-bold uppercase border-b-2 border-gray-800 pb-2 mb-4 text-gray-900"
+                                    onAdd={() => addItem('certificates', {
+                                        name: "Tên chứng chỉ", issuer: "Tổ chức", year: "Năm", link: "Link"
+                                    })}
+                                >
+                                    <div className="flex flex-col gap-4">
+                                        {cvData.certificates.map((cert, itemIndex) => (
+                                            <EditableItemWrapper key={cert.id} id={cert.id} section="certificates" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.certificates.length - 1}>
+                                                <div className="flex flex-col gap-1">
+                                                    <EditableText as="h4" className="font-bold text-gray-900" value={cert.name} onChange={v => {
+                                                        const dt = [...cvData.certificates]; dt[itemIndex].name = v; updateField('certificates', dt);
+                                                    }} />
+                                                    <EditableText as="p" className="text-gray-700 text-sm italic" value={cert.issuer} onChange={v => {
+                                                        const dt = [...cvData.certificates]; dt[itemIndex].issuer = v; updateField('certificates', dt);
+                                                    }} />
+                                                    <EditableText as="p" className="text-gray-500 text-xs font-medium" value={cert.year} onChange={v => {
+                                                        const dt = [...cvData.certificates]; dt[itemIndex].year = v; updateField('certificates', dt);
+                                                    }} />
+                                                    <EditableText as="a" className="text-gray-600 hover:underline text-xs" value={cert.link} onChange={v => {
+                                                        const dt = [...cvData.certificates]; dt[itemIndex].link = v; updateField('certificates', dt);
+                                                    }} />
+                                                </div>
+                                            </EditableItemWrapper>
+                                        ))}
+                                    </div>
+                                </SectionWrapper>
+                            );
                         default: return null;
                     }
                 })}
@@ -157,7 +226,7 @@ const ExecutiveProfessionalTemplate = ({
                 <div className="grid grid-cols-2 gap-8 mt-4">
 
                     {/* Skills */}
-                    <SectionWrapper title="SKILLS" sectionKey="skills" onAdd={() => updateField('skills', ['Skill', ...cvData.skills])}>
+                    <SectionWrapper title="SKILLS" sectionKey="skills" titleClassName="text-xl font-bold uppercase border-b-2 border-gray-800 pb-2 mb-4 text-gray-900" onAdd={() => updateField('skills', ['Skill', ...cvData.skills])}>
                         <ul className="list-disc pl-5 text-gray-700 flex flex-col gap-2">
                             {cvData.skills.map((skill, index) => (
                                 <li key={index} className="group/skill relative">
@@ -176,7 +245,7 @@ const ExecutiveProfessionalTemplate = ({
                     </SectionWrapper>
 
                     {/* Languages */}
-                    <SectionWrapper title="LANGUAGES" sectionKey="languages" onAdd={() => addItem('languages', { name: "Language", level: "Level" })}>
+                    <SectionWrapper title="LANGUAGES" sectionKey="languages" titleClassName="text-xl font-bold uppercase border-b-2 border-gray-800 pb-2 mb-4 text-gray-900" onAdd={() => addItem('languages', { name: "Language", level: "Level" })}>
                         <div className="flex flex-col gap-3">
                             {cvData.languages.map((lang, index) => (
                                 <EditableItemWrapper key={lang.id} id={lang.id} section="languages" index={index} isFirst={index === 0} isLast={index === cvData.languages.length - 1}>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, MapPin, Github, Linkedin, Globe, Eye, EyeOff } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 
 const ModernMinimalistTemplate = ({
@@ -9,24 +9,27 @@ const ModernMinimalistTemplate = ({
     addItem,
     EditableText,
     SectionWrapper,
-    EditableItemWrapper
+    EditableItemWrapper,
+    avatarInputRef,
+    contactVisibility,
+    toggleContactVisibility
 }) => {
     return (
         <div className="w-[850px] mx-auto mt-8 bg-white shadow-xl min-h-[1100px] relative font-sans">
             {/* Header (Name, Title) */}
-            <div className="px-12 pt-12 pb-6">
+            <div className="px-12 pt-12 pb-6 bg-[#3b82f6] text-white rounded-t-lg">
                 <EditableText
                     as="h1"
-                    className="text-4xl font-bold text-[#1F8A70] uppercase mb-2"
+                    className="text-4xl font-bold uppercase mb-2 text-white"
                     value={cvData.personalInfo.fullName}
                     onChange={(val) => updateField('personalInfo.fullName', val)}
                 />
-                <div className="flex items-center gap-3 text-gray-600 font-medium">
+                <div className="flex items-center gap-3 text-blue-100 font-medium">
                     <EditableText
                         value={cvData.personalInfo.title}
                         onChange={(val) => updateField('personalInfo.title', val)}
                     />
-                    <span className="text-gray-400">|</span>
+                    <span className="text-blue-200/50">|</span>
                     <EditableText
                         value={cvData.personalInfo.experienceYears}
                         onChange={(val) => updateField('personalInfo.experienceYears', val)}
@@ -43,13 +46,13 @@ const ModernMinimalistTemplate = ({
                     {/* Avatar Box */}
                     <div className="bg-[#F8F9FA] p-6 rounded-lg aspect-square flex items-center justify-center relative group">
                         <img src={cvData.personalInfo.avatar} alt="Avatar" className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-md" />
-                        <button className="absolute inset-0 m-auto w-10 h-10 bg-white/90 rounded-full shadow-sm flex items-center justify-center text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onClick={() => avatarInputRef?.current?.click()} className="absolute inset-0 m-auto w-10 h-10 bg-white/90 rounded-full shadow-sm flex items-center justify-center text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                             <LucideIcons.Camera size={18} />
                         </button>
                     </div>
 
                     {/* Objective */}
-                    <SectionWrapper title="Career Objective" sectionKey="objective">
+                    <SectionWrapper title="Career Objective" sectionKey="objective" titleClassName="text-xl font-semibold text-blue-600 mb-4">
                         <EditableText
                             as="p"
                             className="text-sm text-gray-600 leading-relaxed text-justify"
@@ -59,32 +62,11 @@ const ModernMinimalistTemplate = ({
                         />
                     </SectionWrapper>
 
-                    {/* Personal Details */}
-                    <SectionWrapper title="Personal Details" sectionKey="personalDetails">
-                        <div className="flex flex-col gap-3 text-sm">
-                            <div className="grid grid-cols-[110px_1fr] items-center">
-                                <span className="text-gray-500">Ngày sinh</span>
-                                <EditableText className="font-medium text-gray-800" value={cvData.personalDetails.dob} onChange={v => updateField('personalDetails.dob', v)} />
-                            </div>
-                            <div className="grid grid-cols-[110px_1fr] items-center">
-                                <span className="text-gray-500">Quốc tịch</span>
-                                <EditableText className="font-medium text-gray-800" value={cvData.personalDetails.nationality} onChange={v => updateField('personalDetails.nationality', v)} />
-                            </div>
-                            <div className="grid grid-cols-[110px_1fr] items-center">
-                                <span className="text-gray-500">Tình trạng hôn nhân</span>
-                                <EditableText className="font-medium text-gray-800" value={cvData.personalDetails.maritalStatus} onChange={v => updateField('personalDetails.maritalStatus', v)} />
-                            </div>
-                            <div className="grid grid-cols-[110px_1fr] items-center">
-                                <span className="text-gray-500">Giới tính</span>
-                                <EditableText className="font-medium text-gray-800" value={cvData.personalDetails.gender} onChange={v => updateField('personalDetails.gender', v)} />
-                            </div>
-                        </div>
-                    </SectionWrapper>
-
                     {/* Languages */}
                     <SectionWrapper
                         title="Languages"
                         sectionKey="languages"
+                        titleClassName="text-xl font-semibold text-blue-600 mb-4"
                         onAdd={() => addItem('languages', { name: "Ngôn ngữ mới", level: "Cơ bản" })}
                     >
                         <div className="flex flex-col gap-2">
@@ -104,7 +86,7 @@ const ModernMinimalistTemplate = ({
                     </SectionWrapper>
 
                     {/* Skills */}
-                    <SectionWrapper title="Skills" sectionKey="skills" onAdd={() => {
+                    <SectionWrapper title="Skills" sectionKey="skills" titleClassName="text-xl font-semibold text-blue-600 mb-4" onAdd={() => {
                         updateField('skills', ['Kỹ năng mới', ...cvData.skills]);
                     }}>
                         <div className="flex flex-col gap-2 text-sm text-gray-700">
@@ -125,19 +107,48 @@ const ModernMinimalistTemplate = ({
                     </SectionWrapper>
 
                     {/* Contact */}
-                    <SectionWrapper title="Contact Info" sectionKey="contact">
+                    <SectionWrapper title="Contact Info" sectionKey="contact" titleClassName="text-xl font-semibold text-blue-600 mb-4">
                         <div className="flex flex-col gap-3 text-sm text-gray-700">
                             <div className="flex gap-3">
-                                <Mail size={16} className="text-[#1F8A70] mt-0.5 min-w-[16px]" />
-                                <EditableText value={cvData.contact.email} onChange={v => updateField('contact.email', v)} />
+                                <Mail size={16} className="text-blue-500 mt-0.5 min-w-[16px]" />
+                                <EditableText value={cvData.contact.emailInResume} onChange={v => updateField('contact.emailInResume', v)} />
                             </div>
                             <div className="flex gap-3">
-                                <Phone size={16} className="text-[#1F8A70] mt-0.5 min-w-[16px]" />
-                                <EditableText value={cvData.contact.phone} onChange={v => updateField('contact.phone', v)} />
+                                <Phone size={16} className="text-blue-500 mt-0.5 min-w-[16px]" />
+                                <EditableText value={cvData.contact.phoneInResume} onChange={v => updateField('contact.phoneInResume', v)} />
                             </div>
                             <div className="flex gap-3">
-                                <MapPin size={16} className="text-[#1F8A70] mt-0.5 min-w-[16px]" />
-                                <EditableText value={cvData.contact.address} onChange={v => updateField('contact.address', v)} />
+                                <MapPin size={16} className="text-blue-500 mt-0.5 min-w-[16px]" />
+                                <EditableText value={cvData.contact.addressInResume} onChange={v => updateField('contact.addressInResume', v)} />
+                            </div>
+                            {contactVisibility.githubLink && (
+                                <div className="flex gap-3">
+                                    <Github size={16} className="text-blue-500 mt-0.5 min-w-[16px]" />
+                                    <EditableText value={cvData.contact.githubLink} onChange={v => updateField('contact.githubLink', v)} />
+                                </div>
+                            )}
+                            {contactVisibility.linkedinLink && (
+                                <div className="flex gap-3">
+                                    <Linkedin size={16} className="text-blue-500 mt-0.5 min-w-[16px]" />
+                                    <EditableText value={cvData.contact.linkedinLink} onChange={v => updateField('contact.linkedinLink', v)} />
+                                </div>
+                            )}
+                            {contactVisibility.portfolioLink && (
+                                <div className="flex gap-3">
+                                    <Globe size={16} className="text-blue-500 mt-0.5 min-w-[16px]" />
+                                    <EditableText value={cvData.contact.portfolioLink} onChange={v => updateField('contact.portfolioLink', v)} />
+                                </div>
+                            )}
+                            <div className="flex gap-2 mt-2 print:hidden">
+                                <button onClick={() => toggleContactVisibility('githubLink')} className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${contactVisibility.githubLink ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-400'}`}>
+                                    {contactVisibility.githubLink ? <Eye size={12} /> : <EyeOff size={12} />} GitHub
+                                </button>
+                                <button onClick={() => toggleContactVisibility('linkedinLink')} className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${contactVisibility.linkedinLink ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-400'}`}>
+                                    {contactVisibility.linkedinLink ? <Eye size={12} /> : <EyeOff size={12} />} LinkedIn
+                                </button>
+                                <button onClick={() => toggleContactVisibility('portfolioLink')} className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${contactVisibility.portfolioLink ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-400'}`}>
+                                    {contactVisibility.portfolioLink ? <Eye size={12} /> : <EyeOff size={12} />} Portfolio
+                                </button>
                             </div>
                         </div>
                     </SectionWrapper>
@@ -147,7 +158,7 @@ const ModernMinimalistTemplate = ({
                 {/* Right Column (65%) */}
                 <div className="w-[65%] flex flex-col gap-8 relative">
                     {/* Vertical line connecting sections */}
-                    <div className="absolute left-[-13px] top-2 bottom-0 w-px border-l-[1.5px] border-dashed border-[#1F8A70]/30" />
+                    <div className="absolute left-[-13px] top-2 bottom-0 w-px border-l-[1.5px] border-dashed border-blue-500/30" />
 
                     {sectionOrder.map((sectionKey, index) => {
                         const isFirst = index === 0;
@@ -163,6 +174,7 @@ const ModernMinimalistTemplate = ({
                                         index={index}
                                         isFirst={isFirst}
                                         isLast={isLast}
+                                        titleClassName="text-xl font-semibold text-blue-600 mb-4"
                                         onAdd={() => addItem('experience', {
                                             role: "Vị trí", company: "Tên công ty", dateRange: "MM/YYYY - MM/YYYY", duration: "(... năm)", description: "Mô tả công việc"
                                         })}
@@ -203,6 +215,7 @@ const ModernMinimalistTemplate = ({
                                         index={index}
                                         isFirst={isFirst}
                                         isLast={isLast}
+                                        titleClassName="text-xl font-semibold text-blue-600 mb-4"
                                         onAdd={() => addItem('education', {
                                             degree: "Bằng cấp", school: "Trường", dateRange: "MM/YYYY - MM/YYYY", duration: "(... năm)"
                                         })}
@@ -245,6 +258,7 @@ const ModernMinimalistTemplate = ({
                                         index={index}
                                         isFirst={isFirst}
                                         isLast={isLast}
+                                        titleClassName="text-xl font-semibold text-blue-600 mb-4"
                                         onAdd={() => addItem('certificates', {
                                             name: "Tên chứng chỉ", issuer: "Tổ chức", year: "Năm", link: "Link"
                                         })}
@@ -271,73 +285,7 @@ const ModernMinimalistTemplate = ({
                                         </div>
                                     </SectionWrapper>
                                 );
-                            case 'activities':
-                                return (
-                                    <SectionWrapper
-                                        key={sectionKey}
-                                        title="Activities"
-                                        sectionKey="activities"
-                                        index={index}
-                                        isFirst={isFirst}
-                                        isLast={isLast}
-                                        onAdd={() => addItem('activities', {
-                                            name: "Tên hoạt động", role: "Vai trò", dateRange: "MM/YYYY - MM/YYYY", description: "Mô tả"
-                                        })}
-                                    >
-                                        <div className="flex flex-col gap-6">
-                                            {cvData.activities.map((act, itemIndex) => (
-                                                <EditableItemWrapper key={act.id} id={act.id} section="activities" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.activities.length - 1}>
-                                                    <div className="flex flex-col gap-1">
-                                                        <EditableText as="h4" className="font-bold text-gray-900" value={act.name} onChange={v => {
-                                                            const dt = [...cvData.activities]; dt[itemIndex].name = v; updateField('activities', dt);
-                                                        }} />
-                                                        <EditableText as="p" className="text-gray-600" value={act.role} onChange={v => {
-                                                            const dt = [...cvData.activities]; dt[itemIndex].role = v; updateField('activities', dt);
-                                                        }} />
-                                                        <EditableText as="p" className="text-gray-500 text-xs font-medium mb-1" value={act.dateRange} onChange={v => {
-                                                            const dt = [...cvData.activities]; dt[itemIndex].dateRange = v; updateField('activities', dt);
-                                                        }} />
-                                                        <EditableText as="p" className="text-sm text-gray-600 leading-relaxed text-justify" value={act.description} onChange={v => {
-                                                            const dt = [...cvData.activities]; dt[itemIndex].description = v; updateField('activities', dt);
-                                                        }} />
-                                                    </div>
-                                                </EditableItemWrapper>
-                                            ))}
-                                        </div>
-                                    </SectionWrapper>
-                                );
-                            case 'references':
-                                return (
-                                    <SectionWrapper
-                                        key={sectionKey}
-                                        title="References"
-                                        sectionKey="references"
-                                        index={index}
-                                        isFirst={isFirst}
-                                        isLast={isLast}
-                                        onAdd={() => addItem('references', {
-                                            name: "Tên", title: "Chức vụ", contact: "Liên hệ"
-                                        })}
-                                    >
-                                        <div className="flex flex-col gap-4">
-                                            {cvData.references.map((ref, itemIndex) => (
-                                                <EditableItemWrapper key={ref.id} id={ref.id} section="references" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.references.length - 1}>
-                                                    <div className="flex flex-col gap-1">
-                                                        <EditableText as="h4" className="font-bold text-gray-900" value={ref.name} onChange={v => {
-                                                            const dt = [...cvData.references]; dt[itemIndex].name = v; updateField('references', dt);
-                                                        }} />
-                                                        <EditableText as="p" className="text-gray-600 text-sm" value={ref.title} onChange={v => {
-                                                            const dt = [...cvData.references]; dt[itemIndex].title = v; updateField('references', dt);
-                                                        }} />
-                                                        <EditableText as="p" className="text-gray-600 text-sm" value={ref.contact} onChange={v => {
-                                                            const dt = [...cvData.references]; dt[itemIndex].contact = v; updateField('references', dt);
-                                                        }} />
-                                                    </div>
-                                                </EditableItemWrapper>
-                                            ))}
-                                        </div>
-                                    </SectionWrapper>
-                                );
+
                             default:
                                 return null;
                         }
