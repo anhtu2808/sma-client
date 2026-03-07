@@ -1,12 +1,13 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { useGetMatchingDetailQuery, useLazyGetMatchingStatusQuery } from "@/apis/matchingApi";
+import { useLazyGetMatchingStatusQuery } from "@/apis/matchingApi";
 import useRequireLoginRedirect from "@/hooks/useRequireLoginRedirect";
 import MatchReportHeader from "@/pages/match-report/header";
-import { MATCH_REPORT_DATA } from "@/pages/match-report/mock-data";
+import { resetMatchingReportState } from "@/store/slices/matchingReportSlice";
 import MatchReportResumePreview from "@/pages/match-report/resume-preview";
 import MatchReportSidebar from "@/pages/match-report/sidebar";
-import MatchingLoading from "@/pages/match-report/matching-loading";
+import MatchingLoading from "@/pages/match-report/loading";
 
 const MATCHING_POLL_INTERVAL_MS = 2_000;
 const MATCHING_POLL_TIMEOUT_MS = 180_000;
@@ -15,22 +16,18 @@ const normalizeEvaluationStatus = (status) =>
   typeof status === "string" ? status.toUpperCase() : "WAITING";
 
 const MatchReport = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { evaluationId } = useParams();
-  const { data: matchingDetail } = useGetMatchingDetailQuery({ evaluationId });
   const requireLogin = useRequireLoginRedirect();
 
-  const hasAccessToken = Boolean(localStorage.getItem("accessToken"));
-  const hasRedirectedRef = useRef(false);
   const pollingTimerRef = useRef(null);
   const pollingStartedAtRef = useRef(null);
 
   const evaluationIdFromParams = Number.parseInt(evaluationId || "", 10);
   const hasValidEvaluationId = Number.isFinite(evaluationIdFromParams);
 
-  const [activeSidebarTab, setActiveSidebarTab] = useState("skills");
-  const [activeDocumentTab, setActiveDocumentTab] = useState("resume");
-  const [expandedSkillKeys, setExpandedSkillKeys] = useState([]);
+  const [isAuthorized, setIsAuthorized] = useState(null);
   const [phase, setPhase] = useState("polling");
   const [activeEvaluationId, setActiveEvaluationId] = useState(
     Number.isFinite(evaluationIdFromParams) ? evaluationIdFromParams : null
@@ -39,29 +36,6 @@ const MatchReport = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const [triggerGetMatchingStatus] = useLazyGetMatchingStatusQuery();
-
-  const activeSections = useMemo(
-    () => MATCH_REPORT_DATA.sidebarContentByTab[activeSidebarTab] || [],
-    [activeSidebarTab]
-  );
-  const reportRequestKey = useMemo(
-    () => `${evaluationIdFromParams || "evaluation"}`,
-    [evaluationIdFromParams]
-  );
-
-  const handleSidebarTabChange = (tabKey) => {
-    setActiveSidebarTab(tabKey);
-    setExpandedSkillKeys([]);
-  };
-
-  const handleToggleSkill = (skillKey) => {
-    setExpandedSkillKeys((previous) => {
-      if (previous.includes(skillKey)) {
-        return previous.filter((item) => item !== skillKey);
-      }
-      return [...previous, skillKey];
-    });
-  };
 
   const stopPolling = useCallback(() => {
     if (pollingTimerRef.current) {
@@ -72,20 +46,17 @@ const MatchReport = () => {
   }, []);
 
   useEffect(() => {
-    if (hasAccessToken || hasRedirectedRef.current) return;
-
-    hasRedirectedRef.current = true;
-    requireLogin({ warningMessage: "Please log in to check AI matching score." });
-  }, [hasAccessToken, requireLogin]);
-
-  useEffect(() => {
-    setActiveSidebarTab("skills");
-    setActiveDocumentTab("resume");
-    setExpandedSkillKeys([]);
-  }, [reportRequestKey]);
+    setIsAuthorized(
+      requireLogin({ warningMessage: "Please log in to check AI matching score." })
+    );
+  }, [requireLogin]);
 
   useEffect(() => {
-    if (!hasAccessToken) return;
+    dispatch(resetMatchingReportState());
+  }, [dispatch, evaluationIdFromParams]);
+
+  useEffect(() => {
+    if (isAuthorized !== true) return;
 
     setErrorMessage("");
     setLatestStatus("WAITING");
@@ -100,9 +71,10 @@ const MatchReport = () => {
 
     setActiveEvaluationId(evaluationIdFromParams);
     setPhase("polling");
-  }, [evaluationIdFromParams, hasAccessToken, hasValidEvaluationId, stopPolling]);
+  }, [evaluationIdFromParams, hasValidEvaluationId, isAuthorized, stopPolling]);
 
   useEffect(() => {
+    if (isAuthorized !== true) return;
     if (phase !== "polling" || !Number.isFinite(activeEvaluationId)) return;
 
     let cancelled = false;
@@ -161,7 +133,7 @@ const MatchReport = () => {
       cancelled = true;
       stopPolling();
     };
-  }, [activeEvaluationId, phase, stopPolling, triggerGetMatchingStatus]);
+  }, [activeEvaluationId, isAuthorized, phase, stopPolling, triggerGetMatchingStatus]);
 
   useEffect(
     () => () => {
@@ -170,17 +142,12 @@ const MatchReport = () => {
     [stopPolling]
   );
 
-  if (!hasAccessToken) {
+  if (isAuthorized !== true) {
     return null;
   }
 
   if (phase === "polling") {
-    const subtitle =
-      latestStatus === "PARTIAL"
-        ? "AI is analyzing your resume in depth. Please keep this page open."
-        : "AI matching is queued and will start shortly. Please wait a moment.";
-
-    return <MatchingLoading title="AI matching in progress" subtitle={subtitle} />;
+    return <MatchingLoading status={latestStatus} />;
   }
 
   if (phase === "failed") {
@@ -206,28 +173,11 @@ const MatchReport = () => {
   return (
     <div className="min-h-screen bg-surface-light text-neutral-900 xl:h-screen">
       <div className="flex min-h-screen flex-col xl:h-screen xl:flex-row">
-        <MatchReportSidebar
-          scoreCard={MATCH_REPORT_DATA.scoreCard}
-          sidebarTabs={MATCH_REPORT_DATA.sidebarTabs}
-          activeSidebarTab={activeSidebarTab}
-          onSidebarTabChange={handleSidebarTabChange}
-          sections={activeSections}
-          expandedSkillKeys={expandedSkillKeys}
-          onToggleSkill={handleToggleSkill}
-        />
+        <MatchReportSidebar />
 
         <main className="flex min-w-0 flex-1 flex-col bg-surface-light">
-          <MatchReportHeader
-            documentTabs={MATCH_REPORT_DATA.documentTabs}
-            activeDocumentTab={activeDocumentTab}
-            onDocumentTabChange={setActiveDocumentTab}
-            editorStatus={MATCH_REPORT_DATA.editorStatus}
-          />
-
-          <MatchReportResumePreview
-            activeDocumentTab={activeDocumentTab}
-            resumePreview={MATCH_REPORT_DATA.resumePreview}
-          />
+          <MatchReportHeader />
+          <MatchReportResumePreview />
         </main>
       </div>
     </div>

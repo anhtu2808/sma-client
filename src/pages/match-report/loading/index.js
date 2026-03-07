@@ -18,9 +18,14 @@ const TIPS = [
   "💡 Tip: Keep your work experience concise — focus on impact, not just responsibilities.",
 ];
 
-const MatchingLoading = ({ title, subtitle }) => {
+const MatchingLoading = ({ status = "WAITING" }) => {
   const [visibleSteps, setVisibleSteps] = useState(0);
   const [currentTip, setCurrentTip] = useState(0);
+
+  const subtitle =
+    status === "PARTIAL"
+      ? "AI is analyzing your resume in depth. Please keep this page open."
+      : "AI matching is queued and will start shortly. Please wait a moment.";
 
   useEffect(() => {
     const timers = ANALYSIS_STEPS.map((step, index) =>
@@ -45,7 +50,9 @@ const MatchingLoading = ({ title, subtitle }) => {
               <Lottie animationData={aiLoadingAnimation} loop autoplay />
             </div>
 
-            <h1 className="mt-2 text-2xl font-bold text-gray-900 md:text-3xl">{title}</h1>
+            <h1 className="mt-2 text-2xl font-bold text-gray-900 md:text-3xl">
+              AI matching in progress
+            </h1>
             <p className="mt-3 text-sm text-gray-600 md:text-base">{subtitle}</p>
           </div>
 

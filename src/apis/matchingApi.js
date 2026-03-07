@@ -14,19 +14,20 @@ export const matchingApi = api.injectEndpoints({
       transformResponse: (response) => response?.data ?? null,
     }),
 
+    getMatchingDetail: builder.query({
+      query: ({ evaluationId }) => ({
+        url: `${API_VERSION}/matching/${evaluationId}`,
+        method: "GET",
+      }),
+      transformResponse: (response) => response?.data ?? null,
+    }),
+
     getMatchingStatus: builder.query({
       query: ({ evaluationId }) => ({
         url: `${API_VERSION}/matching/${evaluationId}/status`,
         method: "GET",
       }),
       transformResponse: (response) => normalizeEvaluationStatus(response?.data),
-    }),
-    getMatchingDetail: builder.query({
-      query: ({ evaluationId }) => ({
-        url: `${API_VERSION}/matching/${evaluationId}`,
-        method: "GET",
-      }),
-      transformResponse: (response) => response?.data ?? {},
     }),
   }),
 });

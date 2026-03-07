@@ -1,5 +1,191 @@
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setActiveSidebarTab,
+  toggleExpandedSidebarKey,
+} from "@/store/slices/matchingReportSlice";
+
 const SCORE_RING_RADIUS = 32;
 const SCORE_RING_CIRCUMFERENCE = 2 * Math.PI * SCORE_RING_RADIUS;
+
+const SIDEBAR_MOCK_DATA = {
+  scoreCard: {
+    score: 88,
+    companyName: "NAB Innovation Team",
+    jobTitle: "Java/Javascript Engineer",
+    resumeTitle: "Java/Javascript Engineer Resume",
+    atsTipLabel: "ATS tip",
+  },
+  sidebarTabs: [
+    { key: "skills", label: "Skills", progress: 40 },
+    { key: "searchability", label: "Searchability", progress: 60 },
+    { key: "recruiterTips", label: "Recruiter Tips", progress: 30, badgeCount: 6 },
+  ],
+  sidebarContentByTab: {
+    skills: [
+      {
+        key: "required-skills",
+        title: "Required skills",
+        metrics: [{ label: "Matched skills", value: 1, tone: "success" }],
+        items: [
+          {
+            key: "javascript",
+            label: "Javascript",
+            status: "matched",
+            progressLabel: "Added 2/2",
+            asTag: true,
+          },
+        ],
+      },
+      {
+        key: "hard-skills",
+        title: "Hard skills",
+        metrics: [
+          { label: "Matched skills", value: 4, tone: "success" },
+          { label: "Missing skills", value: 1, tone: "danger" },
+        ],
+        items: [
+          {
+            key: "software-development",
+            label: "Software Development",
+            status: "matched",
+            progressLabel: "Added 4/2",
+            asTag: true,
+            suggestions: [
+              "Applied Software Development best practices to design, build, and maintain scalable web applications.",
+              "Contributed to the full Software Development lifecycle, from concept to deployment, for diverse projects.",
+              "Leveraged Software Development expertise to create robust and efficient user-facing features.",
+            ],
+          },
+          {
+            key: "information-technology",
+            label: "Information technology",
+            status: "matched",
+            progressLabel: "Added 1/1",
+            asTag: true,
+          },
+          {
+            key: "information-systems",
+            label: "Information Systems",
+            status: "matched",
+            progressLabel: "Added 1/1",
+            asTag: true,
+          },
+          {
+            key: "recruitment",
+            label: "Recruitment",
+            status: "missing",
+            progressLabel: "0/1",
+            asTag: false,
+          },
+          {
+            key: "hcm",
+            label: "HCM",
+            status: "matched",
+            progressLabel: "1/1",
+            asTag: false,
+          },
+        ],
+      },
+    ],
+    searchability: [
+      {
+        key: "keyword-density",
+        title: "Keyword density",
+        metrics: [
+          { label: "Matched keywords", value: 3, tone: "success" },
+          { label: "Missing keywords", value: 2, tone: "danger" },
+        ],
+        items: [
+          {
+            key: "action-verbs",
+            label: "Action verbs",
+            status: "matched",
+            progressLabel: "11/12",
+            asTag: true,
+          },
+          {
+            key: "impact-numbers",
+            label: "Impact numbers",
+            status: "missing",
+            progressLabel: "2/6",
+            asTag: false,
+            suggestions: [
+              "Add measurable outcomes in each role, such as conversion uplift or cycle-time reduction.",
+              "Include metrics for API performance, deployment frequency, and bug-fix turnaround.",
+              "Quantify project scope: users served, services managed, or automation savings.",
+            ],
+          },
+          {
+            key: "role-keywords",
+            label: "Role-specific keywords",
+            status: "matched",
+            progressLabel: "8/10",
+            asTag: true,
+          },
+        ],
+      },
+      {
+        key: "ats-formatting",
+        title: "ATS formatting",
+        metrics: [{ label: "Checklist passed", value: 5, tone: "success" }],
+        items: [
+          {
+            key: "heading-structure",
+            label: "Heading structure",
+            status: "matched",
+            progressLabel: "Ready",
+            asTag: false,
+          },
+          {
+            key: "readability",
+            label: "Readability score",
+            status: "matched",
+            progressLabel: "Good",
+            asTag: false,
+          },
+        ],
+      },
+    ],
+    recruiterTips: [
+      {
+        key: "priority-feedback",
+        title: "Recruiter tips",
+        metrics: [{ label: "Open items", value: 6, tone: "danger" }],
+        items: [
+          {
+            key: "summary-focus",
+            label: "Strengthen profile summary",
+            status: "missing",
+            progressLabel: "High priority",
+            asTag: false,
+            suggestions: [
+              "Start summary with your strongest role-fit statement and 3-4 years equivalent project exposure.",
+              "Emphasize ownership scope for backend APIs, frontend delivery, and CI/CD pipeline automation.",
+            ],
+          },
+          {
+            key: "project-depth",
+            label: "Deepen project outcomes",
+            status: "missing",
+            progressLabel: "High priority",
+            asTag: false,
+            suggestions: [
+              "For each project, add impact before tech stack to improve recruiter scan speed.",
+              "Highlight collaboration with product, QA, and cross-functional teams.",
+            ],
+          },
+          {
+            key: "language-consistency",
+            label: "Keep wording consistent",
+            status: "matched",
+            progressLabel: "In progress",
+            asTag: false,
+          },
+        ],
+      },
+    ],
+  },
+};
 
 const ScoreRing = ({ score }) => {
   const normalizedScore = Math.max(0, Math.min(100, Number(score || 0)));
@@ -70,15 +256,13 @@ const getStatusConfig = (status) => {
   };
 };
 
-const MatchReportSidebar = ({
-  scoreCard,
-  sidebarTabs,
-  activeSidebarTab,
-  onSidebarTabChange,
-  sections,
-  expandedSkillKeys,
-  onToggleSkill,
-}) => {
+const MatchReportSidebar = () => {
+  const dispatch = useDispatch();
+  const activeSidebarTab = useSelector((state) => state.matchingReport.activeSidebarTab);
+  const expandedSidebarKeys = useSelector((state) => state.matchingReport.expandedSidebarKeys);
+  const { scoreCard, sidebarTabs, sidebarContentByTab } = SIDEBAR_MOCK_DATA;
+  const sections = sidebarContentByTab[activeSidebarTab] || [];
+
   return (
     <aside className="flex w-full flex-shrink-0 flex-col border-b border-neutral-200 bg-white xl:h-screen xl:w-[380px] xl:border-b-0 xl:border-r">
       <div className="border-b border-neutral-200 px-4 py-5">
@@ -106,7 +290,7 @@ const MatchReportSidebar = ({
             <button
               key={tab.key}
               type="button"
-              onClick={() => onSidebarTabChange(tab.key)}
+              onClick={() => dispatch(setActiveSidebarTab(tab.key))}
               className={`relative flex-1 border-b-2 px-2 py-3 text-center transition-colors ${
                 isActive
                   ? "border-primary"
@@ -176,7 +360,7 @@ const MatchReportSidebar = ({
                 const statusConfig = getStatusConfig(item.status);
                 const itemKey = `${section.key}:${item.key}`;
                 const hasSuggestions = Array.isArray(item.suggestions) && item.suggestions.length > 0;
-                const isExpanded = expandedSkillKeys.includes(itemKey);
+                const isExpanded = expandedSidebarKeys.includes(itemKey);
 
                 const rowContent = (
                   <>
@@ -217,7 +401,7 @@ const MatchReportSidebar = ({
                     {hasSuggestions ? (
                       <button
                         type="button"
-                        onClick={() => onToggleSkill(itemKey)}
+                        onClick={() => dispatch(toggleExpandedSidebarKey(itemKey))}
                         className="flex w-full items-center justify-between gap-4 px-4 py-3 text-left transition-colors hover:bg-neutral-50"
                       >
                         {rowContent}
