@@ -7,6 +7,7 @@ import {
   useUploadCandidateResumeMutation,
   useUploadFilesMutation,
 } from "@/apis/resumeApi";
+import { useStartMatchingDetailMutation } from "@/apis/matchingApi";
 import Loading from "@/components/Loading";
 import { RESUME_TYPES } from "@/constant";
 import { getErrorMessage, normalizeParseStatus } from "@/constant/attachment";
@@ -71,6 +72,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
   const [uploadFiles, { isLoading: isUploadingFile }] = useUploadFilesMutation();
   const [uploadCandidateResume, { isLoading: isSavingResume }] = useUploadCandidateResumeMutation();
   const [parseCandidateResume, { isLoading: isParsingResume }] = useParseCandidateResumeMutation();
+  const [startMatchingDetail, { isLoading: isStartingMatching }] = useStartMatchingDetailMutation();
 
   const isLoadingResumes = isProfileLoading || isOriginalLoading || isProfileFetching || isOriginalFetching;
 
@@ -147,14 +149,27 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
     }
   };
 
-  const handleCheckMatch = () => {
+  const handleCheckMatch = async () => {
     if (!canSubmit || !selectedResume || !effectiveJobId) {
       message.warning("Please select a parsed resume to continue.");
       return;
     }
 
-    handleClose();
-    navigate(`/jobs/${effectiveJobId}/match-check?resumeId=${selectedResume.id}`);
+    try {
+      const evaluationId = await startMatchingDetail({
+        jobId: Number(effectiveJobId),
+        resumeId: selectedResume.id,
+      }).unwrap();
+
+      if (!Number.isFinite(Number(evaluationId))) {
+        throw new Error("Invalid matching evaluation id");
+      }
+
+      handleClose();
+      navigate(`/match-report/${Number(evaluationId)}`);
+    } catch (error) {
+      message.error(getErrorMessage(error, "Unable to start AI matching."));
+    }
   };
 
   return (
@@ -234,11 +249,11 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
         <button
           type="button"
           onClick={handleCheckMatch}
-          disabled={!canSubmit}
+          disabled={!canSubmit || isStartingMatching}
           className="inline-flex h-11 items-center gap-2 rounded-lg bg-primary px-6 text-sm font-semibold text-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <span className="material-icons-round text-[18px]">auto_awesome</span>
-          Check Match with AI
+          {isStartingMatching ? "Starting..." : "Check Match with AI"}
         </button>
       </div>
     </Modal>
