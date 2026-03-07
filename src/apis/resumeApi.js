@@ -109,7 +109,10 @@ export const resumeApi = api.injectEndpoints({
                 { type: "Resumes", id: arg?.type || "ALL" },
             ],
         }),
-
+        getResumeById: builder.query({
+            query: (id) => `${API_VERSION}/resumes/${id}`,
+            transformResponse: (response) => response?.data ?? {},
+        }),
         getResumeParseStatus: builder.query({
             query: ({ resumeId }) => ({
                 url: `${API_VERSION}/resumes/${resumeId}/parse-status`,
@@ -445,6 +448,7 @@ export const resumeApi = api.injectEndpoints({
 
 export const {
     useGetCandidateResumesQuery,
+    useGetResumeByIdQuery,
     useLazyGetResumeParseStatusQuery,
     useUploadFilesMutation,
     useUploadCandidateResumeMutation,

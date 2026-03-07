@@ -1,15 +1,13 @@
-export const MATCH_REPORT_DATA = {
-  scoreCard: {
-    score: 88,
-    companyName: "NAB Innovation Team",
-    jobTitle: "Java/Javascript Engineer",
-    resumeTitle: "Java/Javascript Engineer Resume",
-    atsTipLabel: "ATS tip",
-  },
+import { createSlice } from "@reduxjs/toolkit";
+
+const createInitialState = () => ({
+  activeSidebarTab: "skills",
+  expandedSidebarKeys: [],
+  activeDocumentTab: "resume",
   sidebarTabs: [
     { key: "skills", label: "Skills", progress: 40 },
     { key: "searchability", label: "Searchability", progress: 60 },
-    { key: "recruiterTips", label: "Recruiter Tips", progress: 30, badgeCount: 6 },
+    { key: "recruiterTips", label: "Recruiter Tips", progress: 30 },
   ],
   sidebarContentByTab: {
     skills: [
@@ -176,118 +174,38 @@ export const MATCH_REPORT_DATA = {
       },
     ],
   },
-  documentTabs: [
-    { key: "resume", label: "Resume" },
-    { key: "coverLetter", label: "Cover Letter" },
-    { key: "jobDescription", label: "Job Description" },
-  ],
-  editorStatus: {
-    aiSuggestionsLabel: "AI Suggestions (22/22)",
-    editStepLabel: "Edit",
-    editStepValue: "2",
-    downloadLabel: "Download",
-  },
-  resumePreview: {
-    note:
-      "AI helps improve your resume, but always review it to make sure every detail is correct.",
-    resume: {
-      candidate: {
-        name: "DANG MAI ANH TU",
-        contacts: [
-          "Address: Thu Duc City, Ho Chi Minh City",
-          "Phone: +84 389 275 513",
-          "Email: dangmaianhtu@gmail.com",
-          "Website: www.anhtudev.com",
-          "GitHub: www.github.com/anhtu2808",
-        ],
-      },
-      summary: {
-        title: "Summary",
-        paragraphs: [
-          "Final-year Software Engineering student and aspiring Full-Stack Software Engineer with hands-on experience in scalable web application development, backend APIs, and cloud deployment.",
-          "Seeking to leverage skills in Java and JavaScript in an international software development environment. Strong analytical and collaborative skills, with fast learning ability and practical ownership mindset.",
-        ],
-        highlights: [
-          "JavaScript",
-          "software development",
-          "analytical",
-          "collaborative",
-        ],
-      },
-      skills: {
-        title: "Skills",
-        groups: [
-          { label: "Programming Languages", value: "Java, JavaScript, C#, Python." },
-          {
-            label: "Backend Development",
-            value:
-              "Spring Boot, Spring Security, RESTful API, OOP, Microservices architecture.",
-          },
-          {
-            label: "Frontend Development",
-            value: "HTML5, CSS, Bootstrap, ReactJS, Ant Design, Responsive Design.",
-          },
-          {
-            label: "DevOps",
-            value:
-              "CI/CD with GitHub Actions, Docker, Linux server administration, AWS and Nginx.",
-          },
-          { label: "Databases", value: "MySQL, Microsoft SQL Server, Database Design." },
-          {
-            label: "Software Development",
-            value:
-              "SDLC, Agile/Scrum Methodologies, Information Technology, Information Systems.",
-          },
-          {
-            label: "Tools and Technologies",
-            value: "Git, Maven, Figma, Postman, Jira, AI integration workflows.",
-          },
-          {
-            label: "Soft Skills",
-            value:
-              "Project management, communication, quick learning, leadership, analytical and collaborative delivery.",
-          },
-        ],
-        highlights: [
-          "JavaScript",
-          "Software Development",
-          "Information Technology",
-          "Information Systems",
-          "analytical",
-          "collaborative",
-        ],
-      },
-      experience: {
-        title: "Work Experience",
-        entries: [
-          {
-            role: "Full-Stack Developer (Freelance)",
-            timeline: "January 2024 - Present",
-            company: "SAT Chasedream",
-            bullets: [
-              "Developed and maintained features for a multi-tenant SaaS platform.",
-              "Implemented backend services using Spring Boot and integrated third-party APIs.",
-              "Built responsive frontend components with React and Ant Design.",
-            ],
-          },
-        ],
-      },
+});
+
+const matchingReportSlice = createSlice({
+  name: "matchingReport",
+  initialState: createInitialState(),
+  reducers: {
+    resetMatchingReportState: () => createInitialState(),
+    setActiveSidebarTab: (state, action) => {
+      state.activeSidebarTab = action.payload;
+      state.expandedSidebarKeys = [];
     },
-    otherDocuments: {
-      coverLetter: {
-        title: "Cover Letter",
-        description:
-          "This panel is reserved for cover-letter optimization flow. You can keep using the same editor controls and ATS insight panel.",
-        placeholder:
-          "Cover Letter editing mode is in UI-only scope for this phase and uses static placeholder content.",
-      },
-      jobDescription: {
-        title: "Job Description",
-        description:
-          "Use this mode to inspect job requirements side by side with the optimized resume content.",
-        placeholder:
-          "Job Description view is currently static and prepared for API integration in a later phase.",
-      },
+    toggleExpandedSidebarKey: (state, action) => {
+      const key = action.payload;
+      if (state.expandedSidebarKeys.includes(key)) {
+        state.expandedSidebarKeys = state.expandedSidebarKeys.filter((item) => item !== key);
+        return;
+      }
+
+      state.expandedSidebarKeys.push(key);
+    },
+    setActiveDocumentTab: (state, action) => {
+      state.activeDocumentTab = action.payload;
     },
   },
-};
+});
+
+export const {
+  resetMatchingReportState,
+  setActiveSidebarTab,
+  toggleExpandedSidebarKey,
+  setActiveDocumentTab,
+} = matchingReportSlice.actions;
+
+export default matchingReportSlice.reducer;
+
