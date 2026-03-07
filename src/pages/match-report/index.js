@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { useLazyGetMatchingStatusQuery } from "@/apis/matchingApi";
 import useRequireLoginRedirect from "@/hooks/useRequireLoginRedirect";
-import MatchReportHeader from "@/pages/match-report/header";
+import MatchReportHeader from "@/pages/match-report/resume-preview/header";
 import { resetMatchingReportState } from "@/store/slices/matchingReportSlice";
 import MatchReportResumePreview from "@/pages/match-report/resume-preview";
 import MatchReportSidebar from "@/pages/match-report/sidebar";
