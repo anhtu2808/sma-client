@@ -2,26 +2,23 @@ import { useSelector } from "react-redux";
 import ContentDetail from "./content-detail";
 
 const SidebarContent = () => {
-  const activeSidebarTab = useSelector((state) => state.matchingReport.activeSidebarTab);
-  const sidebarContentByTab = useSelector((state) => state.matchingReport.sidebarContentByTab);
-  const sections = sidebarContentByTab[activeSidebarTab] || [];
+  const activeCriteriaId = useSelector((state) => state.matchingReport.activeCriteriaId);
+  const criteria = useSelector((state) => state.matchingReport.criteria);
+
+  const activeCriteria = criteria.find((c) => c.id === activeCriteriaId) || {};
+  const details = activeCriteria.details || [];
 
   return (
     <div className="flex-1 overflow-y-auto">
-      {sections.map((section) => (
-        <section key={section.key} className="border-b border-neutral-200">
-          <div>
-            {section.items.map((item, itemIndex) => (
-              <ContentDetail
-                key={item.key}
-                item={item}
-                sectionKey={section.key}
-                isLast={itemIndex === section.items.length - 1}
-              />
-            ))}
-          </div>
-        </section>
-      ))}
+      <div className="flex flex-col">
+        {details.map((item, itemIdx) => (
+          <ContentDetail
+            key={item.id}
+            item={item}
+            isLast={itemIdx === details.length - 1}
+          />
+        ))}
+      </div>
     </div>
   );
 };

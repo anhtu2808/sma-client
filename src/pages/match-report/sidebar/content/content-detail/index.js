@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { toggleExpandedSidebarKey } from "@/store/slices/matchingReportSlice";
+import { toggleExpandedItemId } from "@/store/slices/matchingReportSlice";
 import Suggestions from "../suggestions";
 
 const getStatusConfig = (status) => {
@@ -22,14 +22,13 @@ const getStatusConfig = (status) => {
   };
 };
 
-const ContentDetail = ({ item, sectionKey, isLast }) => {
+const ContentDetail = ({ item, isLast }) => {
   const dispatch = useDispatch();
-  const expandedSidebarKeys = useSelector((state) => state.matchingReport.expandedSidebarKeys);
+  const expandedItemIds = useSelector((state) => state.matchingReport.expandedItemIds);
 
   const statusConfig = getStatusConfig(item.status);
-  const itemKey = `${sectionKey}:${item.key}`;
   const hasSuggestions = Array.isArray(item.suggestions) && item.suggestions.length > 0;
-  const isExpanded = expandedSidebarKeys.includes(itemKey);
+  const isExpanded = expandedItemIds.includes(item.id);
 
   const rowContent = (
     <>
@@ -37,7 +36,7 @@ const ContentDetail = ({ item, sectionKey, isLast }) => {
         <span className={`material-icons-round text-[18px] ${statusConfig.iconClassName}`}>
           {statusConfig.icon}
         </span>
-        {item.asTag ? (
+        {item.status === "fixed" ? (
           <span className={statusConfig.tagClassName}>{item.label}</span>
         ) : (
           <span className="text-sm font-medium text-neutral-900">{item.label}</span>
@@ -45,9 +44,6 @@ const ContentDetail = ({ item, sectionKey, isLast }) => {
       </div>
 
       <div className="flex items-center gap-2">
-        <div className={statusConfig.progressClassName}>
-          <span>{item.progressLabel}</span>
-        </div>
         {hasSuggestions ? (
           <span
             className={`material-icons-round text-sm text-neutral-400 transition-transform ${
@@ -66,7 +62,7 @@ const ContentDetail = ({ item, sectionKey, isLast }) => {
       {hasSuggestions ? (
         <button
           type="button"
-          onClick={() => dispatch(toggleExpandedSidebarKey(itemKey))}
+          onClick={() => dispatch(toggleExpandedItemId(item.id))}
           className="flex w-full items-center justify-between gap-4 px-4 py-3 text-left transition-colors hover:bg-neutral-50"
         >
           {rowContent}

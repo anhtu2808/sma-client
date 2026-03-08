@@ -191,7 +191,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
         </p>
       </div>
 
-      <div className="max-h-[62vh] overflow-y-auto pt-6">
+      <div className="-mr-3 max-h-[62vh] overflow-y-auto pr-3 pt-6">
         {isLoadingResumes ? (
           <Loading size={80} className="py-8" />
         ) : resumes.length === 0 ? (
