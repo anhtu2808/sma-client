@@ -21,9 +21,13 @@ const PreviewStateCard = ({ title, description, action }) => (
 
 const MatchReportResumePreview = () => {
   const activeDocumentTab = useSelector((state) => state.matchingReport.activeDocumentTab);
+  const activeCriteriaId = useSelector((state) => state.matchingReport.activeCriteriaId);
+  const criteria = useSelector((state) => state.matchingReport.criteria);
   const { evaluationId } = useParams();
   const evaluationIdNumber = Number.parseInt(evaluationId || "", 10);
   const shouldLoadResume = activeDocumentTab === "resume" && Number.isFinite(evaluationIdNumber);
+  const activeCriteria = criteria.find((criterion) => criterion.id === activeCriteriaId) || {};
+  const activeDetails = Array.isArray(activeCriteria.details) ? activeCriteria.details : [];
 
   const {
     data: matchingDetail,
@@ -97,6 +101,7 @@ const MatchReportResumePreview = () => {
 
     return (
       <PdfViewer
+        activeDetails={activeDetails}
         resumeUrl={resumeUrl}
         renderError={(error) => (
           <PreviewStateCard
