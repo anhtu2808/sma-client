@@ -1,8 +1,25 @@
-import { render, screen } from '@testing-library/react';
-import App from './App';
+import { render, screen } from "@testing-library/react";
 
-test('renders learn react link', () => {
+jest.mock(
+  "react-router-dom",
+  () => ({
+    RouterProvider: () => <div>router-provider</div>,
+  }),
+  { virtual: true }
+);
+
+jest.mock(
+  "@/routes",
+  () => ({
+    routes: {},
+  }),
+  { virtual: true }
+);
+
+import App from "./App";
+
+test("renders the app router", () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+
+  expect(screen.getByText("router-provider")).not.toBeNull();
 });

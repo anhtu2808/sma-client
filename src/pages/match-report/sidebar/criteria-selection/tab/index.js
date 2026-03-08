@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { setActiveSidebarTab } from "@/store/slices/matchingReportSlice";
+import { setActiveCriteriaId } from "@/store/slices/matchingReportSlice";
 
 const getProgressColors = (progress) => {
   if (progress < 50) return { fill: "bg-red-400", track: "bg-red-100", border: "border-red-200" };
@@ -9,15 +9,15 @@ const getProgressColors = (progress) => {
 
 const Tab = ({ tab }) => {
   const dispatch = useDispatch();
-  const activeSidebarTab = useSelector((state) => state.matchingReport.activeSidebarTab);
+  const activeCriteriaId = useSelector((state) => state.matchingReport.activeCriteriaId);
   
-  const isActive = tab.key === activeSidebarTab;
-  const { fill, track, border } = getProgressColors(tab.progress || 0);
+  const isActive = tab.id === activeCriteriaId;
+  const { fill, track, border } = getProgressColors(tab.aiScore || 0);
 
   return (
     <button
       type="button"
-      onClick={() => dispatch(setActiveSidebarTab(tab.key))}
+      onClick={() => dispatch(setActiveCriteriaId(tab.id))}
       className={`relative flex flex-1 flex-col items-center justify-center border-r border-neutral-200 px-2 py-2 text-center transition-colors last:border-r-0 ${
         isActive ? "bg-neutral-100" : "hover:bg-neutral-50"
       }`}
@@ -27,13 +27,13 @@ const Tab = ({ tab }) => {
           isActive ? "font-bold text-neutral-900" : "font-semibold text-neutral-700"
         }`}
       >
-        {tab.label}
+        {tab.name}
       </p>
       
       <div className={`mt-1.5 h-[6px] w-[50px] overflow-hidden rounded-full border ${border} ${track}`}>
         <div
           className={`h-full rounded-full ${fill}`}
-          style={{ width: `${Math.max(0, Math.min(100, tab.progress || 0))}%` }}
+          style={{ width: `${Math.max(0, Math.min(100, tab.aiScore || 0))}%` }}
         />
       </div>
       
