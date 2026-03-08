@@ -181,6 +181,20 @@ export const resumeApi = api.injectEndpoints({
             ],
         }),
 
+        setResumeAsDefault: builder.mutation({
+            query: ({ resumeId }) => ({
+                url: `${API_VERSION}/resumes/${resumeId}/set-default`,
+                method: "POST",
+            }),
+            transformResponse: (response) => response?.data ?? response,
+            invalidatesTags: [
+                "Users",
+                { type: "Resumes", id: RESUME_TYPES.PROFILE },
+                { type: "Resumes", id: RESUME_TYPES.ORIGINAL },
+                { type: "Resumes", id: "ALL" },
+            ],
+        }),
+
         createResumeSkill: builder.mutation({
             query: ({ resumeId, payload }) => ({
                 url: `${API_VERSION}/resumes/${resumeId}/skills`,
@@ -441,6 +455,7 @@ export const {
     useParseCandidateResumeMutation,
     useDeleteCandidateResumeMutation,
     useSetResumeAsProfileMutation,
+    useSetResumeAsDefaultMutation,
     useCreateResumeSkillMutation,
     useUpdateResumeSkillMutation,
     useDeleteResumeSkillMutation,

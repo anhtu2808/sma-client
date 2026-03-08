@@ -62,7 +62,7 @@ export const routes = createBrowserRouter(
                 <Route path="billing-plans" element={<BillingPlans />} />
                 <Route path="usage" element={<Usage />} />
             </Route>
-            <Route path="dashboard/checkout" element={<Checkout />} />
+            <Route path="checkout" element={<Checkout />} />
         </>
     )
 );

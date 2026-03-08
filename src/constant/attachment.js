@@ -1,4 +1,4 @@
-export const POLL_INTERVAL_MS = 2000;
+export const POLL_INTERVAL_MS = 5000;
 export const POLL_TIMEOUT_MS = 90_000;
 export const TERMINAL_PARSE_STATUSES = new Set(["FINISH", "FAIL"]);
 

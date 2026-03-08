@@ -22,7 +22,7 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
     if (hasDurations) {
       onExpand();
     } else {
-      navigate('/dashboard/checkout', { state: { plan } });
+      navigate('/checkout', { state: { plan } });
     }
   };
 
@@ -30,10 +30,10 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
     <article
       onClick={onClick}
       className={`relative rounded-2xl border p-8 shadow-sm transition-all flex flex-col lg:h-[720px] cursor-pointer ${isSelected
-          ? "bg-white border-2 border-primary shadow-md"
-          : isCurrent
-            ? "bg-white border-gray-200 cursor-default"
-            : "bg-white border-gray-200 hover:border-gray-300"
+        ? "bg-white border-2 border-primary shadow-md"
+        : isCurrent
+          ? "bg-white border-gray-200 cursor-default"
+          : "bg-white border-gray-200 hover:border-gray-300"
         }`}
     >
       {plan.popular ? (
@@ -160,9 +160,9 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
               e.stopPropagation();
               if (!selectedDuration && plan.durations.length > 0) {
                 // If nothing selected, maybe default to first? Or just pass currently selected.
-                navigate('/dashboard/checkout', { state: { plan, selectedDuration: selectedDuration || plan.durations[0].key } });
+                navigate('/checkout', { state: { plan, selectedDuration: selectedDuration || plan.durations[0].key } });
               } else {
-                navigate('/dashboard/checkout', { state: { plan, selectedDuration } });
+                navigate('/checkout', { state: { plan, selectedDuration } });
               }
             }}
             className="w-full bg-primary hover:bg-primary-dark text-white font-bold rounded-xl transition-all shadow-md mt-auto text-sm tracking-wide"
