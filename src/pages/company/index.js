@@ -25,7 +25,6 @@ const CompanyList = () => {
     // Data Transformation
     const companies = companyData?.data?.content || companyData?.content || [];
     const totalPages = companyData?.data?.totalPages || companyData?.totalPages || 0;
-    const totalElements = companyData?.data?.totalElements || companyData?.totalElements || 0;
 
     const handleSearchChange = (val) => {
         setSearchTerm(val);
@@ -44,12 +43,7 @@ const CompanyList = () => {
             />
 
             <div className="container mx-auto px-4 md:px-6 pb-20">
-                {/* Header Info */}
-                <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                    <p className="text-slate-500 dark:text-[#8c6b5d]">
-                        Showing <span className="font-bold text-slate-900 dark:text-white">{totalElements}</span> results
-                    </p>
-                </div>
+                {/* Header Info removed */}
 
                 <DataList
                     data={companies}
@@ -65,8 +59,10 @@ const CompanyList = () => {
                                 key={company.id}
                                 name={company.name}
                                 logo={company.logo}
-                                industry={company.companyIndustry || "Unknown Industry"}
-                                location={company.country || "Unknown Location"}
+                                coverImage={company.images?.[0]?.url || null}
+                                description={company.description}
+                                industry={company.companyIndustry}
+                                location={company.country}
                                 followers={company.followerNumber || 0}
                                 isApproved={company.companyStatus === "APPROVED"}
                                 onViewDetails={() => navigate(`/companies/${company.id}`)}

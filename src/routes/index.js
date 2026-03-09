@@ -13,6 +13,7 @@ import Setting from '@/pages/dashboard/setting';
 import Notification from '@/pages/dashboard/notification';
 import Resumes from '@/pages/dashboard/resumes';
 import CvBuilder from '@/pages/dashboard/resumes/cv-builder';
+import TemplateSelection from '@/pages/dashboard/resumes/template-selection';
 import Profile from '@/pages/dashboard/profile';
 import Invitations from '@/pages/dashboard/invitations';
 import BillingPlans from '@/pages/dashboard/billings';
@@ -56,12 +57,14 @@ export const routes = createBrowserRouter(
                 <Route path="notifications" element={<Notification />} />
                 <Route path="resumes">
                     <Route index element={<Resumes />} />
-                    <Route path="builder" element={<CvBuilder />} />
+                    <Route path="templates" element={<TemplateSelection />} />
                 </Route>
                 <Route path="profile" element={<Profile />} />
                 <Route path="billing-plans" element={<BillingPlans />} />
                 <Route path="usage" element={<Usage />} />
             </Route>
+            <Route path="dashboard/resumes/builder" element={<CvBuilder />} />
+            <Route path="dashboard/resumes/builder/:id" element={<CvBuilder />} />
             <Route path="checkout" element={<Checkout />} />
         </>
     )
