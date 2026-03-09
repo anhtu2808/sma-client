@@ -59,8 +59,10 @@ const CompanyList = () => {
                                 key={company.id}
                                 name={company.name}
                                 logo={company.logo}
-                                industry={company.companyIndustry || "Unknown Industry"}
-                                location={company.country || "Unknown Location"}
+                                coverImage={company.images?.[0]?.url || null}
+                                description={company.description}
+                                industry={company.companyIndustry}
+                                location={company.country}
                                 followers={company.followerNumber || 0}
                                 isApproved={company.companyStatus === "APPROVED"}
                                 onViewDetails={() => navigate(`/companies/${company.id}`)}

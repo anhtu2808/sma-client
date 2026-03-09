@@ -15,9 +15,9 @@ const ResumeBuilderTab = () => {
     e.stopPropagation();
     try {
       await deleteResume({ resumeId }).unwrap();
-      message.success("Đã xóa CV thành công.");
+      message.success("Deleted successfully.");
     } catch (error) {
-      message.error("Không thể xóa CV. Vui lòng thử lại.");
+      message.error("Failed to delete. Please try again.");
     }
   };
 
@@ -69,12 +69,12 @@ const ResumeBuilderTab = () => {
                 >
                   {/* Delete button */}
                   <Popconfirm
-                    title="Xóa CV này?"
-                    description="Bạn có chắc muốn xóa CV này không?"
+                    title="Delete this resume?"
+                    description="Are you sure you want to delete this resume?"
                     onConfirm={(e) => handleDelete(e, resume.id)}
                     onCancel={(e) => e?.stopPropagation()}
-                    okText="Xóa"
-                    cancelText="Hủy"
+                    okText="Delete"
+                    cancelText="Cancel"
                     okButtonProps={{ danger: true }}
                   >
                     <button
