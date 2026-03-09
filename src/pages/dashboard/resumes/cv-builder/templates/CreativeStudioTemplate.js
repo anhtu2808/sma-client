@@ -205,7 +205,7 @@ const CreativeStudioTemplate = ({
                                     isFirst={isFirst}
                                     isLast={isLast}
                                     onAdd={() => addItem('certificates', {
-                                        name: "Certificate Name", issuer: "Issuing Organization", credentialUrl: "https://", description: "Certificate description", image: ""
+                                        name: "Certificate Name", issuer: "Issuing Organization", credentialUrl: "https://", description: "Certificate description"
                                     })}
                                     titleClassName="text-xl font-bold uppercase text-purple-800 mb-4 tracking-wide pb-2 border-b-2 border-purple-100"
                                 >
