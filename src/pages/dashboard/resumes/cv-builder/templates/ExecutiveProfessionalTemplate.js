@@ -1,6 +1,5 @@
 import React from 'react';
 import { Mail, Phone, MapPin, Github, Linkedin, Globe, Eye, EyeOff } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
 
 const ExecutiveProfessionalTemplate = ({
     cvData,
@@ -10,8 +9,11 @@ const ExecutiveProfessionalTemplate = ({
     EditableText,
     SectionWrapper,
     EditableItemWrapper,
+    SkillSelector,
     contactVisibility,
-    toggleContactVisibility
+    toggleContactVisibility,
+    formatDateDisplay,
+    EditableDateRange,
 }) => {
     return (
         <div className="w-[850px] mx-auto mt-8 bg-white shadow-xl min-h-[1100px] relative font-serif text-gray-800">
@@ -19,14 +21,9 @@ const ExecutiveProfessionalTemplate = ({
             <div className="px-14 pt-16 pb-8 text-center">
                 <EditableText
                     as="h1"
-                    className="text-4xl font-bold text-gray-900 uppercase tracking-widest mb-3"
+                    className="text-4xl font-bold text-gray-900 uppercase tracking-widest mb-6"
                     value={cvData.personalInfo.fullName}
                     onChange={(val) => updateField('personalInfo.fullName', val)}
-                />
-                <EditableText
-                    className="text-lg text-gray-600 tracking-wider uppercase mb-6"
-                    value={cvData.personalInfo.title}
-                    onChange={(val) => updateField('personalInfo.title', val)}
                 />
 
                 <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-gray-600">
@@ -76,21 +73,9 @@ const ExecutiveProfessionalTemplate = ({
 
             <div className="px-14 border-b border-gray-300 mx-14 mb-8"></div>
 
-            {/* Body: Single Column Stacked */}
             <div className="px-14 pb-16 flex flex-col gap-8">
 
-                {/* Objective */}
-                <SectionWrapper title="CAREER OBJECTIVE" sectionKey="objective" titleClassName="text-xl font-bold uppercase border-b-2 border-gray-800 pb-2 mb-4 text-gray-900">
-                    <EditableText
-                        as="p"
-                        className="text-gray-700 leading-relaxed text-justify"
-                        value={cvData.objective}
-                        onChange={(val) => updateField('objective', val)}
-                        multiline
-                    />
-                </SectionWrapper>
-
-                {/* Main Sections from standard order */}
+                {/* Main Sections */}
                 {sectionOrder.map((sectionKey, index) => {
                     const isFirst = index === 0;
                     const isLast = index === sectionOrder.length - 1;
@@ -107,33 +92,37 @@ const ExecutiveProfessionalTemplate = ({
                                     isLast={isLast}
                                     titleClassName="text-xl font-bold uppercase border-b-2 border-gray-800 pb-2 mb-4 text-gray-900"
                                     onAdd={() => addItem('experience', {
-                                        role: "Vị trí", company: "Tên công ty", dateRange: "MM/YYYY - MM/YYYY", duration: "(... năm)", description: "Mô tả công việc"
+                                        title: "Position", company: "Company Name", startDate: "", endDate: "", isCurrent: false, description: "Job Description", workingModel: "ONSITE", employmentType: "FULL_TIME"
                                     })}
                                 >
                                     <div className="flex flex-col gap-6">
                                         {cvData.experience.map((exp, itemIndex) => (
                                             <EditableItemWrapper key={exp.id} id={exp.id} section="experience" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.experience.length - 1}>
-                                                <div className="grid grid-cols-[1fr_200px] mb-2">
-                                                    <div>
-                                                        <EditableText as="h4" className="font-bold text-gray-900 text-lg" value={exp.role} onChange={v => {
-                                                            const dt = [...cvData.experience]; dt[itemIndex].role = v; updateField('experience', dt);
-                                                        }} />
-                                                        <EditableText as="p" className="text-gray-700 font-medium italic" value={exp.company} onChange={v => {
-                                                            const dt = [...cvData.experience]; dt[itemIndex].company = v; updateField('experience', dt);
-                                                        }} />
+                                                <div className="flex flex-col gap-1.5 relative z-10">
+                                                    <div className="flex justify-between items-start gap-4">
+                                                        <div className="min-w-0 flex-1">
+                                                            <EditableText as="h4" className="font-bold text-gray-900 text-lg" value={exp.title} onChange={v => updateField(`experience.${itemIndex}.title`, v)} />
+                                                        </div>
+                                                        <div className="flex-shrink-0 text-right flex flex-col items-end">
+                                                            <EditableDateRange
+                                                                startDate={exp.startDate}
+                                                                endDate={exp.endDate}
+                                                                isCurrent={exp.isCurrent}
+                                                                onStartDateChange={v => updateField(`experience.${itemIndex}.startDate`, v)}
+                                                                onEndDateChange={v => updateField(`experience.${itemIndex}.endDate`, v)}
+                                                                onIsCurrentChange={v => updateField(`experience.${itemIndex}.isCurrent`, v)}
+                                                                className="text-sm font-semibold text-gray-800 bg-gray-100 px-2 py-1 rounded"
+                                                            />
+                                                        </div>
                                                     </div>
-                                                    <div className="text-right flex flex-col items-end text-sm text-gray-600 font-medium">
-                                                        <EditableText value={exp.dateRange} onChange={v => {
-                                                            const dt = [...cvData.experience]; dt[itemIndex].dateRange = v; updateField('experience', dt);
-                                                        }} />
-                                                        <EditableText className="text-xs text-gray-500" value={exp.duration} onChange={v => {
-                                                            const dt = [...cvData.experience]; dt[itemIndex].duration = v; updateField('experience', dt);
-                                                        }} />
+                                                    <div className="flex gap-2 text-sm text-gray-500">
+                                                        <span>{exp.workingModel || 'ONSITE'}</span>
+                                                        <span>•</span>
+                                                        <span>{exp.employmentType || 'FULL_TIME'}</span>
                                                     </div>
+                                                    <EditableText as="p" className="font-medium mt-0.5 text-sm" value={exp.company} onChange={v => updateField(`experience.${itemIndex}.company`, v)} />
+                                                    <EditableText as="p" className="font-medium mt-0.5 text-sm" value={exp.description} onChange={v => updateField(`experience.${itemIndex}.description`, v)} />
                                                 </div>
-                                                <EditableText as="p" className="text-gray-700 leading-relaxed text-justify" value={exp.description} onChange={v => {
-                                                    const dt = [...cvData.experience]; dt[itemIndex].description = v; updateField('experience', dt);
-                                                }} />
                                             </EditableItemWrapper>
                                         ))}
                                     </div>
@@ -150,38 +139,40 @@ const ExecutiveProfessionalTemplate = ({
                                     isLast={isLast}
                                     titleClassName="text-xl font-bold uppercase border-b-2 border-gray-800 pb-2 mb-4 text-gray-900"
                                     onAdd={() => addItem('education', {
-                                        degree: "Bằng cấp", school: "Trường", dateRange: "MM/YYYY - MM/YYYY", duration: "(... năm)"
+                                        institution: "Institution Name", degree: "BACHELOR", majorField: "Major", gpa: 0, startDate: "", endDate: "", isCurrent: false
                                     })}
                                 >
                                     <div className="flex flex-col gap-6">
                                         {cvData.education.map((edu, itemIndex) => (
                                             <EditableItemWrapper key={edu.id} id={edu.id} section="education" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.education.length - 1}>
-                                                <div className="grid grid-cols-[1fr_200px] mb-2">
-                                                    <div>
-                                                        <EditableText as="h4" className="font-bold text-gray-900 text-lg" value={edu.degree} onChange={v => {
-                                                            const dt = [...cvData.education]; dt[itemIndex].degree = v; updateField('education', dt);
-                                                        }} />
-                                                        <EditableText as="p" className="text-gray-700 font-medium" value={edu.school} onChange={v => {
-                                                            const dt = [...cvData.education]; dt[itemIndex].school = v; updateField('education', dt);
-                                                        }} />
-                                                    </div>
-                                                    <div className="text-right flex flex-col items-end text-sm text-gray-600 font-medium">
-                                                        <EditableText value={edu.dateRange} onChange={v => {
-                                                            const dt = [...cvData.education]; dt[itemIndex].dateRange = v; updateField('education', dt);
-                                                        }} />
+                                                <div className="flex flex-col gap-1.5 relative z-10">
+                                                    <div className="flex justify-between items-start gap-4">
+                                                        <div className="min-w-0 flex-1">
+                                                            <div className="flex flex-col">
+                                                                <span className="font-bold text-gray-900 text-lg">{edu.degree || 'BACHELOR'}</span>
+                                                                <EditableText as="h4" className="font-medium mt-0.5 text-sm" value={edu.majorField || 'Major'} onChange={v => updateField(`education.${itemIndex}.majorField`, v)} />
+                                                            </div>
+                                                            <EditableText as="p" className="font-medium mt-0.5 text-sm" value={edu.institution} onChange={v => updateField(`education.${itemIndex}.institution`, v)} />
+                                                        </div>
+                                                        <div className="flex-shrink-0 text-right flex flex-col items-end">
+                                                            <EditableDateRange
+                                                                startDate={edu.startDate}
+                                                                endDate={edu.endDate}
+                                                                isCurrent={edu.isCurrent}
+                                                                onStartDateChange={v => updateField(`education.${itemIndex}.startDate`, v)}
+                                                                onEndDateChange={v => updateField(`education.${itemIndex}.endDate`, v)}
+                                                                onIsCurrentChange={v => updateField(`education.${itemIndex}.isCurrent`, v)}
+                                                                className="text-sm font-semibold text-gray-800 bg-gray-100 px-2 py-1 rounded"
+                                                            />
+                                                            {edu.gpa > 0 && <span className="font-medium mt-0.5 text-sm">GPA: {edu.gpa}</span>}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                {edu.description && (
-                                                    <EditableText as="p" className="text-gray-700 leading-relaxed" value={edu.description} onChange={v => {
-                                                        const dt = [...cvData.education]; dt[itemIndex].description = v; updateField('education', dt);
-                                                    }} />
-                                                )}
                                             </EditableItemWrapper>
                                         ))}
                                     </div>
                                 </SectionWrapper>
                             );
-                        // Implement other standard cases here if needed, or rely on the smaller sections below
                         case 'certificates':
                             return (
                                 <SectionWrapper
@@ -193,25 +184,69 @@ const ExecutiveProfessionalTemplate = ({
                                     isLast={isLast}
                                     titleClassName="text-xl font-bold uppercase border-b-2 border-gray-800 pb-2 mb-4 text-gray-900"
                                     onAdd={() => addItem('certificates', {
-                                        name: "Tên chứng chỉ", issuer: "Tổ chức", year: "Năm", link: "Link"
+                                        name: "Certificate Name", issuer: "Issuing Organization", credentialUrl: "https://", description: "Certificate description", image: ""
                                     })}
                                 >
                                     <div className="flex flex-col gap-4">
                                         {cvData.certificates.map((cert, itemIndex) => (
                                             <EditableItemWrapper key={cert.id} id={cert.id} section="certificates" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.certificates.length - 1}>
-                                                <div className="flex flex-col gap-1">
-                                                    <EditableText as="h4" className="font-bold text-gray-900" value={cert.name} onChange={v => {
-                                                        const dt = [...cvData.certificates]; dt[itemIndex].name = v; updateField('certificates', dt);
-                                                    }} />
-                                                    <EditableText as="p" className="text-gray-700 text-sm italic" value={cert.issuer} onChange={v => {
-                                                        const dt = [...cvData.certificates]; dt[itemIndex].issuer = v; updateField('certificates', dt);
-                                                    }} />
-                                                    <EditableText as="p" className="text-gray-500 text-xs font-medium" value={cert.year} onChange={v => {
-                                                        const dt = [...cvData.certificates]; dt[itemIndex].year = v; updateField('certificates', dt);
-                                                    }} />
-                                                    <EditableText as="a" className="text-gray-600 hover:underline text-xs" value={cert.link} onChange={v => {
-                                                        const dt = [...cvData.certificates]; dt[itemIndex].link = v; updateField('certificates', dt);
-                                                    }} />
+                                                <div className="flex flex-col gap-1.5 relative z-10">
+                                                    <div className="flex justify-between items-start gap-4">
+                                                        <div className="min-w-0 flex-1">
+                                                            <EditableText as="h4" className="font-bold text-gray-900 text-lg" value={cert.name} onChange={v => updateField(`certificates.${itemIndex}.name`, v)} />
+                                                        </div>
+                                                    </div>
+                                                    <EditableText as="p" className="font-medium mt-0.5 text-sm" value={cert.description} onChange={v => updateField(`certificates.${itemIndex}.description`, v)} />
+                                                    <EditableText as="p" className="text-gray-600 hover:underline text-sm" value={cert.issuer} onChange={v => updateField(`certificates.${itemIndex}.issuer`, v)} />
+                                                    <EditableText as="a" className="text-gray-600 hover:underline text-sm" value={cert.credentialUrl} onChange={v => updateField(`certificates.${itemIndex}.credentialUrl`, v)} />
+                                                </div>
+                                            </EditableItemWrapper>
+                                        ))}
+                                    </div>
+                                </SectionWrapper>
+                            );
+                        case 'projects':
+                            return (
+                                <SectionWrapper
+                                    key={sectionKey}
+                                    title="PROJECTS"
+                                    sectionKey="projects"
+                                    index={index}
+                                    isFirst={isFirst}
+                                    isLast={isLast}
+                                    titleClassName="text-xl font-bold uppercase border-b-2 border-gray-800 pb-2 mb-4 text-gray-900"
+                                    onAdd={() => addItem('projects', {
+                                        title: "Project Name", position: "Role/Position", description: "Project Description", startDate: "", endDate: "", isCurrent: false, projectUrl: "https://project-url.com", projectType: "PROFESSIONAL", teamSize: 1
+                                    })}
+                                >
+                                    <div className="flex flex-col gap-6">
+                                        {cvData.projects.map((proj, itemIndex) => (
+                                            <EditableItemWrapper key={proj.id} id={proj.id} section="projects" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.projects.length - 1}>
+                                                <div className="flex flex-col gap-1.5 relative z-10">
+                                                    <div className="flex justify-between items-start gap-4">
+                                                        <div className="min-w-0 flex-1">
+                                                            <EditableText as="h4" className="font-bold text-gray-900 text-lg" value={proj.title} onChange={v => updateField(`projects.${itemIndex}.title`, v)} />
+                                                        </div>
+                                                        <div className="flex-shrink-0 text-right flex flex-col items-end">
+                                                            <EditableDateRange
+                                                                startDate={proj.startDate}
+                                                                endDate={proj.endDate}
+                                                                isCurrent={proj.isCurrent}
+                                                                onStartDateChange={v => updateField(`projects.${itemIndex}.startDate`, v)}
+                                                                onEndDateChange={v => updateField(`projects.${itemIndex}.endDate`, v)}
+                                                                onIsCurrentChange={v => updateField(`projects.${itemIndex}.isCurrent`, v)}
+                                                                className="text-sm font-semibold text-gray-800 bg-gray-100 px-2 py-1 rounded"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <EditableText as="p" className="font-medium mt-0.5 text-sm" value={proj.position} onChange={v => updateField(`projects.${itemIndex}.position`, v)} />
+                                                    <div className="font-medium mt-0.5 text-sm">
+                                                        <span>{proj.projectType || 'PROFESSIONAL'}</span>
+                                                        <span className="mx-1">•</span>
+                                                        <span>Team: {proj.teamSize || '1'}</span>
+                                                    </div>
+                                                    <EditableText as="p" className="font-medium mt-0.5 text-sm" value={proj.description} onChange={v => updateField(`projects.${itemIndex}.description`, v)} />
+                                                    <EditableText as="a" className="text-gray-600 hover:underline text-sm" value={proj.projectUrl || "https://project-url.com"} onChange={v => updateField(`projects.${itemIndex}.projectUrl`, v)} />
                                                 </div>
                                             </EditableItemWrapper>
                                         ))}
@@ -226,46 +261,12 @@ const ExecutiveProfessionalTemplate = ({
                 <div className="grid grid-cols-2 gap-8 mt-4">
 
                     {/* Skills */}
-                    <SectionWrapper title="SKILLS" sectionKey="skills" titleClassName="text-xl font-bold uppercase border-b-2 border-gray-800 pb-2 mb-4 text-gray-900" onAdd={() => updateField('skills', ['Skill', ...cvData.skills])}>
-                        <ul className="list-disc pl-5 text-gray-700 flex flex-col gap-2">
-                            {cvData.skills.map((skill, index) => (
-                                <li key={index} className="group/skill relative">
-                                    <EditableText value={skill} onChange={v => {
-                                        const newSkills = [...cvData.skills]; newSkills[index] = v; updateField('skills', newSkills);
-                                    }} />
-                                    <button
-                                        onClick={() => updateField('skills', cvData.skills.filter((_, i) => i !== index))}
-                                        className="absolute -left-6 top-1 text-red-400 opacity-0 group-hover/skill:opacity-100 hover:bg-red-50 rounded p-0.5"
-                                    >
-                                        <LucideIcons.X size={12} />
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
-                    </SectionWrapper>
-
-                    {/* Languages */}
-                    <SectionWrapper title="LANGUAGES" sectionKey="languages" titleClassName="text-xl font-bold uppercase border-b-2 border-gray-800 pb-2 mb-4 text-gray-900" onAdd={() => addItem('languages', { name: "Language", level: "Level" })}>
-                        <div className="flex flex-col gap-3">
-                            {cvData.languages.map((lang, index) => (
-                                <EditableItemWrapper key={lang.id} id={lang.id} section="languages" index={index} isFirst={index === 0} isLast={index === cvData.languages.length - 1}>
-                                    <div className="flex justify-between items-center text-gray-700">
-                                        <EditableText className="font-medium" value={lang.name} onChange={v => {
-                                            const newLang = [...cvData.languages]; newLang[index].name = v; updateField('languages', newLang);
-                                        }} />
-                                        <EditableText className="italic text-gray-500" value={lang.level} onChange={v => {
-                                            const newLang = [...cvData.languages]; newLang[index].level = v; updateField('languages', newLang);
-                                        }} />
-                                    </div>
-                                </EditableItemWrapper>
-                            ))}
-                        </div>
-                    </SectionWrapper>
+                    <SkillSelector titleClassName="text-xl font-bold uppercase border-b-2 border-gray-800 pb-2 mb-4 text-gray-900" />
 
                 </div>
 
             </div>
-        </div>
+        </div >
     );
 };
 

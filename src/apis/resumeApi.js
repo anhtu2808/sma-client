@@ -107,6 +107,8 @@ export const resumeApi = api.injectEndpoints({
             transformResponse: (response) => response?.data ?? [],
             providesTags: (result, error, arg) => [
                 { type: "Resumes", id: arg?.type || "ALL" },
+                { type: "Resumes", id: "ALL" },
+                ...(result ? result.map(({ id }) => ({ type: "Resumes", id })) : [])
             ],
         }),
 
@@ -201,15 +203,30 @@ export const resumeApi = api.injectEndpoints({
             ],
         }),
 
-        setResumeAsProfile: builder.mutation({
-            query: ({ resumeId }) => ({
-                url: `${API_VERSION}/resumes/${resumeId}/set-profile`,
+        setResumeAsDefault: builder.mutation({
+            query: ({ resumeId, payload }) => ({
+                url: `${API_VERSION}/resumes/${resumeId}/set-default`,
                 method: "POST",
+                body: payload,
             }),
             transformResponse: (response) => response?.data ?? response,
             invalidatesTags: [
                 "Users",
                 { type: "Resumes", id: RESUME_TYPES.PROFILE },
+                { type: "Resumes", id: "ALL" },
+            ],
+        }),
+
+        updateCandidateResume: builder.mutation({
+            query: ({ resumeId, payload }) => ({
+                url: `${API_VERSION}/resumes/${resumeId}`,
+                method: "PUT",
+                body: payload,
+            }),
+            transformResponse: (response) => response?.data ?? response,
+            invalidatesTags: [
+                { type: "Resumes", id: RESUME_TYPES.ORIGINAL },
+                { type: "Resumes", id: RESUME_TYPES.TEMPLATE },
                 { type: "Resumes", id: "ALL" },
             ],
         }),
@@ -462,6 +479,38 @@ export const resumeApi = api.injectEndpoints({
                 }
             },
         }),
+
+        deleteResumeEducation: builder.mutation({
+            query: ({ resumeId, educationId }) => ({
+                url: `${API_VERSION}/resumes/${resumeId}/educations/${educationId}`,
+                method: "DELETE",
+            }),
+            transformResponse: (response) => response?.data ?? response,
+        }),
+
+        deleteResumeExperience: builder.mutation({
+            query: ({ resumeId, experienceId }) => ({
+                url: `${API_VERSION}/resumes/${resumeId}/experiences/${experienceId}`,
+                method: "DELETE",
+            }),
+            transformResponse: (response) => response?.data ?? response,
+        }),
+
+        deleteResumeProject: builder.mutation({
+            query: ({ resumeId, projectId }) => ({
+                url: `${API_VERSION}/resumes/${resumeId}/projects/${projectId}`,
+                method: "DELETE",
+            }),
+            transformResponse: (response) => response?.data ?? response,
+        }),
+
+        deleteResumeCertification: builder.mutation({
+            query: ({ resumeId, certificationId }) => ({
+                url: `${API_VERSION}/resumes/${resumeId}/certifications/${certificationId}`,
+                method: "DELETE",
+            }),
+            transformResponse: (response) => response?.data ?? response,
+        }),
     }),
 });
 
@@ -475,18 +524,23 @@ export const {
     useCloneResumeBuilderMutation,
     useParseCandidateResumeMutation,
     useDeleteCandidateResumeMutation,
-    useSetResumeAsProfileMutation,
+    useUpdateCandidateResumeMutation,
+    useSetResumeAsDefaultMutation,
     useCreateResumeSkillMutation,
     useUpdateResumeSkillMutation,
     useDeleteResumeSkillMutation,
     useCreateResumeEducationMutation,
     useUpdateResumeEducationMutation,
+    useDeleteResumeEducationMutation,
     useCreateResumeExperienceMutation,
     useUpdateResumeExperienceMutation,
+    useDeleteResumeExperienceMutation,
     useCreateResumeExperienceDetailMutation,
     useUpdateResumeExperienceDetailMutation,
     useCreateResumeProjectMutation,
     useUpdateResumeProjectMutation,
+    useDeleteResumeProjectMutation,
     useCreateResumeCertificationMutation,
     useUpdateResumeCertificationMutation,
+    useDeleteResumeCertificationMutation,
 } = resumeApi;

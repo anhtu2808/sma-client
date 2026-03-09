@@ -5,7 +5,7 @@ import {
   useGetCandidateResumesQuery,
   useLazyGetResumeParseStatusQuery,
   useParseCandidateResumeMutation,
-  useSetResumeAsProfileMutation,
+  useSetResumeAsDefaultMutation,
   useUploadCandidateResumeMutation,
   useUploadFilesMutation,
 } from "@/apis/resumeApi";
@@ -48,7 +48,7 @@ const AttachmentsTab = () => {
   const [parseCandidateResume] = useParseCandidateResumeMutation();
   const [triggerResumeParseStatus] = useLazyGetResumeParseStatusQuery();
   const [deleteCandidateResume] = useDeleteCandidateResumeMutation();
-  const [setResumeAsProfile, { isLoading: isSettingProfile }] = useSetResumeAsProfileMutation();
+  const [setResumeAsDefault, { isLoading: isSettingProfile }] = useSetResumeAsDefaultMutation();
 
   const [settingProfileId, setSettingProfileId] = useState(null);
   const [parseStatusOverrides, setParseStatusOverrides] = useState({});
@@ -341,7 +341,7 @@ const AttachmentsTab = () => {
       setIsConfirmLoading(true);
       setSettingProfileId(confirmResumeId);
       const delay = new Promise((resolve) => setTimeout(resolve, 800));
-      await Promise.all([setResumeAsProfile({ resumeId: confirmResumeId }).unwrap(), delay]);
+      await Promise.all([setResumeAsDefault({ resumeId: confirmResumeId }).unwrap(), delay]);
       message.success("Set profile resume successfully");
       closeSetProfileConfirm();
     } catch (error) {

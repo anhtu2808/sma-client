@@ -58,7 +58,9 @@ const TemplateSelection = () => {
 
     const handleCreateNew = async (template) => {
         try {
-            const newResume = await createResumeBuilder({}).unwrap();
+            const newResume = await createResumeBuilder({
+                resumeName: `[${template.id}] Mới`
+            }).unwrap();
             setIsModalOpen(false);
             navigate(`/dashboard/resumes/builder?template=${template.id}&resumeId=${newResume.id}`);
         } catch (error) {

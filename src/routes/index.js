@@ -61,12 +61,13 @@ export const routes = createBrowserRouter(
                 <Route path="resumes">
                     <Route index element={<Resumes />} />
                     <Route path="templates" element={<TemplateSelection />} />
-                    <Route path="builder" element={<CvBuilder />} />
                 </Route>
                 <Route path="profile" element={<Profile />} />
                 <Route path="billing-plans" element={<BillingPlans />} />
                 <Route path="usage" element={<Usage />} />
             </Route>
+            <Route path="dashboard/resumes/builder" element={<CvBuilder />} />
+            <Route path="dashboard/resumes/builder/:id" element={<CvBuilder />} />
             <Route path="checkout" element={<Checkout />} />
         </>
     )

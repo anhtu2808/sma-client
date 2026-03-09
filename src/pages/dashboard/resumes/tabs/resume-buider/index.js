@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Row, Col, Spin, Empty, Popconfirm, message } from "antd";
+import { Spin, Popconfirm, message } from "antd";
 import { useGetCandidateResumesQuery, useDeleteCandidateResumeMutation } from "@/apis/resumeApi";
 import { RESUME_TYPES } from "@/constant";
 
@@ -9,9 +9,10 @@ const ResumeBuilderTab = () => {
   const { data: builderResumes = [], isLoading } = useGetCandidateResumesQuery(
     { type: RESUME_TYPES.TEMPLATE }
   );
-  const [deleteResume, { isLoading: isDeleting }] = useDeleteCandidateResumeMutation();
+  const [deleteResume] = useDeleteCandidateResumeMutation();
 
-  const handleDelete = async (resumeId) => {
+  const handleDelete = async (e, resumeId) => {
+    e.stopPropagation();
     try {
       await deleteResume({ resumeId }).unwrap();
       message.success("Đã xóa CV thành công.");
@@ -21,113 +22,110 @@ const ResumeBuilderTab = () => {
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
+    if (!dateString) return "";
     const date = new Date(dateString);
     return date.toLocaleDateString("vi-VN", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
     });
   };
 
   return (
-    <section className="flex flex-col gap-6">
-      {/* Create New Resume Card */}
+    <section>
       <div className="bg-white dark:bg-surface-dark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-        <div
-          onClick={() => navigate('/dashboard/resumes/templates')}
-          className="rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex flex-col items-center justify-center p-12 cursor-pointer hover:border-primary hover:bg-orange-50/50 dark:hover:bg-gray-700/50 transition-all group"
-        >
-          <div className="w-14 h-14 rounded-full bg-orange-100 dark:bg-gray-700 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-white transition-colors">
-            <span className="material-icons-round text-[28px] text-primary group-hover:text-white">add</span>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-16">
+            <Spin size="large" />
           </div>
-          <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-1">Create New Resume</h3>
-          <p className="text-sm text-center text-gray-500 dark:text-gray-400">Choose a professionally designed template to get started building your resume.</p>
-        </div>
-      </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
+            {/* Create New Card */}
+            <div
+              onClick={() => navigate('/dashboard/resumes/templates')}
+              className="rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex flex-col items-center justify-center aspect-[3/4] cursor-pointer hover:border-primary hover:bg-orange-50/50 dark:hover:bg-gray-700/50 transition-all group"
+            >
+              <div className="w-12 h-12 rounded-full bg-orange-100 dark:bg-gray-700 flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-white transition-colors">
+                <span className="material-icons-round text-[24px] text-primary group-hover:text-white">add</span>
+              </div>
+              <h3 className="font-bold text-sm text-gray-900 dark:text-white">Create New</h3>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Start from scratch</p>
+            </div>
 
-      {/* My Created CVs */}
-      {isLoading ? (
-        <div className="flex items-center justify-center py-12">
-          <Spin size="large" />
-        </div>
-      ) : builderResumes.length > 0 ? (
-        <div>
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">CV đã tạo</h2>
-          <Row gutter={[16, 16]}>
-            {builderResumes.map((resume) => (
-              <Col xs={24} sm={12} lg={8} xl={6} key={resume.id}>
-                <div className="bg-white dark:bg-surface-dark rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden h-full flex flex-col group hover:shadow-md transition-shadow">
-                  {/* Mini CV Preview */}
-                  <div
-                    onClick={() => navigate(`/dashboard/resumes/builder?resumeId=${resume.id}`)}
-                    className="relative h-44 bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 p-4 cursor-pointer"
+            {/* Existing CV Cards */}
+            {builderResumes.map((resume) => {
+              const nameRaw = resume.resumeName || resume.fileName || resume.fullName || `Resume #${resume.id}`;
+              const match = nameRaw.match(/^\[(tpl_[a-z0-9_]+)\]\s*(.*)$/);
+              const templateId = match ? match[1] : (resume.template || 'tpl_modern_1');
+              const displayTitle = match ? (match[2] || `Resume #${resume.id}`) : nameRaw;
+
+              return (
+                <div
+                  key={resume.id}
+                  onClick={() => {
+                    navigate(`/dashboard/resumes/builder?template=${templateId}&resumeId=${resume.id}`);
+                  }}
+                  className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-surface-dark flex flex-col cursor-pointer hover:shadow-lg hover:border-primary/30 transition-all group relative overflow-hidden"
+                >
+                  {/* Delete button */}
+                  <Popconfirm
+                    title="Xóa CV này?"
+                    description="Bạn có chắc muốn xóa CV này không?"
+                    onConfirm={(e) => handleDelete(e, resume.id)}
+                    onCancel={(e) => e?.stopPropagation()}
+                    okText="Xóa"
+                    cancelText="Hủy"
+                    okButtonProps={{ danger: true }}
                   >
-                    <div className="w-3/4 h-full bg-white dark:bg-gray-700 rounded-t-lg p-4 border-x border-t border-gray-200 dark:border-gray-600 mx-auto">
-                      <div className="w-1/2 h-2 bg-gray-300 dark:bg-gray-500 rounded mb-2" />
-                      <div className="w-2/3 h-2 bg-gray-200 dark:bg-gray-600 rounded mb-2" />
-                      <div className="w-full h-px bg-gray-200 dark:bg-gray-600 mb-2" />
-                      <div className="space-y-2">
-                        <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-600 rounded" />
-                        <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-600 rounded" />
-                        <div className="w-3/4 h-1.5 bg-gray-200 dark:bg-gray-600 rounded" />
-                      </div>
-                    </div>
+                    <button
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute top-2 right-2 z-20 w-7 h-7 rounded-full bg-white/90 dark:bg-gray-800/90 shadow-sm flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                    >
+                      <span className="material-icons-round text-[16px]">close</span>
+                    </button>
+                  </Popconfirm>
 
-                    {/* Hover Overlay */}
-                    <div className="absolute inset-0 bg-gray-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm z-10">
-                      <span className="bg-white text-gray-900 px-4 py-2 rounded-full text-sm font-semibold shadow-sm flex items-center gap-2">
-                        <span className="material-icons-round text-[18px]">edit</span>
-                        Chỉnh sửa
-                      </span>
+                  {/* CV Preview Skeleton */}
+                  <div className="flex-1 bg-gray-50 dark:bg-gray-800/50 p-4 flex items-start justify-center pt-5">
+                    <div className="w-full max-w-[120px] bg-white dark:bg-gray-700 rounded shadow-sm border border-gray-100 dark:border-gray-600 p-3 aspect-[3/4] flex flex-col">
+                      <div className="w-3/4 h-1.5 bg-gray-300 dark:bg-gray-500 rounded mb-1.5" />
+                      <div className="w-1/2 h-1 bg-gray-200 dark:bg-gray-600 rounded mb-2" />
+                      <div className="w-full h-px bg-gray-200 dark:bg-gray-600 mb-2" />
+                      <div className="space-y-1.5 flex-1">
+                        <div className="w-full h-1 bg-gray-200 dark:bg-gray-600 rounded" />
+                        <div className="w-full h-1 bg-gray-200 dark:bg-gray-600 rounded" />
+                        <div className="w-4/5 h-1 bg-gray-200 dark:bg-gray-600 rounded" />
+                        <div className="w-2/3 h-1.5 bg-gray-300 dark:bg-gray-500 rounded mt-2" />
+                        <div className="w-full h-1 bg-gray-200 dark:bg-gray-600 rounded" />
+                        <div className="w-full h-1 bg-gray-200 dark:bg-gray-600 rounded" />
+                        <div className="w-3/4 h-1 bg-gray-200 dark:bg-gray-600 rounded" />
+                      </div>
                     </div>
                   </div>
 
-                  {/* Info */}
-                  <div className="p-4 flex-1 flex flex-col">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0 flex-1">
-                        <h3 className="font-bold text-gray-900 dark:text-white text-sm truncate">
-                          {resume.fullName || resume.resumeName || `Resume #${resume.id}`}
-                        </h3>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          {formatDate(resume.updatedAt || resume.createdAt)}
-                        </p>
-                      </div>
-                    </div>
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-gray-900/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[1px] z-10 pointer-events-none rounded-xl">
+                    <span className="bg-white text-gray-800 px-3 py-1.5 rounded-full text-xs font-semibold shadow flex items-center gap-1.5">
+                      <span className="material-icons-round text-[14px]">edit</span>
+                      Edit Resume
+                    </span>
+                  </div>
 
-                    <div className="mt-auto pt-3 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between gap-2">
-                      <button
-                        onClick={() => navigate(`/dashboard/resumes/builder?resumeId=${resume.id}`)}
-                        className="flex items-center gap-1 text-sm font-medium text-primary hover:text-orange-700 transition-colors cursor-pointer"
-                      >
-                        <span className="material-icons-round text-[16px]">edit</span>
-                        Sửa
-                      </button>
-                      <Popconfirm
-                        title="Xóa CV này?"
-                        description="Bạn có chắc muốn xóa CV này không?"
-                        onConfirm={() => handleDelete(resume.id)}
-                        okText="Xóa"
-                        cancelText="Hủy"
-                        okButtonProps={{ danger: true, loading: isDeleting }}
-                      >
-                        <button
-                          className="flex items-center gap-1 text-sm text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
-                        >
-                          <span className="material-icons-round text-[16px]">delete</span>
-                        </button>
-                      </Popconfirm>
-                    </div>
+                  {/* Name */}
+                  <div className="px-3 py-2.5 border-t border-gray-100 dark:border-gray-700">
+                    <p className="font-semibold text-sm text-gray-900 dark:text-white truncate" title={displayTitle}>
+                      {displayTitle}
+                    </p>
+                    {(resume.updatedAt || resume.createdAt) && (
+                      <p className="text-[11px] text-gray-400 mt-0.5">{formatDate(resume.updatedAt || resume.createdAt)}</p>
+                    )}
                   </div>
                 </div>
-              </Col>
-            ))}
-          </Row>
-        </div>
-      ) : null}
+              );
+            })}
+          </div>
+        )}
+      </div>
     </section>
   );
 };
