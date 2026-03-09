@@ -67,21 +67,9 @@ const Button: ButtonComponentType = ({
               : "top-[100%] left-1/2 transform -translate-x-1/2 mt-2"
           )}
         >
-          {tooltipPosition === 'bottom' && (
-            <div className="mx-auto">
-              <div className="size-3 bg-white rotate-45 translate-y-1/2 shadow-soft" />
-            </div>
-          )}
-
-          <div className="px-3 py-1.5 bg-white rounded-xl font-medium text-neutral-600 text-sm whitespace-nowrap shadow-lg flex items-center justify-center">
+          <div className="px-2.5 py-1.5 leading-none bg-neutral-800 rounded-lg font-medium text-white text-[13px] whitespace-nowrap shadow-lg flex items-center justify-center">
             {tooltip}
           </div>
-
-          {tooltipPosition === 'top' && (
-            <div className="mx-auto">
-              <div className="size-3 bg-white rotate-45 -translate-y-1/2 shadow-soft" />
-            </div>
-          )}
         </div>
       )}
     </div>
