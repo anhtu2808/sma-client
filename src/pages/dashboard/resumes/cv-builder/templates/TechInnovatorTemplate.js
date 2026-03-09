@@ -200,7 +200,7 @@ const TechInnovatorTemplate = ({
                                         isFirst={isFirst}
                                         isLast={isLast}
                                         onAdd={() => addItem('certificates', {
-                                            name: "Certificate Name", issuer: "Issuing Organization", credentialUrl: "https://", description: "Certificate description", image: ""
+                                            name: "Certificate Name", issuer: "Issuing Organization", credentialUrl: "https://", description: "Certificate description"
                                         })}
                                         titleClassName="text-xl font-bold text-green-700 border-b-2 border-green-100 pb-2 mb-4 uppercase tracking-wider"
                                     >

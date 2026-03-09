@@ -210,7 +210,7 @@ const ModernMinimalistTemplate = ({
                                         isLast={isLast}
                                         titleClassName="text-xl font-semibold text-blue-600 mb-4"
                                         onAdd={() => addItem('certificates', {
-                                            name: "Certificate Name", issuer: "Issuing Organization", credentialUrl: "https://", description: "Certificate description", image: ""
+                                            name: "Certificate Name", issuer: "Issuing Organization", credentialUrl: "https://", description: "Certificate description"
                                         })}
                                     >
                                         <div className="flex flex-col gap-4">

@@ -59,17 +59,25 @@ export default function PropertiesSidebar({ activeSection, cvData, updateField }
     );
     const [tempGroup, setTempGroup] = React.useState("");
     const [tempExperience, setTempExperience] = React.useState("");
+    const [tempSkillId, setTempSkillId] = React.useState(null);
 
-    const handleAddSkill = (skillId) => {
+    const handleExperienceChange = (expVal) => {
+        setTempExperience(expVal);
+
         if (!tempGroup.trim()) {
             message.error("Please enter a skill group name.");
             return;
         }
-        if (tempExperience === "" || tempExperience === undefined) {
-            message.error("Please select years of experience.");
+
+        if (!tempSkillId) {
+            message.error("Please select a skill before selecting years of experience.");
             return;
         }
 
+        handleAddSkill(tempSkillId, expVal);
+    };
+
+    const handleAddSkill = (skillId, expVal) => {
         const selectedSkill = skillOptions.find(s => s.id === skillId);
         if (!selectedSkill) return;
 
@@ -83,11 +91,13 @@ export default function PropertiesSidebar({ activeSection, cvData, updateField }
             skillId: selectedSkill.id,
             skillName: selectedSkill.name,
             groupName: tempGroup.trim(),
-            yearsOfExperience: Number(tempExperience)
+            yearsOfExperience: (expVal !== undefined && expVal !== null && expVal !== '') ? Number(expVal) : null
         };
 
         updateField('skills', [...cvData.skills, newSkill]);
         setSkillSearchText("");
+        setTempSkillId(null);
+        setTempExperience("");
     };
 
     if (!activeSection) {
@@ -148,7 +158,10 @@ export default function PropertiesSidebar({ activeSection, cvData, updateField }
             case 'certificates':
                 return (
                     <>
-                        <Form.Item label="Certificate Image (URL)" name="image">
+                        <Form.Item label="Issuer" name="issuer">
+                            <Input placeholder="e.g: Coursera, AWS" />
+                        </Form.Item>
+                        <Form.Item label="Credential URL" name="credentialUrl">
                             <Input placeholder="https://..." />
                         </Form.Item>
                     </>
@@ -165,24 +178,13 @@ export default function PropertiesSidebar({ activeSection, cvData, updateField }
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Years of Experience</label>
-                            <Select
-                                placeholder="Select years"
-                                value={tempExperience || undefined}
-                                onChange={v => setTempExperience(v)}
-                                options={Array.from({ length: 21 }, (_, i) => ({ label: `${i} years`, value: i }))}
-                                className="w-full"
-                                fullWidth="true"
-                            />
-                        </div>
-                        <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Search and add skill</label>
                             <Select
                                 showSearch
                                 placeholder="Type to search..."
-                                value={null}
+                                value={tempSkillId}
                                 onSearch={(val) => setSkillSearchText(val)}
-                                onSelect={handleAddSkill}
+                                onChange={val => setTempSkillId(val)}
                                 filterOption={false}
                                 loading={isFetchingSkills}
                                 notFoundContent={skillSearchText ? (isFetchingSkills ? <Loading size={24} inline /> : "Not found") : "Type to search"}
@@ -192,6 +194,17 @@ export default function PropertiesSidebar({ activeSection, cvData, updateField }
                                     value: s.id,
                                     label: s.name,
                                 }))}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Years of Experience</label>
+                            <Select
+                                placeholder="Select years"
+                                value={tempExperience || undefined}
+                                onChange={handleExperienceChange}
+                                options={Array.from({ length: 21 }, (_, i) => ({ label: `${i} years`, value: i }))}
+                                className="w-full"
+                                fullWidth="true"
                             />
                         </div>
                     </div>

@@ -157,7 +157,6 @@ export default function CvBuilder({ onBack }) {
                 name: "PSPO I",
                 issuer: "Scrum.org",
                 credentialUrl: "https://www.sample.site/PSPO1.pdf",
-                image: "",
                 description: "Professional Scrum Product Owner"
             },
         ],
@@ -237,7 +236,6 @@ export default function CvBuilder({ onBack }) {
                         issuer: cert.issuer || "",
                         credentialUrl: cert.credentialUrl || "",
                         description: cert.description || "",
-                        image: cert.image || "",
                     }))
                     : prevData.certificates,
                 projects: resumeData.projects && resumeData.projects.length > 0
@@ -520,7 +518,6 @@ export default function CvBuilder({ onBack }) {
                     name: cert.name,
                     issuer: cert.issuer || "",
                     credentialUrl: cert.credentialUrl || "",
-                    image: cert.image || "",
                     description: cert.description || "",
                 };
 

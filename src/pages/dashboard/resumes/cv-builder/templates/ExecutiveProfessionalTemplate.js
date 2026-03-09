@@ -184,7 +184,7 @@ const ExecutiveProfessionalTemplate = ({
                                     isLast={isLast}
                                     titleClassName="text-xl font-bold uppercase border-b-2 border-gray-800 pb-2 mb-4 text-gray-900"
                                     onAdd={() => addItem('certificates', {
-                                        name: "Certificate Name", issuer: "Issuing Organization", credentialUrl: "https://", description: "Certificate description", image: ""
+                                        name: "Certificate Name", issuer: "Issuing Organization", credentialUrl: "https://", description: "Certificate description"
                                     })}
                                 >
                                     <div className="flex flex-col gap-4">
