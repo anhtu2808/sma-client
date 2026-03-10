@@ -46,9 +46,9 @@ const UseTemplateModal = ({ open, onCancel, template, onCreateNew, onSelectExist
                 <div className="py-2">
                     {/* Header */}
                     <div className="text-center mb-6">
-                        <h2 className="text-xl font-bold text-gray-900 mb-1">Sử dụng Template</h2>
+                        <h2 className="text-xl font-bold text-gray-900 mb-1">Use Template</h2>
                         <p className="text-sm text-gray-500">
-                            Chọn cách bạn muốn bắt đầu với template <strong>{template?.name}</strong>
+                            Choose how you want to start with template <strong>{template?.name}</strong>
                         </p>
                     </div>
 
@@ -67,10 +67,10 @@ const UseTemplateModal = ({ open, onCancel, template, onCreateNew, onSelectExist
                                 </div>
                                 <div className="min-w-0 flex-1">
                                     <h3 className="font-semibold text-gray-900 text-base mb-1 group-hover:text-orange-600 transition-colors">
-                                        Tạo CV mới
+                                        Create New CV
                                     </h3>
                                     <p className="text-sm text-gray-500 leading-relaxed">
-                                        Bắt đầu từ đầu với template này. Bạn sẽ tự điền thông tin cá nhân, kinh nghiệm và kỹ năng.
+                                        Start from scratch with this template. You will fill in your personal information, experience, and skills yourself.
                                     </p>
                                 </div>
                                 <span className="material-icons-round text-gray-300 group-hover:text-orange-400 text-[20px] mt-1 transition-colors">
@@ -91,10 +91,10 @@ const UseTemplateModal = ({ open, onCancel, template, onCreateNew, onSelectExist
                                 </div>
                                 <div className="min-w-0 flex-1">
                                     <h3 className="font-semibold text-gray-900 text-base mb-1 group-hover:text-orange-600 transition-colors">
-                                        Chọn CV đã upload
+                                        Choose from uploaded CVs
                                     </h3>
                                     <p className="text-sm text-gray-500 leading-relaxed">
-                                        Sử dụng dữ liệu từ CV đã tải lên trong mục Attachments để tự động điền vào template.
+                                        Use data from CVs uploaded in the Attachments section to automatically fill in the template.
                                     </p>
                                 </div>
                                 <span className="material-icons-round text-gray-300 group-hover:text-orange-400 text-[20px] mt-1 transition-colors">
@@ -115,10 +115,10 @@ const UseTemplateModal = ({ open, onCancel, template, onCreateNew, onSelectExist
                             className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-3 transition-colors cursor-pointer"
                         >
                             <span className="material-icons-round text-[18px]">arrow_back</span>
-                            Quay lại
+                            Back
                         </button>
-                        <h2 className="text-lg font-bold text-gray-900 mb-1">Chọn CV đã upload</h2>
-                        <p className="text-sm text-gray-500">Chọn một CV từ danh sách Attachments của bạn</p>
+                        <h2 className="text-lg font-bold text-gray-900 mb-1">Choose from uploaded CVs</h2>
+                        <p className="text-sm text-gray-500">Choose a CV from the Attachments list</p>
                     </div>
 
                     {/* CV List */}
@@ -131,8 +131,8 @@ const UseTemplateModal = ({ open, onCancel, template, onCreateNew, onSelectExist
                             <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
                                 <span className="material-icons-round text-gray-400 text-[32px]">inbox</span>
                             </div>
-                            <p className="text-gray-500 font-medium mb-1">Chưa có CV nào</p>
-                            <p className="text-sm text-gray-400">Hãy upload CV trong mục Attachments trước.</p>
+                            <p className="text-gray-500 font-medium mb-1">No CVs yet</p>
+                            <p className="text-sm text-gray-400">Please upload CVs in the Attachments section first.</p>
                         </div>
                     ) : (
                         <div className="space-y-2 max-h-[360px] overflow-y-auto pr-1" style={{ scrollbarWidth: "thin" }}>

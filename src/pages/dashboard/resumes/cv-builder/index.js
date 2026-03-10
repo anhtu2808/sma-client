@@ -702,7 +702,7 @@ export default function CvBuilder({ onBack }) {
                 </div>
 
                 {/* Main Content Area */}
-                <div className="flex-1 overflow-y-auto flex flex-col relative pb-12 print:overflow-visible print:pb-0" onClick={() => setActiveSection(null)}>
+                <div className="flex-1 overflow-y-auto flex flex-col relative pb-12 print:block print:overflow-visible print:pb-0" onClick={() => setActiveSection(null)}>
                     {/* Top Toolbar */}
                     <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between sticky top-0 z-50 print:hidden">
                         <div className="flex items-center gap-6">

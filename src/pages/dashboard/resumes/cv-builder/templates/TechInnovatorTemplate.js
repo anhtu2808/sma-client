@@ -85,14 +85,14 @@ const TechInnovatorTemplate = ({
             </div>
 
             {/* Main Content Split */}
-            <div className="flex px-12 py-10 gap-10">
-                {/* Left Column (30%) */}
-                <div className="w-[30%] flex flex-col gap-8 border-r border-gray-200 pr-8">
+            <div className="grid grid-cols-[30%_1fr] px-12 py-10 gap-10">
+                {/* Left Column */}
+                <div className="flex flex-col gap-8 border-r border-gray-200 pr-8">
                     <SkillSelector titleClassName="text-lg font-bold text-green-700 mb-4 uppercase tracking-wider" />
                 </div>
 
-                {/* Right Column (70%) */}
-                <div className="w-[70%] flex flex-col gap-8 pb-12">
+                {/* Right Column */}
+                <div className="flex flex-col gap-8 pb-12 print:block print:space-y-8">
                     {sectionOrder.map((sectionKey, index) => {
                         const isFirst = index === 0;
                         const isLast = index === sectionOrder.length - 1;
@@ -112,10 +112,10 @@ const TechInnovatorTemplate = ({
                                         })}
                                         titleClassName="text-xl font-bold text-green-700 border-b-2 border-green-100 pb-2 mb-4 uppercase tracking-wider"
                                     >
-                                        <div className="flex flex-col gap-6">
+                                        <div className="flex flex-col gap-6 print:block print:space-y-6">
                                             {cvData.experience.map((exp, itemIndex) => (
                                                 <EditableItemWrapper key={exp.id} id={exp.id} section="experience" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.experience.length - 1}>
-                                                    <div className="flex flex-col gap-1.5 relative z-10">
+                                                    <div className="flex flex-col gap-1.5 relative z-10 print:block print:space-y-1.5">
                                                         <div className="flex justify-between items-start gap-4">
                                                             <div className="min-w-0 flex-1">
                                                                 <EditableText as="h4" className="font-bold text-gray-900 text-lg" value={exp.title} onChange={v => updateField(`experience.${itemIndex}.title`, v)} />
@@ -159,10 +159,10 @@ const TechInnovatorTemplate = ({
                                         })}
                                         titleClassName="text-xl font-bold text-green-700 border-b-2 border-green-100 pb-2 mb-4 uppercase tracking-wider"
                                     >
-                                        <div className="flex flex-col gap-6">
+                                        <div className="flex flex-col gap-6 print:block print:space-y-6">
                                             {cvData.education.map((edu, itemIndex) => (
                                                 <EditableItemWrapper key={edu.id} id={edu.id} section="education" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.education.length - 1}>
-                                                    <div className="flex flex-col gap-1.5 relative z-10">
+                                                    <div className="flex flex-col gap-1.5 relative z-10 print:block print:space-y-1.5">
                                                         <div className="flex justify-between items-start gap-4">
                                                             <div className="min-w-0 flex-1">
                                                                 <div className="flex flex-col">
@@ -204,10 +204,10 @@ const TechInnovatorTemplate = ({
                                         })}
                                         titleClassName="text-xl font-bold text-green-700 border-b-2 border-green-100 pb-2 mb-4 uppercase tracking-wider"
                                     >
-                                        <div className="flex flex-col gap-4">
+                                        <div className="flex flex-col gap-4 print:block print:space-y-4">
                                             {cvData.certificates.map((cert, itemIndex) => (
                                                 <EditableItemWrapper key={cert.id} id={cert.id} section="certificates" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.certificates.length - 1}>
-                                                    <div className="flex flex-col gap-1.5 relative z-10">
+                                                    <div className="flex flex-col gap-1.5 relative z-10 print:block print:space-y-1.5">
                                                         <div className="flex justify-between items-start gap-4">
                                                             <div className="min-w-0 flex-1">
                                                                 <EditableText as="h4" className="font-bold text-gray-900 text-lg" value={cert.name} onChange={v => updateField(`certificates.${itemIndex}.name`, v)} />
@@ -236,10 +236,10 @@ const TechInnovatorTemplate = ({
                                         })}
                                         titleClassName="text-xl font-bold text-green-700 border-b-2 border-green-100 pb-2 mb-4 uppercase tracking-wider"
                                     >
-                                        <div className="flex flex-col gap-6">
+                                        <div className="flex flex-col gap-6 print:block print:space-y-6">
                                             {cvData.projects.map((proj, itemIndex) => (
                                                 <EditableItemWrapper key={proj.id} id={proj.id} section="projects" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.projects.length - 1}>
-                                                    <div className="flex flex-col gap-1.5 relative z-10">
+                                                    <div className="flex flex-col gap-1.5 relative z-10 print:block print:space-y-1.5">
                                                         <div className="flex justify-between items-start gap-4">
                                                             <div className="min-w-0 flex-1">
                                                                 <EditableText as="h4" className="font-bold text-gray-900 text-lg" value={proj.title} onChange={v => updateField(`projects.${itemIndex}.title`, v)} />

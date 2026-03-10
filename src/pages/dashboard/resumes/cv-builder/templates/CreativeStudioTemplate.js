@@ -93,7 +93,7 @@ const CreativeStudioTemplate = ({
             </div>
 
             {/* Right Column (65%) */}
-            <div className="w-[65%] p-12 flex flex-col gap-8">
+            <div className="w-[65%] p-12 flex flex-col gap-8 print:block print:space-y-8">
 
                 {/* Main Content */}
                 {sectionOrder.map((sectionKey, index) => {
@@ -115,10 +115,10 @@ const CreativeStudioTemplate = ({
                                     })}
                                     titleClassName="text-xl font-bold uppercase text-purple-800 mb-4 tracking-wide pb-2 border-b-2 border-purple-100"
                                 >
-                                    <div className="flex flex-col gap-6">
+                                    <div className="flex flex-col gap-6 print:block print:space-y-6">
                                         {cvData.experience.map((exp, itemIndex) => (
                                             <EditableItemWrapper key={exp.id} id={exp.id} section="experience" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.experience.length - 1}>
-                                                <div className="flex flex-col gap-1.5 relative pl-4 border-l-2 border-purple-200 hover:border-purple-500 transition-colors">
+                                                <div className="flex flex-col gap-1.5 relative pl-4 border-l-2 border-purple-200 hover:border-purple-500 transition-colors print:block print:space-y-1.5">
                                                     <div className="absolute left-[-5px] top-1.5 w-2 h-2 rounded-full bg-purple-500"></div>
                                                     <div className="flex justify-between items-start gap-4">
                                                         <div className="min-w-0 flex-1">
@@ -163,10 +163,10 @@ const CreativeStudioTemplate = ({
                                     })}
                                     titleClassName="text-xl font-bold uppercase text-purple-800 mb-4 tracking-wide pb-2 border-b-2 border-purple-100"
                                 >
-                                    <div className="flex flex-col gap-6">
+                                    <div className="flex flex-col gap-6 print:block print:space-y-6">
                                         {cvData.education.map((edu, itemIndex) => (
                                             <EditableItemWrapper key={edu.id} id={edu.id} section="education" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.education.length - 1}>
-                                                <div className="flex flex-col gap-1.5 relative pl-4 border-l-2 border-purple-200 hover:border-purple-500 transition-colors">
+                                                <div className="flex flex-col gap-1.5 relative pl-4 border-l-2 border-purple-200 hover:border-purple-500 transition-colors print:block print:space-y-1.5">
                                                     <div className="absolute left-[-5px] top-1.5 w-2 h-2 rounded-full bg-purple-500"></div>
                                                     <div className="flex justify-between items-start gap-4">
                                                         <div className="min-w-0 flex-1">
@@ -209,10 +209,10 @@ const CreativeStudioTemplate = ({
                                     })}
                                     titleClassName="text-xl font-bold uppercase text-purple-800 mb-4 tracking-wide pb-2 border-b-2 border-purple-100"
                                 >
-                                    <div className="flex flex-col gap-4">
+                                    <div className="flex flex-col gap-4 print:block print:space-y-4">
                                         {cvData.certificates.map((cert, itemIndex) => (
                                             <EditableItemWrapper key={cert.id} id={cert.id} section="certificates" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.certificates.length - 1}>
-                                                <div className="flex flex-col gap-1.5 relative pl-4 border-l-2 border-purple-200 hover:border-purple-500 transition-colors">
+                                                <div className="flex flex-col gap-1.5 relative pl-4 border-l-2 border-purple-200 hover:border-purple-500 transition-colors print:block print:space-y-1.5">
                                                     <div className="absolute left-[-5px] top-1.5 w-2 h-2 rounded-full bg-purple-500"></div>
                                                     <div className="flex justify-between items-start gap-4">
                                                         <div className="min-w-0 flex-1">
@@ -242,10 +242,10 @@ const CreativeStudioTemplate = ({
                                     })}
                                     titleClassName="text-xl font-bold uppercase text-purple-800 mb-4 tracking-wide pb-2 border-b-2 border-purple-100"
                                 >
-                                    <div className="flex flex-col gap-6">
+                                    <div className="flex flex-col gap-6 print:block print:space-y-6">
                                         {cvData.projects.map((proj, itemIndex) => (
                                             <EditableItemWrapper key={proj.id} id={proj.id} section="projects" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.projects.length - 1}>
-                                                <div className="flex flex-col gap-1.5 relative pl-4 border-l-2 border-purple-200 hover:border-purple-500 transition-colors">
+                                                <div className="flex flex-col gap-1.5 relative pl-4 border-l-2 border-purple-200 hover:border-purple-500 transition-colors print:block print:space-y-1.5">
                                                     <div className="absolute left-[-5px] top-1.5 w-2 h-2 rounded-full bg-purple-500"></div>
                                                     <div className="flex justify-between items-start gap-4">
                                                         <div className="min-w-0 flex-1">
