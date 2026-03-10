@@ -97,10 +97,10 @@ const ModernMinimalistTemplate = ({
 
                 </div>
 
-                {/* Right Column (65%) */}
-                <div className="w-[65%] flex flex-col gap-8 relative">
-                    {/* Vertical line */}
-                    <div className="absolute left-[-13px] top-2 bottom-0 w-px border-l-[1.5px] border-dashed border-blue-500/30" />
+                {/* Right Column */}
+                <div className="flex flex-col gap-8 relative print:block print:space-y-8">
+                    {/* Vertical line - hidden on print for cleaner looks */}
+                    <div className="absolute left-[-13px] top-2 bottom-0 w-px border-l-[1.5px] border-dashed border-blue-500/30 print:hidden" />
 
                     {sectionOrder.map((sectionKey, index) => {
                         const isFirst = index === 0;
@@ -121,10 +121,10 @@ const ModernMinimalistTemplate = ({
                                             title: "Position", company: "Company Name", startDate: "", endDate: "", isCurrent: false, description: "Job Description", workingModel: "ONSITE", employmentType: "FULL_TIME"
                                         })}
                                     >
-                                        <div className="flex flex-col gap-6">
+                                        <div className="flex flex-col gap-6 print:block print:space-y-6">
                                             {cvData.experience.map((exp, itemIndex) => (
                                                 <EditableItemWrapper key={exp.id} id={exp.id} section="experience" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.experience.length - 1}>
-                                                    <div className="flex flex-col gap-1.5">
+                                                    <div className="flex flex-col gap-1.5 print:block print:space-y-1.5">
                                                         <div className="flex justify-between items-start gap-4">
                                                             <div className="min-w-0 flex-1">
                                                                 <EditableText as="h4" className="font-bold text-gray-900 text-lg" value={exp.title} onChange={v => updateField(`experience.${itemIndex}.title`, v)} />
@@ -168,10 +168,10 @@ const ModernMinimalistTemplate = ({
                                             institution: "Institution Name", degree: "BACHELOR", majorField: "Major", gpa: 0, startDate: "", endDate: "", isCurrent: false
                                         })}
                                     >
-                                        <div className="flex flex-col gap-6">
+                                        <div className="flex flex-col gap-6 print:block print:space-y-6">
                                             {cvData.education.map((edu, itemIndex) => (
                                                 <EditableItemWrapper key={edu.id} id={edu.id} section="education" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.education.length - 1}>
-                                                    <div className="flex flex-col gap-1.5">
+                                                    <div className="flex flex-col gap-1.5 print:block print:space-y-1.5">
                                                         <div className="flex justify-between items-start gap-4">
                                                             <div className="min-w-0 flex-1">
                                                                 <div className="flex flex-col">
@@ -213,10 +213,10 @@ const ModernMinimalistTemplate = ({
                                             name: "Certificate Name", issuer: "Issuing Organization", credentialUrl: "https://", description: "Certificate description"
                                         })}
                                     >
-                                        <div className="flex flex-col gap-4">
+                                        <div className="flex flex-col gap-4 print:block print:space-y-4">
                                             {cvData.certificates.map((cert, itemIndex) => (
                                                 <EditableItemWrapper key={cert.id} id={cert.id} section="certificates" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.certificates.length - 1}>
-                                                    <div className="flex flex-col gap-1.5">
+                                                    <div className="flex flex-col gap-1.5 print:block print:space-y-1.5">
                                                         <div className="flex justify-between items-start gap-4">
                                                             <div className="min-w-0 flex-1">
                                                                 <EditableText as="h4" className="font-bold text-gray-900 text-lg" value={cert.name} onChange={v => updateField(`certificates.${itemIndex}.name`, v)} />
@@ -245,10 +245,10 @@ const ModernMinimalistTemplate = ({
                                             title: "Project Name", position: "Role/Position", description: "Project Description", startDate: "", endDate: "", isCurrent: false, projectUrl: "https://project-url.com", projectType: "PROFESSIONAL", teamSize: 1
                                         })}
                                     >
-                                        <div className="flex flex-col gap-6">
+                                        <div className="flex flex-col gap-6 print:block print:space-y-6">
                                             {cvData.projects.map((proj, itemIndex) => (
                                                 <EditableItemWrapper key={proj.id} id={proj.id} section="projects" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.projects.length - 1}>
-                                                    <div className="flex flex-col gap-1.5">
+                                                    <div className="flex flex-col gap-1.5 print:block print:space-y-1.5">
                                                         <div className="flex justify-between items-start gap-4">
                                                             <div className="min-w-0 flex-1">
                                                                 <EditableText as="h4" className="font-bold text-gray-900 text-lg" value={proj.title} onChange={v => updateField(`projects.${itemIndex}.title`, v)} />

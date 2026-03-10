@@ -4,6 +4,16 @@ import Checkbox from "@/components/Checkbox";
 import dayjs from "dayjs";
 
 export const EditableDateRange = React.memo(({ startDate, endDate, isCurrent, onStartDateChange, onEndDateChange, onIsCurrentChange, className }) => {
+    const onStartDateChangeRef = React.useRef(onStartDateChange);
+    const onEndDateChangeRef = React.useRef(onEndDateChange);
+    const onIsCurrentChangeRef = React.useRef(onIsCurrentChange);
+
+    React.useEffect(() => {
+        onStartDateChangeRef.current = onStartDateChange;
+        onEndDateChangeRef.current = onEndDateChange;
+        onIsCurrentChangeRef.current = onIsCurrentChange;
+    });
+
     return (
         <div className={`flex items-center gap-2 flex-nowrap whitespace-nowrap ${className}`}>
             <DatePicker
@@ -12,9 +22,9 @@ export const EditableDateRange = React.memo(({ startDate, endDate, isCurrent, on
                 value={startDate && !isNaN(new Date(startDate).getTime()) ? dayjs(startDate) : null}
                 onChange={(date) => {
                     if (date) {
-                        onStartDateChange(date.startOf('month').format('YYYY-MM-DD'));
+                        onStartDateChangeRef.current(date.startOf('month').format('YYYY-MM-DD'));
                     } else {
-                        onStartDateChange('');
+                        onStartDateChangeRef.current('');
                     }
                 }}
                 placeholder="Start"
@@ -33,9 +43,9 @@ export const EditableDateRange = React.memo(({ startDate, endDate, isCurrent, on
                     value={endDate && !isNaN(new Date(endDate).getTime()) ? dayjs(endDate) : null}
                     onChange={(date) => {
                         if (date) {
-                            onEndDateChange(date.startOf('month').format('YYYY-MM-DD'));
+                            onEndDateChangeRef.current(date.startOf('month').format('YYYY-MM-DD'));
                         } else {
-                            onEndDateChange('');
+                            onEndDateChangeRef.current('');
                         }
                     }}
                     placeholder="End"
@@ -48,7 +58,7 @@ export const EditableDateRange = React.memo(({ startDate, endDate, isCurrent, on
             <Checkbox
                 label="Now"
                 checked={isCurrent}
-                onChange={(e) => onIsCurrentChange(e.target.checked)}
+                onChange={(e) => onIsCurrentChangeRef.current(e.target.checked)}
                 className="ml-1 text-xs opacity-50 hover:opacity-100 flex-shrink-0 print:hidden"
             />
         </div>
@@ -59,3 +69,4 @@ export const EditableDateRange = React.memo(({ startDate, endDate, isCurrent, on
         prevProps.isCurrent === nextProps.isCurrent &&
         prevProps.className === nextProps.className;
 });
+

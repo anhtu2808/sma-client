@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mail, Phone, MapPin, Github, Linkedin, Globe, Eye, EyeOff } from 'lucide-react';
+import { Mail, Phone, MapPin, Github, Linkedin, Globe, Eye, EyeOff, Camera } from 'lucide-react';
 
 const ExecutiveProfessionalTemplate = ({
     cvData,
@@ -10,6 +10,7 @@ const ExecutiveProfessionalTemplate = ({
     SectionWrapper,
     EditableItemWrapper,
     SkillSelector,
+    avatarInputRef,
     contactVisibility,
     toggleContactVisibility,
     formatDateDisplay,
@@ -19,6 +20,13 @@ const ExecutiveProfessionalTemplate = ({
         <div className="w-[850px] mx-auto mt-8 bg-white shadow-xl min-h-[1100px] relative font-serif text-gray-800">
             {/* Header: Centered, Classic */}
             <div className="px-14 pt-16 pb-8 text-center">
+                {/* Avatar */}
+                <div className="mx-auto mb-6 relative group w-28 h-28">
+                    <img src={cvData.personalInfo.avatar} alt="Avatar" className="w-full h-full rounded-full border-2 border-gray-300 object-cover shadow-lg" />
+                    <button onClick={() => avatarInputRef?.current?.click()} className="absolute inset-0 m-auto w-10 h-10 bg-black/50 rounded-full shadow-sm flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                        <Camera size={18} />
+                    </button>
+                </div>
                 <EditableText
                     as="h1"
                     className="text-4xl font-bold text-gray-900 uppercase tracking-widest mb-6"
@@ -73,7 +81,7 @@ const ExecutiveProfessionalTemplate = ({
 
             <div className="px-14 border-b border-gray-300 mx-14 mb-8"></div>
 
-            <div className="px-14 pb-16 flex flex-col gap-8">
+            <div className="px-14 pb-16 flex flex-col gap-8 print:block print:space-y-8">
 
                 {/* Main Sections */}
                 {sectionOrder.map((sectionKey, index) => {
@@ -95,7 +103,7 @@ const ExecutiveProfessionalTemplate = ({
                                         title: "Position", company: "Company Name", startDate: "", endDate: "", isCurrent: false, description: "Job Description", workingModel: "ONSITE", employmentType: "FULL_TIME"
                                     })}
                                 >
-                                    <div className="flex flex-col gap-6">
+                                    <div className="flex flex-col gap-6 print:block print:space-y-6">
                                         {cvData.experience.map((exp, itemIndex) => (
                                             <EditableItemWrapper key={exp.id} id={exp.id} section="experience" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.experience.length - 1}>
                                                 <div className="flex flex-col gap-1.5 relative z-10">
@@ -142,7 +150,7 @@ const ExecutiveProfessionalTemplate = ({
                                         institution: "Institution Name", degree: "BACHELOR", majorField: "Major", gpa: 0, startDate: "", endDate: "", isCurrent: false
                                     })}
                                 >
-                                    <div className="flex flex-col gap-6">
+                                    <div className="flex flex-col gap-6 print:block print:space-y-6">
                                         {cvData.education.map((edu, itemIndex) => (
                                             <EditableItemWrapper key={edu.id} id={edu.id} section="education" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.education.length - 1}>
                                                 <div className="flex flex-col gap-1.5 relative z-10">
@@ -219,7 +227,7 @@ const ExecutiveProfessionalTemplate = ({
                                         title: "Project Name", position: "Role/Position", description: "Project Description", startDate: "", endDate: "", isCurrent: false, projectUrl: "https://project-url.com", projectType: "PROFESSIONAL", teamSize: 1
                                     })}
                                 >
-                                    <div className="flex flex-col gap-6">
+                                    <div className="flex flex-col gap-6 print:block print:space-y-6">
                                         {cvData.projects.map((proj, itemIndex) => (
                                             <EditableItemWrapper key={proj.id} id={proj.id} section="projects" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.projects.length - 1}>
                                                 <div className="flex flex-col gap-1.5 relative z-10">
@@ -257,13 +265,8 @@ const ExecutiveProfessionalTemplate = ({
                     }
                 })}
 
-                {/* 2-Column Grid for smaller sections */}
-                <div className="grid grid-cols-2 gap-8 mt-4">
-
-                    {/* Skills */}
-                    <SkillSelector titleClassName="text-xl font-bold uppercase border-b-2 border-gray-800 pb-2 mb-4 text-gray-900" />
-
-                </div>
+                {/* Skills - Full Width */}
+                <SkillSelector titleClassName="text-xl font-bold uppercase border-b-2 border-gray-800 pb-2 mb-4 text-gray-900" />
 
             </div>
         </div >

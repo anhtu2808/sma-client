@@ -151,14 +151,16 @@ code {
     page-break-after: avoid !important;
   }
 
+  /* Allow sections to break across pages naturally */
   .print-cv-section .group\/section {
-    break-inside: avoid !important;
-    page-break-inside: avoid !important;
+    break-inside: auto;
+    page-break-inside: auto;
   }
 
+  /* Keep individual items (e.g. one job entry) together on a page */
   .print-cv-section .group\/item {
-    break-inside: avoid !important;
-    page-break-inside: avoid !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 
   /* Hide interactive elements */
