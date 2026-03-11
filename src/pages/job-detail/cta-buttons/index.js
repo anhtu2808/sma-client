@@ -35,12 +35,12 @@ const CTAButtons = () => {
             };
         }
 
-        if (attempt >= 2 || canApply === false) {
+        if (attempt >= 3 || canApply === false) {
             return {
                 text: "Max Attempts Reached",
                 disabled: true,
                 mode: "secondary",
-                note: "You have reached the limit of 2 applications for this job."
+                note: "You have reached the limit applications for this job."
             };
         }
         if (attempt > 0 && lastStatus !== 'APPLIED') {
@@ -52,7 +52,11 @@ const CTAButtons = () => {
             };
         }
         if (attempt === 1) {
-            return { text: "Re-apply (1/2)", disabled: false, mode: "primary" };
+            return { text: "Re-apply (2/3)", disabled: false, mode: "primary" };
+        }
+
+        if (attempt === 2) {
+            return { text: "Final Re-apply (3/3)", disabled: false, mode: "primary" };
         }
 
         return { text: "Apply Now", disabled: false, mode: "primary" };
