@@ -32,12 +32,6 @@ const CompanyHeader = ({ company }) => {
                                 <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
                                     {company.name}
                                 </h1>
-                                {company.companyStatus === "APPROVED" && (
-                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider border border-emerald-100 dark:border-emerald-500/20">
-                                        <span className="material-icons-round text-sm mr-1">verified</span>
-                                        Approved
-                                    </span>
-                                )}
                             </div>
 
                             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-slate-500 dark:text-[#ce9e8d] text-sm md:text-base">

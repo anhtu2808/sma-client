@@ -11,9 +11,12 @@ import dayjs from 'dayjs';
 const employmentTypeOptions = [
     { label: "Full-time", value: "FULL_TIME" },
     { label: "Part-time", value: "PART_TIME" },
+    { label: "Self-employed", value: "SELF_EMPLOYED" },
     { label: "Freelance", value: "FREELANCE" },
     { label: "Contract", value: "CONTRACT" },
-    { label: "Internship", value: "INTERNSHIP" }
+    { label: "Internship", value: "INTERNSHIP" },
+    { label: "Apprenticeship", value: "APPRENTICESHIP" },
+    { label: "Seasonal", value: "SEASONAL" }
 ];
 
 const degreeOptions = [
@@ -22,14 +25,15 @@ const degreeOptions = [
     { label: "Bachelor", value: "BACHELOR" },
     { label: "Master", value: "MASTER" },
     { label: "Doctorate", value: "DOCTORATE" },
-    { label: "Vocational", value: "VOCATIONAL" }
+    { label: "Certificate", value: "CERTIFICATE" }
 ];
 
 const projectTypeOptions = [
     { label: "Personal", value: "PERSONAL" },
-    { label: "Professional", value: "PROFESSIONAL" },
     { label: "Academic", value: "ACADEMIC" },
-    { label: "Open Source", value: "OPEN_SOURCE" }
+    { label: "Professional", value: "PROFESSIONAL" },
+    { label: "Open Source", value: "OPEN_SOURCE" },
+    { label: "Freelance", value: "FREELANCE" }
 ];
 
 export default function PropertiesSidebar({ activeSection, cvData, updateField }) {
