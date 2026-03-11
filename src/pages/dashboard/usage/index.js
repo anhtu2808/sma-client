@@ -20,6 +20,7 @@ const DEFAULT_PRESET_DAYS = 30;
 
 const mapQuotas = (quotas) => {
   if (!Array.isArray(quotas)) return [];
+
   return quotas
     .filter((quota) => quota?.usageType !== "BOOLEAN" && quota?.maxQuota != null)
     .map((quota) => ({
@@ -27,6 +28,8 @@ const mapQuotas = (quotas) => {
       label: quota?.featureName || quota?.featureKey || "Quota",
       used: Number(quota?.used ?? 0),
       total: Number(quota?.maxQuota ?? 0),
+      limitUnit: quota?.limitUnit,
+      renewDate: quota?.renewDate,
     }))
     .filter((quota) => quota.key);
 };

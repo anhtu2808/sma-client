@@ -1,5 +1,32 @@
 import Loading from "@/components/Loading";
 
+const formatDate = (dateString) => {
+  if (!dateString) return null;
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+};
+
+const RenewTooltip = ({ renewDate }) => {
+  const formattedDate = formatDate(renewDate);
+  if (!formattedDate) return null;
+
+  return (
+    <span className="group relative inline-flex items-center ml-1">
+      <span className="material-icons-round text-[14px] text-orange-500 cursor-help">
+        error_outline
+      </span>
+      <span className="invisible group-hover:visible absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded-lg whitespace-nowrap z-10">
+        Resets: {formattedDate}
+        <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900"></span>
+      </span>
+    </span>
+  );
+};
+
 const Quota = ({ quotas, isQuotaLoading, isQuotaError }) => {
   return (
     <section className="bg-white dark:bg-surface-dark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 md:p-8">
@@ -23,10 +50,15 @@ const Quota = ({ quotas, isQuotaLoading, isQuotaError }) => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {quotas.map((quota) => {
             const percent = quota.total > 0 ? Math.min(100, Math.round((quota.used / quota.total) * 100)) : 0;
+            const showRenew = quota.limitUnit !== "TOTAL" && quota.renewDate;
+
             return (
               <div className="space-y-2" key={quota.key}>
                 <div className="flex justify-between items-center text-sm">
-                  <span className="font-medium text-gray-700 dark:text-gray-200">{quota.label}</span>
+                  <span className="font-medium text-gray-700 dark:text-gray-200 flex items-center">
+                    {quota.label}
+                    {showRenew && <RenewTooltip renewDate={quota.renewDate} />}
+                  </span>
                   <span className="font-semibold text-gray-900 dark:text-white">
                     {quota.used}
                     <span className="text-gray-400"> / {quota.total}</span>
