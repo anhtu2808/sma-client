@@ -18,6 +18,10 @@ const NotificationItem = ({ noti }) => {
         switch (type) {
             case 'CV_PARSE_FAILED':
                 return { icon: 'error', color: 'text-red-500' };
+            case 'PAYMENT_SUCCESS':
+                return { icon: 'check_circle', color: 'text-green-500' };
+            case 'PAYMENT_FAILURE':
+                return { icon: 'payments', color: 'text-red-500' };
             default:
                 return { icon: 'notifications', color: 'text-orange-500' };
         }
@@ -40,6 +44,10 @@ const NotificationItem = ({ noti }) => {
         switch (noti.notificationType) {
             case 'CV_PARSE_FAILED':
                 navigate('/dashboard/resumes');
+                break;
+            case 'PAYMENT_SUCCESS':
+            case 'PAYMENT_FAILURE':
+                navigate('/dashboard/billing-plans');
                 break;
             default:
                 console.log("No specific route for this type");
