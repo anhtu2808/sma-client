@@ -193,7 +193,7 @@ export default function PropertiesSidebar({ activeSection, cvData, updateField }
                                 loading={isFetchingSkills}
                                 notFoundContent={skillSearchText ? (isFetchingSkills ? <Loading size={24} inline /> : "Not found") : "Type to search"}
                                 className="w-full"
-                                fullWidth="true"
+                                fullWidth={true}
                                 options={skillOptions.map(s => ({
                                     value: s.id,
                                     label: s.name,

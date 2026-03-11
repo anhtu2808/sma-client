@@ -11,7 +11,7 @@ const FilterSidebar = ({
 }) => {
     return (
         <aside className={`lg:w-1/4 shrink-0 space-y-6 ${className}`}>
-            <div className="bg-white dark:bg-[#2c1a14] p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-[#3d241b] sticky top-24">
+            <div className="bg-white dark:bg-[#2c1a14] p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-[#3d241b]">
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
                         <span className="material-icons-round text-primary">filter_list</span>

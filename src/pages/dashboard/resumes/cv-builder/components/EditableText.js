@@ -28,8 +28,4 @@ export const EditableText = React.memo(({ value, onChange, className, as = "span
             dangerouslySetInnerHTML={{ __html: initialValue.current }}
         />
     );
-}, (prevProps, nextProps) => {
-    return prevProps.value === nextProps.value &&
-        prevProps.className === nextProps.className &&
-        prevProps.as === nextProps.as;
 });

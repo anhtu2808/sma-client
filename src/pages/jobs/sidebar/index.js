@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Slider, Select } from 'antd';
+import { Slider } from 'antd';
+import Input from "@/components/Input";
+import Select from "@/components/Select";
 import FilterSidebar from '@/components/FilterSidebar';
 import { useGetSkillsQuery } from '@/apis/skillApi';
 import { useGetExpertisesQuery } from '@/apis/expertiseApi';
 import { useGetDomainsQuery } from '@/apis/domainApi';
-import { locationOptions, jobLevelOptions, workingModelOptions } from '@/constant';
+import { jobLevelOptions, workingModelOptions } from '@/constant';
 
 const Sidebar = ({ filters, onFilterChange, onReset, isLoading }) => {
     const [salaryRange, setSalaryRange] = useState([0, 100]);
@@ -55,16 +57,13 @@ const Sidebar = ({ filters, onFilterChange, onReset, isLoading }) => {
             {/* Location */}
             <div className="mb-6">
                 <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3">Location</label>
-                <Select
-                    showSearch
+                <Input
                     allowClear
-                    options={locationOptions}
-                    value={filters.location || undefined}
-                    onChange={(val) => onFilterChange('location', val ?? '')}
-                    placeholder="Select Location"
+                    value={filters.location || ''}
+                    onChange={(e) => onFilterChange('location', e.target.value)}
+                    placeholder="Enter Location"
                     className="w-full"
-                    filterOption={(input, option) => option.label.toLowerCase().includes(input.toLowerCase())}
-                    loading={isLoading}
+                    disabled={isLoading}
                 />
             </div>
 
@@ -72,6 +71,7 @@ const Sidebar = ({ filters, onFilterChange, onReset, isLoading }) => {
             <div className="mb-6">
                 <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3">Job Level</label>
                 <Select
+                    fullWidth="true"
                     showSearch
                     allowClear
                     options={jobLevelOptions}
@@ -88,6 +88,7 @@ const Sidebar = ({ filters, onFilterChange, onReset, isLoading }) => {
             <div className="mb-6">
                 <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3">Working Model</label>
                 <Select
+                    fullWidth="true"
                     showSearch
                     allowClear
                     options={workingModelOptions}
@@ -104,6 +105,7 @@ const Sidebar = ({ filters, onFilterChange, onReset, isLoading }) => {
             <div className="mb-6">
                 <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3">Skills</label>
                 <Select
+                    fullWidth="true"
                     mode="multiple"
                     showSearch
                     allowClear
@@ -165,6 +167,7 @@ const Sidebar = ({ filters, onFilterChange, onReset, isLoading }) => {
             <div className="mb-6">
                 <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3">Expertise</label>
                 <Select
+                    fullWidth="true"
                     mode="multiple"
                     showSearch
                     allowClear
@@ -184,6 +187,7 @@ const Sidebar = ({ filters, onFilterChange, onReset, isLoading }) => {
             <div>
                 <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3">Domain</label>
                 <Select
+                    fullWidth="true"
                     mode="multiple"
                     showSearch
                     allowClear
