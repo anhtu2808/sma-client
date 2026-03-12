@@ -26,6 +26,8 @@ const NotificationItem = ({ noti }) => {
                 return { icon: 'work', color: 'text-blue-500' };
             case 'SYSTEM':
                 return { icon: 'error_outline', color: 'text-red-500' };
+            case 'INVITATION':
+                return { icon: 'mail', color: 'text-indigo-500', bg: 'bg-indigo-50' };
             default:
                 return { icon: 'notifications', color: 'text-orange-500' };
         }
@@ -58,6 +60,9 @@ const NotificationItem = ({ noti }) => {
                 break;
             case 'SYSTEM':
                 navigate('/dashboard/usage');
+                break;
+            case 'INVITATION':
+                navigate('/dashboard/invitations');
                 break;
             default:
                 console.log("No specific route for this type");
