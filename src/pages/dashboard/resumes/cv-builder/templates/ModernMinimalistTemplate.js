@@ -23,9 +23,15 @@ const ModernMinimalistTemplate = ({
             <div className="px-12 pt-12 pb-6 bg-[#3b82f6] text-white rounded-t-lg">
                 <EditableText
                     as="h1"
-                    className="text-4xl font-bold text-blue-900 mb-2 truncate"
+                    className="text-4xl font-bold text-blue-900 mb-1 truncate"
                     value={cvData.personalInfo.fullName}
                     onChange={(val) => updateField('personalInfo.fullName', val)}
+                />
+                <EditableText
+                    as="h2"
+                    className="text-xl font-medium text-blue-100 truncate"
+                    value={cvData.personalInfo.jobTitle}
+                    onChange={(val) => updateField('personalInfo.jobTitle', val)}
                 />
             </div>
 

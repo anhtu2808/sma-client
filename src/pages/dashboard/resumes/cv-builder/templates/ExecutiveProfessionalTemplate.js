@@ -29,9 +29,15 @@ const ExecutiveProfessionalTemplate = ({
                 </div>
                 <EditableText
                     as="h1"
-                    className="text-4xl font-bold text-gray-900 uppercase tracking-widest mb-6"
+                    className="text-4xl font-bold text-gray-900 uppercase tracking-widest mb-1"
                     value={cvData.personalInfo.fullName}
                     onChange={(val) => updateField('personalInfo.fullName', val)}
+                />
+                <EditableText
+                    as="p"
+                    className="text-lg font-medium tracking-widest text-gray-500 uppercase mb-6"
+                    value={cvData.personalInfo.jobTitle}
+                    onChange={(val) => updateField('personalInfo.jobTitle', val)}
                 />
 
                 <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-gray-600">

@@ -63,10 +63,5 @@ export const EditableDateRange = React.memo(({ startDate, endDate, isCurrent, on
             />
         </div>
     );
-}, (prevProps, nextProps) => {
-    return prevProps.startDate === nextProps.startDate &&
-        prevProps.endDate === nextProps.endDate &&
-        prevProps.isCurrent === nextProps.isCurrent &&
-        prevProps.className === nextProps.className;
 });
 

@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
-import { Plus, ArrowUp, ArrowDown } from 'lucide-react';
+import { Plus, ArrowUp, ArrowDown, Trash2 } from 'lucide-react';
 import { CvBuilderContext } from '../CvBuilderContext';
 
 export const SectionWrapper = ({ title, sectionKey, index, isFirst, isLast, onAdd, children, titleClassName }) => {
-    const { moveSection } = useContext(CvBuilderContext);
+    const { moveSection, removeSection } = useContext(CvBuilderContext);
     return (
         <div
             className="group/section relative border border-transparent hover:border-[#1F8A70]/30 hover:bg-[#F8F9FA]/50 rounded-xl transition-colors -mx-4 px-4 py-4 mb-2"
@@ -36,6 +36,14 @@ export const SectionWrapper = ({ title, sectionKey, index, isFirst, isLast, onAd
                         >
                             <ArrowDown size={16} />
                         </button>
+                        {removeSection && sectionKey && (
+                            <button
+                                onClick={() => removeSection(sectionKey)}
+                                className="flex items-center justify-center w-8 h-8 rounded-full shadow-sm transition-colors cursor-pointer bg-white text-red-500 hover:bg-red-50 border border-red-200"
+                            >
+                                <Trash2 size={16} />
+                            </button>
+                        )}
                     </>
                 )}
             </div>

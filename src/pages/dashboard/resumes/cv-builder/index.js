@@ -103,7 +103,7 @@ export default function CvBuilder({ onBack }) {
     const [cvData, setCvData] = useState({
         personalInfo: {
             fullName: "NGUYEN SI VAN HAO",
-            title: "SENIOR PRODUCT MANAGER",
+            jobTitle: "SENIOR PRODUCT MANAGER",
             avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d",
         },
         objective: "Motivated and forward-thinking product owner with 7 years of experience in a dynamic SaaS environment.",
@@ -183,6 +183,7 @@ export default function CvBuilder({ onBack }) {
                 personalInfo: {
                     ...prevData.personalInfo,
                     fullName: resumeData.fullName || prevData.personalInfo.fullName,
+                    jobTitle: resumeData.jobTitle || prevData.personalInfo.jobTitle,
                     avatar: resumeData.avatar || prevData.personalInfo.avatar,
                 },
                 contact: {
@@ -335,7 +336,39 @@ export default function CvBuilder({ onBack }) {
         });
     };
 
-    const deleteItem = (section, id) => {
+    const removeSection = (sectionKey) => {
+        setSectionOrder(prev => prev.filter(key => key !== sectionKey));
+    };
+
+    const addSection = (sectionKey) => {
+        setSectionOrder(prev => {
+            if (prev.includes(sectionKey)) return prev;
+            return [...prev, sectionKey];
+        });
+    };
+
+    const deleteItem = async (section, id) => {
+        // If it does not start with typical local prefixes, it's likely a saved item.
+        const isNew = String(id).startsWith(section + "_") || String(id).startsWith("exp_") || String(id).startsWith("experience_") || String(id).startsWith("edu_") || String(id).startsWith("education_") || String(id).startsWith("proj_") || String(id).startsWith("projects_") || String(id).startsWith("cert_") || String(id).startsWith("certificates_") || String(id).startsWith("skill_");
+
+        if (!isNew && resumeId) {
+            try {
+                if (section === 'experience') {
+                    await deleteExperience({ resumeId, experienceId: id }).unwrap();
+                } else if (section === 'education') {
+                    await deleteEducation({ resumeId, educationId: id }).unwrap();
+                } else if (section === 'projects') {
+                    await deleteProject({ resumeId, projectId: id }).unwrap();
+                } else if (section === 'certificates') {
+                    await deleteCertification({ resumeId, certificationId: id }).unwrap();
+                } else if (section === 'skills') {
+                    await deleteSkill({ resumeId, resumeSkillId: id }).unwrap();
+                }
+            } catch (error) {
+                console.error("Delete API error:", error);
+            }
+        }
+
         setCvData(prev => ({
             ...prev,
             [section]: prev[section].filter(item => item.id !== id)
@@ -368,6 +401,7 @@ export default function CvBuilder({ onBack }) {
                         resumeName: `[${currentTemplate}] ${cvData.personalInfo.fullName || 'My Resume'}`,
                         fileName: `[${currentTemplate}] ${cvData.personalInfo.fullName || 'My Resume'}.pdf`,
                         fullName: cvData.personalInfo.fullName,
+                        jobTitle: cvData.personalInfo.jobTitle,
                         avatar: cvData.personalInfo.avatar,
                         addressInResume: cvData.contact.addressInResume,
                         phoneInResume: cvData.contact.phoneInResume,
@@ -387,7 +421,11 @@ export default function CvBuilder({ onBack }) {
             const deletedExpIds = originalExpIds.filter(id => !currentExpIds.includes(id));
             for (const id of deletedExpIds) {
                 if (!id.startsWith("exp_") && !id.startsWith("experience_")) {
-                    await deleteExperience({ resumeId, experienceId: id }).unwrap();
+                    try {
+                        await deleteExperience({ resumeId, experienceId: id }).unwrap();
+                    } catch (e) {
+                        console.warn("Delete experience error or already deleted:", e);
+                    }
                 }
             }
 
@@ -466,7 +504,11 @@ export default function CvBuilder({ onBack }) {
             const deletedEduIds = originalEduIds.filter(id => !currentEduIds.includes(id));
             for (const id of deletedEduIds) {
                 if (!id.startsWith("edu_") && !id.startsWith("education_")) {
-                    await deleteEducation({ resumeId, educationId: id }).unwrap();
+                    try {
+                        await deleteEducation({ resumeId, educationId: id }).unwrap();
+                    } catch (e) {
+                        console.warn("Delete education error or already deleted:", e);
+                    }
                 }
             }
 
@@ -506,7 +548,11 @@ export default function CvBuilder({ onBack }) {
             const deletedCertIds = originalCertIds.filter(id => !currentCertIds.includes(id));
             for (const id of deletedCertIds) {
                 if (!id.startsWith("cert_") && !id.startsWith("certificates_")) {
-                    await deleteCertification({ resumeId, certificationId: id }).unwrap();
+                    try {
+                        await deleteCertification({ resumeId, certificationId: id }).unwrap();
+                    } catch (e) {
+                        console.warn("Delete certification error or already deleted:", e);
+                    }
                 }
             }
 
@@ -541,7 +587,11 @@ export default function CvBuilder({ onBack }) {
             const deletedProjIds = originalProjIds.filter(id => !currentProjIds.includes(id));
             for (const id of deletedProjIds) {
                 if (!id.startsWith("proj_") && !id.startsWith("projects_")) {
-                    await deleteProject({ resumeId, projectId: id }).unwrap();
+                    try {
+                        await deleteProject({ resumeId, projectId: id }).unwrap();
+                    } catch (e) {
+                        console.warn("Delete project error or already deleted:", e);
+                    }
                 }
             }
 
@@ -583,7 +633,11 @@ export default function CvBuilder({ onBack }) {
             const deletedSkills = originalSkills.filter(s => !currentSkillIds.includes(String(s.id)));
             for (const s of deletedSkills) {
                 if (!String(s.id).startsWith("skill_")) {
-                    await deleteSkill({ resumeId, resumeSkillId: s.id }).unwrap();
+                    try {
+                        await deleteSkill({ resumeId, resumeSkillId: s.id }).unwrap();
+                    } catch (e) {
+                        console.warn("Delete skill error or already deleted:", e);
+                    }
                 }
             }
 
@@ -694,11 +748,11 @@ export default function CvBuilder({ onBack }) {
     }
 
     return (
-        <CvBuilderContext.Provider value={{ activeSection, setActiveSection, cvData, updateField, moveSection, moveItem, deleteItem }}>
+        <CvBuilderContext.Provider value={{ activeSection, setActiveSection, cvData, updateField, moveSection, removeSection, moveItem, deleteItem }}>
             <div className="flex h-screen overflow-hidden bg-[#F3F4F6] print:bg-white print:h-auto print:block print:overflow-visible">
                 {/* Properties Sidebar on the Left */}
                 <div className="print:hidden">
-                    <PropertiesSidebar activeSection={activeSection} cvData={cvData} updateField={updateField} />
+                    <PropertiesSidebar activeSection={activeSection} cvData={cvData} updateField={updateField} sectionOrder={sectionOrder} addSection={addSection} />
                 </div>
 
                 {/* Main Content Area */}

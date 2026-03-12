@@ -22,11 +22,16 @@ const TechInnovatorTemplate = ({
 
             {/* Header Block */}
             <div className="bg-teal-800 text-white px-12 py-10 flex justify-between items-center">
-                <div className="flex-1">
+                <div className="flex-1 flex flex-col gap-2">
                     <EditableText
-                        className="text-3xl font-extrabold text-teal-400 uppercase tracking-widest mb-2"
+                        className="text-3xl font-extrabold text-teal-400 uppercase tracking-widest mb-1"
                         value={cvData.personalInfo.fullName}
                         onChange={(val) => updateField('personalInfo.fullName', val)}
+                    />
+                    <EditableText
+                        className="text-xl font-medium text-teal-200 tracking-wider"
+                        value={cvData.personalInfo.jobTitle}
+                        onChange={(val) => updateField('personalInfo.jobTitle', val)}
                     />
                 </div>
 
