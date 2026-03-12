@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useGetJobByIdQuery, useGetJobQuestionsQuery } from '@/apis/jobApi';
 import {
     useGetCandidateResumesQuery,
@@ -26,6 +26,7 @@ const isSupportedResumeFile = (fileName = '') => /\.(pdf|doc|docx)$/i.test((file
 const Application = () => {
     const { id: jobId } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [uploadFiles, { isLoading: isUploadingFile }] = useUploadFilesMutation();
     const [uploadCandidateResume, { isLoading: isSavingResume }] = useUploadCandidateResumeMutation();
@@ -216,10 +217,15 @@ const Application = () => {
     useEffect(() => {
         if (selectedResumeId) return;
         if (resumes && resumes.length > 0) {
-            const defaultResume = resumes.find(r => r.isDefault) || resumes[0];
-            setSelectedResumeId(defaultResume.id);
+            const presetId = location.state?.presetResumeId;
+            if (presetId && resumes.some(r => r.id === presetId)) {
+                setSelectedResumeId(presetId);
+            } else {
+                const defaultResume = resumes.find(r => r.isDefault) || resumes[0];
+                setSelectedResumeId(defaultResume.id);
+            }
         }
-    }, [resumes, selectedResumeId]);
+    }, [resumes, selectedResumeId, location.state]);
 
     const isUploading = isUploadingFile || isSavingResume;
     const isLoading = jobLoading || resumesLoading || questionsLoading;

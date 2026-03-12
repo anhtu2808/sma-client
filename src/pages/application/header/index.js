@@ -18,7 +18,7 @@ const Header = () => {
                     className="flex items-center gap-2 text-gray-500 hover:text-primary transition-colors mb-4 group"
                 >
                     <ChevronLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-                    <span className="text-xs font-semibold uppercase tracking-widest">Back to Job</span>
+                    <span className="text-xs font-semibold uppercase tracking-widest">Back</span>
                 </button>
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900 font-heading tracking-tight">
                     Apply for <span className="text-primary">{jobData?.name}</span>
