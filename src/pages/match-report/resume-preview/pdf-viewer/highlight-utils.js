@@ -41,19 +41,37 @@ const sortByVisualTop = (leftSpan, rightSpan) =>
 const sortByVisualLeft = (leftSpan, rightSpan) =>
   leftSpan.left - rightSpan.left || leftSpan.top - rightSpan.top || leftSpan.domIndex - rightSpan.domIndex;
 
-export const normalizeDetailRange = (detail) => {
-  const startIndex = Number.parseInt(detail?.startIndex, 10);
-  const endIndex = Number.parseInt(detail?.endIndex, 10);
+const normalizeDetailContext = (detail) =>
+  typeof detail?.context === "string" ? detail.context.trim() : "";
 
-  if (!Number.isInteger(startIndex) || !Number.isInteger(endIndex)) {
-    return null;
+export const resolveContextToRanges = (detail, fullDocumentText) => {
+  const context = normalizeDetailContext(detail);
+
+  if (!context || typeof fullDocumentText !== "string" || fullDocumentText.length === 0) {
+    return [];
   }
 
-  if (startIndex < 0 || endIndex <= startIndex) {
-    return null;
+  const normalizedDoc = fullDocumentText.toLowerCase();
+  const normalizedContext = context.toLowerCase();
+  const ranges = [];
+  let searchFromIndex = 0;
+
+  while (searchFromIndex <= normalizedDoc.length - normalizedContext.length) {
+    const startIndex = normalizedDoc.indexOf(normalizedContext, searchFromIndex);
+
+    if (startIndex === -1) {
+      break;
+    }
+
+    ranges.push({
+      startIndex,
+      endIndex: startIndex + context.length,
+    });
+
+    searchFromIndex = startIndex + 1;
   }
 
-  return { startIndex, endIndex };
+  return ranges;
 };
 
 export const buildPageTextRanges = (pageTexts = []) => {
@@ -75,38 +93,41 @@ export const buildPageTextRanges = (pageTexts = []) => {
   });
 };
 
-export const getDetailPageSegments = (detail, pageTextRanges = []) => {
-  const normalizedRange = normalizeDetailRange(detail);
+export const getDetailPageSegments = (detail, pageTextRanges = [], fullDocumentText = "") => {
+  const normalizedRanges = resolveContextToRanges(detail, fullDocumentText);
 
-  if (!normalizedRange || pageTextRanges.length === 0) {
+  if (normalizedRanges.length === 0 || pageTextRanges.length === 0) {
     return [];
   }
 
   const documentLength = pageTextRanges[pageTextRanges.length - 1]?.pageCharEnd ?? 0;
 
-  if (normalizedRange.endIndex > documentLength) {
-    return [];
-  }
-
-  return pageTextRanges.reduce((segments, pageRange) => {
-    const overlapStart = Math.max(normalizedRange.startIndex, pageRange.pageCharStart);
-    const overlapEnd = Math.min(normalizedRange.endIndex, pageRange.pageCharEnd);
-
-    if (overlapEnd <= overlapStart) {
-      return segments;
+  return normalizedRanges.flatMap((normalizedRange, matchIndex) => {
+    if (normalizedRange.endIndex > documentLength) {
+      return [];
     }
 
-    segments.push({
-      detailId: detail.id,
-      pageIndex: pageRange.pageIndex,
-      globalStart: overlapStart,
-      globalEnd: overlapEnd,
-      localStart: overlapStart - pageRange.pageCharStart,
-      localEnd: overlapEnd - pageRange.pageCharStart,
-    });
+    return pageTextRanges.reduce((segments, pageRange) => {
+      const overlapStart = Math.max(normalizedRange.startIndex, pageRange.pageCharStart);
+      const overlapEnd = Math.min(normalizedRange.endIndex, pageRange.pageCharEnd);
 
-    return segments;
-  }, []);
+      if (overlapEnd <= overlapStart) {
+        return segments;
+      }
+
+      segments.push({
+        detailId: detail.id,
+        matchIndex,
+        pageIndex: pageRange.pageIndex,
+        globalStart: overlapStart,
+        globalEnd: overlapEnd,
+        localStart: overlapStart - pageRange.pageCharStart,
+        localEnd: overlapEnd - pageRange.pageCharStart,
+      });
+
+      return segments;
+    }, []);
+  });
 };
 
 const getSpanTextNode = (spanElement) => {
@@ -305,7 +326,9 @@ export const collectHighlightAreasForSegment = ({
 };
 
 export const getHighlightToneClassName = (status, isHovered) => {
-  if (status === "missing") {
+  const normalizedStatus = typeof status === "string" ? status.toLowerCase() : "";
+
+  if (normalizedStatus === "missing") {
     return isHovered
       ? "bg-red-300/55 ring-2 ring-red-500/80"
       : "bg-red-300/35 ring-1 ring-red-400/70";

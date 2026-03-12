@@ -1,8 +1,6 @@
-import { useGetMatchingDetailQuery } from "@/apis/matchingApi";
 import { useGetResumeByIdQuery } from "@/apis/resumeApi";
 import Loading from "@/components/Loading";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
 import PdfViewer from "./pdf-viewer";
 import JobDetail from "./job-detail";
 
@@ -20,25 +18,14 @@ const PreviewStateCard = ({ title, description, action }) => (
 );
 
 const MatchReportResumePreview = () => {
-  const activeDocumentTab = useSelector((state) => state.matchingReport.activeDocumentTab);
-  const activeCriteriaId = useSelector((state) => state.matchingReport.activeCriteriaId);
-  const criteria = useSelector((state) => state.matchingReport.criteria);
-  const { evaluationId } = useParams();
-  const evaluationIdNumber = Number.parseInt(evaluationId || "", 10);
-  const shouldLoadResume = activeDocumentTab === "resume" && Number.isFinite(evaluationIdNumber);
+  const activeDocumentTab = useSelector((state) => state.matchingReport.ui.activeDocumentTab);
+  const activeCriteriaId = useSelector((state) => state.matchingReport.ui.activeCriteriaId);
+  const matchData = useSelector((state) => state.matchingReport.data);
+  const criteria = matchData?.criteriaScores ?? [];
   const activeCriteria = criteria.find((criterion) => criterion.id === activeCriteriaId) || {};
   const activeDetails = Array.isArray(activeCriteria.details) ? activeCriteria.details : [];
-
-  const {
-    data: matchingDetail,
-    isFetching: isMatchingDetailFetching,
-    isError: isMatchingDetailError,
-  } = useGetMatchingDetailQuery(
-    { evaluationId: evaluationIdNumber },
-    { skip: !shouldLoadResume }
-  );
-
-  const resumeId = matchingDetail?.resumeId;
+  const resumeId = matchData?.resumeId;
+  const shouldLoadResume = activeDocumentTab === "resume" && Number.isFinite(resumeId);
   const {
     data: resumeData,
     isFetching: isResumeFetching,
@@ -50,7 +37,7 @@ const MatchReportResumePreview = () => {
       return <JobDetail />;
     }
 
-    if (isMatchingDetailFetching || (resumeId && isResumeFetching)) {
+    if (resumeId && isResumeFetching) {
       return (
         <div className="flex h-full min-h-[680px] items-center justify-center">
           <Loading size={96} className="py-0" />
@@ -60,8 +47,6 @@ const MatchReportResumePreview = () => {
 
     const resumeUrl = `${resumeData?.resumeUrl || ""}`.trim();
     const isErrorOrMissing =
-      !Number.isFinite(evaluationIdNumber) ||
-      isMatchingDetailError ||
       !resumeId ||
       isResumeError ||
       !resumeUrl;

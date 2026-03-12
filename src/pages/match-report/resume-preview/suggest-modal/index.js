@@ -1,6 +1,9 @@
 import React from "react";
 
 const SuggestModal = ({
+  status,
+  isFixed,
+  description,
   suggestions = [],
   onCancel,
   onConfirm,
@@ -9,7 +12,9 @@ const SuggestModal = ({
   onMouseEnter,
   onMouseLeave,
 }) => {
-  if (!suggestions || suggestions.length === 0) return null;
+  if ((!suggestions || suggestions.length === 0) && !description) return null;
+
+  const isDone = status === "MATCHED" || isFixed;
 
   return (
     <div
@@ -19,28 +24,38 @@ const SuggestModal = ({
       onMouseLeave={onMouseLeave}
     >
       <div className="mb-2 text-sm font-semibold text-neutral-400">
-        Suggestion Preview
+        AI Evaluation Detail
       </div>
+
+      {description && (
+        <div className="mb-3 text-sm leading-relaxed text-neutral-700">
+          {description}
+        </div>
+      )}
       
-      <div className="mb-4 max-h-[250px] overflow-y-auto rounded-lg bg-emerald-50/60 p-4 pb-4">
-        <ul className="list-inside list-disc space-y-2 text-sm text-neutral-700">
-          {suggestions.map((suggestion, index) => (
-            <li key={index} className="leading-relaxed">
-              {suggestion}
-            </li>
-          ))}
-        </ul>
-      </div>
+      {suggestions.length > 0 && (
+        <div className="mb-4 max-h-[250px] overflow-y-auto rounded-lg bg-emerald-50/60 p-4 pb-4">
+          <ul className="list-inside list-disc space-y-2 text-sm text-neutral-700">
+            {suggestions.map((suggestion, index) => (
+              <li key={index} className="leading-relaxed">
+                {suggestion}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1 text-neutral-500">
-          <button
-            type="button"
-            className="flex items-center justify-center rounded p-1.5 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
-            title="Regenerate"
-          >
-            <span className="material-icons-round text-[18px]">autorenew</span>
-          </button>
+          {!isDone && (
+            <button
+              type="button"
+              className="flex items-center justify-center rounded p-1.5 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
+              title="Regenerate"
+            >
+              <span className="material-icons-round text-[18px]">autorenew</span>
+            </button>
+          )}
           <button
             type="button"
             className="flex items-center justify-center rounded p-1.5 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
@@ -57,22 +72,24 @@ const SuggestModal = ({
           </button>
         </div>
         
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="rounded-lg px-4 py-2 text-sm font-semibold text-neutral-600 transition-colors hover:bg-neutral-100"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={onConfirm}
-            className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold flex items-center justify-center text-white transition-colors hover:bg-orange-600"
-          >
-            Mark as fixed
-          </button>
-        </div>
+        {!isDone && (
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="rounded-lg px-4 py-2 text-sm font-semibold text-neutral-600 transition-colors hover:bg-neutral-100"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={onConfirm}
+              className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold flex items-center justify-center text-white transition-colors hover:bg-orange-600"
+            >
+              Mark as fixed
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
