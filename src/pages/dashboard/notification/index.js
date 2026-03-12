@@ -9,7 +9,7 @@ const NOTIFICATION_TABS = [
     { key: "unread", label: "Unread", filter: { isRead: false, types: null } },
     { key: "applications", label: "Applications", filter: { isRead: null, types: ['APPLICATION_STATUS'] } },
     { key: "payment", label: "Payments", filter: { isRead: null, types: ['PAYMENT_SUCCESS', 'PAYMENT_FAILURE'] } },
-    { key: "system", label: "System Alerts", filter: { isRead: null, types: ['CV_PARSE_FAILED'] } },
+    { key: "system", label: "System Alerts", filter: { isRead: null, types: ['CV_PARSE_FAILED', 'SYSTEM'] } },
 ];
 
 const NotificationList = () => {
