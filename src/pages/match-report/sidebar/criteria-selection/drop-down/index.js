@@ -21,12 +21,12 @@ const DropDown = ({ items = [] }) => {
   if (items.length === 0) return null;
 
   return (
-    <div className="relative border-l border-slate-200" ref={dropdownRef}>
+    <div className="relative border-l border-neutral-200" ref={dropdownRef}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex w-14 h-full items-center justify-center text-slate-700 transition-all hover:bg-slate-50 hover:text-primary ${
-          isOpen ? "bg-slate-100 text-primary" : ""
+        className={`flex w-14 h-full items-center justify-center text-neutral-700 transition-colors hover:bg-neutral-50 hover:text-neutral-900 ${
+          isOpen ? "bg-neutral-100" : ""
         }`}
         aria-label="More criteria"
       >
@@ -41,12 +41,12 @@ const DropDown = ({ items = [] }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-[calc(100%+8px)] z-[100] w-72 origin-top-right rounded-2xl border border-slate-100 bg-white p-2 shadow-[0_10px_40px_rgba(0,0,0,0.12)] ring-1 ring-black/5 animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute right-0 top-full z-[100] mt-1 w-72 origin-top-right rounded-xl border border-neutral-200 bg-white p-2 shadow-xl ring-1 ring-black/5 animate-in fade-in zoom-in-95 duration-200">
           <div className="mb-2 flex items-center justify-between px-3 py-1.5">
-            <span className="text-xs font-bold  text-slate-400">
+            <span className="text-xs font-bold text-neutral-400">
               Other Criteria
             </span>
-            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500">
+            <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-bold text-neutral-500">
               {items.length} items
             </span>
           </div>
@@ -63,10 +63,10 @@ const DropDown = ({ items = [] }) => {
                     dispatch(setActiveCriteriaId(item.id));
                     setIsOpen(false);
                   }}
-                  className={`flex w-full items-center justify-between rounded-xl px-3 py-3 text-left transition-all ${
+                  className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left transition-all ${
                     isActive 
-                      ? "bg-primary text-white shadow-md shadow-primary/20" 
-                      : "text-slate-700 hover:bg-orange-50 hover:text-primary"
+                      ? "bg-primary/5 text-primary ring-1 ring-inset ring-primary/20" 
+                      : "text-neutral-700 hover:bg-neutral-50"
                   }`}
                 >
                   <div className="flex flex-col min-w-0 flex-1 mr-3">
@@ -74,23 +74,19 @@ const DropDown = ({ items = [] }) => {
                       {item.criteriaName || item.criteriaType}
                     </span>
                     <div className="mt-1.5 flex items-center gap-2">
-                      <div className={`h-1.5 flex-1 overflow-hidden rounded-full ${isActive ? 'bg-white/30' : 'bg-slate-100'}`}>
+                      <div className="h-1.5 w-20 overflow-hidden rounded-full bg-neutral-100">
                         <div 
-                          className={`h-full transition-all duration-500 ${
-                            isActive 
-                              ? "bg-white" 
-                              : progress < 50 ? "bg-red-400" : progress < 80 ? "bg-amber-400" : "bg-emerald-400"
-                          }`}
+                          className={`h-full ${progress < 50 ? "bg-red-400" : progress < 80 ? "bg-amber-400" : "bg-emerald-400"}`}
                           style={{ width: `${progress}%` }}
                         />
                       </div>
-                      <span className={`text-[10px] font-bold tabular-nums ${isActive ? "text-white" : "text-slate-400"}`}>
+                      <span className="text-[10px] font-bold text-neutral-400">
                         {Math.round(progress)}%
                       </span>
                     </div>
                   </div>
                   {isActive && (
-                    <span className="material-icons-round text-white text-[20px] shrink-0">check_circle</span>
+                    <span className="material-icons-round text-primary text-[20px] shrink-0">check</span>
                   )}
                 </button>
               );

@@ -25,10 +25,21 @@ const getStatusConfig = (status) => {
 const ContentDetail = ({ item, isLast }) => {
   const dispatch = useDispatch();
   const expandedItemIds = useSelector((state) => state.matchingReport.ui.expandedItemIds);
+  const isFocused = useSelector((state) => state.matchingReport.ui.focusedItemId === item.id);
 
   const statusConfig = getStatusConfig(item.status);
   const hasSuggestions = Array.isArray(item.suggestions) && item.suggestions.length > 0;
   const isExpanded = expandedItemIds.includes(item.id);
+  const isPositiveStatus = item.status === "FIXED" || item.status === "fixed" || item.status === "MATCHED" || item.status === "matched" || item.isFixed;
+
+  const getFocusClasses = () => {
+    if (!isFocused) return { bg: "bg-white", text: "text-neutral-900" };
+    return isPositiveStatus
+      ? { bg: "bg-emerald-50/80 shadow-[inset_4px_0_0_0_rgba(16,185,129,1)]", text: "text-emerald-700" }
+      : { bg: "bg-orange-50/80 shadow-[inset_4px_0_0_0_rgba(249,115,22,1)]", text: "text-primary" };
+  };
+
+  const focusStyles = getFocusClasses();
 
   const rowContent = (
     <>
@@ -39,11 +50,31 @@ const ContentDetail = ({ item, isLast }) => {
         {item.status === "FIXED" || item.status === "fixed" ? (
           <span className={statusConfig.tagClassName}>{item.label}</span>
         ) : (
-          <span className="text-sm font-medium text-neutral-900">{item.label}</span>
+          <span className={`text-sm font-medium ${isFocused ? focusStyles.text : "text-neutral-900"}`}>{item.label}</span>
         )}
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
+        {hasSuggestions && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              dispatch(toggleDetailFixed({ detailId: item.id }));
+            }}
+            className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold transition-all ring-1 ring-inset ${
+              item.isFixed
+                ? "bg-emerald-50 text-emerald-600 ring-emerald-600/20"
+                : "bg-white text-neutral-500 ring-neutral-200 hover:bg-neutral-50 hover:text-neutral-900"
+            }`}
+          >
+            <span className="material-icons-round text-[14px]">
+              {item.isFixed ? "check_circle" : "check_circle_outline"}
+            </span>
+            <span className="whitespace-nowrap">{item.isFixed ? "Fixed" : "Fix"}</span>
+          </button>
+        )}
+        
         {hasSuggestions ? (
           <span
             className={`material-icons-round text-sm text-neutral-400 transition-transform ${
@@ -58,7 +89,12 @@ const ContentDetail = ({ item, isLast }) => {
   );
 
   return (
-    <div className={`${isLast ? "" : "border-b border-neutral-200"}`}>
+    <div 
+      id={`sidebar-item-${item.id}`} 
+      className={`transition-all duration-500 ${isLast ? "" : "border-b border-neutral-200"} ${
+        isFocused ? focusStyles.bg : "bg-white"
+      }`}
+    >
       {hasSuggestions ? (
         <button
           type="button"
@@ -69,7 +105,9 @@ const ContentDetail = ({ item, isLast }) => {
               dispatch(setFocusedItemId(item.id));
             }
           }}
-          className="flex w-full items-center justify-between gap-4 px-4 py-3 text-left transition-colors hover:bg-neutral-50"
+          className={`flex w-full items-center justify-between gap-4 px-4 py-3 text-left transition-colors ${
+            isFocused ? "" : "hover:bg-neutral-50"
+          }`}
         >
           {rowContent}
         </button>
@@ -80,7 +118,7 @@ const ContentDetail = ({ item, isLast }) => {
       )}
 
       {item.description && isExpanded ? (
-        <div className="bg-white px-4 pb-3 text-sm text-neutral-600 leading-relaxed">
+        <div className={`px-4 pb-3 pl-11 text-[13.5px] text-neutral-700 leading-relaxed ${isFocused ? "bg-transparent" : "bg-white"}`}>
           {item.description}
         </div>
       ) : null}
@@ -89,8 +127,8 @@ const ContentDetail = ({ item, isLast }) => {
         <Suggestions 
           itemKey={item.id} 
           suggestions={item.suggestions} 
-          isFixed={item.isFixed}
-          onToggleFixed={() => dispatch(toggleDetailFixed({ detailId: item.id }))}
+          isFocused={isFocused}
+          isPositiveStatus={isPositiveStatus}
         />
       ) : null}
     </div>
