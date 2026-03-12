@@ -37,14 +37,6 @@ const HeaderBottom = () => {
         <Button mode="ghost" size="sm" btnIcon tooltip="Layout">
           <span className="material-icons-round text-[20px]">view_agenda</span>
         </Button>
-        <Button
-          mode="primary"
-          size="sm"
-          shape="rounded"
-          iconLeft={<span className="material-icons-round text-[18px]">file_download</span>}
-        >
-          Download
-        </Button>
       </div>
     </div>
   );

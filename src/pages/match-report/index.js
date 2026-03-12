@@ -9,6 +9,7 @@ import { mapEvaluationToStore } from "@/utils/matchingReportUtils";
 import MatchReportResumePreview from "@/pages/match-report/resume-preview";
 import MatchReportSidebar from "@/pages/match-report/sidebar";
 import MatchingLoading from "@/pages/match-report/loading";
+import Loading from "@/components/Loading";
 
 const MATCHING_POLL_INTERVAL_MS = 2_000;
 const MATCHING_POLL_TIMEOUT_MS = 180_000;
@@ -34,6 +35,7 @@ const MatchReport = () => {
     Number.isFinite(evaluationIdFromParams) ? evaluationIdFromParams : null
   );
   const [latestStatus, setLatestStatus] = useState("WAITING");
+  const [hasInitialStatus, setHasInitialStatus] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const [triggerGetMatchingStatus] = useLazyGetMatchingStatusQuery();
@@ -62,6 +64,7 @@ const MatchReport = () => {
 
     setErrorMessage("");
     setLatestStatus("WAITING");
+    setHasInitialStatus(false);
     stopPolling();
 
     if (!hasValidEvaluationId) {
@@ -101,6 +104,7 @@ const MatchReport = () => {
         if (cancelled) return;
 
         setLatestStatus(status);
+        setHasInitialStatus(true);
 
         if (status === "FINISH") {
           stopPolling();
@@ -166,8 +170,15 @@ const MatchReport = () => {
     return null;
   }
 
-  if (phase === "polling" || isDetailLoading) {
-    return <MatchingLoading status={isDetailLoading ? "FETCHING_DETAILS" : latestStatus} />;
+  if (phase === "polling") {
+    if (!hasInitialStatus) {
+      return <Loading fullScreen={true} />;
+    }
+    return <MatchingLoading status={latestStatus} />;
+  }
+
+  if (isDetailLoading) {
+    return <Loading fullScreen={true} />;
   }
 
   if (phase === "failed") {

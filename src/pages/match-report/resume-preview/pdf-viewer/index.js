@@ -1,6 +1,7 @@
-import { startTransition, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { startTransition, useCallback, useEffect, useMemo, useRef,
+   useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setFocusedItemId } from "@/store/slices/matchingReportSlice";
+import { focusItemWithTabSwitch } from "@/store/slices/matchingReportSlice";
 import { LayerRenderStatus, Viewer, Worker } from "@react-pdf-viewer/core";
 import { Trigger, highlightPlugin } from "@react-pdf-viewer/highlight";
 import "@react-pdf-viewer/core/lib/styles/index.css";
@@ -16,7 +17,6 @@ import {
 } from "./highlight-utils";
 
 const PDF_WORKER_URL = "https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
-const HOVER_CLOSE_DELAY_MS = 140;
 
 const hasContent = (detail) =>
   !!detail?.description || (Array.isArray(detail?.suggestions) && detail.suggestions.length > 0);
@@ -67,12 +67,7 @@ const PdfViewer = ({ resumeUrl, activeDetails = [], renderError }) => {
     setHoverAnchor(null);
   }, [clearHoverCloseTimer]);
 
-  const scheduleHoverOverlayClose = useCallback(() => {
-    clearHoverCloseTimer();
-    closeTimerRef.current = window.setTimeout(() => {
-      closeHoverOverlay();
-    }, HOVER_CLOSE_DELAY_MS);
-  }, [clearHoverCloseTimer, closeHoverOverlay]);
+
 
   const openHoverOverlay = useCallback((entry) => {
     clearHoverCloseTimer();
@@ -216,12 +211,6 @@ const PdfViewer = ({ resumeUrl, activeDetails = [], renderError }) => {
         behavior: "smooth",
         block: "center",
       });
-      
-      // Optional: Clear after a delay to allow re-triggering if the user clicks again
-      const timer = setTimeout(() => {
-        dispatch(setFocusedItemId(null));
-      }, 1000);
-      return () => clearTimeout(timer);
     }
   }, [focusedItemId, dispatch]);
 
@@ -252,8 +241,25 @@ const PdfViewer = ({ resumeUrl, activeDetails = [], renderError }) => {
                 zIndex: isHovered || isFocused ? 2 : 1,
               }}
               title={entry.detail?.label || "Resume highlight"}
-              onMouseEnter={entryHasContent ? () => openHoverOverlay(entry) : undefined}
-              onMouseLeave={entryHasContent ? scheduleHoverOverlayClose : undefined}
+              onClick={
+                entryHasContent
+                  ? (e) => {
+                      e.stopPropagation();
+                      openHoverOverlay(entry);
+                      dispatch(focusItemWithTabSwitch(entry.detailId));
+                      
+                      // Smoothly scroll the sidebar item into view
+                      // We give it a slightly longer timeout so that if the sidebar had to 
+                      // switch tabs, React has enough time to mount the new elements first
+                      setTimeout(() => {
+                        const sidebarItem = document.getElementById(`sidebar-item-${entry.detailId}`);
+                        if (sidebarItem) {
+                          sidebarItem.scrollIntoView({ behavior: "smooth", block: "center" });
+                        }
+                      }, 250);
+                    }
+                  : undefined
+              }
             />
           );
         })}
@@ -272,10 +278,8 @@ const PdfViewer = ({ resumeUrl, activeDetails = [], renderError }) => {
               description={modalEntry.detail?.description}
               suggestions={modalEntry.detail?.suggestions || []}
               className="w-full"
-              onCancel={closeHoverOverlay}
-              onConfirm={closeHoverOverlay}
-              onMouseEnter={clearHoverCloseTimer}
-              onMouseLeave={scheduleHoverOverlayClose}
+              onCancel={(e) => { e.stopPropagation(); closeHoverOverlay(); }}
+              onConfirm={(e) => { e.stopPropagation(); closeHoverOverlay(); }}
             />
           </div>
         ) : null}
@@ -285,7 +289,10 @@ const PdfViewer = ({ resumeUrl, activeDetails = [], renderError }) => {
 
   return (
     <div className="mx-auto flex h-full w-full flex-col">
-      <div className="flex-1 overflow-hidden border border-neutral-200 bg-white shadow-soft">
+      <div 
+        className="flex-1 overflow-hidden border border-neutral-200 bg-white shadow-soft"
+        onClick={closeHoverOverlay}
+      >
         <div className="h-full w-full">
           <Worker workerUrl={PDF_WORKER_URL}>
             <Viewer

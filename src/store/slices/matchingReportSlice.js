@@ -37,8 +37,38 @@ const matchingReportSlice = createSlice({
       state.ui.expandedItemIds.push(id);
     },
     
+    expandItemId: (state, action) => {
+      const id = action.payload;
+      if (!state.ui.expandedItemIds.includes(id)) {
+        state.ui.expandedItemIds.push(id);
+      }
+    },
+
     setFocusedItemId: (state, action) => {
       state.ui.focusedItemId = action.payload;
+    },
+
+    focusItemWithTabSwitch: (state, action) => {
+      const detailId = action.payload;
+      if (!state.data) return;
+
+      // Find which criteria this detail belongs to
+      let parentCriteriaId = null;
+      for (const criteria of state.data.criteriaScores) {
+        if (criteria.details?.some((d) => d.id === detailId)) {
+          parentCriteriaId = criteria.id;
+          break;
+        }
+      }
+
+      if (parentCriteriaId) {
+        state.ui.activeCriteriaId = parentCriteriaId;
+      }
+      
+      if (!state.ui.expandedItemIds.includes(detailId)) {
+        state.ui.expandedItemIds.push(detailId);
+      }
+      state.ui.focusedItemId = detailId;
     },
 
     setActiveDocumentTab: (state, action) => {
@@ -64,7 +94,9 @@ export const {
   setMatchingReportData,
   setActiveCriteriaId,
   setFocusedItemId,
+  focusItemWithTabSwitch,
   toggleExpandedItemId,
+  expandItemId,
   setActiveDocumentTab,
   toggleDetailFixed,
 } = matchingReportSlice.actions;

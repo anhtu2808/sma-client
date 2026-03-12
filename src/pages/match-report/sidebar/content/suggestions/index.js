@@ -1,32 +1,26 @@
 import SuggestionCard from "./SuggestionCard";
 
-const Suggestions = ({ itemKey, suggestions, isFixed, onToggleFixed }) => {
+const Suggestions = ({ itemKey, suggestions, isFocused }) => {
   return (
-    <div className="space-y-2 border-t border-neutral-200 bg-white p-3">
-      <div className="mb-1 flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm font-semibold text-neutral-900">
+    <div className={`space-y-3 px-4 pb-4 pl-11 pt-2 ${isFocused ? "bg-transparent" : "bg-white"}`}>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2 text-[13.5px] font-semibold text-neutral-800">
           <span className="material-icons-round text-[16px] text-primary">
             auto_awesome
           </span>
           Phrase suggestions
         </div>
-
+        
         <button
           type="button"
+          title="Regenerate"
           onClick={(e) => {
             e.stopPropagation();
-            onToggleFixed?.();
+            // TODO: Hook up API call
           }}
-          className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold transition-all ring-1 ring-inset ${
-            isFixed
-              ? "bg-emerald-50 text-emerald-600 ring-emerald-600/20"
-              : "bg-white text-neutral-500 ring-neutral-200 hover:bg-neutral-50 hover:text-neutral-900"
-          }`}
+          className="flex items-center justify-center rounded p-1.5 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
         >
-          <span className="material-icons-round text-sm">
-            {isFixed ? "check_circle" : "check_circle_outline"}
-          </span>
-          {isFixed ? "Fixed" : "Mark as fixed"}
+          <span className="material-icons-round text-[18px]">autorenew</span>
         </button>
       </div>
       {suggestions.map((suggestion, index) => (
