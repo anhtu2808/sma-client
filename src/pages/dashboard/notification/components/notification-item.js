@@ -24,6 +24,8 @@ const NotificationItem = ({ noti }) => {
                 return { icon: 'payments', color: 'text-red-500' };
             case 'APPLICATION_STATUS':
                 return { icon: 'work', color: 'text-blue-500' };
+            case 'SYSTEM':
+                return { icon: 'error_outline', color: 'text-red-500' };
             default:
                 return { icon: 'notifications', color: 'text-orange-500' };
         }
@@ -53,6 +55,9 @@ const NotificationItem = ({ noti }) => {
                 break;
             case 'APPLICATION_STATUS':
                 navigate('/dashboard/jobs');
+                break;
+            case 'SYSTEM':
+                navigate('/dashboard/usage');
                 break;
             default:
                 console.log("No specific route for this type");
