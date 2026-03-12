@@ -5,9 +5,11 @@ import NotificationItem from './components/notification-item';
 import SearchInput from '@/components/SearchInput';
 
 const NOTIFICATION_TABS = [
-    { key: "all", label: "All", filter: { isRead: null, type: null } },
-    { key: "unread", label: "Unread", filter: { isRead: false, type: null } },
-    { key: "system", label: "System Alerts", filter: { isRead: null, type: 'CV_PARSE_FAILED' } },
+    { key: "all", label: "All", filter: { isRead: null, types: null } },
+    { key: "unread", label: "Unread", filter: { isRead: false, types: null } },
+    { key: "applications", label: "Applications", filter: { isRead: null, types: ['APPLICATION_STATUS'] } },
+    { key: "payment", label: "Payments", filter: { isRead: null, types: ['PAYMENT_SUCCESS', 'PAYMENT_FAILURE'] } },
+    { key: "system", label: "System Alerts", filter: { isRead: null, types: ['CV_PARSE_FAILED'] } },
 ];
 
 const NotificationList = () => {
@@ -32,10 +34,12 @@ const NotificationList = () => {
         setFilter(prev => ({ ...prev, ...tab.filter, page: 0 }));
     };
 
+
+
     return (
         <Row gutter={[24, 24]}>
             <Col span={24}>
-                {/* Header Section styled like DashboardJobs */}
+                {/* Header Section  */}
                 <section className="bg-white dark:bg-surface-dark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 md:p-8">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
                         <div>
@@ -85,7 +89,7 @@ const NotificationList = () => {
                                     {tab.label}
                                     {countToDisplay > 0 && (
                                         <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${tab.key === 'system'
-                                            ? (isActive ? "bg-red-500 text-white" : "bg-red-100 text-red-600") // Màu đỏ cho System
+                                            ? (isActive ? "bg-red-500 text-white" : "bg-red-100 text-red-600")
                                             : (isActive ? "bg-primary text-white" : "bg-gray-100 text-gray-600")
                                             }`}>
                                             {countToDisplay}
@@ -117,7 +121,7 @@ const NotificationList = () => {
                         </div>
                     )}
 
-                    {/* Pagination styled like DashboardJobs helper text */}
+                    {/* Pagination  */}
                     {paging?.totalPages > 1 && (
                         <div className="flex items-center justify-between mt-6 px-2">
                             <p className="text-sm text-gray-500">
