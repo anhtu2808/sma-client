@@ -103,7 +103,7 @@ export default function CvBuilder({ onBack }) {
     const [cvData, setCvData] = useState({
         personalInfo: {
             fullName: "NGUYEN SI VAN HAO",
-            title: "SENIOR PRODUCT MANAGER",
+            jobTitle: "SENIOR PRODUCT MANAGER",
             avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d",
         },
         objective: "Motivated and forward-thinking product owner with 7 years of experience in a dynamic SaaS environment.",
@@ -183,6 +183,7 @@ export default function CvBuilder({ onBack }) {
                 personalInfo: {
                     ...prevData.personalInfo,
                     fullName: resumeData.fullName || prevData.personalInfo.fullName,
+                    jobTitle: resumeData.jobTitle || prevData.personalInfo.jobTitle,
                     avatar: resumeData.avatar || prevData.personalInfo.avatar,
                 },
                 contact: {
@@ -335,6 +336,17 @@ export default function CvBuilder({ onBack }) {
         });
     };
 
+    const removeSection = (sectionKey) => {
+        setSectionOrder(prev => prev.filter(key => key !== sectionKey));
+    };
+
+    const addSection = (sectionKey) => {
+        setSectionOrder(prev => {
+            if (prev.includes(sectionKey)) return prev;
+            return [...prev, sectionKey];
+        });
+    };
+
     const deleteItem = async (section, id) => {
         // If it does not start with typical local prefixes, it's likely a saved item.
         const isNew = String(id).startsWith(section + "_") || String(id).startsWith("exp_") || String(id).startsWith("experience_") || String(id).startsWith("edu_") || String(id).startsWith("education_") || String(id).startsWith("proj_") || String(id).startsWith("projects_") || String(id).startsWith("cert_") || String(id).startsWith("certificates_") || String(id).startsWith("skill_");
@@ -389,6 +401,7 @@ export default function CvBuilder({ onBack }) {
                         resumeName: `[${currentTemplate}] ${cvData.personalInfo.fullName || 'My Resume'}`,
                         fileName: `[${currentTemplate}] ${cvData.personalInfo.fullName || 'My Resume'}.pdf`,
                         fullName: cvData.personalInfo.fullName,
+                        jobTitle: cvData.personalInfo.jobTitle,
                         avatar: cvData.personalInfo.avatar,
                         addressInResume: cvData.contact.addressInResume,
                         phoneInResume: cvData.contact.phoneInResume,
@@ -735,11 +748,11 @@ export default function CvBuilder({ onBack }) {
     }
 
     return (
-        <CvBuilderContext.Provider value={{ activeSection, setActiveSection, cvData, updateField, moveSection, moveItem, deleteItem }}>
+        <CvBuilderContext.Provider value={{ activeSection, setActiveSection, cvData, updateField, moveSection, removeSection, moveItem, deleteItem }}>
             <div className="flex h-screen overflow-hidden bg-[#F3F4F6] print:bg-white print:h-auto print:block print:overflow-visible">
                 {/* Properties Sidebar on the Left */}
                 <div className="print:hidden">
-                    <PropertiesSidebar activeSection={activeSection} cvData={cvData} updateField={updateField} />
+                    <PropertiesSidebar activeSection={activeSection} cvData={cvData} updateField={updateField} sectionOrder={sectionOrder} addSection={addSection} />
                 </div>
 
                 {/* Main Content Area */}

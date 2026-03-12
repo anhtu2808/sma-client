@@ -32,12 +32,18 @@ const CreativeStudioTemplate = ({
                     </div>
                 </div>
 
-                <div className="text-center">
+                <div className="text-center flex flex-col items-center gap-1">
                     <EditableText
                         as="h2"
-                        className="text-2xl font-bold uppercase tracking-wider mb-2"
+                        className="text-2xl font-bold uppercase tracking-wider"
                         value={cvData.personalInfo.fullName}
                         onChange={(val) => updateField('personalInfo.fullName', val)}
+                    />
+                    <EditableText
+                        as="p"
+                        className="text-sm font-medium tracking-widest uppercase text-purple-200"
+                        value={cvData.personalInfo.jobTitle}
+                        onChange={(val) => updateField('personalInfo.jobTitle', val)}
                     />
                 </div>
 

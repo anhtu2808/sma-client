@@ -4,6 +4,7 @@ import Loading from '@/components/Loading';
 import Input from "@/components/Input";
 import Select from "@/components/Select";
 import Switch from "@/components/Switch";
+import Button from "@/components/Button";
 import { workingModelOptions } from '@/constant/job';
 import { useGetSkillsQuery } from "@/apis/skillApi";
 import dayjs from 'dayjs';
@@ -36,7 +37,7 @@ const projectTypeOptions = [
     { label: "Freelance", value: "FREELANCE" }
 ];
 
-export default function PropertiesSidebar({ activeSection, cvData, updateField }) {
+export default function PropertiesSidebar({ activeSection, cvData, updateField, sectionOrder, addSection }) {
     const [form] = Form.useForm();
 
     React.useEffect(() => {
@@ -105,14 +106,47 @@ export default function PropertiesSidebar({ activeSection, cvData, updateField }
     };
 
     if (!activeSection) {
+        const availableSections = [
+            { key: 'experience', label: 'Work Experience' },
+            { key: 'education', label: 'Education' },
+            { key: 'certificates', label: 'Certifications' },
+            { key: 'projects', label: 'Projects' }
+        ];
+
+        const missingSections = sectionOrder ? availableSections.filter(s => !sectionOrder.includes(s.key)) : [];
+
         return (
-            <div className="w-80 bg-white border-r border-gray-200 h-full p-6 text-center shadow-sm z-10 hidden lg:block overflow-y-auto shrink-0">
-                <div className="flex flex-col items-center justify-center h-full text-gray-500 gap-4 mt-20">
-                    <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
-                        <span className="material-icons-round text-3xl">touch_app</span>
+            <div className="w-80 bg-white border-r border-gray-200 h-full p-6 text-center shadow-sm z-10 hidden lg:block overflow-y-auto shrink-0 flex flex-col justify-between">
+                <div>
+                    <div className="flex flex-col items-center justify-center text-gray-500 gap-4 mt-20">
+                        <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                            <span className="material-icons-round text-3xl">touch_app</span>
+                        </div>
+                        <p>Select an item on the right to edit properties</p>
                     </div>
-                    <p>Select an item on the right to edit properties</p>
                 </div>
+                {missingSections.length > 0 && (
+                    <div className="mt-12 text-left bg-gray-50 p-4 rounded-xl border border-gray-100">
+                        <h4 className="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
+                            <span className="material-icons-round text-[16px]">visibility_off</span>
+                            Hidden Sections
+                        </h4>
+                        <div className="flex flex-col gap-2">
+                            {missingSections.map(s => (
+                                <Button
+                                    key={s.key}
+                                    mode='secondary'
+                                    shape='rounded'
+                                    onClick={() => addSection(s.key)}
+                                    className="flex items-center gap-2 bg-white border border-gray-200 hover:border-[#1F8A70] hover:text-[#1F8A70] text-gray-600 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer w-full text-left shadow-sm hover:shadow"
+                                >
+                                    <span className="material-icons-round text-lg">add_circle</span>
+                                    {s.label}
+                                </Button>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }
