@@ -1,9 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
-import { toggleExpandedItemId } from "@/store/slices/matchingReportSlice";
+import { toggleExpandedItemId, setFocusedItemId, toggleDetailFixed } from "@/store/slices/matchingReportSlice";
 import Suggestions from "../suggestions";
 
 const getStatusConfig = (status) => {
-  if (status === "missing") {
+  if (status === "MISSING" || status === "missing") {
     return {
       icon: "cancel",
       iconClassName: "text-red-500",
@@ -24,7 +24,7 @@ const getStatusConfig = (status) => {
 
 const ContentDetail = ({ item, isLast }) => {
   const dispatch = useDispatch();
-  const expandedItemIds = useSelector((state) => state.matchingReport.expandedItemIds);
+  const expandedItemIds = useSelector((state) => state.matchingReport.ui.expandedItemIds);
 
   const statusConfig = getStatusConfig(item.status);
   const hasSuggestions = Array.isArray(item.suggestions) && item.suggestions.length > 0;
@@ -36,7 +36,7 @@ const ContentDetail = ({ item, isLast }) => {
         <span className={`material-icons-round text-[18px] ${statusConfig.iconClassName}`}>
           {statusConfig.icon}
         </span>
-        {item.status === "fixed" ? (
+        {item.status === "FIXED" || item.status === "fixed" ? (
           <span className={statusConfig.tagClassName}>{item.label}</span>
         ) : (
           <span className="text-sm font-medium text-neutral-900">{item.label}</span>
@@ -62,7 +62,13 @@ const ContentDetail = ({ item, isLast }) => {
       {hasSuggestions ? (
         <button
           type="button"
-          onClick={() => dispatch(toggleExpandedItemId(item.id))}
+          onClick={() => {
+            const willExpand = !isExpanded;
+            dispatch(toggleExpandedItemId(item.id));
+            if (willExpand) {
+              dispatch(setFocusedItemId(item.id));
+            }
+          }}
           className="flex w-full items-center justify-between gap-4 px-4 py-3 text-left transition-colors hover:bg-neutral-50"
         >
           {rowContent}
@@ -73,8 +79,19 @@ const ContentDetail = ({ item, isLast }) => {
         </div>
       )}
 
+      {item.description && isExpanded ? (
+        <div className="bg-white px-4 pb-3 text-sm text-neutral-600 leading-relaxed">
+          {item.description}
+        </div>
+      ) : null}
+
       {hasSuggestions && isExpanded ? (
-        <Suggestions itemKey={item.key} suggestions={item.suggestions} />
+        <Suggestions 
+          itemKey={item.id} 
+          suggestions={item.suggestions} 
+          isFixed={item.isFixed}
+          onToggleFixed={() => dispatch(toggleDetailFixed({ detailId: item.id }))}
+        />
       ) : null}
     </div>
   );

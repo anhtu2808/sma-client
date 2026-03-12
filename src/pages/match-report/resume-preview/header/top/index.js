@@ -3,7 +3,7 @@ import { setActiveDocumentTab } from "@/store/slices/matchingReportSlice";
 
 const HeaderTop = () => {
   const dispatch = useDispatch();
-  const activeDocumentTab = useSelector((state) => state.matchingReport.activeDocumentTab);
+  const activeDocumentTab = useSelector((state) => state.matchingReport.ui.activeDocumentTab);
 
   return (
     <header className="border-b border-neutral-200 px-4 pt-2 sm:px-6">

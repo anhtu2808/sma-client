@@ -53,12 +53,19 @@ describe("highlight-utils", () => {
   });
 
   it("maps a detail range across multiple pages", () => {
-    const pageRanges = buildPageTextRanges(["Hello", "World", "Again"]);
-    const detail = { id: 42, startIndex: 3, endIndex: 11 };
+    const pages = ["Hello", "World", "Again"];
+    const fullDocumentText = pages.join("");
+    const pageRanges = buildPageTextRanges(pages);
+    // context "loWorldA" covers:
+    // "lo" (index 3-5 of page 0)
+    // "World" (index 0-5 of page 1)
+    // "A" (index 0-1 of page 2)
+    const detail = { id: 42, context: "loWorldA" };
 
-    expect(getDetailPageSegments(detail, pageRanges)).toEqual([
+    expect(getDetailPageSegments(detail, pageRanges, fullDocumentText)).toEqual([
       {
         detailId: 42,
+        matchIndex: 0,
         pageIndex: 0,
         globalStart: 3,
         globalEnd: 5,
@@ -67,6 +74,7 @@ describe("highlight-utils", () => {
       },
       {
         detailId: 42,
+        matchIndex: 0,
         pageIndex: 1,
         globalStart: 5,
         globalEnd: 10,
@@ -75,6 +83,7 @@ describe("highlight-utils", () => {
       },
       {
         detailId: 42,
+        matchIndex: 0,
         pageIndex: 2,
         globalStart: 10,
         globalEnd: 11,
@@ -85,11 +94,12 @@ describe("highlight-utils", () => {
   });
 
   it("ignores invalid and out-of-bounds ranges", () => {
-    const pageRanges = buildPageTextRanges(["Hello", "World"]);
+    const pages = ["Hello", "World"];
+    const fullDocumentText = pages.join("");
+    const pageRanges = buildPageTextRanges(pages);
 
-    expect(getDetailPageSegments({ id: 1, startIndex: -1, endIndex: 3 }, pageRanges)).toEqual([]);
-    expect(getDetailPageSegments({ id: 2, startIndex: 2, endIndex: 2 }, pageRanges)).toEqual([]);
-    expect(getDetailPageSegments({ id: 3, startIndex: 0, endIndex: 20 }, pageRanges)).toEqual([]);
+    expect(getDetailPageSegments({ id: 1, context: "" }, pageRanges, fullDocumentText)).toEqual([]);
+    expect(getDetailPageSegments({ id: 2, context: "NotFound" }, pageRanges, fullDocumentText)).toEqual([]);
   });
 
   it("buckets spans into the same visual line when vertical drift is small", () => {

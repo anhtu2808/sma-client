@@ -2,8 +2,8 @@ import { useSelector } from "react-redux";
 import ContentDetail from "./content-detail";
 
 const SidebarContent = () => {
-  const activeCriteriaId = useSelector((state) => state.matchingReport.activeCriteriaId);
-  const criteria = useSelector((state) => state.matchingReport.criteria);
+  const activeCriteriaId = useSelector((state) => state.matchingReport.ui.activeCriteriaId);
+  const criteria = useSelector((state) => state.matchingReport.data?.criteriaScores ?? []);
 
   const activeCriteria = criteria.find((c) => c.id === activeCriteriaId) || {};
   const details = activeCriteria.details || [];

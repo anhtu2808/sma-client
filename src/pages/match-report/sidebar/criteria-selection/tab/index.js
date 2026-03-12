@@ -9,8 +9,8 @@ const getProgressColors = (progress) => {
 
 const Tab = ({ tab }) => {
   const dispatch = useDispatch();
-  const activeCriteriaId = useSelector((state) => state.matchingReport.activeCriteriaId);
-  
+  const activeCriteriaId = useSelector((state) => state.matchingReport.ui.activeCriteriaId);
+
   const isActive = tab.id === activeCriteriaId;
   const { fill, track, border } = getProgressColors(tab.aiScore || 0);
 
@@ -18,7 +18,7 @@ const Tab = ({ tab }) => {
     <button
       type="button"
       onClick={() => dispatch(setActiveCriteriaId(tab.id))}
-      className={`relative flex flex-1 flex-col items-center justify-center border-r border-neutral-200 px-2 py-2 text-center transition-colors last:border-r-0 ${
+      className={`relative flex flex-1 flex-col items-center justify-center border-r border-neutral-200 px-1 py-2 text-center transition-colors last:border-r-0 ${
         isActive ? "bg-neutral-100" : "hover:bg-neutral-50"
       }`}
     >
@@ -27,16 +27,21 @@ const Tab = ({ tab }) => {
           isActive ? "font-bold text-neutral-900" : "font-semibold text-neutral-700"
         }`}
       >
-        {tab.name}
+        {tab.criteriaName || tab.criteriaType || "Criteria"}
       </p>
-      
-      <div className={`mt-1.5 h-[6px] w-[50px] overflow-hidden rounded-full border ${border} ${track}`}>
-        <div
-          className={`h-full rounded-full ${fill}`}
-          style={{ width: `${Math.max(0, Math.min(100, tab.aiScore || 0))}%` }}
-        />
+
+      <div className="mt-1.5 flex items-center gap-1.5">
+        <div className={`h-[6px] w-[35px] overflow-hidden rounded-full border ${border} ${track}`}>
+          <div
+            className={`h-full rounded-full ${fill}`}
+            style={{ width: `${Math.max(0, Math.min(100, tab.aiScore || 0))}%` }}
+          />
+        </div>
+        <span className={`text-[10px] tabular-nums font-bold ${isActive ? "text-neutral-900" : "text-neutral-500"}`}>
+          {Math.round(tab.aiScore || 0)}%
+        </span>
       </div>
-      
+
     </button>
   );
 };

@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { useLazyGetMatchingStatusQuery } from "@/apis/matchingApi";
+import { useLazyGetMatchingDetailQuery, useLazyGetMatchingStatusQuery } from "@/apis/matchingApi";
 import useRequireLoginRedirect from "@/hooks/useRequireLoginRedirect";
 import MatchReportHeader from "@/pages/match-report/resume-preview/header";
-import { resetMatchingReportState } from "@/store/slices/matchingReportSlice";
+import { resetMatchingReportState, setMatchingReportData } from "@/store/slices/matchingReportSlice";
+import { mapEvaluationToStore } from "@/utils/matchingReportUtils";
 import MatchReportResumePreview from "@/pages/match-report/resume-preview";
 import MatchReportSidebar from "@/pages/match-report/sidebar";
 import MatchingLoading from "@/pages/match-report/loading";
@@ -36,6 +37,7 @@ const MatchReport = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const [triggerGetMatchingStatus] = useLazyGetMatchingStatusQuery();
+  const [triggerGetMatchingDetail, { isLoading: isDetailLoading }] = useLazyGetMatchingDetailQuery();
 
   const stopPolling = useCallback(() => {
     if (pollingTimerRef.current) {
@@ -142,12 +144,30 @@ const MatchReport = () => {
     [stopPolling]
   );
 
+  useEffect(() => {
+    if (phase !== "success" || !activeEvaluationId) return;
+
+    const fetchDetail = async () => {
+      try {
+        const data = await triggerGetMatchingDetail({ evaluationId: activeEvaluationId }).unwrap();
+        dispatch(setMatchingReportData(mapEvaluationToStore(data)));
+      } catch (error) {
+        setPhase("failed");
+        setErrorMessage(
+          error?.data?.message || error?.message || "Unable to fetch evaluation details."
+        );
+      }
+    };
+
+    void fetchDetail();
+  }, [activeEvaluationId, dispatch, phase, triggerGetMatchingDetail]);
+
   if (isAuthorized !== true) {
     return null;
   }
 
-  if (phase === "polling") {
-    return <MatchingLoading status={latestStatus} />;
+  if (phase === "polling" || isDetailLoading) {
+    return <MatchingLoading status={isDetailLoading ? "FETCHING_DETAILS" : latestStatus} />;
   }
 
   if (phase === "failed") {

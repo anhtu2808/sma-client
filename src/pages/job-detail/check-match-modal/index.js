@@ -87,7 +87,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
       return;
     }
 
-    const selectableResumes = resumes.filter((resume) => resume.parseStatus === "FINISH");
+    const selectableResumes = resumes;
 
     if (selectableResumes.length > 0 && (!selectedResumeId || !selectableResumes.some((r) => r.id === selectedResumeId))) {
       setSelectedResumeId(selectableResumes[0].id);
@@ -136,7 +136,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
   };
 
   const selectedResume = resumes.find((resume) => resume.id === selectedResumeId) || null;
-  const canSubmit = selectedResume?.parseStatus === "FINISH";
+  const canSubmit = !!selectedResume;
   const isUploading = isUploadingFile || isSavingResume;
 
   const handleParseResume = async (resumeId) => {
@@ -151,7 +151,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
 
   const handleCheckMatch = async () => {
     if (!canSubmit || !selectedResume || !effectiveJobId) {
-      message.warning("Please select a parsed resume to continue.");
+      message.warning("Please select a resume to continue.");
       return;
     }
 
@@ -202,7 +202,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
         ) : (
           <div className="space-y-3">
             {resumes.map((resume) => {
-              const isSelectable = resume.parseStatus === "FINISH";
+              const isSelectable = true;
               const isPartial = resume.parseStatus === "PARTIAL";
               return (
                 <ResumeOption
