@@ -5,7 +5,7 @@ import { TemplateCard } from "../resume-card";
 import UseTemplateModal from "./UseTemplateModal";
 import { useCreateResumeBuilderMutation, useCloneResumeBuilderMutation } from "@/apis/resumeApi";
 
-const CV_TEMPLATES = [
+export const CV_TEMPLATES = [
     {
         id: "tpl_modern_1",
         name: "Modern Minimalist",

@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Spin, Popconfirm, message } from "antd";
 import { useGetCandidateResumesQuery, useDeleteCandidateResumeMutation } from "@/apis/resumeApi";
 import { RESUME_TYPES } from "@/constant";
+import { CV_TEMPLATES } from "../../template-selection";
+import { TemplatePreviewContent } from "../../resume-card";
 
 const ResumeBuilderTab = () => {
   const navigate = useNavigate();
@@ -58,6 +60,7 @@ const ResumeBuilderTab = () => {
               const match = nameRaw.match(/^\[(tpl_[a-z0-9_]+)\]\s*(.*)$/);
               const templateId = match ? match[1] : (resume.template || 'tpl_modern_1');
               const displayTitle = match ? (match[2] || `Resume #${resume.id}`) : nameRaw;
+              const templateObj = CV_TEMPLATES.find(t => t.id === templateId) || CV_TEMPLATES[0];
 
               return (
                 <div
@@ -86,20 +89,9 @@ const ResumeBuilderTab = () => {
                   </Popconfirm>
 
                   {/* CV Preview Skeleton */}
-                  <div className="flex-1 bg-gray-50 dark:bg-gray-800/50 p-4 flex items-start justify-center pt-5">
-                    <div className="w-full max-w-[120px] bg-white dark:bg-gray-700 rounded shadow-sm border border-gray-100 dark:border-gray-600 p-3 aspect-[3/4] flex flex-col">
-                      <div className="w-3/4 h-1.5 bg-gray-300 dark:bg-gray-500 rounded mb-1.5" />
-                      <div className="w-1/2 h-1 bg-gray-200 dark:bg-gray-600 rounded mb-2" />
-                      <div className="w-full h-px bg-gray-200 dark:bg-gray-600 mb-2" />
-                      <div className="space-y-1.5 flex-1">
-                        <div className="w-full h-1 bg-gray-200 dark:bg-gray-600 rounded" />
-                        <div className="w-full h-1 bg-gray-200 dark:bg-gray-600 rounded" />
-                        <div className="w-4/5 h-1 bg-gray-200 dark:bg-gray-600 rounded" />
-                        <div className="w-2/3 h-1.5 bg-gray-300 dark:bg-gray-500 rounded mt-2" />
-                        <div className="w-full h-1 bg-gray-200 dark:bg-gray-600 rounded" />
-                        <div className="w-full h-1 bg-gray-200 dark:bg-gray-600 rounded" />
-                        <div className="w-3/4 h-1 bg-gray-200 dark:bg-gray-600 rounded" />
-                      </div>
+                  <div className={`flex-1 ${templateObj.bgColor || 'bg-gray-50'} dark:bg-gray-800/50 p-4 flex items-start justify-center pt-5`}>
+                    <div className="w-full max-w-[120px] bg-white dark:bg-gray-700 rounded shadow-sm border border-gray-100 dark:border-gray-600 aspect-[3/4] flex flex-col overflow-hidden relative">
+                      <TemplatePreviewContent template={templateObj} />
                     </div>
                   </div>
 
