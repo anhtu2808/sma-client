@@ -22,6 +22,12 @@ const NotificationItem = ({ noti }) => {
                 return { icon: 'check_circle', color: 'text-green-500' };
             case 'PAYMENT_FAILURE':
                 return { icon: 'payments', color: 'text-red-500' };
+            case 'APPLICATION_STATUS':
+                return { icon: 'work', color: 'text-blue-500' };
+            case 'SYSTEM':
+                return { icon: 'error_outline', color: 'text-red-500' };
+            case 'INVITATION':
+                return { icon: 'mail', color: 'text-indigo-500', bg: 'bg-indigo-50' };
             default:
                 return { icon: 'notifications', color: 'text-orange-500' };
         }
@@ -48,6 +54,15 @@ const NotificationItem = ({ noti }) => {
             case 'PAYMENT_SUCCESS':
             case 'PAYMENT_FAILURE':
                 navigate('/dashboard/billing-plans');
+                break;
+            case 'APPLICATION_STATUS':
+                navigate('/dashboard/jobs');
+                break;
+            case 'SYSTEM':
+                navigate('/dashboard/usage');
+                break;
+            case 'INVITATION':
+                navigate('/dashboard/invitations');
                 break;
             default:
                 console.log("No specific route for this type");

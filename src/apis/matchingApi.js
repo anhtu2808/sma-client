@@ -37,4 +37,5 @@ export const {
   useGetMatchingStatusQuery,
   useLazyGetMatchingStatusQuery,
   useGetMatchingDetailQuery,
+  useLazyGetMatchingDetailQuery,
 } = matchingApi;
