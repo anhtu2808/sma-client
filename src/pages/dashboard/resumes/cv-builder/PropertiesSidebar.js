@@ -138,7 +138,7 @@ export default function PropertiesSidebar({ activeSection, cvData, updateField, 
                                     mode='secondary'
                                     shape='rounded'
                                     onClick={() => addSection(s.key)}
-                                    className="flex items-center gap-2 bg-white border border-gray-200 hover:border-[#1F8A70] hover:text-[#1F8A70] text-gray-600 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer w-full text-left shadow-sm hover:shadow"
+                                    className="!justify-start flex items-center gap-2 bg-white border border-gray-200 hover:border-[#1F8A70] hover:text-[#1F8A70] text-gray-600 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer w-full text-left shadow-sm hover:shadow"
                                 >
                                     <span className="material-icons-round text-lg">add_circle</span>
                                     {s.label}
@@ -177,9 +177,6 @@ export default function PropertiesSidebar({ activeSection, cvData, updateField, 
                         <Form.Item label="Degree" name="degree">
                             <Select fullWidth="true" options={degreeOptions} placeholder="Select degree" />
                         </Form.Item>
-                        <Form.Item label="GPA" name="gpa">
-                            <Input type="number" step="0.1" placeholder="e.g: 3.5" />
-                        </Form.Item>
                     </>
                 );
             case 'projects':
@@ -187,20 +184,6 @@ export default function PropertiesSidebar({ activeSection, cvData, updateField, 
                     <>
                         <Form.Item label="Project Type" name="projectType">
                             <Select fullWidth="true" options={projectTypeOptions} placeholder="Select project type" />
-                        </Form.Item>
-                        <Form.Item label="Team Size" name="teamSize">
-                            <Input type="number" min={1} placeholder="Number of members" />
-                        </Form.Item>
-                    </>
-                );
-            case 'certificates':
-                return (
-                    <>
-                        <Form.Item label="Issuer" name="issuer">
-                            <Input placeholder="e.g: Coursera, AWS" />
-                        </Form.Item>
-                        <Form.Item label="Credential URL" name="credentialUrl">
-                            <Input placeholder="https://..." />
                         </Form.Item>
                     </>
                 );

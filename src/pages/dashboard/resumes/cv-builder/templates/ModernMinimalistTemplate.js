@@ -196,7 +196,10 @@ const ModernMinimalistTemplate = ({
                                                                     onIsCurrentChange={v => updateField(`education.${itemIndex}.isCurrent`, v)}
                                                                     className="text-sm font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded"
                                                                 />
-                                                                {edu.gpa > 0 && <span className="font-medium mt-0.5 text-sm">GPA: {edu.gpa}</span>}
+                                                                <div className="flex items-center gap-1 mt-0.5 justify-end">
+                                                                    <span className={`font-medium text-sm ${!edu.gpa ? "text-gray-400 print:hidden" : ""}`}>GPA:</span>
+                                                                    <EditableText as="span" className={`font-medium text-sm min-w-[20px] ${!edu.gpa ? "print:hidden" : ""}`} value={edu.gpa} onChange={v => updateField(`education.${itemIndex}.gpa`, v)} />
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -272,10 +275,11 @@ const ModernMinimalistTemplate = ({
                                                             </div>
                                                         </div>
                                                         <EditableText as="p" className="font-medium mt-0.5 text-sm" value={proj.position} onChange={v => updateField(`projects.${itemIndex}.position`, v)} />
-                                                        <div className="font-medium mt-0.5 text-sm">
+                                                        <div className="font-medium mt-0.5 text-sm flex items-center">
                                                             <span>{proj.projectType || 'PROFESSIONAL'}</span>
                                                             <span className="mx-1">•</span>
-                                                            <span>Team: {proj.teamSize || '1'}</span>
+                                                            <span className={`${!proj.teamSize ? "text-gray-400 print:hidden" : ""}`}>Team:</span>
+                                                            <EditableText as="span" className={`ml-1 min-w-[20px] ${!proj.teamSize ? "print:hidden" : ""}`} value={proj.teamSize} onChange={v => updateField(`projects.${itemIndex}.teamSize`, v)} />
                                                         </div>
                                                         <EditableText as="p" className="font-medium mt-0.5 text-sm" value={proj.description} onChange={v => updateField(`projects.${itemIndex}.description`, v)} />
                                                         <EditableText as="a" className="text-blue-500 hover:underline text-sm" value={proj.projectUrl || "https://project-url.com"} onChange={v => updateField(`projects.${itemIndex}.projectUrl`, v)} />

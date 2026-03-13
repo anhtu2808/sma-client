@@ -3,14 +3,15 @@ import ContentEditable from 'react-contenteditable';
 
 export const EditableText = React.memo(({ value, onChange, className, as = "span", multiline = false }) => {
     const textRef = useRef(null);
-    const [html, setHtml] = useState(value || '');
+    const [html, setHtml] = useState(value !== undefined && value !== null ? String(value) : '');
 
     // Sync external changes
     useEffect(() => {
-        if (value !== html && value !== textRef.current?.innerHTML) {
-            setHtml(value || '');
+        const strValue = value !== undefined && value !== null ? String(value) : '';
+        if (strValue !== html && strValue !== textRef.current?.innerHTML) {
+            setHtml(strValue);
         }
-    }, [value]);
+    }, [value, html]);
 
     const handleChange = (e) => {
         setHtml(e.target.value);
