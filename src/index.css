@@ -174,4 +174,9 @@ code {
     outline: none !important;
     box-shadow: none !important;
   }
+
+  /* Hide antd messages during print */
+  .ant-message {
+    display: none !important;
+  }
 }

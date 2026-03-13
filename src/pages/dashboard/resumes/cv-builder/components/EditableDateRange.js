@@ -19,6 +19,7 @@ export const EditableDateRange = React.memo(({ startDate, endDate, isCurrent, on
             <DatePicker
                 picker="month"
                 format="MM/YYYY"
+                suffixIcon={null}
                 value={startDate && !isNaN(new Date(startDate).getTime()) ? dayjs(startDate) : null}
                 onChange={(date) => {
                     if (date) {
@@ -30,16 +31,17 @@ export const EditableDateRange = React.memo(({ startDate, endDate, isCurrent, on
                 placeholder="Start"
                 allowClear={false}
                 bordered={false}
-                className="w-[72px] p-0 text-center font-inherit bg-transparent cursor-pointer flex-shrink-0 flex-nowrap"
+                className="w-[60px] p-0 text-center font-inherit bg-transparent cursor-pointer flex-shrink-0 flex-nowrap"
                 style={{ color: 'inherit', fontWeight: 'inherit', fontSize: 'inherit' }}
             />
             <span className="flex-shrink-0">-</span>
             {isCurrent ? (
-                <span className="w-[72px] text-center flex-shrink-0">Now</span>
+                <span className="w-[60px] text-center flex-shrink-0">Now</span>
             ) : (
                 <DatePicker
                     picker="month"
                     format="MM/YYYY"
+                    suffixIcon={null}
                     value={endDate && !isNaN(new Date(endDate).getTime()) ? dayjs(endDate) : null}
                     onChange={(date) => {
                         if (date) {
@@ -51,7 +53,7 @@ export const EditableDateRange = React.memo(({ startDate, endDate, isCurrent, on
                     placeholder="End"
                     allowClear={false}
                     bordered={false}
-                    className="w-[72px] p-0 text-center font-inherit bg-transparent cursor-pointer flex-shrink-0 flex-nowrap"
+                    className="w-[60px] p-0 text-center font-inherit bg-transparent cursor-pointer flex-shrink-0 flex-nowrap"
                     style={{ color: 'inherit', fontWeight: 'inherit', fontSize: 'inherit' }}
                 />
             )}
