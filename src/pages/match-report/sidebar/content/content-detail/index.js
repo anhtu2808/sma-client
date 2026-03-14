@@ -1,5 +1,17 @@
+import { useState } from "react";
+import { message } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { toggleExpandedItemId, setFocusedItemId, toggleDetailFixed } from "@/store/slices/matchingReportSlice";
+import {
+  toggleExpandedItemId,
+  setFocusedItemId,
+  toggleDetailFixed,
+  updateSuggestion,
+} from "@/store/slices/matchingReportSlice";
+import {
+  useMarkDetailAsFixedMutation,
+  useRegenerateSuggestionMutation,
+} from "@/apis/matchingApi";
+import { getErrorMessage } from "@/constant/attachment";
 import Suggestions from "../suggestions";
 
 const getStatusConfig = (status) => {
@@ -26,11 +38,58 @@ const ContentDetail = ({ item, isLast }) => {
   const dispatch = useDispatch();
   const expandedItemIds = useSelector((state) => state.matchingReport.ui.expandedItemIds);
   const isFocused = useSelector((state) => state.matchingReport.ui.focusedItemId === item.id);
+  const [regenerateSuggestion] = useRegenerateSuggestionMutation();
+  const [markDetailAsFixed] = useMarkDetailAsFixedMutation();
+  const [regeneratingSuggestionId, setRegeneratingSuggestionId] = useState(null);
+  const [isMarkingFixed, setIsMarkingFixed] = useState(false);
 
   const statusConfig = getStatusConfig(item.status);
   const hasSuggestions = Array.isArray(item.suggestions) && item.suggestions.length > 0;
   const isExpanded = expandedItemIds.includes(item.id);
   const isPositiveStatus = item.status === "FIXED" || item.status === "fixed" || item.status === "MATCHED" || item.status === "matched" || item.isFixed;
+  const canMarkAsFixed = hasSuggestions && !item.isFixed && !isPositiveStatus && !isMarkingFixed;
+  const canRegenerate = !item.isFixed && !isPositiveStatus;
+
+  const handleRegenerateSuggestion = async (suggestionId) => {
+    if (!canRegenerate || regeneratingSuggestionId != null || !Number.isFinite(Number(suggestionId))) {
+      return;
+    }
+
+    setRegeneratingSuggestionId(suggestionId);
+
+    try {
+      const updatedSuggestion = await regenerateSuggestion({ suggestionId }).unwrap();
+      if (!Number.isFinite(Number(updatedSuggestion?.id)) || typeof updatedSuggestion?.suggestion !== "string") {
+        throw new Error("Invalid suggestion response.");
+      }
+      dispatch(updateSuggestion(updatedSuggestion));
+      message.success("Suggestion regenerated successfully.");
+    } catch (error) {
+      message.error(getErrorMessage(error, "Unable to regenerate suggestion."));
+    } finally {
+      setRegeneratingSuggestionId(null);
+    }
+  };
+
+  const handleMarkAsFixed = async (event) => {
+    event.stopPropagation();
+
+    if (!canMarkAsFixed) {
+      return;
+    }
+
+    setIsMarkingFixed(true);
+
+    try {
+      await markDetailAsFixed({ detailId: item.id }).unwrap();
+      dispatch(toggleDetailFixed({ detailId: item.id }));
+      message.success("Marked as fixed successfully.");
+    } catch (error) {
+      message.error(getErrorMessage(error, "Unable to mark this item as fixed."));
+    } finally {
+      setIsMarkingFixed(false);
+    }
+  };
 
   const getFocusClasses = () => {
     if (!isFocused) return { bg: "bg-white", text: "text-neutral-900" };
@@ -58,18 +117,16 @@ const ContentDetail = ({ item, isLast }) => {
         {hasSuggestions && (
           <button
             type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              dispatch(toggleDetailFixed({ detailId: item.id }));
-            }}
-            className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold transition-all ring-1 ring-inset ${
+            disabled={!canMarkAsFixed}
+            onClick={handleMarkAsFixed}
+            className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold transition-all ring-1 ring-inset disabled:cursor-not-allowed disabled:opacity-70 ${
               item.isFixed
                 ? "bg-emerald-50 text-emerald-600 ring-emerald-600/20"
                 : "bg-white text-neutral-500 ring-neutral-200 hover:bg-neutral-50 hover:text-neutral-900"
             }`}
           >
-            <span className="material-icons-round text-[14px]">
-              {item.isFixed ? "check_circle" : "check_circle_outline"}
+            <span className={`material-icons-round text-[14px] ${isMarkingFixed ? "animate-spin" : ""}`}>
+              {isMarkingFixed ? "autorenew" : item.isFixed ? "check_circle" : "check_circle_outline"}
             </span>
             <span className="whitespace-nowrap">{item.isFixed ? "Fixed" : "Fix"}</span>
           </button>
@@ -128,7 +185,9 @@ const ContentDetail = ({ item, isLast }) => {
           itemKey={item.id} 
           suggestions={item.suggestions} 
           isFocused={isFocused}
-          isPositiveStatus={isPositiveStatus}
+          canRegenerate={canRegenerate}
+          regeneratingSuggestionId={regeneratingSuggestionId}
+          onRegenerateSuggestion={handleRegenerateSuggestion}
         />
       ) : null}
     </div>

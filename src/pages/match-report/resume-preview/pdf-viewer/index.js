@@ -1,7 +1,17 @@
 import { startTransition, useCallback, useEffect, useMemo, useRef,
    useState } from "react";
+import { message } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { focusItemWithTabSwitch } from "@/store/slices/matchingReportSlice";
+import {
+  focusItemWithTabSwitch,
+  toggleDetailFixed,
+  updateSuggestion,
+} from "@/store/slices/matchingReportSlice";
+import {
+  useMarkDetailAsFixedMutation,
+  useRegenerateSuggestionMutation,
+} from "@/apis/matchingApi";
+import { getErrorMessage } from "@/constant/attachment";
 import { LayerRenderStatus, Viewer, Worker } from "@react-pdf-viewer/core";
 import { Trigger, highlightPlugin } from "@react-pdf-viewer/highlight";
 import "@react-pdf-viewer/core/lib/styles/index.css";
@@ -47,8 +57,12 @@ const PdfViewer = ({ resumeUrl, activeDetails = [], renderError }) => {
   const [highlightEntriesByPage, setHighlightEntriesByPage] = useState(() => new Map());
   const [hoveredDetailId, setHoveredDetailId] = useState(null);
   const [hoverAnchor, setHoverAnchor] = useState(null);
+  const [regeneratingSuggestionId, setRegeneratingSuggestionId] = useState(null);
+  const [markingDetailId, setMarkingDetailId] = useState(null);
   const dispatch = useDispatch();
   const focusedItemId = useSelector((state) => state.matchingReport.ui.focusedItemId);
+  const [regenerateSuggestion] = useRegenerateSuggestionMutation();
+  const [markDetailAsFixed] = useMarkDetailAsFixedMutation();
 
   const closeTimerRef = useRef(null);
   const documentLoadRunIdRef = useRef(0);
@@ -77,6 +91,46 @@ const PdfViewer = ({ resumeUrl, activeDetails = [], renderError }) => {
       pageIndex: entry.pageIndex,
     });
   }, [clearHoverCloseTimer]);
+
+  const handleRegenerateSuggestion = async (suggestionId) => {
+    if (regeneratingSuggestionId != null || !Number.isFinite(Number(suggestionId))) {
+      return;
+    }
+
+    setRegeneratingSuggestionId(suggestionId);
+
+    try {
+      const updatedSuggestion = await regenerateSuggestion({ suggestionId }).unwrap();
+      if (!Number.isFinite(Number(updatedSuggestion?.id)) || typeof updatedSuggestion?.suggestion !== "string") {
+        throw new Error("Invalid suggestion response.");
+      }
+      dispatch(updateSuggestion(updatedSuggestion));
+      message.success("Suggestion regenerated successfully.");
+    } catch (error) {
+      message.error(getErrorMessage(error, "Unable to regenerate suggestion."));
+    } finally {
+      setRegeneratingSuggestionId(null);
+    }
+  };
+
+  const handleMarkAsFixed = async (detail) => {
+    if (!detail?.id || detail?.isFixed || markingDetailId != null) {
+      return;
+    }
+
+    setMarkingDetailId(detail.id);
+
+    try {
+      await markDetailAsFixed({ detailId: detail.id }).unwrap();
+      dispatch(toggleDetailFixed({ detailId: detail.id }));
+      closeHoverOverlay();
+      message.success("Marked as fixed successfully.");
+    } catch (error) {
+      message.error(getErrorMessage(error, "Unable to mark this item as fixed."));
+    } finally {
+      setMarkingDetailId(null);
+    }
+  };
 
   const registryPlugin = useMemo(
     () => ({
@@ -277,9 +331,15 @@ const PdfViewer = ({ resumeUrl, activeDetails = [], renderError }) => {
               isFixed={modalEntry.detail?.isFixed}
               description={modalEntry.detail?.description}
               suggestions={modalEntry.detail?.suggestions || []}
+              onRegenerateSuggestion={handleRegenerateSuggestion}
+              regeneratingSuggestionId={regeneratingSuggestionId}
+              isMarkingFixed={markingDetailId === modalEntry.detail?.id}
               className="w-full"
               onCancel={(e) => { e.stopPropagation(); closeHoverOverlay(); }}
-              onConfirm={(e) => { e.stopPropagation(); closeHoverOverlay(); }}
+              onConfirm={(e) => {
+                e.stopPropagation();
+                void handleMarkAsFixed(modalEntry.detail);
+              }}
             />
           </div>
         ) : null}
