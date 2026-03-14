@@ -6,6 +6,11 @@ export type CandidateLevel = "SENIOR" | "MID" | "JUNIOR";
 
 export type TransferabilityLevel = "HIGH" | "MEDIUM" | "LOW";
 
+export interface SuggestionItem {
+  id: number;
+  suggestion: string;
+}
+
 export interface DetailItem {
   id: number;
   label: string;
@@ -17,7 +22,7 @@ export interface DetailItem {
   isFixed: boolean;
   context: string | null;
   impactScore: number | null;
-  suggestions: string[];
+  suggestions: SuggestionItem[];
 }
 
 export interface CriteriaScore {
@@ -72,11 +77,52 @@ export interface MatchingReportState {
   ui: MatchingReportUiState;
 }
 
+const normalizeSuggestions = (suggestions?: SuggestionItem[] | null): SuggestionItem[] => {
+  if (!Array.isArray(suggestions)) {
+    return [];
+  }
+
+  return suggestions
+    .filter((suggestion): suggestion is SuggestionItem => suggestion != null)
+    .map((suggestion) => ({
+      id: Number(suggestion.id),
+      suggestion: typeof suggestion.suggestion === "string" ? suggestion.suggestion : "",
+    }))
+    .filter((suggestion) => Number.isFinite(suggestion.id));
+};
+
+const normalizeDetails = (details?: DetailItem[] | null): DetailItem[] => {
+  if (!Array.isArray(details)) {
+    return [];
+  }
+
+  return details.map((detail) => ({
+    ...detail,
+    suggestions: normalizeSuggestions(detail?.suggestions),
+  }));
+};
+
+const normalizeCriteriaScores = (criteriaScores?: CriteriaScore[] | null): CriteriaScore[] => {
+  if (!Array.isArray(criteriaScores)) {
+    return [];
+  }
+
+  return criteriaScores.map((criteriaScore) => ({
+    ...criteriaScore,
+    details: normalizeDetails(criteriaScore?.details),
+  }));
+};
+
 export const mapEvaluationToStore = (evaluationData: EvaluationData): MatchingReportState => {
+  const normalizedEvaluationData = {
+    ...evaluationData,
+    criteriaScores: normalizeCriteriaScores(evaluationData?.criteriaScores),
+  };
+
   return {
-    data: evaluationData,
+    data: normalizedEvaluationData,
     ui: {
-      activeCriteriaId: evaluationData.criteriaScores?.[0]?.id ?? null,
+      activeCriteriaId: normalizedEvaluationData.criteriaScores?.[0]?.id ?? null,
       expandedItemIds: [],
       activeDocumentTab: "resume",
     },

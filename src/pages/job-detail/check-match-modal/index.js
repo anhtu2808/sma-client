@@ -166,7 +166,9 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
       }
 
       handleClose();
-      navigate(`/match-report/${Number(evaluationId)}`);
+      navigate(`/match-report/${Number(evaluationId)}`, {
+        state: { jobId: Number(effectiveJobId), resumeId: selectedResume.id },
+      });
     } catch (error) {
       message.error(getErrorMessage(error, "Unable to start AI matching."));
     }

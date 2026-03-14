@@ -86,6 +86,21 @@ const matchingReportSlice = createSlice({
         }
       });
     },
+
+    updateSuggestion: (state, action) => {
+      const { id, suggestion } = action.payload || {};
+      if (!state.data || !Number.isFinite(Number(id)) || typeof suggestion !== "string") return;
+
+      state.data.criteriaScores.forEach((criteria) => {
+        criteria.details.forEach((detail) => {
+          detail.suggestions.forEach((detailSuggestion) => {
+            if (detailSuggestion.id === Number(id)) {
+              detailSuggestion.suggestion = suggestion;
+            }
+          });
+        });
+      });
+    },
   },
 });
 
@@ -99,6 +114,7 @@ export const {
   expandItemId,
   setActiveDocumentTab,
   toggleDetailFixed,
+  updateSuggestion,
 } = matchingReportSlice.actions;
 
 export default matchingReportSlice.reducer;
