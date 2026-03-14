@@ -12,7 +12,7 @@ const DashboardLayout = () => {
   const { data } = useCandidateProfileQuery();
   const user = data?.data?.user;
   const displayName = user?.fullName || user?.email || "Candidate";
-  useNotificationSocket();
+  // useNotificationSocket();
 
   return (
     <div className="bg-background-light dark:bg-background-dark text-gray-900 dark:text-gray-100 font-sans antialiased selection:bg-primary selection:text-white transition-colors duration-300 min-h-screen print:min-h-0 flex flex-col print:block print:bg-white">
