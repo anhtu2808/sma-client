@@ -94,8 +94,8 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
         <div className="flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-300">
           <div className="flex justify-between items-start mb-6">
             <div>
-              <h3 className="text-xl font-bold text-gray-900">Special Plans</h3>
-              <p className="text-sm text-gray-500 mt-1">Pick the right plan for you</p>
+              <h3 className="text-xl font-bold text-gray-900">Choose a Plan Duration</h3>
+              <p className="text-sm text-gray-500 mt-1">Select the duration that best fits your needs</p>
             </div>
             <Button
               mode="ghost"
