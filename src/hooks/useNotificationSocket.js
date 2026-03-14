@@ -5,6 +5,7 @@ import { Client } from '@stomp/stompjs';
 import { api } from '@/apis/baseApi';
 import { setRealtimePreview } from '@/pages/dashboard/notification/components/notification-slice';
 import toast from "react-hot-toast";
+import NotificationToast from '@/components/NotificationToast';
 
 export const useNotificationSocket = () => {
     const dispatch = useDispatch();
@@ -66,28 +67,13 @@ export const useNotificationSocket = () => {
                     }
                     const icon = getIcon(newNoti.notificationType);
 
-                    toast.custom(() => (
-                        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-4 w-[360px]">
-                            <div className="flex gap-3">
-
-                                <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-orange-100">
-                                    <span className="material-symbols-outlined text-orange-500">
-                                        {icon}
-                                    </span>
-                                </div>
-
-                                <div className="flex-1">
-                                    <p className="font-bold text-gray-900">
-                                        {newNoti.title}
-                                    </p>
-
-                                    <p className="text-sm text-gray-600 mt-1">
-                                        {newNoti.message}
-                                    </p>
-                                </div>
-
-                            </div>
-                        </div>
+                    toast.custom((t) => (
+                        <NotificationToast
+                            t={t}
+                            icon={icon}
+                            title={newNoti.title}
+                            message={newNoti.message}
+                        />
                     ), { duration: 5000 });
 
                     dispatch(api.util.invalidateTags(['Notifications']));
