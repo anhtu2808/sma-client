@@ -3,6 +3,7 @@ import { Row, Col } from 'antd';
 import { useGetNotificationsQuery, useMarkAllAsReadMutation } from '@/apis/notificationApi';
 import NotificationItem from './components/notification-item';
 import SearchInput from '@/components/SearchInput';
+import { ChevronLeft, ChevronRight, } from 'lucide-react';
 
 const NOTIFICATION_TABS = [
     { key: "all", label: "All", filter: { isRead: null, types: null } },
@@ -35,7 +36,23 @@ const NotificationList = () => {
         setFilter(prev => ({ ...prev, ...tab.filter, page: 0 }));
     };
 
+    const getPageNumbers = (page, totalPages) => {
+        const pages = [];
+        const maxVisible = 5;
 
+        if (totalPages <= maxVisible) {
+            for (let i = 0; i < totalPages; i++) pages.push(i);
+        } else {
+            const start = Math.max(0, page - 2);
+            const end = Math.min(totalPages, page + 3);
+
+            if (start > 0) pages.push(0, '...');
+            for (let i = start; i < end; i++) pages.push(i);
+            if (end < totalPages) pages.push('...', totalPages - 1);
+        }
+
+        return pages;
+    };
 
     return (
         <Row gutter={[24, 24]}>
@@ -125,25 +142,59 @@ const NotificationList = () => {
                     {/* Pagination  */}
                     {paging?.totalPages > 1 && (
                         <div className="flex items-center justify-between mt-6 px-2">
-                            <p className="text-sm text-gray-500">
-                                Showing <span className="font-medium text-gray-900 dark:text-white">{startEntry}</span> to{' '}
-                                <span className="font-medium text-gray-900 dark:text-white">{endEntry}</span> of{' '}
-                                <span className="font-medium text-gray-900 dark:text-white">{paging.totalElements}</span> results
+                            <p className="text-sm text-subtext-light dark:text-subtext-dark">
                             </p>
-                            <div className="flex gap-2">
+                            <div className="flex items-center gap-2">
+
+                                {/* Previous */}
                                 <button
+                                    onClick={() => setFilter({ ...filter, page: Math.max(0, filter.page - 1) })}
                                     disabled={paging.first}
-                                    onClick={() => setFilter(prev => ({ ...prev, page: prev.page - 1 }))}
-                                    className="px-4 py-1.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 transition-colors"
+                                    className={`p-2 rounded-xl transition-all ${paging.first
+                                        ? "text-gray-200"
+                                        : "text-gray-400 hover:bg-gray-100"
+                                        }`}
                                 >
-                                    Previous
+                                    <ChevronLeft size={16} />
                                 </button>
+
+                                {/* Page numbers */}
+                                <div className="flex items-center gap-1">
+                                    {getPageNumbers(filter.page, paging.totalPages).map((p, index) =>
+                                        p === "..." ? (
+                                            <span
+                                                key={`dots-${index}`}
+                                                className="px-2 text-gray-300 font-black text-xs"
+                                            >
+                                                ...
+                                            </span>
+                                        ) : (
+                                            <button
+                                                key={`page-${p}`}
+                                                onClick={() => setFilter({ ...filter, page: p })}
+                                                className={`w-8 h-8 text-[10px] font-black rounded-lg transition-all ${filter.page === p
+                                                    ? "bg-orange-500 text-white shadow-md shadow-orange-200"
+                                                    : "text-gray-500 hover:bg-gray-100"
+                                                    }`}
+                                            >
+                                                {p + 1}
+                                            </button>
+                                        )
+                                    )}
+                                </div>
+
+                                {/* Next */}
                                 <button
+                                    onClick={() =>
+                                        setFilter({ ...filter, page: filter.page + 1 })
+                                    }
                                     disabled={paging.last}
-                                    onClick={() => setFilter(prev => ({ ...prev, page: prev.page + 1 }))}
-                                    className="px-4 py-1.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 transition-colors"
+                                    className={`p-2 rounded-xl transition-all ${paging.last
+                                        ? "text-gray-200"
+                                        : "text-gray-400 hover:bg-gray-100"
+                                        }`}
                                 >
-                                    Next
+                                    <ChevronRight size={16} />
                                 </button>
                             </div>
                         </div>
