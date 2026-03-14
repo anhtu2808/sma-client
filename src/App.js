@@ -1,8 +1,10 @@
 import { RouterProvider } from 'react-router-dom';
 import { routes } from '@/routes';
 import { Toaster } from "react-hot-toast";
+import { useNotificationSocket } from '@/hooks/useNotificationSocket';
 
 function App() {
+  useNotificationSocket();
   return (
     <>
       <Toaster
