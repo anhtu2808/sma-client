@@ -101,9 +101,9 @@ const JobCard = ({
                         {salary}
                     </div>
                 )}
-                {tags.map((tag, index) => (
+                {tags.map((tag) => (
                     <div
-                        key={index}
+                        key={tag}
                         className="flex items-center justify-center px-4 py-2 rounded-full bg-slate-100 dark:bg-[#3d241b] text-slate-700 dark:text-[#e0c4b7] text-sm font-medium"
                     >
                         {tag}

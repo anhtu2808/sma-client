@@ -152,7 +152,7 @@ const Jobs = () => {
                 companyLogo: job.company?.logo,
                 location: job.location || job.workingModel || job.company?.country || "Remote",
                 salary,
-                tags: job.skills ? job.skills.map(s => s.name) : [],
+                tags: job.skills ? [...job.skills].map(s => s.name).sort((a, b) => a.localeCompare(b)) : [],
                 postedTime: job.uploadTime ? new Date(job.uploadTime).toLocaleDateString() : "Recently",
                 isHot: job.jobLevel === "SENIOR" || job.hot, // Map isHot if available, or infer
                 isApplied: job.isApplied, // Add isApplied flag
