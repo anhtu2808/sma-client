@@ -11,6 +11,7 @@ import { useStartMatchingDetailMutation } from "@/apis/matchingApi";
 import Loading from "@/components/Loading";
 import { RESUME_TYPES } from "@/constant";
 import { getErrorMessage, normalizeParseStatus } from "@/constant/attachment";
+import { getEvaluationHistoryId, getResumeMatchMode } from "./matchHistory";
 import ResumeOption from "./resume-option";
 
 const isSupportedResumeFile = (fileName = "") => /\.(pdf|doc|docx)$/i.test(`${fileName}`.trim());
@@ -48,6 +49,8 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
   const inputRef = useRef(null);
 
   const effectiveJobId = jobId || routeJobId;
+  const normalizedJobId = Number.parseInt(`${effectiveJobId ?? ""}`, 10);
+  const hasValidJobId = Number.isFinite(normalizedJobId);
 
   const [selectedResumeId, setSelectedResumeId] = useState(null);
 
@@ -56,7 +59,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
     isLoading: isProfileLoading,
     isFetching: isProfileFetching,
   } = useGetCandidateResumesQuery(
-    { type: RESUME_TYPES.PROFILE },
+    { type: RESUME_TYPES.PROFILE, jobId: hasValidJobId ? normalizedJobId : undefined },
     { skip: !open }
   );
 
@@ -65,7 +68,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
     isLoading: isOriginalLoading,
     isFetching: isOriginalFetching,
   } = useGetCandidateResumesQuery(
-    { type: RESUME_TYPES.ORIGINAL },
+    { type: RESUME_TYPES.ORIGINAL, jobId: hasValidJobId ? normalizedJobId : undefined },
     { skip: !open }
   );
 
@@ -87,10 +90,15 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
       return;
     }
 
-    const selectableResumes = resumes;
+    const selectableResumes = resumes.filter((resume) => getResumeMatchMode(resume) === "new");
 
     if (selectableResumes.length > 0 && (!selectedResumeId || !selectableResumes.some((r) => r.id === selectedResumeId))) {
       setSelectedResumeId(selectableResumes[0].id);
+      return;
+    }
+
+    if (selectableResumes.length === 0 && selectedResumeId != null) {
+      setSelectedResumeId(null);
     }
   }, [open, resumes, selectedResumeId]);
 
@@ -136,8 +144,24 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
   };
 
   const selectedResume = resumes.find((resume) => resume.id === selectedResumeId) || null;
-  const canSubmit = !!selectedResume;
+  const selectedResumeMatchMode = getResumeMatchMode(selectedResume);
+  const canSubmit = !!selectedResume && selectedResumeMatchMode === "new";
+  const selectedEvaluationId = getEvaluationHistoryId(selectedResume);
   const isUploading = isUploadingFile || isSavingResume;
+
+  const handleViewHistory = (resume) => {
+    const evaluationId = getEvaluationHistoryId(resume);
+    if (!evaluationId) return;
+
+    handleClose();
+    navigate(`/match-report/${evaluationId}`, {
+      state: {
+        jobId: normalizedJobId,
+        resumeId: resume.id,
+        matchSource: "existing",
+      },
+    });
+  };
 
   const handleParseResume = async (resumeId) => {
     if (!resumeId) return;
@@ -155,9 +179,21 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
       return;
     }
 
+    if (selectedResumeMatchMode === "existing" && selectedEvaluationId != null) {
+      handleClose();
+      navigate(`/match-report/${selectedEvaluationId}`, {
+        state: {
+          jobId: normalizedJobId,
+          resumeId: selectedResume.id,
+          matchSource: "existing",
+        },
+      });
+      return;
+    }
+
     try {
       const evaluationId = await startMatchingDetail({
-        jobId: Number(effectiveJobId),
+        jobId: normalizedJobId,
         resumeId: selectedResume.id,
       }).unwrap();
 
@@ -167,7 +203,11 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
 
       handleClose();
       navigate(`/match-report/${Number(evaluationId)}`, {
-        state: { jobId: Number(effectiveJobId), resumeId: selectedResume.id },
+        state: {
+          jobId: normalizedJobId,
+          resumeId: selectedResume.id,
+          matchSource: "new",
+        },
       });
     } catch (error) {
       message.error(getErrorMessage(error, "Unable to start AI matching."));
@@ -204,7 +244,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
         ) : (
           <div className="space-y-3">
             {resumes.map((resume) => {
-              const isSelectable = true;
+              const isSelectable = getResumeMatchMode(resume) === "new";
               const isPartial = resume.parseStatus === "PARTIAL";
               return (
                 <ResumeOption
@@ -216,6 +256,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
                   isParsing={isParsingResume}
                   onSelect={setSelectedResumeId}
                   onParse={handleParseResume}
+                  onViewHistory={handleViewHistory}
                 />
               );
             })}

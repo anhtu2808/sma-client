@@ -132,7 +132,7 @@ const ContentDetail = ({ item, isLast }) => {
           </button>
         )}
         
-        {hasSuggestions ? (
+        {(hasSuggestions || item.description) ? (
           <span
             className={`material-icons-round text-sm text-neutral-400 transition-transform ${
               isExpanded ? "rotate-180" : ""
@@ -152,27 +152,21 @@ const ContentDetail = ({ item, isLast }) => {
         isFocused ? focusStyles.bg : "bg-white"
       }`}
     >
-      {hasSuggestions ? (
-        <button
-          type="button"
-          onClick={() => {
-            const willExpand = !isExpanded;
-            dispatch(toggleExpandedItemId(item.id));
-            if (willExpand) {
-              dispatch(setFocusedItemId(item.id));
-            }
-          }}
-          className={`flex w-full items-center justify-between gap-4 px-4 py-3 text-left transition-colors ${
-            isFocused ? "" : "hover:bg-neutral-50"
-          }`}
-        >
-          {rowContent}
-        </button>
-      ) : (
-        <div className="flex items-center justify-between gap-4 px-4 py-3">
-          {rowContent}
-        </div>
-      )}
+      <button
+        type="button"
+        onClick={() => {
+          const willExpand = !isExpanded;
+          dispatch(toggleExpandedItemId(item.id));
+          if (willExpand) {
+            dispatch(setFocusedItemId(item.id));
+          }
+        }}
+        className={`flex w-full items-center justify-between gap-4 px-4 py-3 text-left transition-colors ${
+          isFocused ? "" : "hover:bg-neutral-50"
+        }`}
+      >
+        {rowContent}
+      </button>
 
       {item.description && isExpanded ? (
         <div className={`px-4 pb-3 pl-11 text-[13.5px] text-neutral-700 leading-relaxed ${isFocused ? "bg-transparent" : "bg-white"}`}>

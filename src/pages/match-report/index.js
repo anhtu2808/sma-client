@@ -44,9 +44,26 @@ const MatchReport = () => {
   const [triggerGetMatchingDetail, { isLoading: isDetailLoading }] = useLazyGetMatchingDetailQuery();
   const [startMatchingDetail, { isLoading: isRetrying }] = useStartMatchingDetailMutation();
 
-  const { jobId, resumeId } = location.state || {};
+  const { jobId, resumeId, matchSource } = location.state || {};
 
   const handleRetry = async () => {
+    if (matchSource !== "new") {
+      if (!hasValidEvaluationId) {
+        if (jobId) {
+          navigate(`/jobs/${jobId}`);
+        } else {
+          navigate("/jobs");
+        }
+        return;
+      }
+
+      setErrorMessage("");
+      setLatestStatus("WAITING");
+      setHasInitialStatus(false);
+      setPhase("polling");
+      return;
+    }
+
     if (!jobId || !resumeId) {
       if (jobId) {
         navigate(`/jobs/${jobId}`);
@@ -67,7 +84,7 @@ const MatchReport = () => {
       }
 
       navigate(`/match-report/${Number(newEvaluationId)}`, {
-        state: { jobId, resumeId },
+        state: { jobId, resumeId, matchSource: "new" },
         replace: true,
       });
     } catch (error) {

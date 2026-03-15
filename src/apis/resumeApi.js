@@ -99,10 +99,10 @@ export const resumeApi = api.injectEndpoints({
     overrideExisting: process.env.NODE_ENV === "development",
     endpoints: (builder) => ({
         getCandidateResumes: builder.query({
-            query: ({ keyword, type } = {}) => ({
+            query: ({ keyword, type, jobId } = {}) => ({
                 url: `${API_VERSION}/resumes`,
                 method: "GET",
-                params: { keyword, type },
+                params: { keyword, type, jobId },
             }),
             transformResponse: (response) => response?.data ?? [],
             providesTags: (result, error, arg) => [
