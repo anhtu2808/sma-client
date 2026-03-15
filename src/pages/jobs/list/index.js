@@ -15,11 +15,6 @@ const JobList = ({ jobs, isLoading, isError, onBookmark, currentPage, totalPages
             emptyMessage="No jobs found"
             emptySubMessage="Try adjusting your search criteria or filters."
         >
-            <div className="mb-6 flex items-center justify-between">
-                <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    {totalElements || jobs?.length} Jobs Found
-                </h1>
-            </div>
             <div className="space-y-4">
                 {jobs?.map((job) => (
                     <JobCard

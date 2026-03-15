@@ -105,7 +105,7 @@ const JobCard = ({
                         {allTags.map((tag, idx) => (
                             <span key={tag + idx} className="inline-flex items-center text-[13px] text-slate-600 dark:text-[#c4a494]">
                                 {idx > 0 && <span className="mx-2 text-slate-300 dark:text-[#4b2c20]">|</span>}
-                                <span className="truncate max-w-[200px]">{tag}</span>
+                                <span className="truncate max-w-[160px]">{tag}</span>
                             </span>
                         ))}
                         {allTags.length > 5 && (
@@ -134,11 +134,10 @@ const JobCard = ({
                                 e.stopPropagation();
                                 onBookmark && onBookmark();
                             }}
-                            className={`shrink-0 !p-1.5 hover:!bg-slate-100 dark:hover:!bg-[#4b2c20] ${
-                                isBookmarked
+                            className={`shrink-0 !p-1.5 hover:!bg-slate-100 dark:hover:!bg-[#4b2c20] ${isBookmarked
                                     ? "!text-primary"
                                     : "!text-slate-400 dark:!text-[#8c6b5d] hover:!text-primary"
-                            }`}
+                                }`}
                             aria-label="Bookmark job"
                         >
                             <span className="material-icons-round text-[22px]">
