@@ -133,13 +133,13 @@ const Application = () => {
 
         // Validation
         const newErrors = {};
-        
+
         // Validate Personal Info
         if (!contactInfo.fullName.trim()) newErrors.fullName = "Full Name is required";
         if (!contactInfo.email.trim()) {
             newErrors.email = "Email Address is required";
         } else if (!/\S+@\S+\.\S+/.test(contactInfo.email)) {
-             newErrors.email = "Email Address is invalid";
+            newErrors.email = "Email Address is invalid";
         }
         if (!contactInfo.phone.trim()) newErrors.phone = "Phone Number is required";
 
@@ -169,7 +169,7 @@ const Application = () => {
         try {
             // Gọi API nộp đơn
             await applyJob(payload).unwrap();
-            toast.success("Application submitted successfully!");
+            // toast.success("Application submitted successfully!");
             navigate(`/jobs/${jobId}/application/success`, { state: { companyName: job?.company?.name } });
         } catch (err) {
             const errorData = err?.data;
@@ -236,7 +236,7 @@ const Application = () => {
     return (
         <div className="min-h-screen bg-[#F3F4F6] py-10 px-6 font-body">
             <div className="max-w-5xl mx-auto">
-                <Header/>
+                <Header />
 
                 <Card className="!p-8 md:!p-10 border border-gray-100 bg-white shadow-sm hover:shadow-md rounded-2xl">
                     <form onSubmit={handleSubmit} className="space-y-10">
