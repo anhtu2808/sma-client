@@ -102,8 +102,8 @@ const SkillFormModal = ({
       message.error("Please enter group name.");
       return;
     }
-    if (!selectedSkillId || selectedYearsOfExperience == null) {
-      message.error("Please select skill and experience.");
+    if (!selectedSkillId) {
+      message.error("Please select skill.");
       return;
     }
     if (pendingSkills.length >= MAX_SKILLS_PER_GROUP) {
