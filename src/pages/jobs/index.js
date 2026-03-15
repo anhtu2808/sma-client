@@ -145,20 +145,52 @@ const Jobs = () => {
                 ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} ${job.currency || 'VND'}`
                 : "Negotiable";
 
+            // Format location from locations array
+            const locationCity = job.locations?.length > 0
+                ? job.locations.map(l => l.city || l.name).filter(Boolean).join(', ')
+                : job.company?.country || '';
+
+            // Format experience
+            const experienceTime = job.experienceTime
+                ? (job.experienceTime >= 1 ? `${job.experienceTime} year${job.experienceTime > 1 ? 's' : ''}` : 'Less than 1 year')
+                : null;
+
+            // Format job level for display
+            const jobLevelMap = {
+                'INTERN': 'Intern',
+                'FRESHER': 'Fresher',
+                'JUNIOR': 'Junior',
+                'MIDDLE': 'Middle',
+                'SENIOR': 'Senior',
+                'LEADER': 'Leader',
+                'MANAGER': 'Manager',
+            };
+
+            // Format working model for display
+            const workingModelMap = {
+                'REMOTE': 'Remote',
+                'ONSITE': 'Onsite',
+                'HYBRID': 'Hybrid',
+            };
+
             return {
                 id: normalizedJobId,
                 title: job.name,
                 company: job.company?.name || "Unknown Company",
                 companyLogo: job.company?.logo,
-                location: job.location || job.workingModel || job.company?.country || "Remote",
+                locationCity,
+                workingModel: workingModelMap[job.workingModel] || job.workingModel || '',
+                jobLevel: jobLevelMap[job.jobLevel] || job.jobLevel || '',
+                experienceTime,
+                expertise: job.expertise?.name || '',
                 salary,
                 tags: job.skills ? [...job.skills].map(s => s.name).sort((a, b) => a.localeCompare(b)) : [],
                 postedTime: job.uploadTime ? new Date(job.uploadTime).toLocaleDateString() : "Recently",
-                isHot: job.jobLevel === "SENIOR" || job.hot, // Map isHot if available, or infer
-                isApplied: job.isApplied, // Add isApplied flag
+                expDate: job.expDate ? new Date(job.expDate).toLocaleDateString() : null,
+                isHot: job.jobLevel === "SENIOR" || job.hot,
+                isApplied: job.isApplied,
                 isBookmarked,
                 isBookmarkLoading: Boolean(bookmarkLoadingById[normalizedJobId]),
-                variant: 'primary'
             };
         });
     }, [jobData, bookmarkOverrides, bookmarkLoadingById, markedJobIds]);
