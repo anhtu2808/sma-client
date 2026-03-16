@@ -76,6 +76,7 @@ const mapPlanToCard = (plan) => {
     return {
       key: String(price.id ?? `${plan.id}-${price.months}m`),
       label: `${price.months} months`,
+      months: price.months,
       total: formatCurrency(price.total, price.currency),
       perMonth: `${formatCurrency(monthly, price.currency)} / month`,
       save,

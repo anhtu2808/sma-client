@@ -3,8 +3,7 @@ import React from "react";
 const OrderSummarySection = ({
     planName,
     planDescription,
-    totalPrice,
-    durationMonths
+    totalPrice
 }) => {
     const formattedTotal = totalPrice?.toString().replace("₫", "đ");
 
@@ -17,11 +16,6 @@ const OrderSummarySection = ({
                     <h3 className="text-[#3b4356] font-bold text-[1.1rem] mb-1">{planName}</h3>
                     <p className="text-[#8492a6] text-[13px]">{planDescription}</p>
                 </div>
-                {durationMonths && (
-                    <span className="bg-[#fff1ed] text-[#ff7e5f] text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                        {durationMonths === 12 ? 'Annual' : durationMonths === 6 ? 'Semi-Annual' : durationMonths === 1 ? 'Monthly' : `${durationMonths} Months`}
-                    </span>
-                )}
             </div>
 
             <div className="mb-12 w-full">
