@@ -10,10 +10,7 @@ const QRPaymentSection = ({
 }) => {
     return (
         <div className="lg:col-span-6 flex flex-col items-center justify-center text-center relative py-4 lg:py-8 lg:px-12">
-            <h2 className="text-[#111e3b] text-[1.35rem] font-extrabold mb-8 tracking-tight">Scan to Pay</h2>
-            <p className="text-[#8492a6] text-[14px] mb-8 font-medium">
-                Open your banking or e-wallet app
-            </p>
+            <h2 className="text-[#111e3b] text-[1.35rem] font-extrabold mb-10 tracking-tight">Scan to Pay</h2>
 
             {/* QR Card Container */}
             <div className="bg-white p-3 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-50 mb-8 w-full max-w-[340px] aspect-square flex items-center justify-center">
@@ -56,18 +53,6 @@ const QRPaymentSection = ({
                 Cancel & Go back
             </Button>
 
-            {/* Need Help Box */}
-            <div className="w-full bg-[#fff8f5] border border-[#ffeedd] rounded-2xl p-5 flex gap-3 text-left">
-                <div className="w-6 h-6 shrink-0 rounded-full bg-[#f46a2a] text-white flex items-center justify-center mt-0.5">
-                    <span className="material-icons-round text-[14px]">question_mark</span>
-                </div>
-                <div>
-                    <h4 className="text-[#3b4356] font-bold text-[14px] mb-1">Need help?</h4>
-                    <p className="text-[#8492a6] text-[12.5px] leading-relaxed pr-2">
-                        Contact our 24/7 support team if you encounter any issues with the payment.
-                    </p>
-                </div>
-            </div>
         </div>
     );
 };

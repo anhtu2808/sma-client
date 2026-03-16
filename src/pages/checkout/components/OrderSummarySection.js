@@ -1,32 +1,11 @@
 import React from "react";
 
-const parseAndCalculate = (formattedPrice) => {
-    // Extract digits
-    const digitsOnly = formattedPrice?.toString().replace(/[^\d]/g, '') || "";
-    if (!digitsOnly) return { subtotal: formattedPrice, tax: "0 đ" };
-
-    // Fix string representation due to possible "đ" character
-    const formattedStr = formattedPrice.toString().replace("₫", "đ");
-
-    const total = parseInt(digitsOnly, 10);
-    const subtotal = Math.round(total / 1.1);
-    const tax = total - subtotal;
-
-    // Attempt to keep same currency symbol
-    const currencyMatch = formattedStr.match(/[^\d.,\s]+/);
-    const currency = currencyMatch ? currencyMatch[0] : 'đ';
-
-    const format = (num) => new Intl.NumberFormat('vi-VN').format(num) + ' ' + currency;
-    return { subtotal: format(subtotal), tax: format(tax) };
-}
-
 const OrderSummarySection = ({
     planName,
     planDescription,
     totalPrice,
     durationMonths
 }) => {
-    const { subtotal, tax } = parseAndCalculate(totalPrice);
     const formattedTotal = totalPrice?.toString().replace("₫", "đ");
 
     return (
@@ -45,31 +24,9 @@ const OrderSummarySection = ({
                 )}
             </div>
 
-            <div className="space-y-4 mb-12 w-full">
-                <div className="flex justify-between text-[14px] text-[#8492a6]">
-                    <span>Subtotal</span>
-                    <span className="font-medium text-[#3b4356]">{subtotal}</span>
-                </div>
-                <div className="flex justify-between text-[14px] text-[#8492a6]">
-                    <span>Tax (10%)</span>
-                    <span className="font-medium text-[#3b4356]">{tax}</span>
-                </div>
-            </div>
-
-            <div className="mb-auto w-full">
+            <div className="mb-12 w-full">
                 <span className="text-[13px] font-bold text-[#8492a6] tracking-wide inline-block mb-1">Total Amount</span>
                 <div className="text-[2rem] font-extrabold text-[#111e3b] tracking-tight">{formattedTotal}</div>
-            </div>
-
-            <div className="mt-16 flex items-center gap-5 text-[10px] text-[#8492a6] font-bold tracking-widest uppercase pb-4 border-b border-[#f1f3f9] w-full mb-8">
-                <div className="flex items-center gap-1.5 border-r border-[#e5e9f2] pr-5">
-                    <span className="material-icons-round text-[15px] opacity-70">lock_outline</span>
-                    <span>SSL SECURE</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                    <span className="material-icons-round text-[15px] opacity-70">security</span>
-                    <span>PCI-DSS</span>
-                </div>
             </div>
 
             <div className="flex flex-col gap-6">
