@@ -1,9 +1,12 @@
+import useAnimatedScore from "@/hooks/useAnimatedScore";
+
 const ScoreCard = ({ score = 88 }) => {
+  const animatedScore = useAnimatedScore(score, 1000);
   const size = 64;
   const strokeWidth = 5;
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
-  const strokeDashoffset = circumference - (score / 100) * circumference;
+  const strokeDashoffset = circumference - (animatedScore / 100) * circumference;
 
   return (
     <div className="relative flex items-center justify-center shrink-0" style={{ width: size, height: size }}>
@@ -30,7 +33,7 @@ const ScoreCard = ({ score = 88 }) => {
         />
       </svg>
       <span className="absolute font-heading text-[22px] font-bold text-[#10B981] leading-none">
-        {score}
+        {animatedScore}
       </span>
     </div>
   );

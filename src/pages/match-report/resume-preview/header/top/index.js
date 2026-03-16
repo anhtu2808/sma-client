@@ -1,10 +1,13 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { setActiveDocumentTab } from "@/store/slices/matchingReportSlice";
+import ReEvaluateModal from "@/pages/match-report/components/ReEvaluateModal";
 
 const HeaderTop = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [isReEvaluateModalOpen, setIsReEvaluateModalOpen] = useState(false);
   const activeDocumentTab = useSelector((state) => state.matchingReport.ui.activeDocumentTab);
   const evaluationData = useSelector((state) => state.matchingReport.data);
 
@@ -32,7 +35,16 @@ const HeaderTop = () => {
           );
         })}
       </nav>
-      <div className="mb-2">
+      <div className="mb-2 flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setIsReEvaluateModalOpen(true)}
+          disabled={!evaluationData?.jobId}
+          className="rounded border border-primary bg-white px-3 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+        >
+          <span className="material-icons-round text-[16px]">upload_file</span>
+          Re-evaluate
+        </button>
         <button
           type="button"
           onClick={() => {
@@ -48,6 +60,12 @@ const HeaderTop = () => {
           Apply Now
         </button>
       </div>
+
+      <ReEvaluateModal
+        open={isReEvaluateModalOpen}
+        onClose={() => setIsReEvaluateModalOpen(false)}
+        jobId={evaluationData?.jobId}
+      />
     </header>
   );
 };

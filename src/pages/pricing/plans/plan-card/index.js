@@ -7,9 +7,10 @@ const getSaveClass = (save) => {
   return "text-gray-400";
 };
 
-const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSelectDuration, isSelected, onClick }) => {
+const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSelectDuration, isSelected, onClick, onOpenPaymentModal }) => {
   const navigate = useNavigate();
   const isCurrent = plan.current;
+  const isDefault = Boolean(plan.isDefault);
   const hasDurations = plan.durations && plan.durations.length > 0;
 
   const handleAction = () => {
@@ -17,7 +18,11 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
     if (hasDurations) {
       onExpand();
     } else {
-      navigate('/checkout', { state: { plan } });
+      if (onOpenPaymentModal) {
+        onOpenPaymentModal(plan, null);
+      } else {
+        navigate('/checkout', { state: { plan } });
+      }
     }
   };
 
@@ -51,6 +56,7 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
             </div>
           </div>
 
+          {!isDefault && (
           <button
             type="button"
             disabled={isCurrent}
@@ -67,6 +73,7 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
           >
             {plan.cta}
           </button>
+          )}
 
           {plan.detailsHtml ? (
             <div className="flex-1" dangerouslySetInnerHTML={{ __html: plan.detailsHtml }} />
@@ -125,15 +132,17 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
             })}
           </div>
 
+          {!isDefault && (
           <Button
             mode="primary"
             shape="rounded"
             onClick={(e) => {
               e.stopPropagation();
-              if (!selectedDuration && plan.durations.length > 0) {
-                navigate('/checkout', { state: { plan, selectedDuration: selectedDuration || plan.durations[0].key } });
+              const duration = selectedDuration || (plan.durations.length > 0 ? plan.durations[0].key : null);
+              if (onOpenPaymentModal) {
+                onOpenPaymentModal(plan, duration);
               } else {
-                navigate('/checkout', { state: { plan, selectedDuration } });
+                navigate('/checkout', { state: { plan, selectedDuration: duration } });
               }
             }}
             className={`w-full py-4 font-bold rounded-xl transition-all shadow-lg text-sm tracking-wide ${isCurrent
@@ -144,6 +153,7 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
           >
             {isCurrent ? "Current Plan" : "Subscribe Now"}
           </Button>
+          )}
         </div>
       )}
     </article>

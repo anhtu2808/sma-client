@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { message } from "antd";
+import { message, Modal } from "antd";
 import {
   useDeleteCandidateResumeMutation,
   useGetCandidateResumesQuery,
@@ -302,23 +302,35 @@ const AttachmentsTab = () => {
     }
   };
 
-  const handleDeleteResume = async (resumeId) => {
-    try {
-      setDeletingId(resumeId);
-      stopPolling(resumeId);
-      setParseStatusOverrides((prev) => {
-        if (prev[resumeId] == null) return prev;
-        const next = { ...prev };
-        delete next[resumeId];
-        return next;
-      });
-      await deleteCandidateResume({ resumeId }).unwrap();
-      message.success("Delete resume successfully");
-    } catch (error) {
-      message.error(getErrorMessage(error, "Delete resume failed"));
-    } finally {
-      setDeletingId(null);
-    }
+  const handleDeleteResume = (resumeId) => {
+    const resume = resumes.find((r) => r.id === resumeId);
+    const resumeName = resume?.fileName || resume?.resumeName || `Resume #${resumeId}`;
+
+    Modal.confirm({
+      title: "Delete Resume",
+      content: `Are you sure you want to delete "${resumeName}"? This action cannot be undone.`,
+      okText: "Delete",
+      okType: "danger",
+      cancelText: "Cancel",
+      onOk: async () => {
+        try {
+          setDeletingId(resumeId);
+          stopPolling(resumeId);
+          setParseStatusOverrides((prev) => {
+            if (prev[resumeId] == null) return prev;
+            const next = { ...prev };
+            delete next[resumeId];
+            return next;
+          });
+          await deleteCandidateResume({ resumeId }).unwrap();
+          message.success("Delete resume successfully");
+        } catch (error) {
+          message.error(getErrorMessage(error, "Delete resume failed"));
+        } finally {
+          setDeletingId(null);
+        }
+      },
+    });
   };
 
   const openSetProfileConfirm = (resumeId) => {
