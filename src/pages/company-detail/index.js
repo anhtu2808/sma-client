@@ -2,15 +2,22 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useGetCompanyByIdQuery } from '@/apis/companyApi';
+import { useGetJobsQuery } from '@/apis/jobApi';
 import Loading from '@/components/Loading';
 import CompanyHeader from './company-header';
 import CompanySidebar from './company-sidebar';
 import { AboutSection, LifeAtSection, LocationsSection } from './content-sections';
+import CompanyJobs from './company-jobs';
 
 const CompanyDetail = () => {
     const { id } = useParams();
-    const { data: companyData, isLoading, isError } = useGetCompanyByIdQuery(id);
+    const { data: companyData, isLoading: isCompanyLoading, isError: isCompanyError } = useGetCompanyByIdQuery(id);
+    const { data: jobsResponse } = useGetJobsQuery({ companyId: id, page: 0, size: 1 });
+    
     const company = companyData?.data || companyData;
+    const publishedJobsCount = jobsResponse?.data?.totalElements || jobsResponse?.totalElements || 0;
+    const isLoading = isCompanyLoading;
+    const isError = isCompanyError;
     const [activeTab, setActiveTab] = useState('overview');
 
     if (isLoading) {
@@ -37,8 +44,7 @@ const CompanyDetail = () => {
 
     const tabs = [
         { id: 'overview', label: 'Overview', icon: 'subject' },
-        { id: 'jobs', label: 'Jobs', icon: 'work', count: company.totalJobs || 0 },
-        { id: 'reviews', label: 'Reviews', icon: 'star_rate' }
+        { id: 'jobs', label: 'Jobs', icon: 'work', count: publishedJobsCount || 0 },
     ];
 
     return (
@@ -95,10 +101,8 @@ const CompanyDetail = () => {
                             </div>
                         )}
                         {activeTab === 'jobs' && (
-                            <div className="bg-white dark:bg-[#2c1a14] rounded-2xl p-8 border border-slate-100 dark:border-[#3d241b] text-center py-20">
-                                <span className="material-icons-round text-6xl text-slate-200 mb-4">work_outline</span>
-                                <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Open Positions</h3>
-                                <p className="text-slate-500">Feature coming soon...</p>
+                            <div className="animate-fade-in">
+                                <CompanyJobs companyId={company.id} />
                             </div>
                         )}
                     </div>
