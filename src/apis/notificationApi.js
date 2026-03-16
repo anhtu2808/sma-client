@@ -26,6 +26,28 @@ export const notificationApi = api.injectEndpoints({
             }),
             invalidatesTags: ["Notifications"],
         }),
+        getNotificationSettings: builder.query({
+            query: () => ({
+                url: `/v1/notification-settings`,
+                method: "GET",
+            }),
+            providesTags: ['NotificationSettings'],
+        }),
+        updateNotificationSetting: builder.mutation({
+            query: (body) => ({
+                url: `/v1/notification-settings`,
+                method: "PATCH",
+                body,
+            }),
+            invalidatesTags: ['NotificationSettings'],
+        }),
+        resetSettings: builder.mutation({
+            query: () => ({
+                url: `/v1/notification-settings/reset`,
+                method: "POST",
+            }),
+            invalidatesTags: ['NotificationSettings'],
+        }),
     }),
 });
 
@@ -33,4 +55,7 @@ export const {
     useGetNotificationsQuery,
     useMarkAsReadMutation,
     useMarkAllAsReadMutation,
+    useGetNotificationSettingsQuery,
+    useUpdateNotificationSettingMutation,
+    useResetSettingsMutation
 } = notificationApi;
