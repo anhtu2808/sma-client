@@ -9,7 +9,7 @@ import JobDetail from '@/pages/job-detail';
 import DashboardLayout from '@/pages/dashboard/layout';
 import DashboardOverview from '@/pages/dashboard/overview';
 import DashboardJobs from '@/pages/dashboard/jobs';
-import Setting from '@/pages/dashboard/setting';
+import NotificationSettings from '@/pages/dashboard/setting';
 import Notification from '@/pages/dashboard/notification';
 import Resumes from '@/pages/dashboard/resumes';
 import CvBuilder from '@/pages/dashboard/resumes/cv-builder';
@@ -54,7 +54,7 @@ export const routes = createBrowserRouter(
                 <Route index element={<DashboardOverview />} />
                 <Route path="jobs" element={<DashboardJobs />} />
                 <Route path="matching-history" element={<MatchingHistory />} />
-                <Route path="setting" element={<Setting />} />
+                <Route path="setting" element={<NotificationSettings />} />
                 <Route path="invitations" element={<Invitations />} />
                 <Route path="notifications" element={<Notification />} />
                 <Route path="resumes">
