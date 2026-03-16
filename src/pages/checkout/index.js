@@ -93,7 +93,7 @@ const Checkout = () => {
     const planDescription = duration
         ? `${duration.months} months subscription`
         : "Lifetime / Standard subscription";
-
+    console.log("asdasd", planDescription);
     return (
         <div className="flex justify-center w-full min-h-screen pt-12 pb-24 px-4 bg-[#f8f9fa]">
             {paymentStatus === "SUCCESS" ? (

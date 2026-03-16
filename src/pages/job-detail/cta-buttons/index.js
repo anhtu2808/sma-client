@@ -74,6 +74,17 @@ const CTAButtons = () => {
         }
     };
 
+    const handleApplyClick = () => {
+        const isAuthorized = requireLogin({
+            warningMessage: "Please log in to apply for this job.",
+            redirectTo: `/jobs/${id}/application`,
+        });
+
+        if (isAuthorized) {
+            navigate(`/jobs/${id}/application`);
+        }
+    };
+
     return (
         <>
             <div className="mt-6 pt-6 border-t border-gray-100 font-body space-y-3">
@@ -97,7 +108,7 @@ const CTAButtons = () => {
                             fullWidth
                             disabled={config.disabled}
                             shape='rounded'
-                            onClick={() => navigate(`/jobs/${id}/application`)}
+                            onClick={handleApplyClick}
                             iconRight={!config.disabled && <span className="material-icons-round text-[20px]">arrow_outward</span>}
                         >
                             {config.text}

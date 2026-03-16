@@ -19,6 +19,7 @@ const Jobs = () => {
         jobLevel: '',
         salaryStart: '',
         salaryEnd: '',
+        currency: '',
         minExperienceTime: '',
         maxExperienceTime: '',
         workingModel: '',
@@ -33,10 +34,10 @@ const Jobs = () => {
     // API Call
     // Filter out empty params
     const queryParams = useMemo(() => ({
-        page: currentPage - 1, // API is 0-indexed
-        size: ITEMS_PER_PAGE,
+        page: 0, 
+        size: 1000, // Fetch big chunk for local filtering (location, currency)
         ...(filters.name && { name: filters.name }),
-        ...(filters.location && { location: filters.location }),
+        // location is filtered locally
         ...(filters.jobLevel && { jobLevel: filters.jobLevel }),
         ...(filters.salaryStart && { salaryStart: filters.salaryStart }),
         ...(filters.salaryEnd && { salaryEnd: filters.salaryEnd }),
@@ -46,7 +47,7 @@ const Jobs = () => {
         ...(filters.skillId?.length && { skillId: filters.skillId }),
         ...(filters.expertiseId?.length && { expertiseId: filters.expertiseId }),
         ...(filters.domainId?.length && { domainId: filters.domainId }),
-    }), [filters, currentPage]);
+    }), [filters]);
 
     // API Call
     const { data: jobData, isLoading, isError } = useGetJobsQuery(queryParams);
@@ -63,7 +64,7 @@ const Jobs = () => {
 
     // Handlers
     // Pagination data
-    const totalPages = jobData?.data?.totalPages || jobData?.totalPages || 0;
+    const totalPages = jobData?.data?.totalPages || jobData?.totalPages || 0; // fallback, will be overwritten by local pagination
     const totalElements = jobData?.data?.totalElements || jobData?.totalElements || 0;
 
     const handleFilterChange = (key, value) => {
@@ -81,6 +82,7 @@ const Jobs = () => {
             jobLevel: '',
             salaryStart: '',
             salaryEnd: '',
+            currency: '',
             minExperienceTime: '',
             maxExperienceTime: '',
             workingModel: '',
@@ -135,33 +137,99 @@ const Jobs = () => {
     };
 
     // Data Transformation (Mapping API response to UI props)
-    const formattedJobs = useMemo(() => {
-        const dataToMap = jobData?.data?.content || jobData?.content || [];
+    const formattedData = useMemo(() => {
+        let dataToMap = jobData?.data?.content || jobData?.content || [];
 
-        return dataToMap.map(job => {
+        // 1. Local Location Filter
+        if (filters.location) {
+            const locLower = filters.location.toLowerCase();
+            dataToMap = dataToMap.filter(job => {
+                const cityMatch = job.locations?.some(l => l.city?.toLowerCase().includes(locLower));
+                const nameMatch = job.locations?.some(l => l.name?.toLowerCase().includes(locLower));
+                const companyMatch = job.company?.country?.toLowerCase().includes(locLower);
+                return cityMatch || nameMatch || companyMatch;
+            });
+        }
+
+        // 2. Local Currency Filter
+        if (filters.currency) {
+            // Include if job.currency exactly matches 'USD' or 'VND', or if empty we'll default it contextually.
+            // But let's strictly require the exact currency match.
+            dataToMap = dataToMap.filter(job => (job.currency || 'VND') === filters.currency);
+        }
+
+        const totalItems = dataToMap.length;
+        const totalPagesCount = Math.ceil(totalItems / ITEMS_PER_PAGE) || 1;
+        
+        // Ensure currentPage isn't out of bounds after filtering
+        const safePage = currentPage > totalPagesCount ? 1 : currentPage;
+        
+        // Apply pagination
+        const startIndex = (safePage - 1) * ITEMS_PER_PAGE;
+        const pagedData = dataToMap.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+        const mappedJobs = pagedData.map(job => {
             const normalizedJobId = Number(job.id);
             const isBookmarked = bookmarkOverrides[normalizedJobId] ?? markedJobIds.has(normalizedJobId);
             const salary = job.salaryStart && job.salaryEnd
                 ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} ${job.currency || 'VND'}`
                 : "Negotiable";
 
+            // Format location from locations array
+            const locationCity = job.locations?.length > 0
+                ? job.locations.map(l => l.city || l.name).filter(Boolean).join(', ')
+                : job.company?.country || '';
+
+            // Format experience
+            const experienceTime = job.experienceTime
+                ? (job.experienceTime >= 1 ? `${job.experienceTime} year${job.experienceTime > 1 ? 's' : ''}` : 'Less than 1 year')
+                : null;
+
+            // Format job level for display
+            const jobLevelMap = {
+                'INTERN': 'Intern',
+                'FRESHER': 'Fresher',
+                'JUNIOR': 'Junior',
+                'MIDDLE': 'Middle',
+                'SENIOR': 'Senior',
+                'LEADER': 'Leader',
+                'MANAGER': 'Manager',
+            };
+
+            // Format working model for display
+            const workingModelMap = {
+                'REMOTE': 'Remote',
+                'ONSITE': 'Onsite',
+                'HYBRID': 'Hybrid',
+            };
+
             return {
                 id: normalizedJobId,
                 title: job.name,
                 company: job.company?.name || "Unknown Company",
                 companyLogo: job.company?.logo,
-                location: job.location || job.workingModel || job.company?.country || "Remote",
+                locationCity,
+                workingModel: workingModelMap[job.workingModel] || job.workingModel || '',
+                jobLevel: jobLevelMap[job.jobLevel] || job.jobLevel || '',
+                experienceTime,
+                expertise: job.expertise?.name || '',
                 salary,
-                tags: job.skills ? job.skills.map(s => s.name) : [],
+                tags: job.skills ? [...job.skills].map(s => s.name).sort((a, b) => a.localeCompare(b)) : [],
                 postedTime: job.uploadTime ? new Date(job.uploadTime).toLocaleDateString() : "Recently",
-                isHot: job.jobLevel === "SENIOR" || job.hot, // Map isHot if available, or infer
-                isApplied: job.isApplied, // Add isApplied flag
+                expDate: job.expDate ? new Date(job.expDate).toLocaleDateString() : null,
+                isHot: job.jobLevel === "SENIOR" || job.hot,
+                isApplied: job.isApplied,
                 isBookmarked,
                 isBookmarkLoading: Boolean(bookmarkLoadingById[normalizedJobId]),
-                variant: 'primary'
             };
         });
-    }, [jobData, bookmarkOverrides, bookmarkLoadingById, markedJobIds]);
+
+        return {
+            jobs: mappedJobs,
+            totalElements: totalItems,
+            totalPages: totalPagesCount
+        };
+    }, [jobData, filters.location, filters.currency, currentPage, bookmarkOverrides, bookmarkLoadingById, markedJobIds]);
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-[#1a100c]">
@@ -187,13 +255,13 @@ const Jobs = () => {
                     {/* 3. Main Job List Section */}
                     <main className="flex-1">
                         <JobList
-                            jobs={formattedJobs}
+                            jobs={formattedData.jobs}
                             isLoading={isLoading}
                             isError={isError}
                             onBookmark={handleBookmark}
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            totalElements={totalElements}
+                            currentPage={currentPage > formattedData.totalPages ? 1 : currentPage}
+                            totalPages={formattedData.totalPages}
+                            totalElements={formattedData.totalElements}
                             onPageChange={setCurrentPage}
                         />
                     </main>

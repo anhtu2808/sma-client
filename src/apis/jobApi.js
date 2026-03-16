@@ -3,11 +3,21 @@ import { api, API_VERSION } from "@/apis/baseApi";
 export const jobApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getJobs: builder.query({
-            query: (params) => ({
-                url: `${API_VERSION}/jobs`,
-                method: "GET",
-                params: params,
-            }),
+            query: (params) => {
+                const searchParams = new URLSearchParams();
+                for (const key in params) {
+                    const value = params[key];
+                    if (Array.isArray(value)) {
+                        value.forEach(v => searchParams.append(key, v));
+                    } else if (value !== undefined && value !== null && value !== '') {
+                        searchParams.append(key, value);
+                    }
+                }
+                return {
+                    url: `${API_VERSION}/jobs?${searchParams.toString()}`,
+                    method: "GET",
+                };
+            },
             providesTags: ["Jobs"]
         }),
 

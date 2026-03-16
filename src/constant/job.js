@@ -7,13 +7,13 @@ export const JOB_LEVEL_LABELS = {
     MANAGER: "Manager"
 };
 
-export const locationOptions = [
-    { label: "All Cities", value: "" },
-    { label: "Ha Noi", value: "Ha Noi" },
-    { label: "Ho Chi Minh City", value: "Ho Chi Minh City" },
-    { label: "Da Nang", value: "Da Nang" },
-    { label: "Remote", value: "Remote" }
-];
+// export const locationOptions = [
+//     { label: "All Cities", value: "" },
+//     { label: "Ha Noi", value: "Ha Noi" },
+//     { label: "Ho Chi Minh City", value: "Ho Chi Minh City" },
+//     { label: "Da Nang", value: "Da Nang" },
+//     { label: "Remote", value: "Remote" }
+// ];
 
 export const jobLevelOptions = [
     { label: "All Levels", value: "" },

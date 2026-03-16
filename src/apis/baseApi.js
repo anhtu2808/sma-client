@@ -19,6 +19,18 @@ const rawBaseQuery = fetchBaseQuery({
         }
         return headers;
     },
+    paramsSerializer: (params) => {
+        const searchParams = new URLSearchParams();
+        for (const key in params) {
+            const value = params[key];
+            if (Array.isArray(value)) {
+                value.forEach(v => searchParams.append(key, v));
+            } else if (value !== undefined && value !== null && value !== '') {
+                searchParams.append(key, value);
+            }
+        }
+        return searchParams.toString();
+    },
     responseHandler: async (response) => {
         const text = await response.text();
         try {
