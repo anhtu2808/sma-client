@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
+import { Dropdown } from "antd";
 import Button from "@/components/Button";
+import RenameResumeModal from "../components/RenameResumeModal";
 
 const scoreClassName = (score) => {
   if (score >= 85) return "bg-green-500";
@@ -7,8 +9,40 @@ const scoreClassName = (score) => {
   return "bg-yellow-500";
 };
 
-export const ResumeCard = ({ resume }) => (
-  <div className="bg-white dark:bg-surface-dark rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden h-full flex flex-col">
+export const ResumeCard = ({ resume }) => {
+  const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
+
+  const dropdownItems = [
+    {
+      key: "rename",
+      label: "Rename",
+      icon: <span className="material-icons-round text-[18px]">edit</span>,
+      onClick: () => setIsRenameModalOpen(true),
+    },
+    {
+      key: "download",
+      label: "Download",
+      icon: <span className="material-icons-round text-[18px]">download</span>,
+    },
+    {
+      key: "share",
+      label: "Share",
+      icon: <span className="material-icons-round text-[18px]">share</span>,
+    },
+    {
+      type: "divider",
+    },
+    {
+      key: "delete",
+      label: "Delete",
+      icon: <span className="material-icons-round text-[18px] text-red-500">delete</span>,
+      danger: true,
+    },
+  ];
+
+  return (
+    <>
+      <div className="bg-white dark:bg-surface-dark rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden h-full flex flex-col">
     <div className="relative h-44 bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 p-4">
       <div className="absolute top-3 right-3 flex gap-2">
         {resume.tag ? (
@@ -39,9 +73,15 @@ export const ResumeCard = ({ resume }) => (
           <h3 className="font-bold text-gray-900 dark:text-white text-lg truncate">{resume.title}</h3>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Last modified: {resume.lastModified}</p>
         </div>
-        <button type="button" className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
-          <span className="material-icons-round text-[20px]">more_vert</span>
-        </button>
+        <Dropdown
+          menu={{ items: dropdownItems }}
+          placement="bottomRight"
+          trigger={["click"]}
+        >
+          <button type="button" className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <span className="material-icons-round text-[20px]">more_vert</span>
+          </button>
+        </Dropdown>
       </div>
 
       <div className="mt-4 mb-4">
@@ -88,7 +128,15 @@ export const ResumeCard = ({ resume }) => (
       </div>
     </div>
   </div>
-);
+
+      <RenameResumeModal
+        open={isRenameModalOpen}
+        onClose={() => setIsRenameModalOpen(false)}
+        resume={resume}
+      />
+    </>
+  );
+};
 
 export const CreateResumeCard = ({ onCreate }) => (
   <div className="rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex flex-col items-center justify-center p-8 h-full aspect-square">
@@ -105,8 +153,12 @@ export const CreateResumeCard = ({ onCreate }) => (
   </div>
 );
 
-export const ResumeListItem = ({ resume }) => (
-  <div className="bg-white dark:bg-surface-dark rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5 flex items-center gap-4">
+export const ResumeListItem = ({ resume }) => {
+  const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
+
+  return (
+    <>
+      <div className="bg-white dark:bg-surface-dark rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5 flex items-center gap-4">
     <div className="h-12 w-12 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center flex-none">
       <span className="material-icons-round text-gray-500 dark:text-gray-300">description</span>
     </div>
@@ -135,7 +187,12 @@ export const ResumeListItem = ({ resume }) => (
           </span>
         </div>
         <div className="flex items-center gap-1">
-          <button type="button" className="p-2 text-gray-500 hover:text-gray-800 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 rounded-lg transition-colors" title="Edit">
+          <button 
+            type="button" 
+            className="p-2 text-gray-500 hover:text-gray-800 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 rounded-lg transition-colors" 
+            title="Rename"
+            onClick={() => setIsRenameModalOpen(true)}
+          >
             <span className="material-icons-round text-[18px]">edit</span>
           </button>
           <button type="button" className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:text-gray-400 dark:hover:bg-gray-700 rounded-lg transition-colors" title="Download">
@@ -151,7 +208,15 @@ export const ResumeListItem = ({ resume }) => (
       </div>
     </div>
   </div>
-);
+
+      <RenameResumeModal
+        open={isRenameModalOpen}
+        onClose={() => setIsRenameModalOpen(false)}
+        resume={resume}
+      />
+    </>
+  );
+};
 
 export const TemplatePreviewContent = ({ template }) => {
   if (template.layout === "modern") {

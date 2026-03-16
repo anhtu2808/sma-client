@@ -5,6 +5,14 @@ const normalizeEvaluationStatus = (status) =>
 
 export const matchingApi = api.injectEndpoints({
   endpoints: (builder) => ({
+    getAllMatching: builder.query({
+      query: ({ page = 0, size = 10 }) => ({
+        url: `${API_VERSION}/matching`,
+        params: { page, size },
+      }),
+      transformResponse: (response) => response?.data ?? null,
+    }),
+
     startMatchingDetail: builder.mutation({
       query: ({ jobId, resumeId }) => ({
         url: `${API_VERSION}/matching/detail`,
@@ -49,6 +57,8 @@ export const matchingApi = api.injectEndpoints({
 });
 
 export const {
+  useGetAllMatchingQuery,
+  useLazyGetAllMatchingQuery,
   useStartMatchingDetailMutation,
   useGetMatchingStatusQuery,
   useLazyGetMatchingStatusQuery,

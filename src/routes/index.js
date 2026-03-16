@@ -25,6 +25,7 @@ import Application from "@/pages/application";
 import ApplicationSuccess from "@/pages/application/sucess";
 import Checkout from "@/pages/checkout";
 import MatchReport from "@/pages/match-report";
+import MatchingHistory from "@/pages/dashboard/matching-history";
 
 
 export const routes = createBrowserRouter(
@@ -52,6 +53,7 @@ export const routes = createBrowserRouter(
             <Route path="dashboard" element={<DashboardLayout />}>
                 <Route index element={<DashboardOverview />} />
                 <Route path="jobs" element={<DashboardJobs />} />
+                <Route path="matching-history" element={<MatchingHistory />} />
                 <Route path="setting" element={<Setting />} />
                 <Route path="invitations" element={<Invitations />} />
                 <Route path="notifications" element={<Notification />} />

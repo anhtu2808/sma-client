@@ -87,6 +87,24 @@ const matchingReportSlice = createSlice({
       });
     },
 
+    updateScoresAfterFixed: (state, action) => {
+      const { afterOverallScore, criteriaScoreId, afterCriteriaScore } = action.payload;
+      if (!state.data) return;
+
+      // Update overall score
+      if (afterOverallScore !== undefined) {
+        state.data.aiOverallScore = afterOverallScore;
+      }
+
+      // Update criteria score
+      if (criteriaScoreId !== undefined && afterCriteriaScore !== undefined) {
+        const criteria = state.data.criteriaScores.find((c) => c.id === criteriaScoreId);
+        if (criteria) {
+          criteria.aiScore = afterCriteriaScore;
+        }
+      }
+    },
+
     updateSuggestion: (state, action) => {
       const { id, suggestion } = action.payload || {};
       if (!state.data || !Number.isFinite(Number(id)) || typeof suggestion !== "string") return;
@@ -115,6 +133,7 @@ export const {
   setActiveDocumentTab,
   toggleDetailFixed,
   updateSuggestion,
+  updateScoresAfterFixed,
 } = matchingReportSlice.actions;
 
 export default matchingReportSlice.reducer;

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useGetPlansQuery } from "@/apis/planApi";
 import PlanCard from "./plan-card";
+import PaymentModal from "@/pages/checkout/components/PaymentModal";
 
 const formatCurrency = (amount, currency) => {
   if (amount == null || Number.isNaN(Number(amount))) return "-";
@@ -38,6 +39,7 @@ const mapPlanToCard = (plan) => {
     const currency = lifetimePrice.currency || plan.currency || "VND";
     const priceLabel = total === 0 ? "Free" : formatCurrency(total, currency);
     const cta = isCurrent ? "Current Plan" : total === 0 ? "Get Started" : `Upgrade to ${name}`;
+    const isDefault = Boolean(plan?.isDefault);
     return {
       id: plan?.id,
       priceId: lifetimePrice.id,
@@ -51,6 +53,7 @@ const mapPlanToCard = (plan) => {
       popular: isPopular,
       detailsHtml,
       durations: [],
+      isDefault,
     };
   }
   const pricesWithMonths = planPrices
@@ -76,6 +79,7 @@ const mapPlanToCard = (plan) => {
     return {
       key: String(price.id ?? `${plan.id}-${price.months}m`),
       label: `${price.months} months`,
+      months: price.months,
       total: formatCurrency(price.total, price.currency),
       perMonth: `${formatCurrency(monthly, price.currency)} / month`,
       save,
@@ -89,6 +93,7 @@ const mapPlanToCard = (plan) => {
   }));
 
   const cta = isCurrent ? "Current Plan" : baseMonthly === 0 ? "Get Started" : `Upgrade to ${name}`;
+  const isDefault = Boolean(plan?.isDefault);
 
   return {
     id: plan?.id,
@@ -102,6 +107,7 @@ const mapPlanToCard = (plan) => {
     popular: isPopular,
     detailsHtml,
     durations: durationsWithPopular,
+    isDefault,
   };
 };
 
@@ -110,6 +116,23 @@ const Plans = () => {
   const [expandedPlan, setExpandedPlan] = useState(null);
   const [selectedDurationByPlan, setSelectedDurationByPlan] = useState({});
   const [selectedPlanCode, setSelectedPlanCode] = useState(null);
+
+  // Payment Modal state
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [selectedPlanForPayment, setSelectedPlanForPayment] = useState(null);
+  const [selectedDurationForPayment, setSelectedDurationForPayment] = useState(null);
+
+  const handleOpenPaymentModal = (plan, duration) => {
+    setSelectedPlanForPayment(plan);
+    setSelectedDurationForPayment(duration);
+    setIsPaymentModalOpen(true);
+  };
+
+  const handleClosePaymentModal = () => {
+    setIsPaymentModalOpen(false);
+    setSelectedPlanForPayment(null);
+    setSelectedDurationForPayment(null);
+  };
 
   const sortedPlans = useMemo(() => {
     if (!Array.isArray(plans)) return [];
@@ -175,27 +198,37 @@ const Plans = () => {
   };
 
   return (
-    <section className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24 items-stretch">
-      {isLoading ? (
-        <p className="text-sm text-gray-400">Loading plans...</p>
-      ) : mappedPlans.length === 0 ? (
-        <p className="text-sm text-gray-400">No plans available.</p>
-      ) : (
-        mappedPlans.map((plan) => (
-          <PlanCard
-            key={plan.code}
-            plan={plan}
-            isSelected={selectedPlanCode === plan.code}
-            onClick={() => setSelectedPlanCode(plan.code)}
-            isExpanded={expandedPlan === plan.code}
-            onExpand={() => setExpandedPlan(plan.code)}
-            onClose={() => setExpandedPlan(null)}
-            selectedDuration={selectedDurationByPlan[plan.code]}
-            onSelectDuration={(durationKey) => onSelectDuration(plan.code, durationKey)}
-          />
-        ))
-      )}
-    </section>
+    <>
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24 items-stretch">
+        {isLoading ? (
+          <p className="text-sm text-gray-400">Loading plans...</p>
+        ) : mappedPlans.length === 0 ? (
+          <p className="text-sm text-gray-400">No plans available.</p>
+        ) : (
+          mappedPlans.map((plan) => (
+            <PlanCard
+              key={plan.code}
+              plan={plan}
+              isSelected={selectedPlanCode === plan.code}
+              onClick={() => setSelectedPlanCode(plan.code)}
+              isExpanded={expandedPlan === plan.code}
+              onExpand={() => setExpandedPlan(plan.code)}
+              onClose={() => setExpandedPlan(null)}
+              selectedDuration={selectedDurationByPlan[plan.code]}
+              onSelectDuration={(durationKey) => onSelectDuration(plan.code, durationKey)}
+              onOpenPaymentModal={handleOpenPaymentModal}
+            />
+          ))
+        )}
+      </section>
+
+      <PaymentModal
+        isOpen={isPaymentModalOpen}
+        onClose={handleClosePaymentModal}
+        plan={selectedPlanForPayment}
+        selectedDuration={selectedDurationForPayment}
+      />
+    </>
   );
 };
 

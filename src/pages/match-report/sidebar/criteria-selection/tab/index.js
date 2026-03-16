@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { setActiveCriteriaId } from "@/store/slices/matchingReportSlice";
+import useAnimatedScore from "@/hooks/useAnimatedScore";
 
 const getProgressColors = (progress) => {
   if (progress < 50) return { fill: "bg-red-400", track: "bg-red-100", border: "border-red-200" };
@@ -12,7 +13,8 @@ const Tab = ({ tab }) => {
   const activeCriteriaId = useSelector((state) => state.matchingReport.ui.activeCriteriaId);
 
   const isActive = tab.id === activeCriteriaId;
-  const { fill, track, border } = getProgressColors(tab.aiScore || 0);
+  const animatedScore = useAnimatedScore(tab.aiScore || 0, 1000);
+  const { fill, track, border } = getProgressColors(animatedScore);
 
   return (
     <button
@@ -34,11 +36,11 @@ const Tab = ({ tab }) => {
         <div className={`h-[6px] w-[35px] overflow-hidden rounded-full border ${border} ${track}`}>
           <div
             className={`h-full rounded-full ${fill}`}
-            style={{ width: `${Math.max(0, Math.min(100, tab.aiScore || 0))}%` }}
+            style={{ width: `${Math.max(0, Math.min(100, animatedScore))}%` }}
           />
         </div>
         <span className={`text-[10px] tabular-nums font-bold ${isActive ? "text-neutral-900" : "text-neutral-500"}`}>
-          {Math.round(tab.aiScore || 0)}%
+          {animatedScore}%
         </span>
       </div>
 

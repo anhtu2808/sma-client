@@ -11,9 +11,10 @@ const getSaveBadgeStyle = (savePercent) => {
   return "bg-gray-100 text-gray-500";
 };
 
-const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSelectDuration, isSelected, onClick }) => {
+const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSelectDuration, isSelected, onClick, onOpenPaymentModal }) => {
   const navigate = useNavigate();
   const isCurrent = plan.current;
+  const isDefault = Boolean(plan.isDefault);
   const hasDurations = plan.durations && plan.durations.length > 0;
   const canExpand = !isCurrent && hasDurations;
 
@@ -22,7 +23,11 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
     if (hasDurations) {
       onExpand();
     } else {
-      navigate('/checkout', { state: { plan } });
+      if (onOpenPaymentModal) {
+        onOpenPaymentModal(plan, null);
+      } else {
+        navigate('/checkout', { state: { plan } });
+      }
     }
   };
 
@@ -69,22 +74,24 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
             <p className="text-xs text-gray-400 mt-2">{plan.note}</p>
           </div>
 
-          <button
-            type="button"
-            disabled={isCurrent}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleAction();
-            }}
-            className={`w-full py-3 px-4 rounded-lg font-semibold transition-all mb-8 ${isCurrent
-              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-              : plan.popular
-                ? "bg-primary hover:bg-primary-dark text-white shadow-md"
-                : "bg-white border border-gray-300 hover:border-primary hover:text-primary text-gray-700"
-              }`}
-          >
-            {plan.cta}
-          </button>
+          {!isDefault && (
+            <button
+              type="button"
+              disabled={isCurrent}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAction();
+              }}
+              className={`w-full py-3 px-4 rounded-lg font-semibold transition-all mb-8 ${isCurrent
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : plan.popular
+                  ? "bg-primary hover:bg-primary-dark text-white shadow-md"
+                  : "bg-white border border-gray-300 hover:border-primary hover:text-primary text-gray-700"
+                }`}
+            >
+              {plan.cta}
+            </button>
+          )}
 
           {plan.detailsHtml ? (
             <div className="flex-1" dangerouslySetInnerHTML={{ __html: plan.detailsHtml }} />
@@ -153,22 +160,29 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
             })}
           </div>
 
-          <Button
-            mode="primary"
-            shape="rounded"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (!selectedDuration && plan.durations.length > 0) {
-                // If nothing selected, maybe default to first? Or just pass currently selected.
-                navigate('/checkout', { state: { plan, selectedDuration: selectedDuration || plan.durations[0].key } });
-              } else {
-                navigate('/checkout', { state: { plan, selectedDuration } });
-              }
-            }}
-            className="w-full bg-primary hover:bg-primary-dark text-white font-bold rounded-xl transition-all shadow-md mt-auto text-sm tracking-wide"
-          >
-            Subscribe Now
-          </Button>
+          {!isDefault && (
+            <Button
+              mode="primary"
+              shape="rounded"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onOpenPaymentModal) {
+                  const duration = selectedDuration || (plan.durations.length > 0 ? plan.durations[0].key : null);
+                  const selectedDurationObj = plan.durations?.find(d => d.key === duration) || null;
+                  onOpenPaymentModal(plan, selectedDurationObj);
+                } else {
+                  if (!selectedDuration && plan.durations.length > 0) {
+                    navigate('/checkout', { state: { plan, selectedDuration: selectedDuration || plan.durations[0].key } });
+                  } else {
+                    navigate('/checkout', { state: { plan, selectedDuration } });
+                  }
+                }
+              }}
+              className="w-full bg-primary hover:bg-primary-dark text-white font-bold rounded-xl transition-all shadow-md mt-auto text-sm tracking-wide"
+            >
+              Subscribe Now
+            </Button>
+          )}
         </div>
       )}
     </article>

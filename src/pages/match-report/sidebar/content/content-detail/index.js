@@ -6,6 +6,7 @@ import {
   setFocusedItemId,
   toggleDetailFixed,
   updateSuggestion,
+  updateScoresAfterFixed,
 } from "@/store/slices/matchingReportSlice";
 import {
   useMarkDetailAsFixedMutation,
@@ -81,8 +82,18 @@ const ContentDetail = ({ item, isLast }) => {
     setIsMarkingFixed(true);
 
     try {
-      await markDetailAsFixed({ detailId: item.id }).unwrap();
+      const response = await markDetailAsFixed({ detailId: item.id }).unwrap();
       dispatch(toggleDetailFixed({ detailId: item.id }));
+      
+      // Update scores if response contains score data
+      if (response) {
+        dispatch(updateScoresAfterFixed({
+          afterOverallScore: response.afterOverallScore,
+          criteriaScoreId: response.criteriaScoreId,
+          afterCriteriaScore: response.afterCriteriaScore,
+        }));
+      }
+      
       message.success("Marked as fixed successfully.");
     } catch (error) {
       message.error(getErrorMessage(error, "Unable to mark this item as fixed."));

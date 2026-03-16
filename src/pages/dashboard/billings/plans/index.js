@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import PlanCard from "./plan-card";
+import PaymentModal from "@/pages/checkout/components/PaymentModal";
 
 const formatCurrency = (amount, currency) => {
   if (amount == null || Number.isNaN(Number(amount))) return "-";
@@ -47,6 +48,7 @@ const mapPlanToCard = (plan, currentPlanId) => {
       description,
       current: isCurrent,
       popular: isPopular,
+      isDefault: Boolean(plan?.isDefault),
       basePriceLabel: priceLabel,
       baseUnit: "",
       note,
@@ -107,6 +109,7 @@ const mapPlanToCard = (plan, currentPlanId) => {
     description,
     current: isCurrent,
     popular: isPopular,
+    isDefault: Boolean(plan?.isDefault),
     basePriceLabel: basePrice ? formatCurrency(baseMonthly, basePrice.currency) : "-",
     baseUnit: "/ month",
     note,
@@ -120,6 +123,9 @@ const Plans = ({ plans = [], currentPlanId = null }) => {
   const [expandedPlanCode, setExpandedPlanCode] = useState(null);
   const [selectedDurationByPlan, setSelectedDurationByPlan] = useState({});
   const [selectedPlanCode, setSelectedPlanCode] = useState(null);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [selectedPlanForModal, setSelectedPlanForModal] = useState(null);
+  const [selectedDurationForModal, setSelectedDurationForModal] = useState(null);
 
   const sortedPlans = useMemo(() => {
     if (!Array.isArray(plans)) return [];
@@ -184,29 +190,51 @@ const Plans = ({ plans = [], currentPlanId = null }) => {
     setSelectedDurationByPlan((prev) => ({ ...prev, [planCode]: durationKey }));
   };
 
+  const handleOpenPaymentModal = (plan, duration) => {
+    setSelectedPlanForModal(plan);
+    setSelectedDurationForModal(duration?.key || null);
+    setIsPaymentModalOpen(true);
+    setExpandedPlanCode(null);
+  };
+
+  const handleClosePaymentModal = () => {
+    setIsPaymentModalOpen(false);
+    setSelectedPlanForModal(null);
+    setSelectedDurationForModal(null);
+  };
+
   return (
-    <div className="space-y-3">
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2">
-          Choose your plan
-        </h2>
+    <>
+      <div className="space-y-3">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2">
+            Choose your plan
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 items-stretch">
+          {mappedPlans.map((plan) => (
+            <PlanCard
+              key={plan.code}
+              plan={plan}
+              isSelected={selectedPlanCode === plan.code}
+              onClick={() => setSelectedPlanCode(plan.code)}
+              isExpanded={expandedPlanCode === plan.code}
+              onExpand={() => setExpandedPlanCode(plan.code)}
+              onClose={() => setExpandedPlanCode(null)}
+              selectedDuration={selectedDurationByPlan[plan.code]}
+              onSelectDuration={(durationKey) => onSelectDuration(plan.code, durationKey)}
+              onOpenPaymentModal={handleOpenPaymentModal}
+            />
+          ))}
+        </div>
       </div>
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 items-stretch">
-        {mappedPlans.map((plan) => (
-          <PlanCard
-            key={plan.code}
-            plan={plan}
-            isSelected={selectedPlanCode === plan.code}
-            onClick={() => setSelectedPlanCode(plan.code)}
-            isExpanded={expandedPlanCode === plan.code}
-            onExpand={() => setExpandedPlanCode(plan.code)}
-            onClose={() => setExpandedPlanCode(null)}
-            selectedDuration={selectedDurationByPlan[plan.code]}
-            onSelectDuration={(durationKey) => onSelectDuration(plan.code, durationKey)}
-          />
-        ))}
-      </div>
-    </div>
+      <PaymentModal
+        isOpen={isPaymentModalOpen}
+        onClose={handleClosePaymentModal}
+        plan={selectedPlanForModal}
+        selectedDuration={selectedDurationForModal}
+      />
+    </>
   );
 };
 
