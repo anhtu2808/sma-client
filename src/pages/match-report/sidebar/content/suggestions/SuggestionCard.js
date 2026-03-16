@@ -1,9 +1,17 @@
 import { useState } from "react";
 
-const SuggestionCard = ({ text }) => {
+const SuggestionCard = ({
+  suggestion,
+  canRegenerate = true,
+  isRegenerating = false,
+  onRegenerate,
+}) => {
   const [copied, setCopied] = useState(false);
+  const text = suggestion?.suggestion || "";
 
   const handleCopy = async () => {
+    if (!text) return;
+
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
@@ -22,9 +30,30 @@ const SuggestionCard = ({ text }) => {
           : "border-neutral-200 text-neutral-700"
       }`}
     >
-      {text}
+      <div className="flex items-start gap-3">
+        <div className="min-w-0 flex-1">{text}</div>
 
-      {/* Badge copied */}
+        {canRegenerate ? (
+          <button
+            type="button"
+            aria-label="Regenerate suggestion"
+            title="Uses 1 suggestion credit"
+            disabled={isRegenerating || !Number.isFinite(Number(suggestion?.id))}
+            onClick={(event) => {
+              event.stopPropagation();
+              onRegenerate?.(suggestion?.id);
+            }}
+            className="flex shrink-0 items-center justify-center rounded p-1 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <span
+              className={`material-icons-round text-[18px] ${isRegenerating ? "animate-spin" : ""}`}
+            >
+              autorenew
+            </span>
+          </button>
+        ) : null}
+      </div>
+
       {copied && (
         <div className="absolute bottom-0 right-0 flex items-center gap-0.5 rounded-tl-md bg-emerald-500 px-2 py-1 text-[10px] font-medium text-white animate-in fade-in zoom-in duration-200">
           <span className="material-icons-round text-[10px]">check</span>

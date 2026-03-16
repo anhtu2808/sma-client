@@ -29,6 +29,22 @@ export const matchingApi = api.injectEndpoints({
       }),
       transformResponse: (response) => normalizeEvaluationStatus(response?.data),
     }),
+
+    regenerateSuggestion: builder.mutation({
+      query: ({ suggestionId }) => ({
+        url: `${API_VERSION}/matching/suggestion/${suggestionId}`,
+        method: "PUT",
+      }),
+      transformResponse: (response) => response?.data ?? null,
+    }),
+
+    markDetailAsFixed: builder.mutation({
+      query: ({ detailId }) => ({
+        url: `${API_VERSION}/criteria-score/detail/${detailId}/mark-as-fixed`,
+        method: "PUT",
+      }),
+      transformResponse: (response) => response?.data ?? null,
+    }),
   }),
 });
 
@@ -38,4 +54,6 @@ export const {
   useLazyGetMatchingStatusQuery,
   useGetMatchingDetailQuery,
   useLazyGetMatchingDetailQuery,
+  useRegenerateSuggestionMutation,
+  useMarkDetailAsFixedMutation,
 } = matchingApi;

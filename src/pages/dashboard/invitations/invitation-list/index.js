@@ -18,7 +18,7 @@ const EMPTY_STATE_BY_TAB = {
   },
 };
 
-const InvitationList = ({ items, activeTab, onAccept, onDecline, onViewDetails }) => {
+const InvitationList = ({ items, activeTab, onViewDetails, onAccept, onDecline, isProcessing }) => {
   if (!items.length) {
     const emptyState = EMPTY_STATE_BY_TAB[activeTab] || EMPTY_STATE_BY_TAB.new;
 
@@ -38,9 +38,10 @@ const InvitationList = ({ items, activeTab, onAccept, onDecline, onViewDetails }
           key={item.id}
           item={item}
           activeTab={activeTab}
+          onViewDetails={onViewDetails}
           onAccept={onAccept}
           onDecline={onDecline}
-          onViewDetails={onViewDetails}
+          isProcessing={isProcessing}
         />
       ))}
     </div>

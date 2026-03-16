@@ -7,6 +7,9 @@ const SuggestModal = ({
   suggestions = [],
   onCancel,
   onConfirm,
+  onRegenerateSuggestion,
+  regeneratingSuggestionId = null,
+  isMarkingFixed = false,
   className = "",
   style,
   onMouseEnter,
@@ -35,10 +38,39 @@ const SuggestModal = ({
       
       {suggestions.length > 0 && (
         <div className="mb-4 max-h-[250px] overflow-y-auto rounded-lg bg-emerald-50/60 p-4 pb-4">
-          <ul className="list-inside list-disc space-y-2 text-sm text-neutral-700">
+          <ul className="space-y-3 text-sm text-neutral-700">
             {suggestions.map((suggestion, index) => (
-              <li key={index} className="leading-relaxed">
-                {suggestion}
+              <li
+                key={suggestion?.id ?? index}
+                className="rounded-lg bg-white/80 p-3 shadow-sm"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="min-w-0 flex-1 leading-relaxed">
+                    {suggestion?.suggestion}
+                  </div>
+
+                  {!isDone ? (
+                    <button
+                      type="button"
+                      aria-label="Regenerate suggestion"
+                      title="Uses 1 suggestion credit"
+                      disabled={
+                        regeneratingSuggestionId === suggestion?.id
+                        || !Number.isFinite(Number(suggestion?.id))
+                      }
+                      onClick={() => onRegenerateSuggestion?.(suggestion?.id)}
+                      className="flex shrink-0 items-center justify-center rounded p-1.5 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <span
+                        className={`material-icons-round text-[18px] ${
+                          regeneratingSuggestionId === suggestion?.id ? "animate-spin" : ""
+                        }`}
+                      >
+                        autorenew
+                      </span>
+                    </button>
+                  ) : null}
+                </div>
               </li>
             ))}
           </ul>
@@ -46,32 +78,8 @@ const SuggestModal = ({
       )}
 
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1 text-neutral-500">
-          {!isDone && (
-            <button
-              type="button"
-              className="flex items-center justify-center rounded p-1.5 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
-              title="Regenerate"
-            >
-              <span className="material-icons-round text-[18px]">autorenew</span>
-            </button>
-          )}
-          <button
-            type="button"
-            className="flex items-center justify-center rounded p-1.5 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
-            title="Helpful"
-          >
-            <span className="material-icons-round text-[18px]">thumb_up_off_alt</span>
-          </button>
-          <button
-            type="button"
-            className="flex items-center justify-center rounded p-1.5 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
-            title="Not helpful"
-          >
-            <span className="material-icons-round text-[18px]">thumb_down_off_alt</span>
-          </button>
-        </div>
-        
+        <div />
+
         {!isDone && (
           <div className="flex items-center gap-2">
             <button
@@ -84,9 +92,10 @@ const SuggestModal = ({
             <button
               type="button"
               onClick={onConfirm}
-              className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold flex items-center justify-center text-white transition-colors hover:bg-orange-600"
+              disabled={isMarkingFixed}
+              className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold flex items-center justify-center text-white transition-colors hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-70"
             >
-              Mark as fixed
+              {isMarkingFixed ? "Marking..." : "Mark as fixed"}
             </button>
           </div>
         )}

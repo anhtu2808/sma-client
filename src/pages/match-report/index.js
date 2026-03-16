@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-import { useLazyGetMatchingDetailQuery, useLazyGetMatchingStatusQuery } from "@/apis/matchingApi";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLazyGetMatchingDetailQuery, useLazyGetMatchingStatusQuery, useStartMatchingDetailMutation } from "@/apis/matchingApi";
 import useRequireLoginRedirect from "@/hooks/useRequireLoginRedirect";
 import MatchReportHeader from "@/pages/match-report/resume-preview/header";
 import { resetMatchingReportState, setMatchingReportData } from "@/store/slices/matchingReportSlice";
@@ -10,6 +10,7 @@ import MatchReportResumePreview from "@/pages/match-report/resume-preview";
 import MatchReportSidebar from "@/pages/match-report/sidebar";
 import MatchingLoading from "@/pages/match-report/loading";
 import Loading from "@/components/Loading";
+import Button from "@/components/Button";
 
 const MATCHING_POLL_INTERVAL_MS = 2_000;
 const MATCHING_POLL_TIMEOUT_MS = 180_000;
@@ -20,6 +21,7 @@ const normalizeEvaluationStatus = (status) =>
 const MatchReport = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { evaluationId } = useParams();
   const requireLogin = useRequireLoginRedirect();
 
@@ -40,6 +42,55 @@ const MatchReport = () => {
 
   const [triggerGetMatchingStatus] = useLazyGetMatchingStatusQuery();
   const [triggerGetMatchingDetail, { isLoading: isDetailLoading }] = useLazyGetMatchingDetailQuery();
+  const [startMatchingDetail, { isLoading: isRetrying }] = useStartMatchingDetailMutation();
+
+  const { jobId, resumeId, matchSource } = location.state || {};
+
+  const handleRetry = async () => {
+    if (matchSource !== "new") {
+      if (!hasValidEvaluationId) {
+        if (jobId) {
+          navigate(`/jobs/${jobId}`);
+        } else {
+          navigate("/jobs");
+        }
+        return;
+      }
+
+      setErrorMessage("");
+      setLatestStatus("WAITING");
+      setHasInitialStatus(false);
+      setPhase("polling");
+      return;
+    }
+
+    if (!jobId || !resumeId) {
+      if (jobId) {
+        navigate(`/jobs/${jobId}`);
+      } else {
+        navigate("/jobs");
+      }
+      return;
+    }
+
+    try {
+      const newEvaluationId = await startMatchingDetail({
+        jobId: Number(jobId),
+        resumeId: Number(resumeId),
+      }).unwrap();
+
+      if (!Number.isFinite(Number(newEvaluationId))) {
+        throw new Error("Invalid matching evaluation id");
+      }
+
+      navigate(`/match-report/${Number(newEvaluationId)}`, {
+        state: { jobId, resumeId, matchSource: "new" },
+        replace: true,
+      });
+    } catch (error) {
+      setErrorMessage("Retry failed. Please go back to job details and try again.");
+    }
+  };
 
   const stopPolling = useCallback(() => {
     if (pollingTimerRef.current) {
@@ -183,19 +234,52 @@ const MatchReport = () => {
 
   if (phase === "failed") {
     return (
-      <div className="min-h-screen bg-[#F3F4F6] px-6 py-10">
-        <div className="mx-auto max-w-4xl rounded-2xl border border-red-100 bg-white p-8 text-center shadow-sm">
-          <h1 className="text-2xl font-bold text-red-500">Unable to complete AI matching</h1>
-          <p className="mt-2 text-sm text-gray-600">
-            {errorMessage || "An unexpected error occurred while processing AI matching."}
+      <div className="flex min-h-screen items-center justify-center bg-[#F8FAFC] px-6 py-10">
+        <div className="w-full max-w-[480px] overflow-hidden rounded-2xl bg-white text-center shadow-sm p-8 ring-1 ring-gray-900/5 transition-all">
+          <div className="mx-auto flex h-[64px] w-[64px] items-center justify-center rounded-2xl bg-red-50 mb-5">
+            <span className="material-icons-round text-[32px] text-red-500">warning_amber</span>
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+            Oops, something went wrong!
+          </h1>
+          <p className="mt-3 text-[15px] text-gray-500 leading-relaxed px-2">
+            {errorMessage || "AI matching failed. Please go back and try matching again."}
           </p>
-          <button
-            type="button"
-            className="mt-5 rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-white"
-            onClick={() => navigate("/jobs")}
-          >
-            Back to Jobs
-          </button>
+          <div className="mt-6 rounded-xl bg-orange-50 p-4 border border-orange-100 flex items-center justify-center gap-2">
+            <span className="material-icons-round text-orange-500 text-[18px]">replay_circle_filled</span>
+            <p className="text-[14px] font-semibold text-orange-700 tracking-tight">Your AI credit has been refunded.</p>
+          </div>
+          
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <Button
+              mode="primary"
+              shape="rounded"
+              fullWidth
+              className="py-2.5 text-[14px] whitespace-nowrap"
+              onClick={handleRetry}
+              disabled={isRetrying}
+              iconLeft={
+                isRetrying ? (
+                  <span className="material-icons-round animate-spin text-[18px]">autorenew</span>
+                ) : (
+                  <span className="material-icons-round text-[18px] group-hover:-rotate-90 transition-transform duration-300">refresh</span>
+                )
+              }
+            >
+              {isRetrying ? "Retrying..." : "Try Again"}
+            </Button>
+            <Button
+              mode="default"
+              shape="rounded"
+              fullWidth
+              className="py-2.5 text-[14px] bg-white text-gray-700 ring-1 ring-inset ring-gray-200 hover:bg-gray-50 hover:text-gray-900 whitespace-nowrap"
+              onClick={() => jobId ? navigate(`/jobs/${jobId}`) : navigate(-1)}
+              disabled={isRetrying}
+              iconLeft={<span className="material-icons-round text-[18px] text-gray-500">arrow_back</span>}
+            >
+              Back to Job Detail
+            </Button>
+          </div>
         </div>
       </div>
     );

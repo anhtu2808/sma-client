@@ -4,9 +4,35 @@ import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 import { api } from '@/apis/baseApi';
 import { setRealtimePreview } from '@/pages/dashboard/notification/components/notification-slice';
+import toast from "react-hot-toast";
+import NotificationToast from '@/components/NotificationToast';
 
 export const useNotificationSocket = () => {
     const dispatch = useDispatch();
+    const getIcon = (type) => {
+        switch (type) {
+            case 'APPLICATION_STATUS':
+                return 'work';
+
+            case 'PAYMENT_SUCCESS':
+                return 'check_circle';
+
+            case 'PAYMENT_FAILURE':
+                return 'payments';
+
+            case 'INVITATION':
+                return 'mail';
+
+            case 'CV_PARSE_FAILED':
+                return 'error';
+
+            case 'SYSTEM':
+                return 'error_outline';
+
+            default:
+                return 'notifications';
+        }
+    };
 
     useEffect(() => {
         const token = localStorage.getItem('accessToken');
@@ -36,7 +62,20 @@ export const useNotificationSocket = () => {
                 client.subscribe('/user/queue/notifications', (message) => {
                     console.log("🔥 WS RECEIVED:", message.body);
                     const newNoti = JSON.parse(message.body);
-                    dispatch(setRealtimePreview(newNoti));
+                    if (!newNoti?.title && !newNoti?.message) {
+                        return;
+                    }
+                    const icon = getIcon(newNoti.notificationType);
+
+                    toast.custom((t) => (
+                        <NotificationToast
+                            t={t}
+                            icon={icon}
+                            title={newNoti.title}
+                            message={newNoti.message}
+                        />
+                    ), { duration: 5000 });
+
                     dispatch(api.util.invalidateTags(['Notifications']));
                 });
             },
