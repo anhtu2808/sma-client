@@ -180,3 +180,16 @@ code {
     display: none !important;
   }
 }
+
+/* Scroll Reveal Animations */
+.reveal-wrapper {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 2s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-active {
+  opacity: 1;
+  transform: translateY(0);
+}

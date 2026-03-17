@@ -1,6 +1,9 @@
+import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 
 const CTASection = () => {
+    const navigate = useNavigate();
+
     return (
         <section className="py-20">
             <div className="max-w-7xl mx-auto px-6">
@@ -9,26 +12,20 @@ const CTASection = () => {
                     <div className="absolute top-0 right-0 w-64 h-64 bg-primary rounded-full blur-[100px] opacity-20 transform translate-x-1/2 -translate-y-1/2"></div>
                     
                     <h2 className="relative z-10 text-3xl md:text-5xl font-bold text-white mb-6">
-                        Ready to scale your tech team?
+                        Ready to elevate your career journey?
                     </h2>
                     <p className="relative z-10 text-gray-400 text-lg mb-10 max-w-2xl mx-auto">
-                        Join 2,500+ highly productive teams who use SmartRecruit to find, hire, and manage their dream candidates.
+                        Join thousands of professionals and top companies who are already using SmartRecruit to connect, grow, and succeed together.
                     </p>
                     
                     <div className="relative z-10 flex flex-col sm:flex-row justify-center gap-4">
                         <Button 
                             mode="primary" 
                             size="lg" 
-                            className=""
+                            onClick={() => navigate('/register')}
+                            className="px-12"
                         >
-                            Start Hiring Now
-                        </Button>
-                        <Button 
-                            mode="secondary" 
-                            size="lg" 
-                            className="bg-white"
-                        >
-                            Book a Demo
+                            Join Now
                         </Button>
                     </div>
                 </div>
