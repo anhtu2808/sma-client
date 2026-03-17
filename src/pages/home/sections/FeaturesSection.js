@@ -33,9 +33,9 @@ const FeaturesSection = () => {
             <div className="max-w-7xl mx-auto px-6">
                 {/* Header */}
                 <div className="text-center max-w-3xl mx-auto mb-16">
-                    <span className="text-primary font-semibold text-sm uppercase tracking-wider">Why Choose SmartRecruit</span>
-                    <h2 className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
-                        Recruitment simplified, <br/>results amplified.
+                    <span className="text-primary font-semibold text-sm uppercase tracking-wider"></span>
+                    <h2 className="mt-3 text-3xl md:text-4xl font-bold text-primary">
+                        Why Choose SmartRecruit
                     </h2>
                     <p className="mt-4 text-gray-600 dark:text-gray-400">
                         Stop sifting through irrelevant resumes. Our AI-driven platform connects you with pre-vetted talent that matches your stack perfectly.
@@ -45,7 +45,7 @@ const FeaturesSection = () => {
                 {/* Feature Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {features.map((feature, index) => (
-                        <div 
+                        <div
                             key={index}
                             className="group bg-white dark:bg-surface-dark p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-xl hover:border-primary/20 dark:hover:border-primary/20 transition duration-300"
                         >

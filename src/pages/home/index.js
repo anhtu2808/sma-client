@@ -1,21 +1,37 @@
 import React from 'react';
 import HeroSection from './sections/HeroSection';
-import TrustedBySection from './sections/TrustedBySection';
+import FeaturedJobsSection from './sections/FeaturedJobsSection';
 import FeaturesSection from './sections/FeaturesSection';
-import AboutSection from './sections/AboutSection';
-import CategoriesSection from './sections/CategoriesSection';
+import AIMatchingSection from './sections/AIMatchingSection';
+import InteractiveFeaturesSection from './sections/InteractiveFeaturesSection';
 import CTASection from './sections/CTASection';
+import Reveal from '@/components/Reveal/Reveal';
 
 const Home = () => {
     return (
-        <>
+        <div className="flex flex-col">
             <HeroSection />
-            <TrustedBySection />
-            <FeaturesSection />
-            <AboutSection />
-            <CategoriesSection />
-            <CTASection />
-        </>
+
+            <Reveal delay={0.2}>
+                <FeaturedJobsSection />
+            </Reveal>
+
+            <Reveal delay={0.2}>
+                <FeaturesSection />
+            </Reveal>
+
+            <Reveal delay={0.2}>
+                <AIMatchingSection />
+            </Reveal>
+
+            <Reveal delay={0.2}>
+                <InteractiveFeaturesSection />
+            </Reveal>
+
+            <Reveal delay={0.2}>
+                <CTASection />
+            </Reveal>
+        </div>
     );
 };
 
