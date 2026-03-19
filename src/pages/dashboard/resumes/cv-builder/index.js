@@ -102,26 +102,20 @@ export default function CvBuilder({ onBack }) {
     // Initial State with API-compatible field names
     const [cvData, setCvData] = useState({
         personalInfo: {
-            fullName: "NGUYEN SI VAN HAO",
+            fullName: "Nguyen Van A",
             jobTitle: "SENIOR PRODUCT MANAGER",
             avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d",
         },
         objective: "Motivated and forward-thinking product owner with 7 years of experience in a dynamic SaaS environment.",
-        personalDetails: {
-            dob: "19/04/1998",
-            nationality: "Việt Nam",
-            maritalStatus: "Độc thân",
-            gender: "Nam"
-        },
         languages: [
             { id: 'lang_1', name: "English", level: "Ielts 6.0" },
             { id: 'lang_2', name: "Chinese", level: "HSK 6" }
         ],
         skills: [],
         contact: {
-            emailInResume: "haonsvse172181@fpt.edu.vn",
+            emailInResume: "mail@fpt.edu.vn",
             phoneInResume: "+84-975052978",
-            addressInResume: "11 Doan Van Bo, Quận 4, Hồ Chí Minh, Việt Nam",
+            addressInResume: "District 9, Ho Chi Minh, Viet Nam",
             githubLink: "github.com/username",
             linkedinLink: "linkedin.com/in/username",
             portfolioLink: "portfolio.dev"
