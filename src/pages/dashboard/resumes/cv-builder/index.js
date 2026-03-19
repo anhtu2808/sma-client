@@ -46,6 +46,7 @@ import { EditableDateRange } from "./components/EditableDateRange";
 import { SectionWrapper } from "./components/SectionWrapper";
 import { EditableItemWrapper } from "./components/EditableItemWrapper";
 import { SkillSelector } from "./components/SkillSelector";
+import InlineSelect from "./components/InlineSelect";
 
 // --- Date formatting helper ---
 
@@ -102,19 +103,14 @@ export default function CvBuilder({ onBack }) {
     // Initial State with API-compatible field names
     const [cvData, setCvData] = useState({
         personalInfo: {
-            fullName: "Nguyen Van A",
-            jobTitle: "SENIOR PRODUCT MANAGER",
+            fullName: "Your Name",
+            jobTitle: "Your Job Title",
             avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d",
         },
-        objective: "Motivated and forward-thinking product owner with 7 years of experience in a dynamic SaaS environment.",
-        languages: [
-            { id: 'lang_1', name: "English", level: "Ielts 6.0" },
-            { id: 'lang_2', name: "Chinese", level: "HSK 6" }
-        ],
         skills: [],
         contact: {
             emailInResume: "mail@fpt.edu.vn",
-            phoneInResume: "+84-975052978",
+            phoneInResume: "+84",
             addressInResume: "District 9, Ho Chi Minh, Viet Nam",
             githubLink: "github.com/username",
             linkedinLink: "linkedin.com/in/username",
@@ -123,23 +119,23 @@ export default function CvBuilder({ onBack }) {
         experience: [
             {
                 id: "exp_1",
-                title: "Senior Product Manager",
-                company: "Navigos Group VN",
+                title: "Job Title",
+                company: "Company Name",
                 startDate: "2016-01-01",
                 endDate: "2023-01-01",
                 isCurrent: false,
                 workingModel: "ONSITE",
                 employmentType: "FULL_TIME",
-                description: "Skilled and experienced Product Manager with experience in product marketing, product introduction, and the overall management of a product's life from conception to fruition."
+                description: "Job Description"
             },
         ],
         education: [
             {
                 id: "edu_1",
-                institution: "FPT University",
-                degree: "BACHELOR",
-                majorField: "Software Engineering",
-                gpa: 8.5,
+                institution: "University Name",
+                degree: "Degree",
+                majorField: "Major Field",
+                gpa: 0,
                 startDate: "2016-09-01",
                 endDate: "2020-07-01",
                 isCurrent: false,
@@ -148,23 +144,23 @@ export default function CvBuilder({ onBack }) {
         certificates: [
             {
                 id: "cert_1",
-                name: "PSPO I",
-                issuer: "Scrum.org",
+                name: "Certificate Name",
+                issuer: "Certificate Issuer",
                 credentialUrl: "https://www.sample.site/PSPO1.pdf",
-                description: "Professional Scrum Product Owner"
+                description: "Certificate Description"
             },
         ],
         projects: [
             {
                 id: "proj_1",
-                title: "Smart Recruit Platform",
-                position: "Product Owner",
-                description: "A comprehensive recruitment platform with AI-powered matching.",
+                title: "Project Name",
+                position: "Project Position",
+                description: "Project Description",
                 startDate: "2022-01-01",
                 endDate: "2023-06-01",
                 isCurrent: false,
-                projectUrl: "https://smartrecruit.vn",
-                teamSize: 5,
+                projectUrl: "https://project.vn",
+                teamSize: 0,
                 projectType: "PROFESSIONAL",
             }
         ],
@@ -444,6 +440,16 @@ export default function CvBuilder({ onBack }) {
                         }
                     }).unwrap();
                     expResultId = expResult?.id;
+
+                    // Immediately update local state with server ID to prevent
+                    // duplicate items when refetch + useEffect runs later
+                    const oldExpId = exp.id;
+                    setCvData(prev => ({
+                        ...prev,
+                        experience: prev.experience.map(e =>
+                            e.id === oldExpId ? { ...e, id: expResultId } : e
+                        ),
+                    }));
                 } else {
                     await updateExperience({
                         resumeId,
@@ -463,7 +469,7 @@ export default function CvBuilder({ onBack }) {
                 // Create or update experience detail (title + description)
                 if (expResultId) {
                     if (isNew || !exp.detailId) {
-                        await createExperienceDetail({
+                        const detailResult = await createExperienceDetail({
                             resumeId,
                             experienceId: expResultId,
                             payload: {
@@ -475,6 +481,14 @@ export default function CvBuilder({ onBack }) {
                                 orderIndex: 0,
                             }
                         }).unwrap();
+
+                        // Update detailId so subsequent saves use update instead of create
+                        setCvData(prev => ({
+                            ...prev,
+                            experience: prev.experience.map(e =>
+                                e.id === expResultId ? { ...e, detailId: detailResult?.id } : e
+                            ),
+                        }));
                     } else {
                         await updateExperienceDetail({
                             resumeId,
@@ -724,6 +738,7 @@ export default function CvBuilder({ onBack }) {
         SectionWrapper,
         EditableItemWrapper,
         SkillSelector,
+        InlineSelect,
         LucideIcons,
         avatarInputRef,
         contactVisibility,
