@@ -1,13 +1,6 @@
 import React from 'react';
-import { Form, DatePicker, message } from 'antd';
-import Loading from '@/components/Loading';
-import Input from "@/components/Input";
-import Select from "@/components/Select";
-import Switch from "@/components/Switch";
+import { Form } from 'antd';
 import Button from "@/components/Button";
-import { workingModelOptions } from '@/constant/job';
-import { useGetSkillsQuery } from "@/apis/skillApi";
-import dayjs from 'dayjs';
 
 const employmentTypeOptions = [
     { label: "Full-time", value: "FULL_TIME" },
@@ -55,55 +48,6 @@ export default function PropertiesSidebar({ activeSection, cvData, updateField, 
     }, [activeSection, cvData, form]);
 
     const { section, index } = activeSection || {};
-
-    // Skill search state
-    const [skillSearchText, setSkillSearchText] = React.useState("");
-    const { data: skillOptions = [], isFetching: isFetchingSkills } = useGetSkillsQuery(
-        { name: skillSearchText, size: 20 },
-        { skip: section !== 'skills' }
-    );
-    const [tempGroup, setTempGroup] = React.useState("");
-    const [tempExperience, setTempExperience] = React.useState("");
-    const [tempSkillId, setTempSkillId] = React.useState(null);
-
-    const handleExperienceChange = (expVal) => {
-        setTempExperience(expVal);
-
-        if (!tempGroup.trim()) {
-            message.error("Please enter a skill group name.");
-            return;
-        }
-
-        if (!tempSkillId) {
-            message.error("Please select a skill before selecting years of experience.");
-            return;
-        }
-
-        handleAddSkill(tempSkillId, expVal);
-    };
-
-    const handleAddSkill = (skillId, expVal) => {
-        const selectedSkill = skillOptions.find(s => s.id === skillId);
-        if (!selectedSkill) return;
-
-        if (cvData.skills.some(s => s.skillId === skillId)) {
-            message.warning("This skill has already been added.");
-            return;
-        }
-
-        const newSkill = {
-            id: `skill_${Date.now()}_${Math.random()}`,
-            skillId: selectedSkill.id,
-            skillName: selectedSkill.name,
-            groupName: tempGroup.trim(),
-            yearsOfExperience: (expVal !== undefined && expVal !== null && expVal !== '') ? Number(expVal) : null
-        };
-
-        updateField('skills', [...cvData.skills, newSkill]);
-        setSkillSearchText("");
-        setTempSkillId(null);
-        setTempExperience("");
-    };
 
     if (!activeSection) {
         const availableSections = [
@@ -160,78 +104,11 @@ export default function PropertiesSidebar({ activeSection, cvData, updateField, 
 
     const renderFormFields = () => {
         switch (section) {
-            case 'experience':
-                return (
-                    <>
-                        <Form.Item label="Working Model" name="workingModel">
-                            <Select fullWidth="true" options={workingModelOptions.filter(o => o.value)} placeholder="Select model" />
-                        </Form.Item>
-                        <Form.Item label="Employment Type" name="employmentType">
-                            <Select fullWidth="true" options={employmentTypeOptions} placeholder="Select employment type" />
-                        </Form.Item>
-                    </>
-                );
-            case 'education':
-                return (
-                    <>
-                        <Form.Item label="Degree" name="degree">
-                            <Select fullWidth="true" options={degreeOptions} placeholder="Select degree" />
-                        </Form.Item>
-                    </>
-                );
-            case 'projects':
-                return (
-                    <>
-                        <Form.Item label="Project Type" name="projectType">
-                            <Select fullWidth="true" options={projectTypeOptions} placeholder="Select project type" />
-                        </Form.Item>
-                    </>
-                );
             case 'skills':
-                return (
-                    <div className="flex flex-col gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Skill Group</label>
-                            <Input
-                                placeholder="e.g., Frontend, Backend..."
-                                value={tempGroup}
-                                onChange={e => setTempGroup(e.target.value)}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Search and add skill</label>
-                            <Select
-                                showSearch
-                                placeholder="Type to search..."
-                                value={tempSkillId}
-                                onSearch={(val) => setSkillSearchText(val)}
-                                onChange={val => setTempSkillId(val)}
-                                filterOption={false}
-                                loading={isFetchingSkills}
-                                notFoundContent={skillSearchText ? (isFetchingSkills ? <Loading size={24} inline /> : "Not found") : "Type to search"}
-                                className="w-full"
-                                fullWidth={true}
-                                options={skillOptions.map(s => ({
-                                    value: s.id,
-                                    label: s.name,
-                                }))}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Years of Experience</label>
-                            <Select
-                                placeholder="Select years"
-                                value={tempExperience || undefined}
-                                onChange={handleExperienceChange}
-                                options={Array.from({ length: 21 }, (_, i) => ({ label: `${i} years`, value: i }))}
-                                className="w-full"
-                                fullWidth="true"
-                            />
-                        </div>
-                    </div>
-                );
+                return <div className="text-gray-500 text-sm">Skills can be added and removed directly on the resume. Use the "Add Skill" button in the Skills section.</div>;
+
             default:
-                return <div className="text-gray-500 text-sm">No settings available for this section.</div>;
+                return <div className="text-gray-500 text-sm">Select fields are now editable directly on the resume. Click on the values to change them.</div>;
         }
     };
 
@@ -249,11 +126,6 @@ export default function PropertiesSidebar({ activeSection, cvData, updateField, 
                 <span className="material-icons-round text-primary-600">tune</span>
                 Properties
             </h3>
-
-            <div className="bg-blue-50 text-blue-800 p-3 rounded-md mb-6 text-sm font-medium border border-blue-100 flex items-center gap-2">
-                <span className="material-icons-round text-blue-500 text-lg">edit</span>
-                Editing: {sectionLabels[section] || section}
-            </div>
 
             <Form
                 form={form}
