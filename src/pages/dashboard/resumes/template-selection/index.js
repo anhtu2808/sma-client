@@ -5,6 +5,11 @@ import { TemplateCard } from "../resume-card";
 import UseTemplateModal from "./UseTemplateModal";
 import { useCreateResumeBuilderMutation, useCloneResumeBuilderMutation } from "@/apis/resumeApi";
 
+import ModernMinimalistImg from "@/assets/template/ModernMinimalist.png";
+import ExecutiveProfessionalImg from "@/assets/template/ExecutiveProfessional.png";
+import CreativeStudioImg from "@/assets/template/CreativeStudio.png";
+import TechInnovatorImg from "@/assets/template/TechInnovator.png";
+
 export const CV_TEMPLATES = [
     {
         id: "tpl_modern_1",
@@ -14,6 +19,7 @@ export const CV_TEMPLATES = [
         bgColor: "bg-blue-50 dark:bg-blue-900/20",
         themeColor: "bg-blue-600",
         isPremium: false,
+        preview: ModernMinimalistImg,
     },
     {
         id: "tpl_prof_1",
@@ -23,6 +29,7 @@ export const CV_TEMPLATES = [
         bgColor: "bg-gray-100 dark:bg-gray-800",
         themeColor: "bg-gray-800 dark:bg-gray-400",
         isPremium: false,
+        preview: ExecutiveProfessionalImg,
     },
     {
         id: "tpl_creative_1",
@@ -32,6 +39,7 @@ export const CV_TEMPLATES = [
         bgColor: "bg-purple-50 dark:bg-purple-900/20",
         themeColor: "bg-purple-600",
         isPremium: true,
+        preview: CreativeStudioImg,
     },
     {
         id: "tpl_modern_2",
@@ -41,6 +49,7 @@ export const CV_TEMPLATES = [
         bgColor: "bg-teal-50 dark:bg-teal-900/20",
         themeColor: "bg-teal-600",
         isPremium: true,
+        preview: TechInnovatorImg,
     }
 ];
 

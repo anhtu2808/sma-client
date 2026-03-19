@@ -4,7 +4,7 @@ import { Spin, Popconfirm, message } from "antd";
 import { useGetCandidateResumesQuery, useDeleteCandidateResumeMutation, useUpdateCandidateResumeMutation } from "@/apis/resumeApi";
 import { RESUME_TYPES } from "@/constant";
 import { CV_TEMPLATES } from "../../template-selection";
-import { TemplatePreviewContent } from "../../resume-card";
+
 
 const ResumeBuilderTab = () => {
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ const ResumeBuilderTab = () => {
       setEditingId(null);
       return;
     }
-    
+
     try {
       await updateCandidateResume({
         resumeId,
@@ -78,7 +78,7 @@ const ResumeBuilderTab = () => {
             {/* Create New Card */}
             <div
               onClick={() => navigate('/dashboard/resumes/templates')}
-              className="rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex flex-col items-center justify-center aspect-[3/4] cursor-pointer hover:border-primary hover:bg-orange-50/50 dark:hover:bg-gray-700/50 transition-all group"
+              className="rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex flex-col items-center justify-center h-[480px] cursor-pointer hover:border-primary hover:bg-orange-50/50 dark:hover:bg-gray-700/50 transition-all group"
             >
               <div className="w-12 h-12 rounded-full bg-orange-100 dark:bg-gray-700 flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-white transition-colors">
                 <span className="material-icons-round text-[24px] text-primary group-hover:text-white">add</span>
@@ -122,10 +122,18 @@ const ResumeBuilderTab = () => {
                   </Popconfirm>
 
                   {/* CV Preview Skeleton & Hover Overlay */}
-                  <div className={`flex-1 ${templateObj.bgColor || 'bg-gray-50'} dark:bg-gray-800/50 p-4 flex items-start justify-center pt-5 relative`}>
-                    <div className="w-full max-w-[120px] bg-white dark:bg-gray-700 rounded shadow-sm border border-gray-100 dark:border-gray-600 aspect-[3/4] flex flex-col overflow-hidden relative">
-                      <TemplatePreviewContent template={templateObj} />
-                    </div>
+                  <div className={`flex-1 ${templateObj.bgColor || 'bg-gray-50'} dark:bg-gray-800/50 p-4 flex items-center justify-center relative`}>
+                    {templateObj.preview ? (
+                      <img
+                        src={templateObj.preview}
+                        alt={templateObj.name}
+                        className="max-h-full max-w-full object-contain rounded shadow-sm border border-gray-100 dark:border-gray-600"
+                      />
+                    ) : (
+                      <div className="w-full max-w-[120px] bg-white dark:bg-gray-700 rounded shadow-sm border border-gray-100 dark:border-gray-600 aspect-[3/4] flex items-center justify-center">
+                        <span className="material-icons-round text-gray-300 text-[32px]">description</span>
+                      </div>
+                    )}
                     {/* Hover overlay that only covers the preview area */}
                     <div className="absolute inset-0 bg-gray-900/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[1px] z-10 pointer-events-none">
                       <span className="bg-white text-gray-800 px-3 py-1.5 rounded-full text-xs font-semibold shadow flex items-center gap-1.5">

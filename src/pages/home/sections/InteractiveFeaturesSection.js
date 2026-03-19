@@ -1,9 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const InteractiveFeaturesSection = () => {
     const navigate = useNavigate();
     const [activeTabId, setActiveTabId] = useState('jobs');
+    const isPausedRef = useRef(false);
+    const tabIds = ['jobs', 'companies', 'cv-analysis', 'cv-builder', 'smart-ai'];
+
+    const goToNextTab = useCallback(() => {
+        if (isPausedRef.current) return;
+        setActiveTabId(prev => {
+            const currentIndex = tabIds.indexOf(prev);
+            const nextIndex = (currentIndex + 1) % tabIds.length;
+            return tabIds[nextIndex];
+        });
+    }, []);
+
+    useEffect(() => {
+        const intervalId = setInterval(goToNextTab, 2000);
+        return () => clearInterval(intervalId);
+    }, [goToNextTab]);
 
     const tabs = [
         {
@@ -390,7 +406,11 @@ const InteractiveFeaturesSection = () => {
             <div className="max-w-7xl mx-auto px-6">
 
                 {/* 1. The 5 Cards (Tabs) */}
-                <div className="flex flex-col lg:flex-row gap-4 mb-8">
+                <div
+                    className="flex flex-col lg:flex-row gap-4 mb-8"
+                    onMouseEnter={() => { isPausedRef.current = true; }}
+                    onMouseLeave={() => { isPausedRef.current = false; }}
+                >
                     {tabs.map((tab) => {
                         const isActive = activeTabId === tab.id;
                         return (

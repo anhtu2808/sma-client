@@ -2,6 +2,37 @@ import React from 'react';
 import { Mail, Phone, MapPin, Github, Linkedin, Globe, Eye, EyeOff } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 
+const workingModelOptions = [
+    { label: "On-site", value: "ONSITE" },
+    { label: "Remote", value: "REMOTE" },
+    { label: "Hybrid", value: "HYBRID" },
+];
+const employmentTypeOptions = [
+    { label: "Full-time", value: "FULL_TIME" },
+    { label: "Part-time", value: "PART_TIME" },
+    { label: "Self-employed", value: "SELF_EMPLOYED" },
+    { label: "Freelance", value: "FREELANCE" },
+    { label: "Contract", value: "CONTRACT" },
+    { label: "Internship", value: "INTERNSHIP" },
+    { label: "Apprenticeship", value: "APPRENTICESHIP" },
+    { label: "Seasonal", value: "SEASONAL" },
+];
+const degreeOptions = [
+    { label: "High School", value: "HIGH_SCHOOL" },
+    { label: "Associate", value: "ASSOCIATE" },
+    { label: "Bachelor", value: "BACHELOR" },
+    { label: "Master", value: "MASTER" },
+    { label: "Doctorate", value: "DOCTORATE" },
+    { label: "Certificate", value: "CERTIFICATE" },
+];
+const projectTypeOptions = [
+    { label: "Personal", value: "PERSONAL" },
+    { label: "Academic", value: "ACADEMIC" },
+    { label: "Professional", value: "PROFESSIONAL" },
+    { label: "Open Source", value: "OPEN_SOURCE" },
+    { label: "Freelance", value: "FREELANCE" },
+];
+
 const ModernMinimalistTemplate = ({
     cvData,
     sectionOrder,
@@ -11,6 +42,7 @@ const ModernMinimalistTemplate = ({
     SectionWrapper,
     EditableItemWrapper,
     SkillSelector,
+    InlineSelect,
     avatarInputRef,
     contactVisibility,
     toggleContactVisibility,
@@ -18,9 +50,9 @@ const ModernMinimalistTemplate = ({
     EditableDateRange,
 }) => {
     return (
-        <div className="w-[850px] mx-auto mt-8 bg-white shadow-xl min-h-[1100px] relative font-sans">
+        <div className="w-[850px] mx-auto mt-8 bg-white shadow-xl min-h-[1100px] relative font-sans print:min-h-0 print:w-full print:mt-0 print:shadow-none">
             {/* Header (Name, Title) */}
-            <div className="px-12 pt-12 pb-6 bg-[#3b82f6] text-white rounded-t-lg">
+            <div className="px-12 pt-12 pb-6 bg-[#3b82f6] text-white rounded-t-lg print:rounded-none print:pt-8 print:pb-4">
                 <EditableText
                     as="h1"
                     className="text-4xl font-bold text-blue-900 mb-1 truncate"
@@ -36,13 +68,13 @@ const ModernMinimalistTemplate = ({
             </div>
 
             {/* Main Content Layout */}
-            <div className="flex px-12 pb-12 gap-10">
+            <div className="flex px-12 pb-12 gap-10 print:px-8 print:pb-6 print:gap-6">
 
                 {/* Left Column (35%) */}
-                <div className="w-[35%] flex flex-col gap-8">
+                <div className="w-[35%] flex flex-col gap-8 print:gap-4">
 
                     {/* Avatar Box */}
-                    <div className="bg-[#F8F9FA] p-6 rounded-lg aspect-square flex items-center justify-center relative group">
+                    <div className="bg-[#F8F9FA] p-6 rounded-lg aspect-square flex items-center justify-center relative group print:aspect-auto print:p-4">
                         <img src={cvData.personalInfo.avatar} alt="Avatar" className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-md" />
                         <button onClick={() => avatarInputRef?.current?.click()} className="absolute inset-0 m-auto w-10 h-10 bg-white/90 rounded-full shadow-sm flex items-center justify-center text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                             <LucideIcons.Camera size={18} />
@@ -148,9 +180,9 @@ const ModernMinimalistTemplate = ({
                                                             </div>
                                                         </div>
                                                         <div className="font-medium mt-0.5 text-sm">
-                                                            <span>{exp.workingModel || 'ONSITE'}</span>
+                                                            <InlineSelect value={exp.workingModel} options={workingModelOptions} onChange={v => updateField(`experience.${itemIndex}.workingModel`, v)} />
                                                             <span className="mx-1">•</span>
-                                                            <span>{exp.employmentType || 'FULL_TIME'}</span>
+                                                            <InlineSelect value={exp.employmentType} options={employmentTypeOptions} onChange={v => updateField(`experience.${itemIndex}.employmentType`, v)} />
                                                         </div>
                                                         <EditableText as="p" className="font-medium mt-0.5 text-sm" value={exp.company} onChange={v => updateField(`experience.${itemIndex}.company`, v)} />
                                                         <EditableText as="p" className="font-medium mt-0.5 text-sm" value={exp.description} onChange={v => updateField(`experience.${itemIndex}.description`, v)} />
@@ -181,7 +213,7 @@ const ModernMinimalistTemplate = ({
                                                         <div className="flex justify-between items-start gap-4">
                                                             <div className="min-w-0 flex-1">
                                                                 <div className="flex flex-col">
-                                                                    <span className="font-bold text-gray-900 text-lg">{edu.degree || 'BACHELOR'}</span>
+                                                                    <InlineSelect className="font-bold text-gray-900 text-lg" value={edu.degree} options={degreeOptions} onChange={v => updateField(`education.${itemIndex}.degree`, v)} />
                                                                     <EditableText as="h4" className="font-medium mt-0.5 text-sm" value={edu.majorField || 'Major'} onChange={v => updateField(`education.${itemIndex}.majorField`, v)} />
                                                                 </div>
                                                                 <EditableText as="p" className="font-medium mt-0.5 text-sm" value={edu.institution} onChange={v => updateField(`education.${itemIndex}.institution`, v)} />
@@ -276,7 +308,7 @@ const ModernMinimalistTemplate = ({
                                                         </div>
                                                         <EditableText as="p" className="font-medium mt-0.5 text-sm" value={proj.position} onChange={v => updateField(`projects.${itemIndex}.position`, v)} />
                                                         <div className="font-medium mt-0.5 text-sm flex items-center">
-                                                            <span>{proj.projectType || 'PROFESSIONAL'}</span>
+                                                            <InlineSelect value={proj.projectType} options={projectTypeOptions} onChange={v => updateField(`projects.${itemIndex}.projectType`, v)} />
                                                             <span className="mx-1">•</span>
                                                             <span className={`${!proj.teamSize ? "text-gray-400 print:hidden" : ""}`}>Team:</span>
                                                             <EditableText as="span" className={`ml-1 min-w-[20px] ${!proj.teamSize ? "print:hidden" : ""}`} value={proj.teamSize} onChange={v => updateField(`projects.${itemIndex}.teamSize`, v)} />

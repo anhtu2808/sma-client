@@ -51,14 +51,6 @@ const FeaturedJobsSection = () => {
             <div className="max-w-7xl mx-auto px-6">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10">
-                    <div>
-                        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                            Highlight Jobs
-                        </h2>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm">
-                            Explore our top opportunities from leading companies
-                        </p>
-                    </div>
                     <button
                         onClick={() => navigate('/jobs')}
                         className="mt-4 md:mt-0 text-primary font-semibold hover:underline inline-flex items-center gap-1 text-sm"
@@ -78,7 +70,7 @@ const FeaturedJobsSection = () => {
                             <div
                                 key={job.id}
                                 onClick={() => navigate(`/jobs/${job.id}`)}
-                                className="group bg-white dark:bg-surface-dark rounded-2xl border border-gray-100 dark:border-gray-800 p-5 hover:shadow-lg hover:border-primary/30 dark:hover:border-primary/30 transition-all duration-300 cursor-pointer relative"
+                                className="group bg-white dark:bg-surface-dark rounded-2xl border border-gray-200 dark:border-gray-800 p-5 hover:shadow-lg hover:border-primary/30 dark:hover:border-primary/30 transition-all duration-300 cursor-pointer relative"
                             >
                                 {/* HOT badge */}
                                 {job.isHot && (

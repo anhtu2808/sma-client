@@ -2,6 +2,37 @@ import React from 'react';
 import { Mail, Phone, MapPin, Github, Linkedin, Globe, Eye, EyeOff } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 
+const workingModelOptions = [
+    { label: "On-site", value: "ONSITE" },
+    { label: "Remote", value: "REMOTE" },
+    { label: "Hybrid", value: "HYBRID" },
+];
+const employmentTypeOptions = [
+    { label: "Full-time", value: "FULL_TIME" },
+    { label: "Part-time", value: "PART_TIME" },
+    { label: "Self-employed", value: "SELF_EMPLOYED" },
+    { label: "Freelance", value: "FREELANCE" },
+    { label: "Contract", value: "CONTRACT" },
+    { label: "Internship", value: "INTERNSHIP" },
+    { label: "Apprenticeship", value: "APPRENTICESHIP" },
+    { label: "Seasonal", value: "SEASONAL" },
+];
+const degreeOptions = [
+    { label: "High School", value: "HIGH_SCHOOL" },
+    { label: "Associate", value: "ASSOCIATE" },
+    { label: "Bachelor", value: "BACHELOR" },
+    { label: "Master", value: "MASTER" },
+    { label: "Doctorate", value: "DOCTORATE" },
+    { label: "Certificate", value: "CERTIFICATE" },
+];
+const projectTypeOptions = [
+    { label: "Personal", value: "PERSONAL" },
+    { label: "Academic", value: "ACADEMIC" },
+    { label: "Professional", value: "PROFESSIONAL" },
+    { label: "Open Source", value: "OPEN_SOURCE" },
+    { label: "Freelance", value: "FREELANCE" },
+];
+
 const TechInnovatorTemplate = ({
     cvData,
     sectionOrder,
@@ -11,6 +42,7 @@ const TechInnovatorTemplate = ({
     SectionWrapper,
     EditableItemWrapper,
     SkillSelector,
+    InlineSelect,
     avatarInputRef,
     contactVisibility,
     toggleContactVisibility,
@@ -138,9 +170,9 @@ const TechInnovatorTemplate = ({
                                                             </div>
                                                         </div>
                                                         <div className="font-medium mt-0.5 text-sm">
-                                                            <span>{exp.workingModel || 'ONSITE'}</span>
+                                                            <InlineSelect value={exp.workingModel} options={workingModelOptions} onChange={v => updateField(`experience.${itemIndex}.workingModel`, v)} />
                                                             <span className="mx-1">•</span>
-                                                            <span>{exp.employmentType || 'FULL_TIME'}</span>
+                                                            <InlineSelect value={exp.employmentType} options={employmentTypeOptions} onChange={v => updateField(`experience.${itemIndex}.employmentType`, v)} />
                                                         </div>
                                                         <EditableText as="p" className="font-medium mt-0.5 text-sm" value={exp.company} onChange={v => updateField(`experience.${itemIndex}.company`, v)} />
                                                         <EditableText as="p" className="font-medium mt-0.5 text-sm" value={exp.description} onChange={v => updateField(`experience.${itemIndex}.description`, v)} />
@@ -171,7 +203,7 @@ const TechInnovatorTemplate = ({
                                                         <div className="flex justify-between items-start gap-4">
                                                             <div className="min-w-0 flex-1">
                                                                 <div className="flex flex-col">
-                                                                    <span className="font-bold text-gray-900 text-lg">{edu.degree || 'BACHELOR'}</span>
+                                                                    <InlineSelect className="font-bold text-gray-900 text-lg" value={edu.degree} options={degreeOptions} onChange={v => updateField(`education.${itemIndex}.degree`, v)} />
                                                                     <EditableText as="h4" className="font-medium mt-0.5 text-sm" value={edu.majorField || 'Major'} onChange={v => updateField(`education.${itemIndex}.majorField`, v)} />
                                                                 </div>
                                                                 <EditableText as="p" className="font-medium mt-0.5 text-sm" value={edu.institution} onChange={v => updateField(`education.${itemIndex}.institution`, v)} />
@@ -266,7 +298,7 @@ const TechInnovatorTemplate = ({
                                                         </div>
                                                         <EditableText as="p" className="font-medium mt-0.5 text-sm" value={proj.position} onChange={v => updateField(`projects.${itemIndex}.position`, v)} />
                                                         <div className="font-medium mt-0.5 text-sm flex items-center">
-                                                            <span>{proj.projectType || 'PROFESSIONAL'}</span>
+                                                            <InlineSelect value={proj.projectType} options={projectTypeOptions} onChange={v => updateField(`projects.${itemIndex}.projectType`, v)} />
                                                             <span className="mx-1">•</span>
                                                             <span className={`${!proj.teamSize ? "text-gray-400 print:hidden" : ""}`}>Team:</span>
                                                             <EditableText as="span" className={`ml-1 min-w-[20px] ${!proj.teamSize ? "print:hidden" : ""}`} value={proj.teamSize} onChange={v => updateField(`projects.${itemIndex}.teamSize`, v)} />

@@ -1,8 +1,24 @@
 import Button from '@/components/Button';
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import FeaturedJobsSection from './FeaturedJobsSection';
 
 const HeroSection = () => {
+    const navigate = useNavigate();
+    const [keyword, setKeyword] = useState('');
+    const [location, setLocation] = useState('');
+
+    const handleSearch = () => {
+        const params = new URLSearchParams();
+        if (keyword.trim()) params.set('name', keyword.trim());
+        if (location.trim()) params.set('location', location.trim());
+        navigate(`/jobs?${params.toString()}`);
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') handleSearch();
+    };
+
     return (
         <section className="relative pt-20 pb-20 overflow-hidden">
             {/* Background Blobs */}
@@ -30,6 +46,9 @@ const HeroSection = () => {
                             className="w-full bg-transparent border-none focus:ring-0 text-gray-800 dark:text-white placeholder-gray-400 text-sm outline-none"
                             placeholder="Job title, keywords..."
                             type="text"
+                            value={keyword}
+                            onChange={(e) => setKeyword(e.target.value)}
+                            onKeyDown={handleKeyDown}
                         />
                     </div>
                     <div className="flex-1 h-12 flex items-center px-4">
@@ -38,6 +57,9 @@ const HeroSection = () => {
                             className="w-full bg-transparent border-none focus:ring-0 text-gray-800 dark:text-white placeholder-gray-400 text-sm outline-none"
                             placeholder="City, state, or remote"
                             type="text"
+                            value={location}
+                            onChange={(e) => setLocation(e.target.value)}
+                            onKeyDown={handleKeyDown}
                         />
                     </div>
                     <Button
@@ -45,11 +67,13 @@ const HeroSection = () => {
                         size="md"
                         className="h-12 px-8 shrink-0 w-full sm:w-auto rounded-xl sm:rounded-full"
                         glow={true}
-
+                        onClick={handleSearch}
                     >
                         Find a Job
                     </Button>
                 </div>
+
+                <FeaturedJobsSection />
 
                 {/* Dashboard Preview - Job Listing Mockup */}
                 <div className="mt-16 relative mx-auto max-w-5xl">
@@ -93,13 +117,13 @@ const HeroSection = () => {
                                     </label>
                                     <label className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300 font-medium">
                                         <span className="w-3.5 h-3.5 rounded bg-primary flex items-center justify-center">
-                                            <span className="material-icons-round text-white" style={{fontSize: '10px'}}>check</span>
+                                            <span className="material-icons-round text-white" style={{ fontSize: '10px' }}>check</span>
                                         </span>
                                         Mid Level
                                     </label>
                                     <label className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300 font-medium">
                                         <span className="w-3.5 h-3.5 rounded bg-primary flex items-center justify-center">
-                                            <span className="material-icons-round text-white" style={{fontSize: '10px'}}>check</span>
+                                            <span className="material-icons-round text-white" style={{ fontSize: '10px' }}>check</span>
                                         </span>
                                         Senior Level
                                     </label>
