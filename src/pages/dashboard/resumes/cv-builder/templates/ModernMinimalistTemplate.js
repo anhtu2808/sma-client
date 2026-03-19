@@ -50,9 +50,9 @@ const ModernMinimalistTemplate = ({
     EditableDateRange,
 }) => {
     return (
-        <div className="w-[850px] mx-auto mt-8 bg-white shadow-xl min-h-[1100px] relative font-sans">
+        <div className="w-[850px] mx-auto mt-8 bg-white shadow-xl min-h-[1100px] relative font-sans print:min-h-0 print:w-full print:mt-0 print:shadow-none">
             {/* Header (Name, Title) */}
-            <div className="px-12 pt-12 pb-6 bg-[#3b82f6] text-white rounded-t-lg">
+            <div className="px-12 pt-12 pb-6 bg-[#3b82f6] text-white rounded-t-lg print:rounded-none print:pt-8 print:pb-4">
                 <EditableText
                     as="h1"
                     className="text-4xl font-bold text-blue-900 mb-1 truncate"
@@ -68,13 +68,13 @@ const ModernMinimalistTemplate = ({
             </div>
 
             {/* Main Content Layout */}
-            <div className="flex px-12 pb-12 gap-10">
+            <div className="flex px-12 pb-12 gap-10 print:px-8 print:pb-6 print:gap-6">
 
                 {/* Left Column (35%) */}
-                <div className="w-[35%] flex flex-col gap-8">
+                <div className="w-[35%] flex flex-col gap-8 print:gap-4">
 
                     {/* Avatar Box */}
-                    <div className="bg-[#F8F9FA] p-6 rounded-lg aspect-square flex items-center justify-center relative group">
+                    <div className="bg-[#F8F9FA] p-6 rounded-lg aspect-square flex items-center justify-center relative group print:aspect-auto print:p-4">
                         <img src={cvData.personalInfo.avatar} alt="Avatar" className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-md" />
                         <button onClick={() => avatarInputRef?.current?.click()} className="absolute inset-0 m-auto w-10 h-10 bg-white/90 rounded-full shadow-sm flex items-center justify-center text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                             <LucideIcons.Camera size={18} />
