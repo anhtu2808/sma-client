@@ -24,7 +24,7 @@ const FeaturedJobsSection = () => {
                 companyLogo: job.company?.logo,
                 salary,
                 locationCity,
-                isHot: job.jobLevel === 'SENIOR' || job.hot,
+                isHot: job.isHighlight === true,
             };
         });
     }, [jobData]);

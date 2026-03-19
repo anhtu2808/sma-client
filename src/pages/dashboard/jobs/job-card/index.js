@@ -29,17 +29,17 @@ const DashboardJobCard = ({ job, activeTab }) => {
     e.stopPropagation();
     try {
       await toggleMark(job.id).unwrap();
-      
+
       const isRemoving = isSavedTab;
       const msg = isRemoving ? "Job removed from saved." : "Job saved successfully.";
-      
+
       message.success({
         content: (
           <div className="flex items-center gap-4">
             <span>{msg}</span>
-            <AntButton 
-              type="link" 
-              size="small" 
+            <AntButton
+              type="link"
+              size="small"
               className="!p-0 !h-auto font-bold text-primary hover:text-primary/80"
               onClick={() => toggleMark(job.id)}
             >
@@ -55,8 +55,8 @@ const DashboardJobCard = ({ job, activeTab }) => {
   };
 
   return (
-    <article 
-      className="bg-white dark:bg-surface-dark rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-6 md:p-8 transition-all hover:border-primary/30 cursor-pointer group"
+    <article
+      className="bg-white dark:bg-surface-dark rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-6 md:p-8 pb-4 md:pb-5 transition-all hover:border-primary/30 cursor-pointer group"
       onClick={handleNavigate}
     >
       <div className="flex flex-col xl:flex-row gap-6 xl:gap-8">
@@ -89,6 +89,21 @@ const DashboardJobCard = ({ job, activeTab }) => {
                 <span className="font-semibold text-gray-900 dark:text-white">{job.company}</span>
                 <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" />
                 <span>{job.location}</span>
+                {isAppliedTab && job.resumeUrl && (
+                  <>
+                    <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" />
+                    <a
+                      href={job.resumeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[12px] font-bold text-primary hover:text-primary/80 transition-colors"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <span className="material-icons-round text-[16px]">description</span>
+                      View Applied Resume
+                    </a>
+                  </>
+                )}
                 {job.match ? (
                   <>
                     <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" />
@@ -138,13 +153,12 @@ const DashboardJobCard = ({ job, activeTab }) => {
         </aside>
       </div>
 
-      <div className="mt-6 pt-5 border-t border-gray-100 dark:border-gray-800 flex justify-end">
+      {/* <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-end">
         <button
-          className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${
-            isPrimaryCta
-              ? "bg-primary hover:bg-primary-dark text-white shadow-sm"
-              : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-          }`}
+          className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${isPrimaryCta
+            ? "bg-primary hover:bg-primary-dark text-white shadow-sm"
+            : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+            }`}
           type="button"
           onClick={(e) => {
             e.stopPropagation();
@@ -156,7 +170,7 @@ const DashboardJobCard = ({ job, activeTab }) => {
             {isPrimaryCta ? "arrow_outward" : "arrow_forward"}
           </span>
         </button>
-      </div>
+      </div> */}
     </article>
   );
 };

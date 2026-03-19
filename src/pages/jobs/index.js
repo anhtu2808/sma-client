@@ -218,7 +218,7 @@ const Jobs = () => {
                 tags: job.skills ? [...job.skills].map(s => s.name).sort((a, b) => a.localeCompare(b)) : [],
                 postedTime: job.uploadTime ? new Date(job.uploadTime).toLocaleDateString() : "Recently",
                 expDate: job.expDate ? new Date(job.expDate).toLocaleDateString() : null,
-                isHot: job.jobLevel === "SENIOR" || job.hot,
+                isHot: job.isHighlight === true,
                 isApplied: job.isApplied,
                 isBookmarked,
                 isBookmarkLoading: Boolean(bookmarkLoadingById[normalizedJobId]),
