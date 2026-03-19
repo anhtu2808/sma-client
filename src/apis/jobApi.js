@@ -86,6 +86,16 @@ export const jobApi = api.injectEndpoints({
             }),
             invalidatesTags: ["Jobs"],
         }),
+
+        getSimilarJobs: builder.query({
+            query: (jobId) => ({
+                url: `${API_VERSION}/jobs/similar`,
+                method: "GET",
+                params: { jobId },
+            }),
+            transformResponse: (response) => response?.data?.content || response?.data || response?.content || [],
+            providesTags: ["Jobs"],
+        }),
     })
 });
 
@@ -103,4 +113,5 @@ export const {
     useGetAppliedJobsQuery,
     useLazyGetAppliedJobsQuery,
     useToggleMarkJobMutation,
+    useGetSimilarJobsQuery,
 } = jobApi;
