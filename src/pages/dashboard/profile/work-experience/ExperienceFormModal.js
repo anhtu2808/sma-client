@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Checkbox, DatePicker, Form, Input, Select } from "antd";
 import dayjs from "dayjs";
 import ProfileSectionModal from "@/components/ProfileSectionModal";
+import SimpleTextEditor from "@/components/SimpleTextEditor";
 
 const FORM_ID = "experience-form";
 
@@ -270,8 +271,7 @@ const ExperienceFormModal = ({
                     </Form.Item>
 
                     <Form.Item label="Role Description" name={[field.name, "description"]} className="!mb-0">
-                      <Input.TextArea
-                        rows={4}
+                      <SimpleTextEditor
                         showCount
                         maxLength={5000}
                         placeholder="Describe key achievements and responsibilities for this role..."
