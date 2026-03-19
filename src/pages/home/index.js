@@ -13,10 +13,6 @@ const Home = () => {
             <HeroSection />
 
             <Reveal delay={0.2}>
-                <FeaturedJobsSection />
-            </Reveal>
-
-            <Reveal delay={0.2}>
                 <FeaturesSection />
             </Reveal>
 

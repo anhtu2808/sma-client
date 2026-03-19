@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { message, Button as AntButton } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useGetJobsQuery, useGetMarkedJobsQuery, useToggleMarkJobMutation } from '@/apis/jobApi';
 
 // Import các components con
@@ -12,10 +12,11 @@ const ITEMS_PER_PAGE = 10;
 
 const Jobs = () => {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [currentPage, setCurrentPage] = useState(1);
     const [filters, setFilters] = useState({
-        name: '',
-        location: '',
+        name: searchParams.get('name') || '',
+        location: searchParams.get('location') || '',
         jobLevel: '',
         salaryStart: '',
         salaryEnd: '',
