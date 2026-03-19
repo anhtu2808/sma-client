@@ -144,11 +144,10 @@ const DashboardJobs = () => {
               const isActive = tab.key === activeTab;
               return (
                 <button
-                  className={`pb-4 text-sm inline-flex items-center gap-2 border-b-2 transition-colors ${
-                    isActive
-                      ? "font-bold text-primary border-primary"
-                      : "font-medium text-gray-500 border-transparent hover:text-gray-700"
-                  }`}
+                  className={`pb-4 text-sm inline-flex items-center gap-2 border-b-2 transition-colors ${isActive
+                    ? "font-bold text-primary border-primary"
+                    : "font-medium text-gray-500 border-transparent hover:text-gray-700"
+                    }`}
                   key={tab.key}
                   onClick={() => {
                     setActiveTab(tab.key);
@@ -157,9 +156,8 @@ const DashboardJobs = () => {
                 >
                   {tab.label}
                   <span
-                    className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
-                      isActive ? "bg-primary text-white" : "bg-gray-100 text-gray-600"
-                    }`}
+                    className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${isActive ? "bg-primary text-white" : "bg-gray-100 text-gray-600"
+                      }`}
                   >
                     {tabCounts[tab.key] ?? 0}
                   </span>
