@@ -2,6 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import { Checkbox, DatePicker, Form, Input, Select } from "antd";
 import dayjs from "dayjs";
 import ProfileSectionModal from "@/components/ProfileSectionModal";
+import SimpleTextEditor from "@/components/SimpleTextEditor";
 
 const FORM_ID = "project-form";
 
@@ -144,7 +145,7 @@ const ProjectFormModal = ({
         </Form.Item>
 
         <Form.Item label="Project Description" name="description">
-          <Input.TextArea rows={5} showCount maxLength={5000} placeholder="Describe your project scope and impact..." />
+          <SimpleTextEditor showCount maxLength={5000} placeholder="Describe your project scope and impact..." />
         </Form.Item>
       </Form>
     </ProfileSectionModal>

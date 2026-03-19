@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Form, Input } from "antd";
 import ProfileSectionModal from "@/components/ProfileSectionModal";
+import SimpleTextEditor from "@/components/SimpleTextEditor";
 
 const FORM_ID = "certification-form";
 
@@ -71,7 +72,7 @@ const CertificationFormModal = ({
         </div>
 
         <Form.Item label="Description" name="description">
-          <Input.TextArea rows={4} showCount maxLength={5000} placeholder="Highlight what this certification validates..." />
+          <SimpleTextEditor showCount maxLength={5000} placeholder="Highlight what this certification validates..." />
         </Form.Item>
       </Form>
     </ProfileSectionModal>
