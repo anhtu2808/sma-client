@@ -20,7 +20,6 @@ const Jobs = () => {
         jobLevel: '',
         salaryStart: '',
         salaryEnd: '',
-        currency: '',
         minExperienceTime: '',
         maxExperienceTime: '',
         workingModel: '',
@@ -35,10 +34,10 @@ const Jobs = () => {
     // API Call
     // Filter out empty params
     const queryParams = useMemo(() => ({
-        page: 0, 
-        size: 1000, // Fetch big chunk for local filtering (location, currency)
+        page: currentPage - 1,
+        size: ITEMS_PER_PAGE,
         ...(filters.name && { name: filters.name }),
-        // location is filtered locally
+        ...(filters.location && { location: filters.location }),
         ...(filters.jobLevel && { jobLevel: filters.jobLevel }),
         ...(filters.salaryStart && { salaryStart: filters.salaryStart }),
         ...(filters.salaryEnd && { salaryEnd: filters.salaryEnd }),
@@ -48,7 +47,7 @@ const Jobs = () => {
         ...(filters.skillId?.length && { skillId: filters.skillId }),
         ...(filters.expertiseId?.length && { expertiseId: filters.expertiseId }),
         ...(filters.domainId?.length && { domainId: filters.domainId }),
-    }), [filters]);
+    }), [filters, currentPage]);
 
     // API Call
     const { data: jobData, isLoading, isError } = useGetJobsQuery(queryParams);
@@ -83,7 +82,6 @@ const Jobs = () => {
             jobLevel: '',
             salaryStart: '',
             salaryEnd: '',
-            currency: '',
             minExperienceTime: '',
             maxExperienceTime: '',
             workingModel: '',
@@ -141,39 +139,14 @@ const Jobs = () => {
     const formattedData = useMemo(() => {
         let dataToMap = jobData?.data?.content || jobData?.content || [];
 
-        // 1. Local Location Filter
-        if (filters.location) {
-            const locLower = filters.location.toLowerCase();
-            dataToMap = dataToMap.filter(job => {
-                const cityMatch = job.locations?.some(l => l.city?.toLowerCase().includes(locLower));
-                const nameMatch = job.locations?.some(l => l.name?.toLowerCase().includes(locLower));
-                const companyMatch = job.company?.country?.toLowerCase().includes(locLower);
-                return cityMatch || nameMatch || companyMatch;
-            });
-        }
+        const totalItems = jobData?.data?.totalElements || jobData?.totalElements || 0;
+        const totalPagesCount = jobData?.data?.totalPages || jobData?.totalPages || 1;
 
-        // 2. Local Currency Filter
-        if (filters.currency) {
-            // Include if job.currency exactly matches 'USD' or 'VND', or if empty we'll default it contextually.
-            // But let's strictly require the exact currency match.
-            dataToMap = dataToMap.filter(job => (job.currency || 'VND') === filters.currency);
-        }
-
-        const totalItems = dataToMap.length;
-        const totalPagesCount = Math.ceil(totalItems / ITEMS_PER_PAGE) || 1;
-        
-        // Ensure currentPage isn't out of bounds after filtering
-        const safePage = currentPage > totalPagesCount ? 1 : currentPage;
-        
-        // Apply pagination
-        const startIndex = (safePage - 1) * ITEMS_PER_PAGE;
-        const pagedData = dataToMap.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-
-        const mappedJobs = pagedData.map(job => {
+        const mappedJobs = dataToMap.map(job => {
             const normalizedJobId = Number(job.id);
             const isBookmarked = bookmarkOverrides[normalizedJobId] ?? markedJobIds.has(normalizedJobId);
             const salary = job.salaryStart && job.salaryEnd
-                ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} ${job.currency || 'VND'}`
+                ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} VND`
                 : "Negotiable";
 
             // Format location from locations array
@@ -230,7 +203,7 @@ const Jobs = () => {
             totalElements: totalItems,
             totalPages: totalPagesCount
         };
-    }, [jobData, filters.location, filters.currency, currentPage, bookmarkOverrides, bookmarkLoadingById, markedJobIds]);
+    }, [jobData, bookmarkOverrides, bookmarkLoadingById, markedJobIds]);
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-[#1a100c]">

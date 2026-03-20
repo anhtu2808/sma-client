@@ -10,8 +10,6 @@ import { jobLevelOptions, workingModelOptions } from '@/constant';
 const Sidebar = ({ filters, onFilterChange, onReset, isLoading }) => {
     const [salaryRange, setSalaryRange] = useState([0, 100]);
     const [experienceRange, setExperienceRange] = useState([0, 10]);
-    const currency = filters.currency || '';
-    const EXCHANGE_RATE = 25000;
 
     const [skillSearch, setSkillSearch] = useState('');
     const [expertiseSearch, setExpertiseSearch] = useState('');
@@ -26,16 +24,10 @@ const Sidebar = ({ filters, onFilterChange, onReset, isLoading }) => {
     const domainOptions = domains.map(d => ({ label: d.name, value: d.id }));
 
     useEffect(() => {
-        if (currency === 'VND') {
-            const min = filters.salaryStart ? Math.floor(filters.salaryStart / 1000000) : 0;
-            const max = filters.salaryEnd ? Math.floor(filters.salaryEnd / 1000000) : 100;
-            setSalaryRange([min, Math.min(max, 100)]);
-        } else {
-            const min = filters.salaryStart ? Math.floor(filters.salaryStart) : 0;
-            const max = filters.salaryEnd ? Math.floor(filters.salaryEnd) : 50000;
-            setSalaryRange([min, Math.min(max, 50000)]);
-        }
-    }, [filters.salaryStart, filters.salaryEnd, currency]);
+        const min = filters.salaryStart ? Math.floor(filters.salaryStart / 1000000) : 0;
+        const max = filters.salaryEnd ? Math.floor(filters.salaryEnd / 1000000) : 100;
+        setSalaryRange([min, Math.min(max, 100)]);
+    }, [filters.salaryStart, filters.salaryEnd]);
 
     useEffect(() => {
         setExperienceRange([filters.minExperienceTime || 0, filters.maxExperienceTime || 10]);
@@ -44,21 +36,9 @@ const Sidebar = ({ filters, onFilterChange, onReset, isLoading }) => {
     const handleSalaryChange = useCallback((value) => {
         setSalaryRange(value);
         const [min, max] = value;
-        if (currency === 'VND') {
-            onFilterChange('salaryStart', min > 0 ? min * 1000000 : '');
-            onFilterChange('salaryEnd', max < 100 ? max * 1000000 : '');
-        } else {
-            onFilterChange('salaryStart', min > 0 ? min : '');
-            onFilterChange('salaryEnd', max < 50000 ? max : '');
-        }
-    }, [onFilterChange, currency]);
-
-    const handleCurrencyChange = (clickedCurrency) => {
-        const newCurrency = currency === clickedCurrency ? '' : clickedCurrency;
-        onFilterChange('currency', newCurrency);
-        onFilterChange('salaryStart', '');
-        onFilterChange('salaryEnd', '');
-    };
+        onFilterChange('salaryStart', min > 0 ? min * 1000000 : '');
+        onFilterChange('salaryEnd', max < 100 ? max * 1000000 : '');
+    }, [onFilterChange]);
 
     const handleExperienceChange = useCallback((value) => {
         setExperienceRange(value);
@@ -142,46 +122,21 @@ const Sidebar = ({ filters, onFilterChange, onReset, isLoading }) => {
 
             {/* Salary Range */}
             <div className="mb-6">
-                <div className="flex items-center justify-between mb-3">
-                    <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">
-                        Salary Range
-                        <span className="ml-2 text-xs font-normal text-slate-500">
-                            {currency === 'VND'
-                                ? `${salaryRange[0] === 0 ? '0' : `${salaryRange[0]}M`} - ${salaryRange[1] === 100 ? '100M+' : `${salaryRange[1]}M`}`
-                                : `${salaryRange[0] === 0 ? '0' : `$${salaryRange[0]}`} - ${salaryRange[1] === 50000 ? '$50000+' : `$${salaryRange[1]}`}`}
-                        </span>
-                    </label>
-                    <div className="flex bg-white border border-slate-300 rounded-md overflow-hidden">
-                        <button
-                            className={`px-3 py-1 text-xs font-semibold focus:outline-none transition-colors duration-200 ${currency === 'VND'
-                                    ? 'bg-orange-500 text-white border-orange-500'
-                                    : 'text-slate-600 hover:bg-slate-50'
-                                }`}
-                            onClick={() => handleCurrencyChange('VND')}
-                        >
-                            VND
-                        </button>
-                        <div className="w-px bg-slate-300"></div>
-                        <button
-                            className={`px-3 py-1 text-xs font-semibold focus:outline-none transition-colors duration-200 ${currency === 'USD'
-                                    ? 'bg-orange-500 text-white border-orange-500'
-                                    : 'text-slate-600 hover:bg-slate-50'
-                                }`}
-                            onClick={() => handleCurrencyChange('USD')}
-                        >
-                            USD
-                        </button>
-                    </div>
-                </div>
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3">
+                    Salary Range (VND)
+                    <span className="ml-2 text-xs font-normal text-slate-500">
+                        {`${salaryRange[0] === 0 ? '0' : `${salaryRange[0]}M`} - ${salaryRange[1] === 100 ? '100M+' : `${salaryRange[1]}M`}`}
+                    </span>
+                </label>
                 <Slider
                     range
                     min={0}
-                    max={currency === 'VND' ? 100 : 50000}
-                    step={currency === 'VND' ? 5 : 500}
+                    max={100}
+                    step={5}
                     value={salaryRange}
                     onChange={setSalaryRange}
                     onChangeComplete={handleSalaryChange}
-                    tooltip={{ formatter: (v) => currency === 'VND' ? `${v}M` : `$${v}` }}
+                    tooltip={{ formatter: (v) => `${v}M VND` }}
                     disabled={isLoading}
                 />
             </div>

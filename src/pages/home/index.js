@@ -4,6 +4,7 @@ import FeaturedJobsSection from './sections/FeaturedJobsSection';
 import FeaturesSection from './sections/FeaturesSection';
 import AIMatchingSection from './sections/AIMatchingSection';
 import InteractiveFeaturesSection from './sections/InteractiveFeaturesSection';
+import DashboardPreviewSection from './sections/DashboardPreviewSection';
 import CTASection from './sections/CTASection';
 import Reveal from '@/components/Reveal/Reveal';
 
@@ -13,15 +14,19 @@ const Home = () => {
             <HeroSection />
 
             <Reveal delay={0.2}>
+                <InteractiveFeaturesSection />
+            </Reveal>
+
+            <Reveal delay={0.2}>
+                <DashboardPreviewSection />
+            </Reveal>
+
+            <Reveal delay={0.2}>
                 <FeaturesSection />
             </Reveal>
 
             <Reveal delay={0.2}>
                 <AIMatchingSection />
-            </Reveal>
-
-            <Reveal delay={0.2}>
-                <InteractiveFeaturesSection />
             </Reveal>
 
             <Reveal delay={0.2}>

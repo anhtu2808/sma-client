@@ -8,7 +8,7 @@ const Loading = ({
   inline = false,
   className = "",
 }) => {
-  const resolvedSize = size ?? (inline ? 24 : fullScreen ? 180 : 150);
+  const resolvedSize = size ?? (inline ? 24 : fullScreen ? 180 : 200);
   const shouldBoostDefaultLoader = size == null && !inline;
   const zoom = shouldBoostDefaultLoader ? (fullScreen ? 2.1 : 1.8) : 1;
 

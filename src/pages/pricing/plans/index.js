@@ -3,13 +3,11 @@ import { useGetPlansQuery } from "@/apis/planApi";
 import PlanCard from "./plan-card";
 import PaymentModal from "@/pages/checkout/components/PaymentModal";
 
-const formatCurrency = (amount, currency) => {
+const formatCurrency = (amount) => {
   if (amount == null || Number.isNaN(Number(amount))) return "-";
-  const resolvedCurrency = currency || "VND";
-  const locale = resolvedCurrency === "VND" ? "vi-VN" : "en-US";
-  return new Intl.NumberFormat(locale, {
+  return new Intl.NumberFormat("vi-VN", {
     style: "currency",
-    currency: resolvedCurrency,
+    currency: "VND",
     maximumFractionDigits: 2,
   }).format(Number(amount));
 };
@@ -36,8 +34,7 @@ const mapPlanToCard = (plan) => {
 
   if (lifetimePrice) {
     const total = Number(lifetimePrice.salePrice ?? lifetimePrice.originalPrice ?? 0);
-    const currency = lifetimePrice.currency || plan.currency || "VND";
-    const priceLabel = total === 0 ? "Free" : formatCurrency(total, currency);
+    const priceLabel = total === 0 ? "Free" : formatCurrency(total);
     const cta = isCurrent ? "Current Plan" : total === 0 ? "Get Started" : `Upgrade to ${name}`;
     const isDefault = Boolean(plan?.isDefault);
     return {
@@ -62,7 +59,6 @@ const mapPlanToCard = (plan) => {
       id: price.id,
       months: toMonths(price.duration, price.unit),
       total: Number(price.salePrice ?? price.originalPrice ?? 0),
-      currency: price.currency || plan.currency || "VND",
     }))
     .filter((price) => price.months > 0);
 
@@ -80,8 +76,8 @@ const mapPlanToCard = (plan) => {
       key: String(price.id ?? `${plan.id}-${price.months}m`),
       label: `${price.months} months`,
       months: price.months,
-      total: formatCurrency(price.total, price.currency),
-      perMonth: `${formatCurrency(monthly, price.currency)} / month`,
+      total: formatCurrency(price.total),
+      perMonth: `${formatCurrency(monthly)} / month`,
       save,
     };
   });
@@ -100,7 +96,7 @@ const mapPlanToCard = (plan) => {
     code,
     name,
     description,
-    price: basePrice ? formatCurrency(baseMonthly, basePrice.currency) : "-",
+    price: basePrice ? formatCurrency(baseMonthly) : "-",
     unit: "/ month",
     cta,
     current: isCurrent,

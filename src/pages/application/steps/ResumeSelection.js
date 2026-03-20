@@ -29,12 +29,12 @@ const ResumeSelection = ({
                                 : 'border-gray-100 bg-white hover:border-orange-200 hover:shadow-sm'
                                 }`}
                         >
-                            <div className="flex items-center gap-4">
-                                <div className={`p-2.5 rounded-lg ${isSelected ? 'bg-orange-500/10 text-orange-600' : 'bg-gray-100 text-gray-500'}`}>
+                            <div className="flex items-center gap-4 min-w-0 flex-1">
+                                <div className={`p-2.5 rounded-lg shrink-0 ${isSelected ? 'bg-orange-500/10 text-orange-600' : 'bg-gray-100 text-gray-500'}`}>
                                     <FileText size={18} />
                                 </div>
-                                <div className="overflow-hidden">
-                                    <p className="text-sm font-semibold text-gray-900 truncate pr-4">{resume.resumeName || resume.fileName}</p>
+                                <div className="min-w-0">
+                                    <p className="text-sm font-semibold text-gray-900 truncate" title={resume.resumeName || resume.fileName}>{resume.resumeName || resume.fileName}</p>
                                     <p className="text-[11px] text-gray-500 mt-1">Verified by AI</p>
                                 </div>
                             </div>
@@ -53,12 +53,12 @@ const ResumeSelection = ({
                             : 'border-gray-100 bg-white hover:border-emerald-200 hover:shadow-sm'
                             }`}
                     >
-                        <div className="flex items-center gap-4">
-                            <div className={`p-2.5 rounded-lg ${selectedResumeId === newlyUploadedResume.id ? 'bg-emerald-500/10 text-emerald-600' : 'bg-gray-100 text-gray-500'}`}>
+                        <div className="flex items-center gap-4 min-w-0 flex-1">
+                            <div className={`p-2.5 rounded-lg shrink-0 ${selectedResumeId === newlyUploadedResume.id ? 'bg-emerald-500/10 text-emerald-600' : 'bg-gray-100 text-gray-500'}`}>
                                 <CheckCircle2 size={18} />
                             </div>
-                            <div className="overflow-hidden">
-                                <p className="text-sm font-semibold text-gray-900 truncate pr-4">{newlyUploadedResume.fileName}</p>
+                            <div className="min-w-0">
+                                <p className="text-sm font-semibold text-gray-900 truncate" title={newlyUploadedResume.fileName}>{newlyUploadedResume.fileName}</p>
                                 <p className="text-[11px] text-emerald-600 mt-1">Newly Uploaded</p>
                             </div>
                         </div>

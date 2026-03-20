@@ -16,14 +16,14 @@ const getCompareDate = (job, tabKey) => {
   return 0;
 };
 
-const formatSalary = (salaryStart, salaryEnd, currency = "VND") => {
+const formatSalary = (salaryStart, salaryEnd) => {
   if (!salaryStart && !salaryEnd) return "Negotiable";
   const formatNumber = (value) => new Intl.NumberFormat("vi-VN").format(value);
   if (salaryStart && salaryEnd) {
-    return `${formatNumber(salaryStart)} - ${formatNumber(salaryEnd)} ${currency}`;
+    return `${formatNumber(salaryStart)} - ${formatNumber(salaryEnd)} VND`;
   }
-  if (salaryStart) return `From ${formatNumber(salaryStart)} ${currency}`;
-  return `Up to ${formatNumber(salaryEnd)} ${currency}`;
+  if (salaryStart) return `From ${formatNumber(salaryStart)} VND`;
+  return `Up to ${formatNumber(salaryEnd)} VND`;
 };
 
 const mapSavedJobFromApi = (job) => {
@@ -34,7 +34,7 @@ const mapSavedJobFromApi = (job) => {
     title: job?.name || "Job Title",
     company: companyName,
     location: company?.address || job?.workingModel || "Location",
-    salary: formatSalary(job?.salaryStart, job?.salaryEnd, job?.currency),
+    salary: formatSalary(job?.salaryStart, job?.salaryEnd),
     tags: job?.skills?.map((skill) => skill.name) || [],
     companyLogo:
       company?.logo ||
@@ -54,7 +54,7 @@ const mapAppliedJobFromApi = (job) => {
     title: job?.name || "Job Title",
     company: companyName,
     location: company?.address || job?.workingModel || "Location",
-    salary: formatSalary(job?.salaryStart, job?.salaryEnd, job?.currency),
+    salary: formatSalary(job?.salaryStart, job?.salaryEnd),
     tags: job?.skills?.map((skill) => skill.name) || [],
     companyLogo:
       company?.logo ||
