@@ -75,7 +75,7 @@ const ResumeBuilderTab = () => {
             <Loading size={110} className="py-0" />
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
             {/* Create New Card */}
             <div
               onClick={() => navigate('/dashboard/resumes/templates')}

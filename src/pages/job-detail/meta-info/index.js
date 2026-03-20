@@ -13,7 +13,7 @@ const MetaInfo = () => {
     // Formatting logic
     const location = apiJob.workingModel || apiJob.company?.country || "Remote";
     const salaryFormatted = apiJob.salaryStart && apiJob.salaryEnd
-        ? `${new Intl.NumberFormat('vi-VN').format(apiJob.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(apiJob.salaryEnd)} ${apiJob.currency || 'VND'}`
+        ? `${new Intl.NumberFormat('vi-VN').format(apiJob.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(apiJob.salaryEnd)} VND`
         : "Negotiable";
     const experienceTime = apiJob.experienceTime ? `${apiJob.experienceTime} years` : null;
     const expDate = apiJob.expDate ? new Date(apiJob.expDate).toLocaleDateString() : null;

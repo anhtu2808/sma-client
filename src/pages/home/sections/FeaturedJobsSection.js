@@ -10,7 +10,7 @@ const FeaturedJobsSection = () => {
         const rawJobs = jobData?.data?.content || jobData?.content || [];
         return rawJobs.map(job => {
             const salary = job.salaryStart && job.salaryEnd
-                ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} ${job.currency || 'VND'}`
+                ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} VND`
                 : 'Thoả thuận';
 
             const locationCity = job.locations?.length > 0

@@ -3,13 +3,13 @@ import { useSelector } from "react-redux";
 import { useLazyGetJobByIdQuery } from "@/apis/jobApi";
 import Loading from "@/components/Loading";
 
-const formatSalary = (start, end, currency) => {
+const formatSalary = (start, end) => {
   if (!start && !end) return null;
   const format = (num) => num?.toLocaleString("vi-VN") || "";
   if (start && end) {
-    return `${format(start)} - ${format(end)} ${currency || ""}`;
+    return `${format(start)} - ${format(end)} VND`;
   }
-  return `${format(start || end)} ${currency || ""}`;
+  return `${format(start || end)} VND`;
 };
 
 const JobDetail = () => {
@@ -43,7 +43,7 @@ const JobDetail = () => {
 
   const job = response.data;
   const location = job.locations?.[0];
-  const salary = formatSalary(job.salaryStart, job.salaryEnd, job.currency);
+  const salary = formatSalary(job.salaryStart, job.salaryEnd);
 
   return (
     <div className="mx-auto max-w-[820px] rounded-xl border border-neutral-200 bg-white p-8 shadow-soft lg:p-10">

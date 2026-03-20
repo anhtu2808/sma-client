@@ -85,7 +85,7 @@ const CompanyJobs = ({ companyId }) => {
             const normalizedJobId = Number(job.id);
             const isBookmarked = bookmarkOverrides[normalizedJobId] ?? markedJobIds.has(normalizedJobId);
             const salary = job.salaryStart && job.salaryEnd
-                ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} ${job.currency || 'VND'}`
+                ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} VND`
                 : "Negotiable";
 
             const locationCity = job.locations?.length > 0

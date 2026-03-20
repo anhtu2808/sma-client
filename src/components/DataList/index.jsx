@@ -15,7 +15,7 @@ const DataList = ({
     // 1. Loading State
     if (isLoading) {
         return (
-            <Loading className={className} size={110} />
+            <Loading className={className} />
         );
     }
 

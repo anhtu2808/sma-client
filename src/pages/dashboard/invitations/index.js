@@ -38,18 +38,18 @@ const STATUS_TO_TAB = {
   DECLINED: 'declined',
 };
 
-const formatSalary = (salaryStart, salaryEnd, currency = 'VND') => {
+const formatSalary = (salaryStart, salaryEnd) => {
   if (!salaryStart && !salaryEnd) return null;
 
   const formatNumber = (value) => new Intl.NumberFormat('vi-VN').format(value);
 
   if (salaryStart && salaryEnd) {
-    return `${formatNumber(salaryStart)} - ${formatNumber(salaryEnd)} ${currency}`;
+    return `${formatNumber(salaryStart)} - ${formatNumber(salaryEnd)} VND`;
   }
 
-  if (salaryStart) return `From ${formatNumber(salaryStart)} ${currency}`;
+  if (salaryStart) return `From ${formatNumber(salaryStart)} VND`;
 
-  return `Up to ${formatNumber(salaryEnd)} ${currency}`;
+  return `Up to ${formatNumber(salaryEnd)} VND`;
 };
 
 const formatLocation = (locations, workModeLabel) => {
@@ -85,7 +85,7 @@ const mapInvitationFromApi = (invitation) => {
       company?.logo ||
       getInvitationAvatar(companyName, 'DBEAFE', '1D4ED8'),
     message: invitation?.content || '',
-    salaryText: formatSalary(job?.salaryStart, job?.salaryEnd, job?.currency),
+    salaryText: formatSalary(job?.salaryStart, job?.salaryEnd),
     locationText: formatLocation(company?.locations, workModeLabel),
     workMode,
     workModeLabel,
