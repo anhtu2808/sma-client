@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGetAllMatchingQuery } from "@/apis/matchingApi";
 import Button from "@/components/Button";
+import Loading from "@/components/Loading";
 import { Pagination, Dropdown } from "antd";
 
 const getScoreColor = (score) => {
@@ -200,8 +201,7 @@ const MatchingHistory = () => {
         <div className="space-y-4 mb-4">
           {isLoading ? (
             <div className="bg-white dark:bg-surface-dark rounded-2xl border border-gray-100 dark:border-gray-800 p-12 text-center">
-              <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-3"></div>
-              <p className="text-gray-500 dark:text-gray-400">Loading scan history...</p>
+              <Loading size={96} className="py-0" />
             </div>
           ) : isError ? (
             <div className="bg-white dark:bg-surface-dark rounded-2xl border border-gray-100 dark:border-gray-800 p-12 text-center">

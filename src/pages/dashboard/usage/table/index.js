@@ -1,6 +1,7 @@
 import { Dropdown, Space, Empty } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import Button from "@/components/Button";
+import Loading from "@/components/Loading";
 import Pagination from "@/components/Pagination";
 import { formatDateTime } from "@/utils/dateTimeUtils";
 
@@ -79,8 +80,8 @@ const Table = ({
           <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
             {isHistoryLoading ? (
               <tr>
-                <td className="px-6 py-10 text-sm text-gray-500 dark:text-gray-400" colSpan={4}>
-                  Loading usage history...
+                <td className="px-6 py-10" colSpan={4}>
+                  <Loading size={88} className="py-0" />
                 </td>
               </tr>
             ) : isHistoryError ? (

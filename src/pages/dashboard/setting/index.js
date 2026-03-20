@@ -1,6 +1,7 @@
 import React from 'react';
-import { message, Spin, Modal as AntModal } from 'antd';
+import { message } from 'antd';
 import { useGetNotificationSettingsQuery, useUpdateNotificationSettingMutation, useResetSettingsMutation } from '@/apis/notificationApi';
+import Loading from '@/components/Loading';
 
 const NotificationSettings = () => {
     const { data: settingsResponse, isLoading } = useGetNotificationSettingsQuery();
@@ -76,7 +77,7 @@ const NotificationSettings = () => {
         }
     };
 
-    if (isLoading) return <div className="flex justify-center items-center py-20"><Spin size="large" /></div>;
+    if (isLoading) return <Loading className="py-20" />;
 
     return (
         <main className="flex-1 space-y-6 animate-fadeIn font-sans mx-auto">

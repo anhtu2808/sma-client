@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Modal, Spin } from "antd";
+import { Modal } from "antd";
 import { useGetCandidateResumesQuery } from "@/apis/resumeApi";
+import Loading from "@/components/Loading";
 import { RESUME_TYPES } from "@/constant";
 
 const UseTemplateModal = ({ open, onCancel, template, onCreateNew, onSelectExisting, isCreating, isCloning }) => {
@@ -63,7 +64,7 @@ const UseTemplateModal = ({ open, onCancel, template, onCreateNew, onSelectExist
                         >
                             <div className="flex items-start gap-4">
                                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all">
-                                    {isCreating ? <Spin size="small" /> : <span className="material-icons-round text-white text-[24px]">add_circle</span>}
+                                    {isCreating ? <Loading inline size={20} /> : <span className="material-icons-round text-white text-[24px]">add_circle</span>}
                                 </div>
                                 <div className="min-w-0 flex-1">
                                     <h3 className="font-semibold text-gray-900 text-base mb-1 group-hover:text-orange-600 transition-colors">
@@ -124,7 +125,7 @@ const UseTemplateModal = ({ open, onCancel, template, onCreateNew, onSelectExist
                     {/* CV List */}
                     {isLoadingResumes ? (
                         <div className="flex items-center justify-center py-12">
-                            <Spin size="default" />
+                            <Loading size={88} className="py-0" />
                         </div>
                     ) : resumes.length === 0 ? (
                         <div className="text-center py-10">
