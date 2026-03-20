@@ -18,21 +18,24 @@ const SideDecorator = () => {
                 <span className="material-icons-round text-6xl absolute top-1/2 left-1/2 transform translate-x-10 translate-y-20 rotate-12">security</span>
             </div>
             <Logo className="relative z-10" iconColor="white" />
-            <div className="w-40 h-40 bg-white/20 rounded-[2.5rem] flex items-center justify-center mb-10 shadow-lg backdrop-blur-sm border border-white/20">
-                <svg width="84" height="84" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-                    <path d="M3 3v5h5" />
-                    <rect x="9" y="11" width="6" height="6" rx="1" fill="white" stroke="white" />
-                    <path d="M10 11V9a2 2 0 1 1 4 0v2" />
-                </svg>
-            </div>
 
-            <h1 className="text-4xl md:text-[2.5rem] font-bold mb-4 tracking-tight leading-tight">
-                Securing your journey.
-            </h1>
-            <p className="text-white/90 text-[1.1rem] leading-relaxed font-medium px-4">
-                We'll help you get back into your account in just a few simple steps.
-            </p>
+            <div className="flex-1 flex flex-col items-center justify-center text-center relative z-10">
+                <div className="w-40 h-40 bg-white/20 rounded-[2.5rem] flex items-center justify-center mb-10 shadow-lg backdrop-blur-sm border border-white/20">
+                    <svg width="84" height="84" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                        <path d="M3 3v5h5" />
+                        <rect x="9" y="11" width="6" height="6" rx="1" fill="white" stroke="white" />
+                        <path d="M10 11V9a2 2 0 1 1 4 0v2" />
+                    </svg>
+                </div>
+
+                <h1 className="text-4xl md:text-[2.5rem] font-bold mb-4 tracking-tight leading-tight">
+                    Securing your journey.
+                </h1>
+                <p className="text-white/90 text-[1.1rem] leading-relaxed font-medium px-4 max-w-md">
+                    We'll help you get back into your account in just a few simple steps.
+                </p>
+            </div>
 
             <div className="relative z-10 flex items-center gap-4 text-sm text-white/70">
                 <span>© 2026 SmartRecruit</span>
