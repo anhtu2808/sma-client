@@ -4,6 +4,7 @@ import UiKit from '@/pages/ui-kit';
 import Home from '@/pages/home';
 import Login from '@/pages/login';
 import Register from '@/pages/register';
+import ForgotPassword from '@/pages/forgot-password';
 import Jobs from '@/pages/jobs';
 import JobDetail from '@/pages/job-detail';
 import DashboardLayout from '@/pages/dashboard/layout';
@@ -34,6 +35,7 @@ export const routes = createBrowserRouter(
             <Route>
                 <Route path="login" element={<Login />} />
                 <Route path="register" element={<Register />} />
+                <Route path="forgot-password" element={<ForgotPassword />} />
             </Route>
             <Route element={<Layout />}>
                 <Route index element={<Home />} />
