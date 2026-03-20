@@ -56,6 +56,25 @@ const authService = {
         }
     },
 
+    verifyCandidateRole: async () => {
+        try {
+            const token = localStorage.getItem('accessToken');
+            const response = await AuthAPI.get('/candidate/me', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.data?.data?.user?.role !== 'CANDIDATE') {
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+                return false;
+            }
+            return true;
+        } catch (error) {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            return false;
+        }
+    },
+
     logout: async () => {
         try {
             const refreshToken = localStorage.getItem('refreshToken');

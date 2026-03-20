@@ -40,6 +40,11 @@ const Login = () => {
       const response = await authService.login({ email, password });
 
       if (response.data.code === 200) {
+        const isCandidate = await authService.verifyCandidateRole();
+        if (!isCandidate) {
+          message.error("This account is not authorized to access the candidate portal");
+          return;
+        }
         message.success(response.data.message || "Login successfully");
         navigate(redirectPath, { replace: true });
       } else {
@@ -63,6 +68,11 @@ const Login = () => {
       );
 
       if (res.data.code === 200) {
+        const isCandidate = await authService.verifyCandidateRole();
+        if (!isCandidate) {
+          message.error("This account is not authorized to access the candidate portal");
+          return;
+        }
         message.success(res.data.message || "Login successfully");
         navigate(redirectPath, { replace: true });
       } else {
