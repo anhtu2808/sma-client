@@ -1,7 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Spin, Popconfirm, message } from "antd";
+import { Popconfirm, message } from "antd";
 import { useGetCandidateResumesQuery, useDeleteCandidateResumeMutation, useUpdateCandidateResumeMutation } from "@/apis/resumeApi";
+import Loading from "@/components/Loading";
 import { RESUME_TYPES } from "@/constant";
 import { CV_TEMPLATES } from "../../template-selection";
 
@@ -71,7 +72,7 @@ const ResumeBuilderTab = () => {
       <div className="bg-white dark:bg-surface-dark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
-            <Spin size="large" />
+            <Loading size={110} className="py-0" />
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">

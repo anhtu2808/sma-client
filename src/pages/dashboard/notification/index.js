@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Row, Col } from 'antd';
 import { useGetNotificationsQuery, useMarkAllAsReadMutation } from '@/apis/notificationApi';
 import NotificationItem from './components/notification-item';
+import Loading from '@/components/Loading';
 import SearchInput from '@/components/SearchInput';
 import { ChevronLeft, ChevronRight, } from 'lucide-react';
 
@@ -19,7 +20,7 @@ const NotificationList = () => {
     const [filter, setFilter] = useState({ page: 0, size: 10, isRead: null, type: null, keyword: '' });
     const hasAccessToken = Boolean(localStorage.getItem("accessToken"));
 
-    const { data, isLoading, isError } = useGetNotificationsQuery(filter, {
+    const { data, isLoading } = useGetNotificationsQuery(filter, {
         skip: !hasAccessToken
     });
     const [markAllAsRead] = useMarkAllAsReadMutation();
@@ -27,9 +28,6 @@ const NotificationList = () => {
     const paging = data?.data?.notifications;
     const notifications = useMemo(() => paging?.content || [], [paging]);
     const unreadCount = data?.data?.unreadCount || 0;
-
-    const startEntry = (paging?.pageNumber || 0) * (paging?.pageSize || 10) + 1;
-    const endEntry = Math.min(((paging?.pageNumber || 0) + 1) * (paging?.pageSize || 10), paging?.totalElements || 0);
 
     const handleTabChange = (tab) => {
         setActiveTab(tab.key);
@@ -124,10 +122,8 @@ const NotificationList = () => {
             <Col span={24}>
                 <div className="space-y-4">
                     {isLoading ? (
-                        <div className="animate-pulse space-y-4">
-                            {[1, 2, 3].map(i => (
-                                <div key={i} className="h-24 bg-gray-100 dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-800" />
-                            ))}
+                        <div className="bg-white dark:bg-surface-dark rounded-2xl border border-gray-100 dark:border-gray-800">
+                            <Loading size={96} className="py-12" />
                         </div>
                     ) : notifications.length > 0 ? (
                         notifications.map((noti) => (
