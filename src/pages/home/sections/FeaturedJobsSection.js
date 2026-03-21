@@ -4,11 +4,13 @@ import { useGetJobsQuery } from '@/apis/jobApi';
 
 const FeaturedJobsSection = () => {
     const navigate = useNavigate();
-    const { data: jobData, isLoading } = useGetJobsQuery({ page: 0, size: 9 });
+    const { data: jobData, isLoading } = useGetJobsQuery({ page: 0, size: 9, isHighlight: true });
 
     const featuredJobs = useMemo(() => {
         const rawJobs = jobData?.data?.content || jobData?.content || [];
-        return rawJobs.map(job => {
+        return rawJobs
+            .filter(job => job.isHighlight === true)
+            .map(job => {
             const salary = job.salaryStart && job.salaryEnd
                 ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} VND`
                 : 'Thoả thuận';
@@ -98,7 +100,7 @@ const FeaturedJobsSection = () => {
                                     </div>
 
                                     {/* Title + Company */}
-                                    <div className="min-w-0 flex-1">
+                                    <div className="min-w-0 flex-1 text-left">
                                         <h3 className="font-bold text-sm text-gray-900 dark:text-white leading-snug group-hover:text-primary transition-colors line-clamp-2 mb-0.5">
                                             {job.title}
                                         </h3>
@@ -119,9 +121,6 @@ const FeaturedJobsSection = () => {
                                             </span>
                                         )}
                                     </div>
-                                    <span className="material-icons-round text-gray-300 dark:text-gray-600 text-lg shrink-0 group-hover:text-primary/40 transition-colors">
-                                        favorite_border
-                                    </span>
                                 </div>
                             </div>
                         ))}

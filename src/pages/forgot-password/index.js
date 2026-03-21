@@ -1,21 +1,29 @@
 import React, { useState } from "react";
 import { message } from "antd";
+import { useNavigate } from "react-router-dom";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
 import SideDecorator from "./side-decorator";
+import authService from "@/services/authService";
 
 const ForgotPassword = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    // Simulate API call for now
-    setTimeout(() => {
+    try {
+      await authService.forgotPassword({ email });
+      message.success("OTP has been sent to your email.");
+      navigate("/reset-password", { state: { email } });
+    } catch (error) {
+      console.error("Failed to send reset link:", error);
+      message.error(error.response?.data?.message || error.message || "Failed to send reset link");
+    } finally {
       setLoading(false);
-      message.success("Password reset link sent to your email");
-    }, 1500);
+    }
   };
 
   return (

@@ -102,6 +102,24 @@ const authService = {
         }
     },
 
+    forgotPassword: async (data) => {
+        try {
+            const response = await AuthAPI.post('/auth/forgot-password', data);
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    resetPassword: async (data) => {
+        try {
+            const response = await AuthAPI.post('/auth/reset-password', data);
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    },
+
     isAuthenticated: () => {
         return !!localStorage.getItem('accessToken');
     },
