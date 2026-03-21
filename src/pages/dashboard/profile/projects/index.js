@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { message } from "antd";
+import toastMessage from "@/utils/toastMessage";
 import { useCandidateDashboardProfileQuery } from "@/apis/candidateApi";
 import {
   useCreateResumeProjectMutation,
@@ -43,7 +43,7 @@ const Projects = () => {
 
   const handleSubmit = async (payload) => {
     if (!profileResumeId) {
-      message.error("No PROFILE resume found.");
+      toastMessage.error("No PROFILE resume found.");
       return;
     }
 
@@ -54,15 +54,15 @@ const Projects = () => {
           projectId: editingProject.id,
           payload,
         }).unwrap();
-        message.success("Project updated successfully.");
+        toastMessage.success("Project updated successfully.");
       } else {
         await createProject({ resumeId: profileResumeId, payload }).unwrap();
-        message.success("Project added successfully.");
+        toastMessage.success("Project added successfully.");
       }
 
       closeModal();
     } catch (error) {
-      message.error(error?.data?.message || "Failed to save project.");
+      toastMessage.error(error?.data?.message || "Failed to save project.");
     }
   };
 

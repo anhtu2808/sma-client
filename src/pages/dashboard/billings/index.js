@@ -31,7 +31,7 @@ const BillingPlans = () => {
   }, [addons]);
 
   if (isPlansLoading || isAddonsLoading) {
-    return <Loading />
+    return <Loading className="h-[50vh]" />
   }
 
   return (

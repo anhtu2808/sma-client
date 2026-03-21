@@ -181,6 +181,11 @@ code {
   }
 }
 
+/* Hide react-hot-toast animated icon indicator */
+[data-testid="toast-bar"] > div:first-child > div[style*="animation"] {
+  display: none !important;
+}
+
 /* Rich HTML content (job descriptions from API) */
 .job-detail-content ul {
   list-style-type: disc;

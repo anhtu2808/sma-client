@@ -7,32 +7,19 @@ import { setRealtimePreview } from '@/pages/dashboard/notification/components/no
 import toast from "react-hot-toast";
 import NotificationToast from '@/components/NotificationToast';
 
+const ICON_MAP = {
+    APPLICATION_STATUS: "fa-solid fa-briefcase",
+    PAYMENT_SUCCESS: "fa-solid fa-circle-check",
+    PAYMENT_FAILURE: "fa-solid fa-credit-card",
+    INVITATION: "fa-solid fa-envelope",
+    CV_PARSE_FAILED: "fa-solid fa-circle-exclamation",
+    SYSTEM: "fa-solid fa-circle-info",
+};
+const DEFAULT_ICON = "fa-solid fa-bell";
+
 export const useNotificationSocket = () => {
     const dispatch = useDispatch();
-    const getIcon = (type) => {
-        switch (type) {
-            case 'APPLICATION_STATUS':
-                return 'work';
-
-            case 'PAYMENT_SUCCESS':
-                return 'check_circle';
-
-            case 'PAYMENT_FAILURE':
-                return 'payments';
-
-            case 'INVITATION':
-                return 'mail';
-
-            case 'CV_PARSE_FAILED':
-                return 'error';
-
-            case 'SYSTEM':
-                return 'error_outline';
-
-            default:
-                return 'notifications';
-        }
-    };
+    const getIcon = (type) => ICON_MAP[type] || DEFAULT_ICON;
 
     useEffect(() => {
         const token = localStorage.getItem('accessToken');

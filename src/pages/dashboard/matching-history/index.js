@@ -4,6 +4,9 @@ import { useGetAllMatchingQuery } from "@/apis/matchingApi";
 import Button from "@/components/Button";
 import Loading from "@/components/Loading";
 import { Pagination, Dropdown } from "antd";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
 
 const getScoreColor = (score) => {
   if (score === null || score === undefined) return { bg: "bg-gray-100", text: "text-gray-600", border: "border-gray-300" };
@@ -34,14 +37,24 @@ const getMatchLevelColor = (level) => {
   return colorMap[level] || { bg: "bg-gray-100", text: "text-gray-600" };
 };
 
-const formatDate = (dateString) => {
+const formatRelativeDate = (dateString) => {
   if (!dateString) return "N/A";
-  const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+  const date = dayjs(dateString);
+  const now = dayjs();
+  if (now.diff(date, "day") < 7) {
+    return date.fromNow();
+  }
+  return date.format("MMM D, YYYY");
+};
+
+const getEvaluationTypeLabel = (type) => {
+  if (type === "OVERVIEW") {
+    return { label: "Quick Scan", icon: "bolt", bg: "bg-purple-100", text: "text-purple-700" };
+  }
+  if (type === "DETAIL") {
+    return { label: "Detailed", icon: "analytics", bg: "bg-indigo-100", text: "text-indigo-700" };
+  }
+  return null;
 };
 
 const MatchingHistoryItem = ({ item, onViewReport }) => {
@@ -49,10 +62,14 @@ const MatchingHistoryItem = ({ item, onViewReport }) => {
 
   const scoreColors = getScoreColor(score);
   const matchLevelColors = getMatchLevelColor(item.matchLevel);
+  const evalType = getEvaluationTypeLabel(item.evaluationType);
 
   // Use direct API fields
   const jobTitle = item.jobName || "N/A";
   const companyName = item.companyName || "N/A";
+  const resumeName = item.resumeFullName || item.candidateName;
+  const strengthCount = item.strengths?.split("\n").filter(Boolean).length || 0;
+  const weaknessCount = item.weaknesses?.split("\n").filter(Boolean).length || 0;
 
   // Dropdown menu items
   const menuItems = [
@@ -98,19 +115,43 @@ const MatchingHistoryItem = ({ item, onViewReport }) => {
             >
               {getMatchLevelLabel(item.matchLevel)}
             </span>
+            {evalType && (
+              <span
+                className={`shrink-0 px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1 ${evalType.bg} ${evalType.text}`}
+              >
+                <i className="material-icons-round text-[12px]">{evalType.icon}</i>
+                {evalType.label}
+              </span>
+            )}
           </div>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
             {companyName}
           </p>
-          <div className="flex items-center gap-4 text-xs text-gray-400 dark:text-gray-500">
+          {resumeName && (
+            <p className="text-xs text-gray-400 dark:text-gray-500 mb-1 flex items-center gap-1 truncate">
+              <i className="material-icons-round text-[14px]">description</i>
+              Resume: {resumeName}
+            </p>
+          )}
+          <div className="flex items-center gap-3 text-xs text-gray-400 dark:text-gray-500">
             <span className="flex items-center gap-1">
               <i className="material-icons-round text-[14px]">schedule</i>
-              {formatDate(item.lastEditedAt)}
+              {formatRelativeDate(item.scoreAt)}
             </span>
+            <span className="text-gray-300 dark:text-gray-600">&middot;</span>
             <span className="flex items-center gap-1">
               <i className="material-icons-round text-[14px]">lightbulb</i>
-              {item.strengths?.split("\n").filter(Boolean).length || 0} strengths
+              {strengthCount}
             </span>
+            {weaknessCount > 0 && (
+              <>
+                <span className="text-gray-300 dark:text-gray-600">&middot;</span>
+                <span className="flex items-center gap-1">
+                  <i className="material-icons-round text-[14px]">warning</i>
+                  {weaknessCount}
+                </span>
+              </>
+            )}
           </div>
         </div>
 
@@ -159,11 +200,14 @@ const MatchingHistory = () => {
 
   const filteredList = searchQuery
     ? matchingList.filter((item) => {
+        const query = searchQuery.toLowerCase();
         const jobTitle = item.jobName || item.job?.name || "";
         const companyName = item.companyName || "";
+        const resumeName = item.resumeFullName || "";
         return (
-          jobTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          companyName.toLowerCase().includes(searchQuery.toLowerCase())
+          jobTitle.toLowerCase().includes(query) ||
+          companyName.toLowerCase().includes(query) ||
+          resumeName.toLowerCase().includes(query)
         );
       })
     : matchingList;
@@ -189,7 +233,7 @@ const MatchingHistory = () => {
           </i>
           <input
             type="text"
-            placeholder="Search by job title or company..."
+            placeholder="Search by job title, company, or resume..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
@@ -201,7 +245,7 @@ const MatchingHistory = () => {
         <div className="space-y-4 mb-4">
           {isLoading ? (
             <div className="bg-white dark:bg-surface-dark rounded-2xl border border-gray-100 dark:border-gray-800 p-12 text-center">
-              <Loading size={96} className="py-0" />
+              <Loading className="py-0" />
             </div>
           ) : isError ? (
             <div className="bg-white dark:bg-surface-dark rounded-2xl border border-gray-100 dark:border-gray-800 p-12 text-center">

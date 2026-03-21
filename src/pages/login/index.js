@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { message } from "antd";
+import toastMessage from "@/utils/toastMessage";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
 import SideDecorator from "@/pages/login/side-decorator";
@@ -42,16 +42,16 @@ const Login = () => {
       if (response.data.code === 200) {
         const isCandidate = await authService.verifyCandidateRole();
         if (!isCandidate) {
-          message.error("This account is not authorized to access the candidate portal");
+          toastMessage.error("This account is not authorized to access the candidate portal");
           return;
         }
-        message.success(response.data.message || "Login successfully");
+        toastMessage.success(response.data.message || "Login successfully");
         navigate(redirectPath, { replace: true });
       } else {
-        message.error(response.data.message || "Login failed");
+        toastMessage.error(response.data.message || "Login failed");
       }
     } catch (error) {
-      message.error(
+      toastMessage.error(
         error.response.data.message || "An error occurred during login",
       );
     } finally {
@@ -70,16 +70,16 @@ const Login = () => {
       if (res.data.code === 200) {
         const isCandidate = await authService.verifyCandidateRole();
         if (!isCandidate) {
-          message.error("This account is not authorized to access the candidate portal");
+          toastMessage.error("This account is not authorized to access the candidate portal");
           return;
         }
-        message.success(res.data.message || "Login successfully");
+        toastMessage.success(res.data.message || "Login successfully");
         navigate(redirectPath, { replace: true });
       } else {
-        message.error(res.data.message || "Login failed");
+        toastMessage.error(res.data.message || "Login failed");
       }
     } catch (error) {
-      message.error(error.response?.data?.message || "Google login failed");
+      toastMessage.error(error.response?.data?.message || "Google login failed");
     } finally {
       setLoading(false);
     }
@@ -119,7 +119,7 @@ const Login = () => {
                 <GoogleLogin
                   onSuccess={handleGoogleSuccess}
                   onError={() => {
-                    message.error("Google login failed");
+                    toastMessage.error("Google login failed");
                   }}
                   useOneTap={false}
                   width="100%"

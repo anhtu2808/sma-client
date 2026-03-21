@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams, useParams, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { api } from "@/apis/baseApi";
-import { message } from "antd";
+import toastMessage from "@/utils/toastMessage";
 import Loading from "@/components/Loading";
 import dayjs from "dayjs";
 import {
@@ -376,7 +376,7 @@ export default function CvBuilder({ onBack }) {
     // --- Save Handler ---
     const handleSave = async () => {
         if (!resumeId) {
-            message.error("Không tìm thấy Resume ID.");
+            toastMessage.error("Không tìm thấy Resume ID.");
             return;
         }
 
@@ -678,12 +678,12 @@ export default function CvBuilder({ onBack }) {
                 localStorage.setItem(`cv_layout_${resumeId}`, JSON.stringify(sectionOrder));
             }
 
-            message.success("Save CV successfully!");
+            toastMessage.success("Save CV successfully!");
             dispatch(api.util.invalidateTags(['Resumes']));
             await refetch();
         } catch (error) {
             console.error("Save error:", error);
-            message.error("Có lỗi xảy ra khi lưu CV. Vui lòng thử lại.");
+            toastMessage.error("Có lỗi xảy ra khi lưu CV. Vui lòng thử lại.");
         } finally {
             setIsSaving(false);
         }
@@ -703,7 +703,7 @@ export default function CvBuilder({ onBack }) {
         if (!file) return;
 
         if (!file.type.startsWith('image/')) {
-            message.error('Chỉ hỗ trợ file ảnh (PNG, JPG, JPEG, GIF).');
+            toastMessage.error('Chỉ hỗ trợ file ảnh (PNG, JPG, JPEG, GIF).');
             event.target.value = '';
             return;
         }
@@ -720,10 +720,10 @@ export default function CvBuilder({ onBack }) {
             }
 
             updateField('personalInfo.avatar', uploadedFile.downloadUrl);
-            message.success('Cập nhật ảnh đại diện thành công!');
+            toastMessage.success('Cập nhật ảnh đại diện thành công!');
         } catch (error) {
             console.error('Avatar upload error:', error);
-            message.error('Có lỗi xảy ra khi tải ảnh lên.');
+            toastMessage.error('Có lỗi xảy ra khi tải ảnh lên.');
         } finally {
             event.target.value = '';
         }

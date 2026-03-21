@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { message } from "antd";
+import toastMessage from "@/utils/toastMessage";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
 import SideDecorator from "@/pages/login/side-decorator";
@@ -20,7 +20,7 @@ const Register = () => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      message.error("Passwords do not match");
+      toastMessage.error("Passwords do not match");
       return;
     }
 
@@ -33,13 +33,13 @@ const Register = () => {
       });
 
       if (response.data.code === 200) {
-        message.success(response.data.message || "Registration successful");
+        toastMessage.success(response.data.message || "Registration successful");
         navigate("/");
       } else {
-        message.error(response.data.message || "Registration failed");
+        toastMessage.error(response.data.message || "Registration failed");
       }
     } catch (error) {
-      message.error(
+      toastMessage.error(
         error.response?.data?.message ||
           "An error occurred during registration",
       );
@@ -59,16 +59,16 @@ const Register = () => {
       if (res.data.code === 200) {
         const isCandidate = await authService.verifyCandidateRole();
         if (!isCandidate) {
-          message.error("This account is not authorized to access the candidate portal");
+          toastMessage.error("This account is not authorized to access the candidate portal");
           return;
         }
-        message.success(res.data.message || "Login successfully");
+        toastMessage.success(res.data.message || "Login successfully");
         navigate("/");
       } else {
-        message.error(res.data.message || "Login failed");
+        toastMessage.error(res.data.message || "Login failed");
       }
     } catch (error) {
-      message.error(error.response?.data?.message || "Google login failed");
+      toastMessage.error(error.response?.data?.message || "Google login failed");
     } finally {
       setLoading(false);
     }
@@ -107,7 +107,7 @@ const Register = () => {
                 <GoogleLogin
                   onSuccess={handleGoogleSuccess}
                   onError={() => {
-                    message.error("Google login failed");
+                    toastMessage.error("Google login failed");
                   }}
                   useOneTap={false}
                   width="100%"

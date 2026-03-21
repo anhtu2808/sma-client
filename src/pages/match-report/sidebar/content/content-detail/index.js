@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { message } from "antd";
+import toastMessage from "@/utils/toastMessage";
 import { useDispatch, useSelector } from "react-redux";
 import {
   toggleExpandedItemId,
@@ -64,9 +64,9 @@ const ContentDetail = ({ item, isLast }) => {
         throw new Error("Invalid suggestion response.");
       }
       dispatch(updateSuggestion(updatedSuggestion));
-      message.success("Suggestion regenerated successfully.");
+      toastMessage.success("Suggestion regenerated successfully.");
     } catch (error) {
-      message.error(getErrorMessage(error, "Unable to regenerate suggestion."));
+      toastMessage.error(getErrorMessage(error, "Unable to regenerate suggestion."));
     } finally {
       setRegeneratingSuggestionId(null);
     }
@@ -94,9 +94,9 @@ const ContentDetail = ({ item, isLast }) => {
         }));
       }
       
-      message.success("Marked as fixed successfully.");
+      toastMessage.success("Marked as fixed successfully.");
     } catch (error) {
-      message.error(getErrorMessage(error, "Unable to mark this item as fixed."));
+      toastMessage.error(getErrorMessage(error, "Unable to mark this item as fixed."));
     } finally {
       setIsMarkingFixed(false);
     }

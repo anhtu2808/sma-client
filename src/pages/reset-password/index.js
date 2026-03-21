@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { message } from "antd";
+import toastMessage from "@/utils/toastMessage";
 import { useLocation, useNavigate } from "react-router-dom";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
@@ -18,7 +18,7 @@ const ResetPassword = () => {
 
     useEffect(() => {
         if (!location.state?.email) {
-            message.error("Please enter your email first");
+            toastMessage.error("Please enter your email first");
             navigate("/forgot-password");
         } else {
             setEmail(location.state.email);
@@ -41,18 +41,18 @@ const ResetPassword = () => {
             if (response.data.code === 200) {
                 const isCandidate = await authService.verifyCandidateRole();
                 if (!isCandidate) {
-                    message.error("This account is not authorized to access the candidate portal");
+                    toastMessage.error("This account is not authorized to access the candidate portal");
                     return;
                 }
-                message.success("Password reset and logged in successfully");
+                toastMessage.success("Password reset and logged in successfully");
                 navigate("/");
             } else {
-                message.error(response.data.message || "Reset successful but login failed");
+                toastMessage.error(response.data.message || "Reset successful but login failed");
                 navigate("/login");
             }
         } catch (error) {
             console.error("Failed to reset password:", error);
-            message.error(error.response?.data?.message || error.message || "Failed to reset password");
+            toastMessage.error(error.response?.data?.message || error.message || "Failed to reset password");
             setIsResetting(false);
         } finally {
             setIsLoggingIn(false);

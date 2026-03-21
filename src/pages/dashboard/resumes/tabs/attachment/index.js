@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { message, Modal } from "antd";
+import { Modal } from "antd";
+import toastMessage from "@/utils/toastMessage";
 import {
   useDeleteCandidateResumeMutation,
   useGetCandidateResumesQuery,
@@ -11,6 +12,7 @@ import {
 } from "@/apis/resumeApi";
 import { RESUME_TYPES } from "@/constant";
 import FilesList from "./files-list";
+import RenameResumeModal from "../../components/RenameResumeModal";
 import ParseConsentModal from "./parse-consent-modal";
 import SetProfileConfirmModal from "./set-profile-confirm-modal";
 import UploadPanel from "./upload-panel";
@@ -56,6 +58,7 @@ const AttachmentsTab = () => {
   const [confirmValue, setConfirmValue] = useState("");
   const [confirmResumeId, setConfirmResumeId] = useState(null);
   const [isConfirmLoading, setIsConfirmLoading] = useState(false);
+  const [renameResume, setRenameResume] = useState(null);
 
   const files = useMemo(
     () =>
@@ -65,14 +68,14 @@ const AttachmentsTab = () => {
           timestamp && !Number.isNaN(Number(timestamp))
             ? new Date(Number.parseInt(timestamp, 10)).toLocaleString()
             : "Unknown";
-        const fileName = resume.fileName || resume.resumeName || "";
         const effectiveStatus = parseStatusOverrides[resume.id] || resume.parseStatus || "WAITING";
 
         return {
           id: resume.id,
-          name: fileName || `Resume #${resume.id}`,
+          name: resume.resumeName || `Resume #${resume.id}`,
+          fileName: resume.fileName || "",
           status: normalizeParseStatus(effectiveStatus),
-          type: isPdfFile(fileName) ? "pdf" : "doc",
+          type: isPdfFile(resume.fileName || "") ? "pdf" : "doc",
           url: resume.resumeUrl,
           uploadTime,
         };
@@ -132,7 +135,7 @@ const AttachmentsTab = () => {
 
         if (Date.now() - startedAt >= POLL_TIMEOUT_MS) {
           stopPolling(resumeId);
-          message.info("Resume parsing is still processing. Please check again in a moment.");
+          toastMessage.info("Resume parsing is still processing. Please check again in a moment.");
           return;
         }
 
@@ -145,7 +148,7 @@ const AttachmentsTab = () => {
           }
         } catch (error) {
           stopPolling(resumeId);
-          message.error(getErrorMessage(error, "Unable to check parse status."));
+          toastMessage.error(getErrorMessage(error, "Unable to check parse status."));
         }
       };
 
@@ -203,7 +206,7 @@ const AttachmentsTab = () => {
       return true;
     } catch (error) {
       if (!silentError) {
-        message.error(getErrorMessage(error, "Failed to start resume parsing."));
+        toastMessage.error(getErrorMessage(error, "Failed to start resume parsing."));
       }
       return false;
     } finally {
@@ -239,7 +242,7 @@ const AttachmentsTab = () => {
         resumeId: null,
       });
     } catch (error) {
-      message.error(getErrorMessage(error, "Upload resume failed"));
+      toastMessage.error(getErrorMessage(error, "Upload resume failed"));
     } finally {
       event.target.value = "";
     }
@@ -264,18 +267,18 @@ const AttachmentsTab = () => {
         const createdResume = await createUploadedResume(consentModal.pendingUploadPayload);
         const parseStarted = await triggerResumeParsing(createdResume?.id, { silentError: true });
         if (parseStarted) {
-          message.success("Upload completed. Resume parsing has started.");
+          toastMessage.success("Upload completed. Resume parsing has started.");
         } else {
-          message.warning("Upload completed, but parsing could not start. You can parse this resume manually later.");
+          toastMessage.warning("Upload completed, but parsing could not start. You can parse this resume manually later.");
         }
       } else if (consentModal.mode === "manual" && consentModal.resumeId) {
         const parseStarted = await triggerResumeParsing(consentModal.resumeId);
         if (parseStarted) {
-          message.success("Resume parsing has started.");
+          toastMessage.success("Resume parsing has started.");
         }
       }
     } catch (error) {
-      message.error(getErrorMessage(error, "Unable to continue."));
+      toastMessage.error(getErrorMessage(error, "Unable to continue."));
     } finally {
       resetConsentModal();
       setIsConsentLoading(false);
@@ -293,9 +296,9 @@ const AttachmentsTab = () => {
     try {
       setIsConsentLoading(true);
       await createUploadedResume(consentModal.pendingUploadPayload);
-      message.success("Upload resume successfully");
+      toastMessage.success("Upload resume successfully");
     } catch (error) {
-      message.error(getErrorMessage(error, "Upload resume failed"));
+      toastMessage.error(getErrorMessage(error, "Upload resume failed"));
     } finally {
       resetConsentModal();
       setIsConsentLoading(false);
@@ -304,7 +307,7 @@ const AttachmentsTab = () => {
 
   const handleDeleteResume = (resumeId) => {
     const resume = resumes.find((r) => r.id === resumeId);
-    const resumeName = resume?.fileName || resume?.resumeName || `Resume #${resumeId}`;
+    const resumeName = resume?.resumeName || `Resume #${resumeId}`;
 
     Modal.confirm({
       title: "Delete Resume",
@@ -323,9 +326,9 @@ const AttachmentsTab = () => {
             return next;
           });
           await deleteCandidateResume({ resumeId }).unwrap();
-          message.success("Delete resume successfully");
+          toastMessage.success("Delete resume successfully");
         } catch (error) {
-          message.error(getErrorMessage(error, "Delete resume failed"));
+          toastMessage.error(getErrorMessage(error, "Delete resume failed"));
         } finally {
           setDeletingId(null);
         }
@@ -354,10 +357,10 @@ const AttachmentsTab = () => {
       setSettingProfileId(confirmResumeId);
       const delay = new Promise((resolve) => setTimeout(resolve, 800));
       await Promise.all([setResumeAsDefault({ resumeId: confirmResumeId }).unwrap(), delay]);
-      message.success("Set profile resume successfully");
+      toastMessage.success("Set profile resume successfully");
       closeSetProfileConfirm();
     } catch (error) {
-      message.error(getErrorMessage(error, "Set profile resume failed"));
+      toastMessage.error(getErrorMessage(error, "Set profile resume failed"));
     } finally {
       setIsConfirmLoading(false);
       setSettingProfileId(null);
@@ -390,6 +393,10 @@ const AttachmentsTab = () => {
         onOpenParseConsent={openParseConsent}
         onOpenSetProfileConfirm={openSetProfileConfirm}
         onDeleteResume={handleDeleteResume}
+        onRename={(fileId) => {
+          const resume = resumes.find((r) => r.id === fileId);
+          if (resume) setRenameResume(resume);
+        }}
       />
 
       <ParseConsentModal
@@ -398,6 +405,12 @@ const AttachmentsTab = () => {
         isConsentLoading={isConsentLoading}
         onCancel={handleConsentCancel}
         onSubmit={handleConsentSubmit}
+      />
+
+      <RenameResumeModal
+        open={Boolean(renameResume)}
+        onClose={() => setRenameResume(null)}
+        resume={renameResume}
       />
 
       <SetProfileConfirmModal

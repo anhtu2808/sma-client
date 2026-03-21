@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Form, Input, Select, message } from "antd";
+import { Form, Input, Select } from "antd";
+import toastMessage from "@/utils/toastMessage";
 import ProfileSectionModal from "@/components/ProfileSectionModal";
 import { useGetSkillsQuery } from "@/apis/skillApi";
 import { formatYearsOfExperience } from "@/utils/profileUtils";
@@ -99,15 +100,15 @@ const SkillFormModal = ({
     const selectedYearsOfExperience = form.getFieldValue("selectedYearsOfExperience");
 
     if (!groupName) {
-      message.error("Please enter group name.");
+      toastMessage.error("Please enter group name.");
       return;
     }
     if (!selectedSkillId) {
-      message.error("Please select skill.");
+      toastMessage.error("Please select skill.");
       return;
     }
     if (pendingSkills.length >= MAX_SKILLS_PER_GROUP) {
-      message.error(`Maximum ${MAX_SKILLS_PER_GROUP} skills per group.`);
+      toastMessage.error(`Maximum ${MAX_SKILLS_PER_GROUP} skills per group.`);
       return;
     }
 
@@ -138,11 +139,11 @@ const SkillFormModal = ({
   const submitForm = () => {
     const groupName = `${form.getFieldValue("groupName") ?? ""}`.trim().replace(/\s+/g, " ");
     if (!groupName) {
-      message.error("Please enter group name.");
+      toastMessage.error("Please enter group name.");
       return;
     }
     if (pendingSkills.length === 0) {
-      message.error("Please add at least one skill.");
+      toastMessage.error("Please add at least one skill.");
       return;
     }
     onSubmit({ groupName, entries: pendingSkills });

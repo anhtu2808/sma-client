@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Popconfirm, message } from "antd";
+import { Popconfirm } from "antd";
+import toastMessage from "@/utils/toastMessage";
 import { useGetCandidateResumesQuery, useDeleteCandidateResumeMutation, useUpdateCandidateResumeMutation } from "@/apis/resumeApi";
 import Loading from "@/components/Loading";
 import { RESUME_TYPES } from "@/constant";
@@ -39,9 +40,9 @@ const ResumeBuilderTab = () => {
           fileName: `[${templateId}] ${editName.trim()}.pdf`,
         }
       }).unwrap();
-      message.success("Đổi tên CV thành công!");
+      toastMessage.success("Đổi tên CV thành công!");
     } catch (error) {
-      message.error("Có lỗi xảy ra khi đổi tên CV.");
+      toastMessage.error("Có lỗi xảy ra khi đổi tên CV.");
     } finally {
       setEditingId(null);
     }
@@ -51,9 +52,9 @@ const ResumeBuilderTab = () => {
     e.stopPropagation();
     try {
       await deleteResume({ resumeId }).unwrap();
-      message.success("Deleted successfully.");
+      toastMessage.success("Deleted successfully.");
     } catch (error) {
-      message.error("Failed to delete. Please try again.");
+      toastMessage.error("Failed to delete. Please try again.");
     }
   };
 
@@ -72,10 +73,10 @@ const ResumeBuilderTab = () => {
       <div className="bg-white dark:bg-surface-dark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
-            <Loading size={110} className="py-0" />
+            <Loading className="py-0" />
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Create New Card */}
             <div
               onClick={() => navigate('/dashboard/resumes/templates')}

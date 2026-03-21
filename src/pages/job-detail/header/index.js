@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { message, Button as AntButton } from 'antd';
+import { Button as AntButton } from 'antd';
+import toastMessage from "@/utils/toastMessage";
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGetJobByIdQuery, useGetMarkedJobsQuery, useToggleMarkJobMutation } from '@/apis/jobApi';
 
@@ -31,7 +32,7 @@ const Header = () => {
 
     const handleToggleMark = async () => {
         if (!hasAccessToken) {
-            message.warning('Please log in to mark jobs.');
+            toastMessage.warning('Please log in to mark jobs.');
             return;
         }
         if (bookmarkLoading) return;
@@ -44,28 +45,25 @@ const Header = () => {
         try {
             await toggleMarkJob(jobId).unwrap();
             if (nextMarked) {
-                message.success({
-                    content: (
-                        <div className="flex items-center gap-4">
-                            <span>This job has been added to your Saved jobs.</span>
-                            <AntButton
-                                type="link"
-                                size="small"
-                                className="!p-0 !h-auto font-bold text-primary hover:text-primary/80"
-                                onClick={() => navigate('/dashboard/jobs?tab=saved')}
-                            >
-                                View now
-                            </AntButton>
-                        </div>
-                    ),
-                    duration: 5,
-                });
+                toastMessage.success(
+                    <div className="flex items-center gap-4">
+                        <span>This job has been added to your Saved jobs.</span>
+                        <AntButton
+                            type="link"
+                            size="small"
+                            className="!p-0 !h-auto font-bold text-primary hover:text-primary/80"
+                            onClick={() => navigate('/dashboard/jobs?tab=saved')}
+                        >
+                            View now
+                        </AntButton>
+                    </div>
+                );
             } else {
-                message.success('Job removed from Saved jobs.');
+                toastMessage.success('Job removed from Saved jobs.');
             }
         } catch (error) {
             setOptimisticMarked(previousMarked);
-            message.error(error?.data?.message || 'Failed to save job');
+            toastMessage.error(error?.data?.message || 'Failed to save job');
         } finally {
             setBookmarkLoading(false);
         }

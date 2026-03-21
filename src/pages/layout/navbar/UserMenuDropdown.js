@@ -46,6 +46,12 @@ const UserMenuDropdown = () => {
       onClick: () => navigate('/dashboard/resumes'),
     },
     {
+      key: 'resume-checker',
+      label: 'Resume Checker',
+      icon: <span className="material-icons-round text-lg">fact_check</span>,
+      onClick: () => navigate('/dashboard/matching-history'),
+    },
+    {
       key: 'my-jobs',
       label: 'My Jobs',
       icon: <span className="material-icons-round text-lg">work_history</span>,
@@ -68,6 +74,12 @@ const UserMenuDropdown = () => {
       label: 'Billing & Plans',
       icon: <span className="material-icons-round text-lg">credit_card</span>,
       onClick: () => navigate('/dashboard/billing-plans'),
+    },
+    {
+      key: 'usage',
+      label: 'Usage',
+      icon: <span className="material-icons-round text-lg">history</span>,
+      onClick: () => navigate('/dashboard/usage'),
     },
     {
       key: 'settings',

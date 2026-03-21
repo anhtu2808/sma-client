@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { message } from "antd";
+import toastMessage from "@/utils/toastMessage";
 import Switch from "@/components/Switch";
 import { useCandidateDashboardProfileQuery, useUpdateCandidateDashboardProfileMutation } from "@/apis/candidateApi";
 import { useGetCandidateResumesQuery, useSetResumeAsDefaultMutation } from "@/apis/resumeApi";
@@ -54,9 +54,9 @@ const CvVisibilityControl = () => {
     const nextValue = event.target.checked;
     try {
       await updateCandidateDashboardProfile({ isProfilePublic: nextValue }).unwrap();
-      message.success(nextValue ? "Profile search visibility enabled." : "Profile search visibility disabled.");
+      toastMessage.success(nextValue ? "Profile search visibility enabled." : "Profile search visibility disabled.");
     } catch (error) {
-      message.error(error?.data?.message || "Failed to update profile visibility.");
+      toastMessage.error(error?.data?.message || "Failed to update profile visibility.");
     }
   };
 
@@ -73,7 +73,7 @@ const CvVisibilityControl = () => {
 
   const handleSaveProfileSetting = async () => {
     if (!selectedResume?.id) {
-      message.warning("Please select a resume before saving.");
+      toastMessage.warning("Please select a resume before saving.");
       return;
     }
 
@@ -81,10 +81,10 @@ const CvVisibilityControl = () => {
       await setResumeAsDefault({ resumeId: selectedResume.id }).unwrap();
       const showAs = selectedResume.type === RESUME_TYPES.PROFILE ? "PROFILE" : "RESUME";
       await updateCandidateDashboardProfile({ showAs }).unwrap();
-      message.success("Visible resume settings updated successfully.");
+      toastMessage.success("Visible resume settings updated successfully.");
       setIsModalOpen(false);
     } catch (error) {
-      message.error(error?.data?.message || "Failed to update visible resume settings.");
+      toastMessage.error(error?.data?.message || "Failed to update visible resume settings.");
     }
   };
 

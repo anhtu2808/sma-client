@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
-import { Modal, message } from "antd";
+import { Modal } from "antd";
+import toastMessage from "@/utils/toastMessage";
 import {
   useGetCandidateResumesQuery,
   useUploadFilesMutation,
@@ -170,7 +171,7 @@ const ReEvaluateModal = ({ open, onClose, jobId }) => {
     if (!file) return;
 
     if (!isSupportedResumeFile(file.name)) {
-      message.error("Only PDF, DOC, and DOCX files are supported.");
+      toastMessage.error("Only PDF, DOC, and DOCX files are supported.");
       event.target.value = "";
       return;
     }
@@ -210,9 +211,9 @@ const ReEvaluateModal = ({ open, onClose, jobId }) => {
 
       setUploadedResume(newResume);
       setSelectedResumeId(newResume.id);
-      message.success("Resume uploaded successfully.");
+      toastMessage.success("Resume uploaded successfully.");
     } catch (error) {
-      message.error(getErrorMessage(error, "Upload resume failed"));
+      toastMessage.error(getErrorMessage(error, "Upload resume failed"));
     } finally {
       event.target.value = "";
     }
@@ -233,7 +234,7 @@ const ReEvaluateModal = ({ open, onClose, jobId }) => {
 
   const handleCheckMatch = async () => {
     if (!canSubmit || !selectedResume || !jobId) {
-      message.warning("Please select a resume to continue.");
+      toastMessage.warning("Please select a resume to continue.");
       return;
     }
 
@@ -257,7 +258,7 @@ const ReEvaluateModal = ({ open, onClose, jobId }) => {
         replace: true,
       });
     } catch (error) {
-      message.error(getErrorMessage(error, "Unable to start AI matching."));
+      toastMessage.error(getErrorMessage(error, "Unable to start AI matching."));
     }
   };
 

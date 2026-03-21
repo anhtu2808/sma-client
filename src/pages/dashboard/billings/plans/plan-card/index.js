@@ -38,7 +38,9 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
         ? "bg-white border-2 border-primary shadow-md"
         : isCurrent
           ? "bg-white border-gray-200 cursor-default"
-          : "bg-white border-gray-200 hover:border-gray-300"
+          : plan.popular
+            ? "bg-white border-primary border-2"
+            : "bg-white border-gray-200 hover:border-gray-300"
         }`}
     >
       {plan.popular ? (

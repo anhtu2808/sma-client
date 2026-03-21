@@ -81,7 +81,7 @@ const Table = ({
             {isHistoryLoading ? (
               <tr>
                 <td className="px-6 py-10" colSpan={4}>
-                  <Loading size={88} className="py-0" />
+                  <Loading className="py-0" />
                 </td>
               </tr>
             ) : isHistoryError ? (

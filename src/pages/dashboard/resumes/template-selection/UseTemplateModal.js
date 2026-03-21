@@ -125,7 +125,7 @@ const UseTemplateModal = ({ open, onCancel, template, onCreateNew, onSelectExist
                     {/* CV List */}
                     {isLoadingResumes ? (
                         <div className="flex items-center justify-center py-12">
-                            <Loading size={88} className="py-0" />
+                            <Loading className="py-0" />
                         </div>
                     ) : resumes.length === 0 ? (
                         <div className="text-center py-10">

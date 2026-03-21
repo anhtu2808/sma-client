@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 import Button from '@/components/Button';
+import NotificationToast from '@/components/NotificationToast';
 import SectionHeader from '@/components/SectionHeader';
 import ColorSwatch from '@/components/ColorSwatch';
 import Card from '@/components/Card';
@@ -387,9 +389,57 @@ const UiKit = () => {
                     </div>
                 </section>
 
-                {/* 06. Text Editor */}
+                {/* 06. Toast Notifications */}
+                <section id="toasts">
+                    <SectionHeader number="06" title="Toast Notifications" />
+
+                    <Card className="!p-8">
+                        <div className="flex flex-wrap gap-4">
+                            <Button
+                                mode="primary"
+                                onClick={() => toast.success('Action completed successfully!')}
+                            >
+                                Success Toast
+                            </Button>
+                            <Button
+                                mode="secondary"
+                                onClick={() => toast.error('Something went wrong. Please try again.')}
+                            >
+                                Error Toast
+                            </Button>
+                            <Button
+                                mode="ghost"
+                                onClick={() => toast('This is a neutral notification.')}
+                            >
+                                Default Toast
+                            </Button>
+                            <Button
+                                mode="secondary"
+                                onClick={() => toast.loading('Loading, please wait...')}
+                            >
+                                Loading Toast
+                            </Button>
+                            <Button
+                                mode="primary"
+                                iconLeft={<span className="material-icons-round text-base">notifications</span>}
+                                onClick={() => toast.custom((t) => (
+                                    <NotificationToast
+                                        t={t}
+                                        icon="fa-solid fa-briefcase"
+                                        title="New Job Application"
+                                        message="TechFlow Systems has reviewed your application for Senior UX/UI Designer."
+                                    />
+                                ), { duration: 5000 })}
+                            >
+                                Notification Toast
+                            </Button>
+                        </div>
+                    </Card>
+                </section>
+
+                {/* 07. Text Editor */}
                 <section id="text-editor">
-                    <SectionHeader number="06" title="Text Editor" />
+                    <SectionHeader number="07" title="Text Editor" />
 
                     <Card className="!p-8">
                         <SimpleTextEditor

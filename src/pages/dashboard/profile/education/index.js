@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { message } from "antd";
+import toastMessage from "@/utils/toastMessage";
 import { useCandidateDashboardProfileQuery } from "@/apis/candidateApi";
 import {
   useCreateResumeEducationMutation,
@@ -51,7 +51,7 @@ const Education = () => {
 
   const handleSubmit = async (payload) => {
     if (!profileResumeId) {
-      message.error("No PROFILE resume found.");
+      toastMessage.error("No PROFILE resume found.");
       return;
     }
 
@@ -62,15 +62,15 @@ const Education = () => {
           educationId: editingEducation.id,
           payload,
         }).unwrap();
-        message.success("Education updated successfully.");
+        toastMessage.success("Education updated successfully.");
       } else {
         await createEducation({ resumeId: profileResumeId, payload }).unwrap();
-        message.success("Education added successfully.");
+        toastMessage.success("Education added successfully.");
       }
 
       closeModal();
     } catch (error) {
-      message.error(error?.data?.message || "Failed to save education.");
+      toastMessage.error(error?.data?.message || "Failed to save education.");
     }
   };
 

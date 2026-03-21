@@ -123,7 +123,7 @@ const NotificationList = () => {
                 <div className="space-y-4">
                     {isLoading ? (
                         <div className="bg-white dark:bg-surface-dark rounded-2xl border border-gray-100 dark:border-gray-800">
-                            <Loading size={96} className="py-12" />
+                            <Loading className="py-0" />
                         </div>
                     ) : notifications.length > 0 ? (
                         notifications.map((noti) => (

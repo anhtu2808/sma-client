@@ -3,7 +3,7 @@ import * as LucideIcons from 'lucide-react';
 import { CvBuilderContext } from '../CvBuilderContext';
 import { SectionWrapper } from './SectionWrapper';
 import { useGetSkillsQuery } from '@/apis/skillApi';
-import { message } from 'antd';
+import toastMessage from '@/utils/toastMessage';
 
 export const SkillSelector = ({ titleClassName, itemClassName, groupClassName, groupListClassName }) => {
     const { cvData, updateField } = useContext(CvBuilderContext);
@@ -52,7 +52,7 @@ export const SkillSelector = ({ titleClassName, itemClassName, groupClassName, g
 
     const handleSelectSkill = (skill) => {
         if (cvData.skills.some(s => s.skillId === skill.id)) {
-            message.warning('This skill has already been added.');
+            toastMessage.warning('This skill has already been added.');
             setShowDropdown(false);
             setSearchText('');
             return;
@@ -65,11 +65,11 @@ export const SkillSelector = ({ titleClassName, itemClassName, groupClassName, g
 
     const handleAddSkill = () => {
         if (!groupName.trim()) {
-            message.error('Please enter a skill group name.');
+            toastMessage.error('Please enter a skill group name.');
             return;
         }
         if (!selectedSkillId) {
-            message.error('Please search and select a skill first.');
+            toastMessage.error('Please search and select a skill first.');
             return;
         }
 

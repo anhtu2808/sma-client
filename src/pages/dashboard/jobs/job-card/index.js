@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { message, Button as AntButton } from "antd";
+import { Button as AntButton } from "antd";
+import toastMessage from "@/utils/toastMessage";
 import { useToggleMarkJobMutation } from "@/apis/jobApi";
 import Button from "@/components/Button";
 import StatusTimeline from "../status-timeline";
@@ -33,24 +34,21 @@ const DashboardJobCard = ({ job, activeTab }) => {
       const isRemoving = isSavedTab;
       const msg = isRemoving ? "Job removed from saved." : "Job saved successfully.";
 
-      message.success({
-        content: (
-          <div className="flex items-center gap-4">
-            <span>{msg}</span>
-            <AntButton
-              type="link"
-              size="small"
-              className="!p-0 !h-auto font-bold text-primary hover:text-primary/80"
-              onClick={() => toggleMark(job.id)}
-            >
-              Undo
-            </AntButton>
-          </div>
-        ),
-        duration: 4,
-      });
+      toastMessage.success(
+        <div className="flex items-center gap-4">
+          <span>{msg}</span>
+          <AntButton
+            type="link"
+            size="small"
+            className="!p-0 !h-auto font-bold text-primary hover:text-primary/80"
+            onClick={() => toggleMark(job.id)}
+          >
+            Undo
+          </AntButton>
+        </div>
+      );
     } catch (err) {
-      message.error("Failed to update bookmark.");
+      toastMessage.error("Failed to update bookmark.");
     }
   };
 

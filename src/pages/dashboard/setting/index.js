@@ -1,5 +1,5 @@
 import React from 'react';
-import { message } from 'antd';
+import toastMessage from "@/utils/toastMessage";
 import { useGetNotificationSettingsQuery, useUpdateNotificationSettingMutation, useResetSettingsMutation } from '@/apis/notificationApi';
 import Loading from '@/components/Loading';
 
@@ -13,9 +13,9 @@ const NotificationSettings = () => {
     const handleResetAll = async () => {
         try {
             await resetSettings().unwrap();
-            message.success('All settings have been reset to default');
+            toastMessage.success('All settings have been reset to default');
         } catch (error) {
-            message.error('Failed to reset settings');
+            toastMessage.error('Failed to reset settings');
         }
     };
 
@@ -71,13 +71,13 @@ const NotificationSettings = () => {
             } else {
                 await updateSetting({ notificationType: displayItem.key, [field]: value }).unwrap();
             }
-            message.success('Setting updated successfully');
+            toastMessage.success('Setting updated successfully');
         } catch (error) {
-            message.error('Failed to update setting');
+            toastMessage.error('Failed to update setting');
         }
     };
 
-    if (isLoading) return <Loading className="py-20" />;
+    if (isLoading) return <Loading className="h-[50vh]" />;
 
     return (
         <main className="flex-1 space-y-6 animate-fadeIn font-sans mx-auto">

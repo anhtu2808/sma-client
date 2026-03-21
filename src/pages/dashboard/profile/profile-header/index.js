@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { Col, Row, message } from "antd";
+import { Col, Row } from "antd";
+import toastMessage from "@/utils/toastMessage";
 import Button from "@/components/Button";
 import { useCandidateDashboardProfileQuery, useUpdateCandidateDashboardProfileMutation } from "@/apis/candidateApi";
 import { getValidLink, getHostLabel } from "@/utils/profileUtils";
@@ -38,10 +39,10 @@ const ProfileHeader = () => {
   const handleSubmit = async (payload) => {
     try {
       await updateProfile(payload).unwrap();
-      message.success("Profile updated successfully.");
+      toastMessage.success("Profile updated successfully.");
       closeEdit();
     } catch (error) {
-      message.error(error?.data?.message || "Failed to update profile.");
+      toastMessage.error(error?.data?.message || "Failed to update profile.");
     }
   };
 

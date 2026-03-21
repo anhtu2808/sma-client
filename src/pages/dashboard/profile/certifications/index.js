@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { message } from "antd";
+import toastMessage from "@/utils/toastMessage";
 import { useCandidateDashboardProfileQuery } from "@/apis/candidateApi";
 import {
   useCreateResumeCertificationMutation,
@@ -38,7 +38,7 @@ const Certifications = () => {
 
   const handleSubmit = async (payload) => {
     if (!profileResumeId) {
-      message.error("No PROFILE resume found.");
+      toastMessage.error("No PROFILE resume found.");
       return;
     }
 
@@ -49,15 +49,15 @@ const Certifications = () => {
           certificationId: editingCertification.id,
           payload,
         }).unwrap();
-        message.success("Certification updated successfully.");
+        toastMessage.success("Certification updated successfully.");
       } else {
         await createCertification({ resumeId: profileResumeId, payload }).unwrap();
-        message.success("Certification added successfully.");
+        toastMessage.success("Certification added successfully.");
       }
 
       closeModal();
     } catch (error) {
-      message.error(error?.data?.message || "Failed to save certification.");
+      toastMessage.error(error?.data?.message || "Failed to save certification.");
     }
   };
 

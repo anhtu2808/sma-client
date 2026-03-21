@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Col, Row, message } from "antd";
+import { Col, Row } from "antd";
+import toastMessage from "@/utils/toastMessage";
 import { useNavigate } from "react-router-dom";
 import { TemplateCard } from "../resume-card";
 import UseTemplateModal from "./UseTemplateModal";
@@ -73,7 +74,7 @@ const TemplateSelection = () => {
             setIsModalOpen(false);
             navigate(`/dashboard/resumes/builder?template=${template.id}&resumeId=${newResume.id}`);
         } catch (error) {
-            message.error("Không thể tạo CV mới. Vui lòng thử lại.");
+            toastMessage.error("Không thể tạo CV mới. Vui lòng thử lại.");
         }
     };
 
@@ -83,7 +84,7 @@ const TemplateSelection = () => {
             setIsModalOpen(false);
             navigate(`/dashboard/resumes/builder?template=${template.id}&resumeId=${clonedResume.id}`);
         } catch (error) {
-            message.error("Không thể clone CV. Vui lòng thử lại.");
+            toastMessage.error("Không thể clone CV. Vui lòng thử lại.");
         }
     };
 

@@ -1,6 +1,6 @@
 import { useCallback } from "react";
-import { message } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
+import toastMessage from "@/utils/toastMessage";
 
 const useRequireLoginRedirect = () => {
   const navigate = useNavigate();
@@ -13,7 +13,7 @@ const useRequireLoginRedirect = () => {
         return true;
       }
 
-      message.warning(warningMessage);
+      toastMessage.warning(warningMessage);
       const targetPath =
         redirectTo || `${location.pathname}${location.search}${location.hash}`;
       navigate(`/login?redirect=${encodeURIComponent(targetPath)}`);

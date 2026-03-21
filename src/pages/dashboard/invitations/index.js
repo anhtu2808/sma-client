@@ -1,5 +1,6 @@
 import { useMemo, useState, useCallback } from 'react';
-import { Alert, Col, Row, message } from 'antd';
+import { Alert, Col, Row } from 'antd';
+import toastMessage from "@/utils/toastMessage";
 import { useNavigate } from 'react-router-dom';
 import Loading from '@/components/Loading';
 import { 
@@ -182,12 +183,12 @@ const Invitations = () => {
     try {
       const response = await takeAction({ id: invitationId, action: 'ACCEPTED' }).unwrap();
       if (response?.data) {
-        message.success('Invitation accepted successfully!');
+        toastMessage.success('Invitation accepted successfully!');
       } else {
-        message.error(response?.message || 'Failed to accept invitation');
+        toastMessage.error(response?.message || 'Failed to accept invitation');
       }
     } catch (err) {
-      message.error(err?.data?.message || 'Failed to accept invitation. Please try again.');
+      toastMessage.error(err?.data?.message || 'Failed to accept invitation. Please try again.');
     } finally {
       setProcessingIds((prev) => ({ ...prev, [invitationId]: false }));
     }
@@ -198,12 +199,12 @@ const Invitations = () => {
     try {
       const response = await takeAction({ id: invitationId, action: 'DECLINED' }).unwrap();
       if (response?.data) {
-        message.success('Invitation declined');
+        toastMessage.success('Invitation declined');
       } else {
-        message.error(response?.message || 'Failed to decline invitation');
+        toastMessage.error(response?.message || 'Failed to decline invitation');
       }
     } catch (err) {
-      message.error(err?.data?.message || 'Failed to decline invitation. Please try again.');
+      toastMessage.error(err?.data?.message || 'Failed to decline invitation. Please try again.');
     } finally {
       setProcessingIds((prev) => ({ ...prev, [invitationId]: false }));
     }
@@ -220,7 +221,7 @@ const Invitations = () => {
   }
 
   if (isLoading || (!invitationData && isFetching)) {
-    return <Loading className="h-[40vh]" />;
+    return <Loading className="h-[50vh]" />;
   }
 
   return (

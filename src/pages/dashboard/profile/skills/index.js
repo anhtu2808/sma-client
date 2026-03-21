@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { Popconfirm, message } from "antd";
+import { Popconfirm } from "antd";
+import toastMessage from "@/utils/toastMessage";
 import { useCandidateDashboardProfileQuery } from "@/apis/candidateApi";
 import {
   useCreateResumeSkillMutation,
@@ -52,7 +53,7 @@ const Skills = () => {
 
   const handleSubmit = async ({ groupName, entries }) => {
     if (!profileResumeId) {
-      message.error("No PROFILE resume found.");
+      toastMessage.error("No PROFILE resume found.");
       return;
     }
 
@@ -108,7 +109,7 @@ const Skills = () => {
         }
 
         await Promise.all(ops);
-        message.success("Skill group updated successfully.");
+        toastMessage.success("Skill group updated successfully.");
       } else {
         await Promise.all(
           entries.map((entry) =>
@@ -122,18 +123,18 @@ const Skills = () => {
             }).unwrap()
           )
         );
-        message.success("Skill group added successfully.");
+        toastMessage.success("Skill group added successfully.");
       }
 
       closeModal();
     } catch (error) {
-      message.error(error?.data?.message || "Failed to save skill group.");
+      toastMessage.error(error?.data?.message || "Failed to save skill group.");
     }
   };
 
   const handleDeleteGroup = async (group) => {
     if (!profileResumeId) {
-      message.error("No PROFILE resume found.");
+      toastMessage.error("No PROFILE resume found.");
       return;
     }
     const skills = group?.skills ?? [];
@@ -150,9 +151,9 @@ const Skills = () => {
             }).unwrap()
           )
       );
-      message.success("Skill group deleted successfully.");
+      toastMessage.success("Skill group deleted successfully.");
     } catch (error) {
-      message.error(error?.data?.message || "Failed to delete skill group.");
+      toastMessage.error(error?.data?.message || "Failed to delete skill group.");
     }
   };
 

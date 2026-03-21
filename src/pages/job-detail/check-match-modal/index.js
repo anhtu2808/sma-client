@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { message, Modal } from "antd";
+import { Modal } from "antd";
+import toastMessage from "@/utils/toastMessage";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   useGetCandidateResumesQuery,
@@ -112,7 +113,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
     if (!file) return;
 
     if (!isSupportedResumeFile(file.name)) {
-      message.error("Only PDF, DOC, and DOCX files are supported.");
+      toastMessage.error("Only PDF, DOC, and DOCX files are supported.");
       event.target.value = "";
       return;
     }
@@ -135,9 +136,9 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
       }).unwrap();
 
       setSelectedResumeId(createdResume?.id ?? null);
-      message.success("Resume uploaded successfully.");
+      toastMessage.success("Resume uploaded successfully.");
     } catch (error) {
-      message.error(getErrorMessage(error, "Upload resume failed"));
+      toastMessage.error(getErrorMessage(error, "Upload resume failed"));
     } finally {
       event.target.value = "";
     }
@@ -167,15 +168,15 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
     if (!resumeId) return;
     try {
       await parseCandidateResume({ resumeId }).unwrap();
-      message.success("Resume parsing started. Please wait a moment.");
+      toastMessage.success("Resume parsing started. Please wait a moment.");
     } catch (error) {
-      message.error(getErrorMessage(error, "Failed to start resume parsing."));
+      toastMessage.error(getErrorMessage(error, "Failed to start resume parsing."));
     }
   };
 
   const handleCheckMatch = async () => {
     if (!canSubmit || !selectedResume || !effectiveJobId) {
-      message.warning("Please select a resume to continue.");
+      toastMessage.warning("Please select a resume to continue.");
       return;
     }
 
@@ -210,7 +211,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
         },
       });
     } catch (error) {
-      message.error(getErrorMessage(error, "Unable to start AI matching."));
+      toastMessage.error(getErrorMessage(error, "Unable to start AI matching."));
     }
   };
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, message, Upload } from "antd";
+import { Form, Input, Upload } from "antd";
+import toastMessage from "@/utils/toastMessage";
 import ProfileSectionModal from "@/components/ProfileSectionModal";
 import Loading from "@/components/Loading";
 import { useUploadFilesMutation } from "@/apis/resumeApi";
@@ -63,7 +64,7 @@ const EditProfileModal = ({ open, loading, initialValues, onCancel, onSubmit }) 
     };
 
     if (!payload.fullName) {
-      message.error("Full name is required.");
+      toastMessage.error("Full name is required.");
       return;
     }
 
@@ -73,14 +74,14 @@ const EditProfileModal = ({ open, loading, initialValues, onCancel, onSubmit }) 
   const customUploadRequest = async ({ file, onSuccess, onError }) => {
     const isImage = file.type === "image/jpeg" || file.type === "image/png" || file.type === "image/webp";
     if (!isImage) {
-      message.error("You can only upload JPG/PNG/WEBP files!");
+      toastMessage.error("You can only upload JPG/PNG/WEBP files!");
       onError(new Error("Invalid file type"));
       return;
     }
 
     const isLt10M = file.size / 1024 / 1024 < 10;
     if (!isLt10M) {
-      message.error("Image must smaller than 10MB!");
+      toastMessage.error("Image must smaller than 10MB!");
       onError(new Error("File too large"));
       return;
     }
@@ -102,11 +103,11 @@ const EditProfileModal = ({ open, loading, initialValues, onCancel, onSubmit }) 
       form.setFieldValue("avatar", uploadedFile.downloadUrl);
       setPreviewImage(uploadedFile.downloadUrl);
       onSuccess("ok");
-      message.success("Avatar uploaded successfully.");
+      toastMessage.success("Avatar uploaded successfully.");
     } catch (error) {
       setPreviewImage(form.getFieldValue("avatar"));
       onError(error);
-      message.error("Failed to upload avatar.");
+      toastMessage.error("Failed to upload avatar.");
     }
   };
 

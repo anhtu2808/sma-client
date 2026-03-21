@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { message } from "antd";
+import toastMessage from "@/utils/toastMessage";
 import { useNavigate } from "react-router-dom";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
@@ -16,11 +16,11 @@ const ForgotPassword = () => {
     setLoading(true);
     try {
       await authService.forgotPassword({ email });
-      message.success("OTP has been sent to your email.");
+      toastMessage.success("OTP has been sent to your email.");
       navigate("/reset-password", { state: { email } });
     } catch (error) {
       console.error("Failed to send reset link:", error);
-      message.error(error.response?.data?.message || error.message || "Failed to send reset link");
+      toastMessage.error(error.response?.data?.message || error.message || "Failed to send reset link");
     } finally {
       setLoading(false);
     }

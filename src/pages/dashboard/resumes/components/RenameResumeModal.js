@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Input, message } from "antd";
+import { Modal, Input } from "antd";
+import toastMessage from "@/utils/toastMessage";
 import { useUpdateCandidateResumeMutation } from "@/apis/resumeApi";
 
 const RenameResumeModal = ({ open, onClose, resume }) => {
@@ -41,10 +42,10 @@ const RenameResumeModal = ({ open, onClose, resume }) => {
         },
       }).unwrap();
       
-      message.success("Resume renamed successfully");
+      toastMessage.success("Resume renamed successfully");
       handleCancel();
     } catch (err) {
-      message.error(err?.data?.message || "Failed to rename resume");
+      toastMessage.error(err?.data?.message || "Failed to rename resume");
     }
   };
 

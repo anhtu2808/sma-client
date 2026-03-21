@@ -5,9 +5,7 @@ import Loading from "@/components/Loading";
 const SavedJobs = ({ jobs, isLoading, isError }) => {
   if (isLoading) {
     return (
-      <div className="flex justify-center py-16">
-        <Loading />
-      </div>
+      <Loading className="h-[50vh]" />
     );
   }
 

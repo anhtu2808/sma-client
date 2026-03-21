@@ -14,6 +14,7 @@ const FilesList = ({
   onOpenParseConsent,
   onOpenSetProfileConfirm,
   onDeleteResume,
+  onRename,
 }) => (
   <div className="bg-white dark:bg-surface-dark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
     <div className="flex items-center justify-between mb-4">
@@ -22,7 +23,7 @@ const FilesList = ({
     </div>
 
     {isLoadingResumes ? (
-      <Loading size={90} className="py-4" />
+      <Loading className="py-0" />
     ) : files.length === 0 ? (
       <p className="text-sm text-gray-500 dark:text-gray-400">No attached resume yet.</p>
     ) : (
@@ -60,6 +61,9 @@ const FilesList = ({
                     <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{file.name}</p>
                   )}
                   <div className="mt-1 flex items-center gap-2">
+                    {file.fileName && file.fileName !== file.name && (
+                      <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate">{file.fileName}</p>
+                    )}
                     <p className="text-xs text-gray-500 dark:text-gray-400">Uploaded: {file.uploadTime}</p>
                     <span
                       className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium ${statusView.className}`}
@@ -73,6 +77,16 @@ const FilesList = ({
                 </div>
               </div>
               <div className="flex items-center gap-1 flex-none">
+                <Button
+                  mode="ghost"
+                  size="sm"
+                  shape="rounded"
+                  btnIcon
+                  tooltip="Rename"
+                  onClick={() => onRename(file.id)}
+                >
+                  <i className="material-icons-round text-[18px]">edit</i>
+                </Button>
                 <Button
                   mode="ghost"
                   size="sm"

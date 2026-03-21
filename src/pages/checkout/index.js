@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, Navigate } from "react-router-dom";
-import { notification } from "antd";
+import toastMessage from "@/utils/toastMessage";
 import { useCreateSubscriptionMutation } from "@/apis/subscriptionApi";
 import { useGetPaymentStatusQuery } from "@/apis/paymentApi";
 import QRPaymentSection from "./components/QRPaymentSection";
@@ -31,18 +31,10 @@ const Checkout = () => {
             const status = statusRes.data.toUpperCase();
             if (status === "SUCCESS") {
                 setPaymentStatus("SUCCESS");
-                notification.success({
-                    message: "Payment Successful",
-                    description: `Your subscription has been activated successfully.`,
-                    placement: "topRight"
-                });
+                toastMessage.success(`Your subscription has been activated successfully.`);
             } else if (status === "FAILED") {
                 setPaymentStatus("FAILED");
-                notification.error({
-                    message: "Payment Failed",
-                    description: `We were unable to process your payment.`,
-                    placement: "topRight"
-                });
+                toastMessage.error(`We were unable to process your payment.`);
             }
         }
     }, [statusRes]);
@@ -68,11 +60,7 @@ const Checkout = () => {
                 setQrCodeUrl(res.data);
             }
         } catch (error) {
-            notification.error({
-                message: "Error Generating Payment",
-                description: "We couldn't generate the QR code at this time.",
-                placement: "topRight"
-            });
+            toastMessage.error("We couldn't generate the QR code at this time.");
         }
     };
 

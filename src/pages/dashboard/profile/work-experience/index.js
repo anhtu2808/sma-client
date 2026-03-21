@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { message } from "antd";
+import toastMessage from "@/utils/toastMessage";
 import { useCandidateDashboardProfileQuery } from "@/apis/candidateApi";
 import {
   useCreateResumeExperienceDetailMutation,
@@ -51,7 +51,7 @@ const WorkExperience = () => {
 
   const handleSubmit = async ({ experiencePayload, details }) => {
     if (!profileResumeId) {
-      message.error("No PROFILE resume found.");
+      toastMessage.error("No PROFILE resume found.");
       return;
     }
 
@@ -96,10 +96,10 @@ const WorkExperience = () => {
         }
       }
 
-      message.success(editingExperience?.id ? "Work experience updated successfully." : "Work experience added successfully.");
+      toastMessage.success(editingExperience?.id ? "Work experience updated successfully." : "Work experience added successfully.");
       closeModal();
     } catch (error) {
-      message.error(error?.data?.message || "Failed to save work experience.");
+      toastMessage.error(error?.data?.message || "Failed to save work experience.");
     }
   };
 

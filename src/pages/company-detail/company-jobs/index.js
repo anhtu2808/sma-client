@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { message, Button as AntButton } from 'antd';
+import { Button as AntButton } from 'antd';
+import toastMessage from "@/utils/toastMessage";
 import { useGetJobsQuery, useGetMarkedJobsQuery, useToggleMarkJobMutation } from '@/apis/jobApi';
 import JobCard from '@/components/JobCard';
 import Pagination from '@/components/Pagination';
@@ -35,7 +36,7 @@ const CompanyJobs = ({ companyId }) => {
 
     const handleBookmark = async (jobId) => {
         if (!hasAccessToken) {
-            message.warning('Please log in to mark jobs.');
+            toastMessage.warning('Please log in to mark jobs.');
             return;
         }
         if (bookmarkLoadingById[jobId]) return;
@@ -49,28 +50,25 @@ const CompanyJobs = ({ companyId }) => {
         try {
             await toggleMarkJob(jobId).unwrap();
             if (nextMarked) {
-                message.success({
-                    content: (
-                        <div className="flex items-center gap-4">
-                            <span>This job has been added to your Saved jobs.</span>
-                            <AntButton
-                                type="link"
-                                size="small"
-                                className="!p-0 !h-auto font-bold text-primary hover:text-primary/80"
-                                onClick={() => navigate('/dashboard/jobs?tab=saved')}
-                            >
-                                View now
-                            </AntButton>
-                        </div>
-                    ),
-                    duration: 5,
-                });
+                toastMessage.success(
+                    <div className="flex items-center gap-4">
+                        <span>This job has been added to your Saved jobs.</span>
+                        <AntButton
+                            type="link"
+                            size="small"
+                            className="!p-0 !h-auto font-bold text-primary hover:text-primary/80"
+                            onClick={() => navigate('/dashboard/jobs?tab=saved')}
+                        >
+                            View now
+                        </AntButton>
+                    </div>
+                );
             } else {
-                message.success('Job removed from Saved jobs.');
+                toastMessage.success('Job removed from Saved jobs.');
             }
         } catch (error) {
             setBookmarkOverrides((prev) => ({ ...prev, [jobId]: currentMarked }));
-            message.error(error?.data?.message || 'Failed to update marked job.');
+            toastMessage.error(error?.data?.message || 'Failed to update marked job.');
         } finally {
             setBookmarkLoadingById((prev) => ({ ...prev, [jobId]: false }));
         }

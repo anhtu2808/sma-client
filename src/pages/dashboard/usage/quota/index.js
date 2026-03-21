@@ -41,7 +41,7 @@ const Quota = ({ quotas, isQuotaLoading, isQuotaError }) => {
       </div>
 
       {isQuotaLoading ? (
-        <Loading />
+        <Loading className="py-0" />
       ) : isQuotaError ? (
         <p className="text-sm text-red-500">Failed to load quota data.</p>
       ) : quotas.length === 0 ? (
