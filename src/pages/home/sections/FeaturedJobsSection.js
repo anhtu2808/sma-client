@@ -11,24 +11,24 @@ const FeaturedJobsSection = () => {
         return rawJobs
             .filter(job => job.isHighlight === true)
             .map(job => {
-            const salary = job.salaryStart && job.salaryEnd
-                ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} VND`
-                : 'Thoả thuận';
+                const salary = job.salaryStart && job.salaryEnd
+                    ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} VND`
+                    : 'Thoả thuận';
 
-            const locationCity = job.locations?.length > 0
-                ? job.locations.map(l => l.city || l.name).filter(Boolean).join(', ')
-                : job.company?.country || '';
+                const locationCity = job.locations?.length > 0
+                    ? job.locations.map(l => l.city || l.name).filter(Boolean).join(', ')
+                    : job.company?.country || '';
 
-            return {
-                id: Number(job.id),
-                title: job.name,
-                company: job.company?.name || 'Unknown Company',
-                companyLogo: job.company?.logo,
-                salary,
-                locationCity,
-                isHot: job.isHighlight === true,
-            };
-        });
+                return {
+                    id: Number(job.id),
+                    title: job.name,
+                    company: job.company?.name || 'Unknown Company',
+                    companyLogo: job.company?.logo,
+                    salary,
+                    locationCity,
+                    isHot: job.isHighlight === true,
+                };
+            });
     }, [jobData]);
 
     // Skeleton card for loading state
@@ -76,7 +76,7 @@ const FeaturedJobsSection = () => {
                             >
                                 {/* HOT badge */}
                                 {job.isHot && (
-                                    <span className="absolute top-3 right-3 inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wide border border-primary/20">
+                                    <span className="absolute bottom-4 right-3 inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wide border border-primary/20">
                                         <span className="material-icons-round text-xs">local_fire_department</span>
                                         HOT
                                     </span>
