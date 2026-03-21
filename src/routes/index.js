@@ -27,6 +27,7 @@ import ApplicationSuccess from "@/pages/application/sucess";
 import Checkout from "@/pages/checkout";
 import MatchReport from "@/pages/match-report";
 import MatchingHistory from "@/pages/dashboard/matching-history";
+import ResetPassword from "@/pages/reset-password";
 
 
 export const routes = createBrowserRouter(
@@ -36,6 +37,7 @@ export const routes = createBrowserRouter(
                 <Route path="login" element={<Login />} />
                 <Route path="register" element={<Register />} />
                 <Route path="forgot-password" element={<ForgotPassword />} />
+                <Route path="reset-password" element={<ResetPassword />} />
             </Route>
             <Route element={<Layout />}>
                 <Route index element={<Home />} />

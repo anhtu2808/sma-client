@@ -201,11 +201,10 @@ const HeroSection = () => {
                                         <button
                                             type="button"
                                             onClick={() => handleSelectProvince('')}
-                                            className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition ${
-                                                !location
+                                            className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition ${!location
                                                     ? 'bg-primary/10 text-primary font-medium'
                                                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
-                                            }`}
+                                                }`}
                                         >
                                             All locations
                                         </button>
@@ -214,11 +213,10 @@ const HeroSection = () => {
                                                 key={province}
                                                 type="button"
                                                 onClick={() => handleSelectProvince(province)}
-                                                className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition ${
-                                                    location === province
+                                                className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition ${location === province
                                                         ? 'bg-primary/10 text-primary font-medium'
                                                         : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
-                                                }`}
+                                                    }`}
                                             >
                                                 {province}
                                             </button>

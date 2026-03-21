@@ -5,6 +5,15 @@ const DashboardPreviewSection = () => {
         <section className="py-20 bg-white dark:bg-background-dark">
             <div className="max-w-7xl mx-auto px-6">
                 <div className="relative mx-auto max-w-5xl">
+                    {/* Header */}
+                    <div className="text-center max-w-3xl mx-auto mb-14">
+                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                            Job Listing
+                        </h2>
+                        <p className="text-gray-500 dark:text-gray-400">
+                            Browse through the available job listings and find the perfect match for your skills and experience.
+                        </p>
+                    </div>
                     <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                         {/* Window Header */}
                         <div className="h-8 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex items-center px-4 space-x-2">
