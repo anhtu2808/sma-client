@@ -13,6 +13,7 @@ const ResetPassword = () => {
     const [email, setEmail] = useState("");
     const [otp, setOtp] = useState("");
     const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [isResetting, setIsResetting] = useState(false);
     const [isLoggingIn, setIsLoggingIn] = useState(false);
 
@@ -27,6 +28,11 @@ const ResetPassword = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (newPassword !== confirmPassword) {
+            message.error("Passwords do not match");
+            return;
+        }
 
         try {
             setIsResetting(true);
@@ -114,11 +120,23 @@ const ResetPassword = () => {
                             <label className="block text-[0.85rem] font-bold text-[#3a2b25] dark:text-gray-300">
                                 New Password
                             </label>
-                            <Input
-                                type="password"
+                            <Input.Password
                                 placeholder="••••••••"
                                 value={newPassword}
                                 onChange={(e) => setNewPassword(e.target.value)}
+                                required
+                                prefix={<span className="material-icons-round text-gray-400" style={{ fontSize: '20px' }}>lock</span>}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="block text-[0.85rem] font-bold text-[#3a2b25] dark:text-gray-300">
+                                Confirm Password
+                            </label>
+                            <Input.Password
+                                placeholder="••••••••"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
                                 required
                                 prefix={<span className="material-icons-round text-gray-400" style={{ fontSize: '20px' }}>lock</span>}
                             />
