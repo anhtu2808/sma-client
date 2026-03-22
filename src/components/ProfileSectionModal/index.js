@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal } from "antd";
+import { Modal, Tooltip } from "antd";
 
 const ProfileSectionModal = ({
   open,
@@ -9,6 +9,7 @@ const ProfileSectionModal = ({
   loadingText = "Saving...",
   submitText = "Save",
   submitDisabled = false,
+  submitTooltip,
   cancelText = "Cancel",
   width = 860,
   formId,
@@ -32,14 +33,18 @@ const ProfileSectionModal = ({
           {cancelText}
         </button>
 
-        <button
-          type={formId ? "submit" : "button"}
-          form={formId}
-          disabled={loading || submitDisabled}
-          className="px-5 h-10 rounded-lg bg-primary text-white hover:opacity-90 disabled:opacity-50"
-        >
-          {loading ? loadingText : submitText}
-        </button>
+        <Tooltip title={submitTooltip} color={submitDisabled ? "#ef4444" : undefined}>
+          <span>
+            <button
+              type={formId ? "submit" : "button"}
+              form={formId}
+              disabled={loading || submitDisabled}
+              className="px-5 h-10 rounded-lg bg-primary text-white hover:opacity-90 disabled:opacity-50"
+            >
+              {loading ? loadingText : submitText}
+            </button>
+          </span>
+        </Tooltip>
       </div>
     </Modal>
   );

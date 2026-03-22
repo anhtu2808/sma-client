@@ -203,6 +203,7 @@ export const resumeApi = api.injectEndpoints({
                 { type: "Resumes", id: RESUME_TYPES.ORIGINAL },
                 { type: "Resumes", id: RESUME_TYPES.TEMPLATE },
                 { type: "Resumes", id: "ALL" },
+                "FeatureUsage",
             ],
         }),
 

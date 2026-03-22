@@ -1,4 +1,5 @@
 import React from "react";
+import { Tooltip } from "antd";
 import Button from "@/components/Button";
 import Loading from "@/components/Loading";
 import { getParseStatusView, normalizeParseStatus } from "@/constant/attachment";
@@ -15,11 +16,25 @@ const FilesList = ({
   onOpenSetProfileConfirm,
   onDeleteResume,
   onRename,
+  uploadQuota,
 }) => (
   <div className="bg-white dark:bg-surface-dark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
     <div className="flex items-center justify-between mb-4">
       <h3 className="text-base font-semibold text-gray-900 dark:text-white">Attached Files</h3>
-      <span className="text-xs text-gray-500 dark:text-gray-400">{files.length} file(s)</span>
+      {uploadQuota ? (
+        <div className="flex items-center gap-1">
+          <span className={`text-sm font-semibold ${uploadQuota.exhausted ? "text-red-600" : "text-gray-600 dark:text-gray-400"}`}>
+            {uploadQuota.used}/{uploadQuota.max}
+          </span>
+          <Tooltip title="Upgrade your plan to unlock more uploads">
+            <span className={`material-icons-round text-[16px] cursor-help ${uploadQuota.exhausted ? "text-red-400" : "text-gray-400 dark:text-gray-500"}`}>
+              info
+            </span>
+          </Tooltip>
+        </div>
+      ) : (
+        <span className="text-xs text-gray-500 dark:text-gray-400">{files.length} file(s)</span>
+      )}
     </div>
 
     {isLoadingResumes ? (

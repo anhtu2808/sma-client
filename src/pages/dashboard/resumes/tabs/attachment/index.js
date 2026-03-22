@@ -10,6 +10,7 @@ import {
   useUploadCandidateResumeMutation,
   useUploadFilesMutation,
 } from "@/apis/resumeApi";
+import { useGetFeatureUsageQuery } from "@/apis/featureUsageApi";
 import { RESUME_TYPES } from "@/constant";
 import FilesList from "./files-list";
 import RenameResumeModal from "../../components/RenameResumeModal";
@@ -41,6 +42,14 @@ const AttachmentsTab = () => {
     resumeId: null,
   });
   const [isConsentLoading, setIsConsentLoading] = useState(false);
+
+  const { data: featureUsageData } = useGetFeatureUsageQuery();
+
+  const uploadFeature = useMemo(
+    () => (featureUsageData || []).find((item) => item?.featureKey === "CV_UPLOAD_LIMIT"),
+    [featureUsageData]
+  );
+  const uploadExhausted = uploadFeature?.maxQuota != null && uploadFeature?.remaining === 0;
 
   const { data: resumes = [], isLoading: isLoadingResumes } = useGetCandidateResumesQuery({
     type: RESUME_TYPES.ORIGINAL,
@@ -380,7 +389,7 @@ const AttachmentsTab = () => {
         </div>
       </div>
 
-      <UploadPanel inputRef={inputRef} isUploading={isUploading} onUploadFile={handleUploadFile} />
+      <UploadPanel inputRef={inputRef} isUploading={isUploading} onUploadFile={handleUploadFile} disabled={uploadExhausted} />
 
       <FilesList
         files={files}
@@ -397,6 +406,11 @@ const AttachmentsTab = () => {
           const resume = resumes.find((r) => r.id === fileId);
           if (resume) setRenameResume(resume);
         }}
+        uploadQuota={uploadFeature?.maxQuota != null ? {
+          used: uploadFeature.maxQuota - (uploadFeature.remaining ?? 0),
+          max: uploadFeature.maxQuota,
+          exhausted: uploadExhausted,
+        } : null}
       />
 
       <ParseConsentModal
@@ -405,6 +419,7 @@ const AttachmentsTab = () => {
         isConsentLoading={isConsentLoading}
         onCancel={handleConsentCancel}
         onSubmit={handleConsentSubmit}
+        featureUsageData={featureUsageData}
       />
 
       <RenameResumeModal

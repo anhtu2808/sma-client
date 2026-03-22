@@ -1,6 +1,6 @@
 import React from "react";
 
-const UploadPanel = ({ inputRef, isUploading, onUploadFile }) => (
+const UploadPanel = ({ inputRef, isUploading, onUploadFile, disabled }) => (
   <div className="bg-white dark:bg-surface-dark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
     <input
       ref={inputRef}
@@ -11,7 +11,7 @@ const UploadPanel = ({ inputRef, isUploading, onUploadFile }) => (
     />
     <button
       type="button"
-      disabled={isUploading}
+      disabled={disabled || isUploading}
       onClick={() => inputRef.current?.click()}
       className="w-full rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 px-6 py-14 text-center hover:border-primary transition-colors disabled:cursor-not-allowed disabled:opacity-70"
     >
