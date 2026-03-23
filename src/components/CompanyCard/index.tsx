@@ -1,4 +1,4 @@
-
+import { Building2 } from 'lucide-react';
 import PropTypes from 'prop-types';
 
 const CompanyCard = ({
@@ -36,9 +36,7 @@ const CompanyCard = ({
                             className="w-full h-full object-contain"
                         />
                     ) : (
-                        <span className="text-xl font-bold text-slate-400">
-                            {name?.charAt(0) || 'C'}
-                        </span>
+                        <Building2 className="text-slate-400" size={24} />
                     )}
                 </div>
             </div>

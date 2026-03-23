@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Modal } from "antd";
 import toastMessage from "@/utils/toastMessage";
 import { useNavigate, useParams } from "react-router-dom";
@@ -11,38 +11,11 @@ import {
 import { useStartMatchingDetailMutation } from "@/apis/matchingApi";
 import Loading from "@/components/Loading";
 import { RESUME_TYPES } from "@/constant";
-import { getErrorMessage, normalizeParseStatus } from "@/constant/attachment";
+import { getErrorMessage } from "@/constant/attachment";
 import { getEvaluationHistoryId, getResumeMatchMode } from "./matchHistory";
 import ResumeOption from "./resume-option";
 
 const isSupportedResumeFile = (fileName = "") => /\.(pdf|doc|docx)$/i.test(`${fileName}`.trim());
-
-const mergeAndSortResumes = (profileResumes = [], originalResumes = []) => {
-  const mergedMap = new Map();
-
-  [...profileResumes, ...originalResumes].forEach((resume) => {
-    if (!resume?.id) return;
-    const existing = mergedMap.get(resume.id);
-    if (!existing || resume.type === "PROFILE") {
-      mergedMap.set(resume.id, resume);
-    }
-  });
-
-  return [...mergedMap.values()]
-    .map((resume) => ({
-      ...resume,
-      parseStatus: normalizeParseStatus(resume.parseStatus || "WAITING"),
-    }))
-    .sort((left, right) => {
-      const leftParsed = left.parseStatus === "FINISH";
-      const rightParsed = right.parseStatus === "FINISH";
-      if (leftParsed !== rightParsed) return leftParsed ? -1 : 1;
-
-      if (left.type === "PROFILE" && right.type !== "PROFILE") return -1;
-      if (left.type !== "PROFILE" && right.type === "PROFILE") return 1;
-      return Number(right.id || 0) - Number(left.id || 0);
-    });
-};
 
 const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
   const { id: routeJobId } = useParams();
@@ -56,18 +29,9 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
   const [selectedResumeId, setSelectedResumeId] = useState(null);
 
   const {
-    data: profileResumes = [],
-    isLoading: isProfileLoading,
-    isFetching: isProfileFetching,
-  } = useGetCandidateResumesQuery(
-    { type: RESUME_TYPES.PROFILE, jobId: hasValidJobId ? normalizedJobId : undefined },
-    { skip: !open }
-  );
-
-  const {
-    data: originalResumes = [],
-    isLoading: isOriginalLoading,
-    isFetching: isOriginalFetching,
+    data: resumes = [],
+    isLoading: isLoadingResumes,
+    isFetching: isFetchingResumes,
   } = useGetCandidateResumesQuery(
     { type: RESUME_TYPES.ORIGINAL, jobId: hasValidJobId ? normalizedJobId : undefined },
     { skip: !open }
@@ -78,12 +42,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
   const [parseCandidateResume, { isLoading: isParsingResume }] = useParseCandidateResumeMutation();
   const [startMatchingDetail, { isLoading: isStartingMatching }] = useStartMatchingDetailMutation();
 
-  const isLoadingResumes = isProfileLoading || isOriginalLoading || isProfileFetching || isOriginalFetching;
-
-  const resumes = useMemo(
-    () => mergeAndSortResumes(profileResumes, originalResumes),
-    [profileResumes, originalResumes]
-  );
+  const isResumesLoading = isLoadingResumes || isFetchingResumes;
 
   useEffect(() => {
     if (!open) {
@@ -235,7 +194,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
       </div>
 
       <div className="-mr-3 max-h-[62vh] overflow-y-auto pr-3 pt-6">
-        {isLoadingResumes ? (
+        {isResumesLoading ? (
           <Loading size={80} className="py-8" />
         ) : resumes.length === 0 ? (
           <div className="rounded-xl border border-gray-200 bg-gray-50 p-6 text-center">

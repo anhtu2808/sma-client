@@ -1,4 +1,5 @@
 import Button from '@/components/Button';
+import { Building2 } from 'lucide-react';
 import PropTypes from 'prop-types';
 
 const JobCard = ({
@@ -49,9 +50,7 @@ const JobCard = ({
                         src={companyLogo}
                     />
                 ) : (
-                    <span className="text-2xl font-bold text-slate-400 dark:text-[#8c6b5d]">
-                        {company?.charAt(0) || 'C'}
-                    </span>
+                    <Building2 className="text-slate-400 dark:text-[#8c6b5d]" size={28} />
                 )}
             </div>
 

@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Building2 } from 'lucide-react';
 import Button from '@/components/Button';
 import PropTypes from 'prop-types';
 
@@ -18,8 +19,8 @@ const CompanyHeader = ({ company }) => {
                             className="w-full h-full object-contain rounded-xl"
                         />
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-slate-50 dark:bg-white/5 text-4xl font-bold text-slate-400">
-                            {company.name?.charAt(0) || 'C'}
+                        <div className="w-full h-full flex items-center justify-center bg-slate-50 dark:bg-white/5">
+                            <Building2 className="text-slate-400" size={40} />
                         </div>
                     )}
                 </div>

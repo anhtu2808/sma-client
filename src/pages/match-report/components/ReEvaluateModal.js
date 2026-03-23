@@ -19,33 +19,6 @@ dayjs.extend(relativeTime);
 const isSupportedResumeFile = (fileName = "") =>
   /\.(pdf|doc|docx)$/i.test(`${fileName}`.trim());
 
-const mergeAndSortResumes = (profileResumes = [], originalResumes = []) => {
-  const mergedMap = new Map();
-
-  [...profileResumes, ...originalResumes].forEach((resume) => {
-    if (!resume?.id) return;
-    const existing = mergedMap.get(resume.id);
-    if (!existing || resume.type === "PROFILE") {
-      mergedMap.set(resume.id, resume);
-    }
-  });
-
-  return [...mergedMap.values()]
-    .map((resume) => ({
-      ...resume,
-      parseStatus: normalizeParseStatus(resume.parseStatus || "WAITING"),
-    }))
-    .sort((left, right) => {
-      const leftParsed = left.parseStatus === "FINISH";
-      const rightParsed = right.parseStatus === "FINISH";
-      if (leftParsed !== rightParsed) return leftParsed ? -1 : 1;
-
-      if (left.type === "PROFILE" && right.type !== "PROFILE") return -1;
-      if (left.type !== "PROFILE" && right.type === "PROFILE") return 1;
-      return Number(right.id || 0) - Number(left.id || 0);
-    });
-};
-
 const ResumeOption = ({ resume, isSelected, onSelect }) => {
   const status = normalizeParseStatus(resume?.parseStatus);
   const isParsed = status === "FINISH";
@@ -73,11 +46,6 @@ const ResumeOption = ({ resume, isSelected, onSelect }) => {
             <h4 className="text-base font-semibold text-gray-900 truncate">
               {resume.resumeName || resume.fileName || `Resume #${resume.id}`}
             </h4>
-            {resume.type === "PROFILE" && (
-              <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-semibold text-blue-700">
-                Built-in
-              </span>
-            )}
           </div>
 
           <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-600">
@@ -121,13 +89,7 @@ const ReEvaluateModal = ({ open, onClose, jobId }) => {
   const [selectedResumeId, setSelectedResumeId] = useState(null);
   const [uploadedResume, setUploadedResume] = useState(null);
 
-  const { data: profileResumes = [], isLoading: isProfileLoading } =
-    useGetCandidateResumesQuery(
-      { type: RESUME_TYPES.PROFILE, jobId },
-      { skip: !open || !jobId }
-    );
-
-  const { data: originalResumes = [], isLoading: isOriginalLoading } =
+  const { data: resumes = [], isLoading: isLoadingResumes } =
     useGetCandidateResumesQuery(
       { type: RESUME_TYPES.ORIGINAL, jobId },
       { skip: !open || !jobId }
@@ -140,12 +102,6 @@ const ReEvaluateModal = ({ open, onClose, jobId }) => {
   const [startMatchingDetail, { isLoading: isStartingMatching }] =
     useStartMatchingDetailMutation();
 
-  const resumes = useMemo(
-    () => mergeAndSortResumes(profileResumes, originalResumes),
-    [profileResumes, originalResumes]
-  );
-
-  const isLoadingResumes = isProfileLoading || isOriginalLoading;
 
   useEffect(() => {
     if (!open) {

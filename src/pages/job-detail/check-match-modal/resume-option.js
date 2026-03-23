@@ -48,11 +48,6 @@ const ResumeOption = ({
             <h4 className="text-base font-semibold text-gray-900 truncate">
               {resume.resumeName || resume.fileName || `Resume #${resume.id}`}
             </h4>
-            {resume.type === "PROFILE" && (
-              <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-semibold text-blue-700">
-                Built-in
-              </span>
-            )}
             {hasEvaluationHistory && (
               <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
                 Matched before

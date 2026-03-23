@@ -125,42 +125,14 @@ const Plans = ({ plans = [], currentPlanId = null }) => {
 
   const sortedPlans = useMemo(() => {
     if (!Array.isArray(plans)) return [];
-    const getBaseMonthly = (plan) => {
-      const prices = Array.isArray(plan?.planPrices) ? plan.planPrices : [];
-      const activePrices = prices.filter((price) => price?.isActive !== false);
-      const lifetime = activePrices.find((price) => isLifetimeUnit(price?.unit));
-      if (lifetime) {
-        return {
-          price: Number(lifetime.salePrice ?? lifetime.originalPrice ?? 0),
-          hasPrice: true,
-        };
-      }
-      const priced = activePrices
-        .map((price) => ({
-          months: toMonths(price.duration, price.unit),
-          total: Number(price.salePrice ?? price.originalPrice ?? 0),
-        }))
-        .filter((price) => price.months > 0)
-        .sort((a, b) => a.months - b.months);
-      if (priced.length === 0) {
-        return { price: Number.POSITIVE_INFINITY, hasPrice: false };
-      }
-      const base = priced[0];
-      return {
-        price: base.total / base.months,
-        hasPrice: true,
-      };
-    };
     return [...plans].sort((a, b) => {
       const aDefault = Boolean(a?.isDefault);
       const bDefault = Boolean(b?.isDefault);
       if (aDefault !== bDefault) return aDefault ? -1 : 1;
-      const aPrice = getBaseMonthly(a);
-      const bPrice = getBaseMonthly(b);
-      if (aPrice.price !== bPrice.price) return aPrice.price - bPrice.price;
-      const aName = String(a?.name || "");
-      const bName = String(b?.name || "");
-      return aName.localeCompare(bName);
+      const aLevel = a?.planLevel ?? Number.MAX_SAFE_INTEGER;
+      const bLevel = b?.planLevel ?? Number.MAX_SAFE_INTEGER;
+      if (aLevel !== bLevel) return aLevel - bLevel;
+      return String(a?.name || "").localeCompare(String(b?.name || ""));
     });
   }, [plans]);
 

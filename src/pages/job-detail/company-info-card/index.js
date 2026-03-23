@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
+import { Building2 } from 'lucide-react';
 import { useGetJobByIdQuery } from '@/apis/jobApi';
 
 const CompanyInfoCard = () => {
@@ -24,7 +25,7 @@ const CompanyInfoCard = () => {
                     {company.logo ? (
                         <img src={company.logo} alt={company.name} className="w-full h-full object-cover" />
                     ) : (
-                        <span className="text-white font-bold text-xl">{company.name.charAt(0)}</span>
+                        <Building2 className="text-white" size={24} />
                     )}
                 </div>
                 <div>

@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Building2 } from 'lucide-react';
 import { useGetJobsQuery } from '@/apis/jobApi';
 
 const FeaturedJobsSection = () => {
@@ -93,9 +94,7 @@ const FeaturedJobsSection = () => {
                                                 className="w-full h-full object-contain"
                                             />
                                         ) : (
-                                            <span className="text-lg font-bold text-gray-400 dark:text-gray-600">
-                                                {job.company?.charAt(0) || 'C'}
-                                            </span>
+                                            <Building2 className="text-gray-400 dark:text-gray-600" size={22} />
                                         )}
                                     </div>
 

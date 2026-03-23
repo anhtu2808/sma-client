@@ -26,7 +26,10 @@ const FilesList = ({
           <span className={`text-sm font-semibold ${uploadQuota.exhausted ? "text-red-600" : "text-gray-600 dark:text-gray-400"}`}>
             {uploadQuota.used}/{uploadQuota.max}
           </span>
-          <Tooltip title="Upgrade your plan to unlock more uploads">
+          <Tooltip title={uploadQuota.exhausted
+            ? "Upload limit reached. Upload a new resume to replace an existing one."
+            : "Upgrade your plan to unlock more uploads"
+          }>
             <span className={`material-icons-round text-[16px] cursor-help ${uploadQuota.exhausted ? "text-red-400" : "text-gray-400 dark:text-gray-500"}`}>
               info
             </span>

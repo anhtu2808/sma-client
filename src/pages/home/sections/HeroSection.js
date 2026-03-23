@@ -1,6 +1,7 @@
 import Button from '@/components/Button';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Building2 } from 'lucide-react';
 import { useGetJobsQuery } from '@/apis/jobApi';
 import { VIETNAM_PROVINCES } from '@/constant/job';
 import FeaturedJobsSection from './FeaturedJobsSection';
@@ -279,7 +280,7 @@ const HeroSection = () => {
                                                         {job.companyLogo ? (
                                                             <img src={job.companyLogo} alt={job.company} className="w-full h-full object-contain" />
                                                         ) : (
-                                                            <span className="text-sm font-bold text-gray-400">{job.company?.charAt(0) || 'C'}</span>
+                                                            <Building2 className="text-gray-400" size={16} />
                                                         )}
                                                     </div>
                                                     <div className="min-w-0 flex-1">

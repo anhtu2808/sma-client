@@ -17,6 +17,7 @@ import RenameResumeModal from "../../components/RenameResumeModal";
 import ParseConsentModal from "./parse-consent-modal";
 import SetProfileConfirmModal from "./set-profile-confirm-modal";
 import UploadPanel from "./upload-panel";
+import ReplaceResumeModal from "./replace-resume-modal";
 import {
   POLL_INTERVAL_MS,
   POLL_TIMEOUT_MS,
@@ -42,6 +43,7 @@ const AttachmentsTab = () => {
     resumeId: null,
   });
   const [isConsentLoading, setIsConsentLoading] = useState(false);
+  const [replaceModal, setReplaceModal] = useState({ open: false, pendingUploadPayload: null });
 
   const { data: featureUsageData } = useGetFeatureUsageQuery();
 
@@ -244,12 +246,16 @@ const AttachmentsTab = () => {
         resumeUrl: uploadedFile.downloadUrl,
       };
 
-      setConsentModal({
-        open: true,
-        mode: "upload",
-        pendingUploadPayload: payload,
-        resumeId: null,
-      });
+      if (uploadExhausted) {
+        setReplaceModal({ open: true, pendingUploadPayload: payload });
+      } else {
+        setConsentModal({
+          open: true,
+          mode: "upload",
+          pendingUploadPayload: payload,
+          resumeId: null,
+        });
+      }
     } catch (error) {
       toastMessage.error(getErrorMessage(error, "Upload resume failed"));
     } finally {
@@ -312,6 +318,27 @@ const AttachmentsTab = () => {
       resetConsentModal();
       setIsConsentLoading(false);
     }
+  };
+
+  const handleReplaceSelect = async (resumeIdToDelete) => {
+    try {
+      setIsConsentLoading(true);
+      stopPolling(resumeIdToDelete);
+      await deleteCandidateResume({ resumeId: resumeIdToDelete }).unwrap();
+
+      const payload = replaceModal.pendingUploadPayload;
+      setReplaceModal({ open: false, pendingUploadPayload: null });
+      setConsentModal({ open: true, mode: "upload", pendingUploadPayload: payload, resumeId: null });
+    } catch (error) {
+      toastMessage.error(getErrorMessage(error, "Failed to replace resume."));
+    } finally {
+      setIsConsentLoading(false);
+    }
+  };
+
+  const handleReplaceCancel = () => {
+    if (isConsentLoading) return;
+    setReplaceModal({ open: false, pendingUploadPayload: null });
   };
 
   const handleDeleteResume = (resumeId) => {
@@ -389,7 +416,7 @@ const AttachmentsTab = () => {
         </div>
       </div>
 
-      <UploadPanel inputRef={inputRef} isUploading={isUploading} onUploadFile={handleUploadFile} disabled={uploadExhausted} />
+      <UploadPanel inputRef={inputRef} isUploading={isUploading} onUploadFile={handleUploadFile} exhausted={uploadExhausted} />
 
       <FilesList
         files={files}
@@ -426,6 +453,14 @@ const AttachmentsTab = () => {
         open={Boolean(renameResume)}
         onClose={() => setRenameResume(null)}
         resume={renameResume}
+      />
+
+      <ReplaceResumeModal
+        open={replaceModal.open}
+        files={files}
+        loading={isConsentLoading}
+        onSelect={handleReplaceSelect}
+        onCancel={handleReplaceCancel}
       />
 
       <SetProfileConfirmModal

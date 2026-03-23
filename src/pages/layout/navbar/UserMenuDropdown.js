@@ -109,9 +109,9 @@ const UserMenuDropdown = () => {
           size={36}
           src={avatar || undefined}
           className="bg-gray-800 text-white font-semibold"
-        >
-          {!avatar ? avatarInitial : null}
-        </Avatar>
+          icon={!avatar ? <span className="material-icons-round text-lg text-gray-400">person</span> : undefined}
+        />
+
         <span className="material-icons-round text-gray-500 text-lg">expand_more</span>
       </button>
     </Dropdown>
