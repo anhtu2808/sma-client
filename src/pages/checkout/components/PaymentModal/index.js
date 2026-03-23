@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useCreateSubscriptionMutation } from "@/apis/subscriptionApi";
 import { useGetPaymentStatusQuery } from "@/apis/paymentApi";
 import Loading from "@/components/Loading";
@@ -83,7 +84,7 @@ const PaymentModal = ({ isOpen, onClose, plan, selectedDuration }) => {
 
     // Show success state
     if (paymentStatus === "SUCCESS") {
-        return (
+        return createPortal(
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50" onClick={handleClose}>
                 <div
                     className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden pb-6"
@@ -100,13 +101,14 @@ const PaymentModal = ({ isOpen, onClose, plan, selectedDuration }) => {
                         </Button>
                     </div>
                 </div>
-            </div>
+            </div>,
+            document.body
         );
     }
 
     // Show failed state
     if (paymentStatus === "FAILED") {
-        return (
+        return createPortal(
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50" onClick={handleClose}>
                 <div
                     className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden pb-6"
@@ -128,11 +130,12 @@ const PaymentModal = ({ isOpen, onClose, plan, selectedDuration }) => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>,
+            document.body
         );
     }
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50" onClick={handleClose}>
             <div
                 className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden pb-6"
@@ -249,7 +252,8 @@ const PaymentModal = ({ isOpen, onClose, plan, selectedDuration }) => {
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 
