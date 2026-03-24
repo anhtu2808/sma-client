@@ -126,10 +126,6 @@ const PaymentModal = ({ isOpen, onClose, plan, selectedDuration }) => {
                             <span className="material-icons-round text-primary text-sm">check_circle</span>
                             <span className="text-primary font-medium text-sm">Cancel anytime</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <span className="material-icons-round text-[#8492a6] text-sm">security</span>
-                            <span className="text-[#8492a6] text-sm">7-day money-back guarantee</span>
-                        </div>
                     </div>
 
                     {/* Payment Instructions */}

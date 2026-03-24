@@ -86,17 +86,17 @@ const Navbar = () => {
                 mode="secondary"
                 size="md"
                 className="hidden sm:inline-flex"
-                onClick={() => navigate('/register')}
+                onClick={() => navigate('/login')}
               >
-                Sign up
+                Sign in
               </Button>
               <Button
                 mode="primary"
                 size="md"
                 glow
-                onClick={() => navigate('/login')}
+                onClick={() => navigate('/register')}
               >
-                Sign in
+                Sign up
               </Button>
             </div>
           ) : (
