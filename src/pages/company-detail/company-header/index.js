@@ -3,6 +3,7 @@ import React from 'react';
 import { Building2 } from 'lucide-react';
 import Button from '@/components/Button';
 import PropTypes from 'prop-types';
+import { getIndustryLabel } from '@/constant/job';
 
 const CompanyHeader = ({ company }) => {
     if (!company) return null;
@@ -39,7 +40,7 @@ const CompanyHeader = ({ company }) => {
                                 {company.companyIndustry && (
                                     <div className="flex items-center gap-2">
                                         <span className="material-icons-round text-[20px]">business</span>
-                                        <span>{company.companyIndustry}</span>
+                                        <span>{getIndustryLabel(company.companyIndustry)}</span>
                                     </div>
                                 )}
                                 {company.country && (

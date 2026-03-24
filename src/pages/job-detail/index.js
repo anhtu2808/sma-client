@@ -47,7 +47,7 @@ const JobDetail = () => {
                             <div className="p-6 md:p-8 border-b border-gray-100">
                                 <Header />
                                 <p className="text-gray-600 text-base mb-4">
-                                    <Link to={`/companies/${jobData.company?.name || "Unknown Company"}`} className="font-semibold text-gray-900 hover:text-primary">
+                                    <Link to={`/companies/${jobData.company?.id}`} className="font-semibold text-gray-900 hover:text-primary">
                                         {jobData.company?.name || "Unknown Company"}
                                     </Link>
                                     {jobData.uploadTime && <span className="ml-2 text-gray-400">• Posted {new Date(jobData.uploadTime).toLocaleDateString()}</span>}

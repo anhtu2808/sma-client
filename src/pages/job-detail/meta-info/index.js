@@ -42,6 +42,12 @@ const MetaInfo = () => {
                 <span className="material-icons-round text-gray-400 text-[20px]">apartment</span>
                 <span>{apiJob.workingModel}</span>
             </div>
+            {apiJob.quantity > 0 && (
+                <div className="flex items-center gap-2">
+                    <span className="material-icons-round text-gray-400 text-[20px]">people</span>
+                    <span>{apiJob.quantity} positions</span>
+                </div>
+            )}
             {expDate && (
                 <div className="flex items-center gap-2">
                     <span className="material-icons-round text-gray-400 text-[20px]">event</span>
