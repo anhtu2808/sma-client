@@ -7,8 +7,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build SMA Client
+  deploy:
+    name: Build & Deploy SMA Employer
     runs-on: ubuntu-latest
     environment: PROD
 
@@ -24,32 +24,11 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Build SMA Client
+      - name: Build
         env:
           REACT_APP_API_URL: ${{ vars.DOMAIN }}
         run: |
-          echo "Building with API URL: $REACT_APP_API_URL"
           CI=false npm run build
-
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: sma-client-build
-          path: build/
-          retention-days: 1
-
-  deploy:
-    name: Deploy to PROD Server
-    runs-on: ubuntu-latest
-    environment: PROD
-    needs: build
-
-    steps:
-      - name: Download Build Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: sma-client-build
-          path: build
 
       - name: Copy Build Files to Server
         uses: appleboy/scp-action@master
@@ -58,7 +37,7 @@ jobs:
           username: root
           key: ${{ secrets.SECRET_KEY }}
           source: "build/*"
-          target: "/var/www/sma-client"
+          target: "/var/www/sma-employer"
           strip_components: 1
 
       - name: Finalize Deployment
@@ -68,5 +47,4 @@ jobs:
           username: root
           key: ${{ secrets.SECRET_KEY }}
           script: |
-            chown -R www-data:www-data /var/www/sma-client
-            echo "Deploy SMA Client frontend to PROD environment successfully!"
+            chown -R www-data:www-data /var/www/sma-employer
