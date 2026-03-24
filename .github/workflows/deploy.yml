@@ -8,7 +8,7 @@ on:
 
 jobs:
   deploy:
-    name: Build & Deploy SMA Employer
+    name: Build & Deploy SMA Client
     runs-on: ubuntu-latest
     environment: PROD
 
@@ -24,7 +24,7 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Build
+      - name: Build SMA Client
         env:
           REACT_APP_API_URL: ${{ vars.DOMAIN }}
         run: |
@@ -37,7 +37,7 @@ jobs:
           username: root
           key: ${{ secrets.SECRET_KEY }}
           source: "build/*"
-          target: "/var/www/sma-employer"
+          target: "/var/www/sma-client"
           strip_components: 1
 
       - name: Finalize Deployment
@@ -47,4 +47,4 @@ jobs:
           username: root
           key: ${{ secrets.SECRET_KEY }}
           script: |
-            chown -R www-data:www-data /var/www/sma-employer
+            chown -R www-data:www-data /var/www/sma-client
