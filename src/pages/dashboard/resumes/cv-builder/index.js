@@ -111,24 +111,31 @@ export default function CvBuilder({ onBack }) {
         try {
             const element = pdfRef.current;
             const canvas = await html2canvas(element, { scale: 2, useCORS: true, logging: false });
-            const imgData = canvas.toDataURL("image/png");
+            const imgData = canvas.toDataURL("image/jpeg", 0.8);
             const pdf = new jsPDF("p", "mm", "a4");
             const pdfWidth = pdf.internal.pageSize.getWidth();
             const pdfHeight = pdf.internal.pageSize.getHeight();
             const imgHeight = (canvas.height * pdfWidth) / canvas.width;
             let heightLeft = imgHeight, position = 0;
-            pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
+            pdf.addImage(imgData, "JPEG", 0, position, pdfWidth, imgHeight);
             heightLeft -= pdfHeight;
             while (heightLeft > 0) {
                 position -= pdfHeight;
                 pdf.addPage();
-                pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
+                pdf.addImage(imgData, "JPEG", 0, position, pdfWidth, imgHeight);
                 heightLeft -= pdfHeight;
+            }
+
+            const pdfBlob = pdf.output("blob");
+            const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+            if (pdfBlob.size > MAX_FILE_SIZE) {
+                toastMessage.error("Exported PDF exceeds 10MB. Please reduce CV content and try again.");
+                return;
             }
 
             const fileName = `${cvData.personalInfo?.fullName || "Resume"}_CV.pdf`;
             const formData = new FormData();
-            formData.append("files", new File([pdf.output("blob")], fileName, { type: "application/pdf" }));
+            formData.append("files", new File([pdfBlob], fileName, { type: "application/pdf" }));
             const uploadResult = await uploadFiles(formData).unwrap();
             const uploadedUrl = (Array.isArray(uploadResult) ? uploadResult[0] : uploadResult)?.downloadUrl;
             if (!uploadedUrl) throw new Error("Upload failed");
