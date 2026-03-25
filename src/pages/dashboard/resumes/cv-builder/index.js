@@ -110,19 +110,45 @@ export default function CvBuilder({ onBack }) {
         setIsExporting(true);
         try {
             const element = pdfRef.current;
+
+            // Convert cross-origin avatar to inline base64 so html2canvas can render it
+            const avatarImg = element.querySelector('img[alt="Avatar"]');
+            let originalSrc = null;
+            if (avatarImg && avatarImg.src && !avatarImg.src.startsWith('data:')) {
+                originalSrc = avatarImg.src;
+                try {
+                    const response = await fetch(avatarImg.src);
+                    const blob = await response.blob();
+                    const dataUrl = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result);
+                        reader.readAsDataURL(blob);
+                    });
+                    avatarImg.src = dataUrl;
+                } catch (e) {
+                    console.warn("Could not convert avatar to base64, it may be missing in PDF:", e);
+                }
+            }
+
             const canvas = await html2canvas(element, { scale: 2, useCORS: true, logging: false });
-            const imgData = canvas.toDataURL("image/jpeg", 0.8);
+
+            // Restore original avatar src after capture
+            if (originalSrc) {
+                avatarImg.src = originalSrc;
+            }
+
+            const imgData = canvas.toDataURL("image/png");
             const pdf = new jsPDF("p", "mm", "a4");
             const pdfWidth = pdf.internal.pageSize.getWidth();
             const pdfHeight = pdf.internal.pageSize.getHeight();
             const imgHeight = (canvas.height * pdfWidth) / canvas.width;
             let heightLeft = imgHeight, position = 0;
-            pdf.addImage(imgData, "JPEG", 0, position, pdfWidth, imgHeight);
+            pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
             heightLeft -= pdfHeight;
             while (heightLeft > 0) {
                 position -= pdfHeight;
                 pdf.addPage();
-                pdf.addImage(imgData, "JPEG", 0, position, pdfWidth, imgHeight);
+                pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
                 heightLeft -= pdfHeight;
             }
 

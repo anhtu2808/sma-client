@@ -34,7 +34,7 @@ const ProfileSectionModal = ({
           {cancelText}
         </button>
 
-        <Tooltip title={submitTooltip} color={submitDisabled ? "#ef4444" : undefined}>
+        <Tooltip title={!loading ? submitTooltip : undefined} color={submitDisabled && !loading ? "#ef4444" : undefined}>
           <span>
             <button
               type={formId ? "submit" : "button"}

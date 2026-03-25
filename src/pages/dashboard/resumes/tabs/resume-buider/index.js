@@ -80,7 +80,7 @@ const ResumeBuilderTab = () => {
             {/* Create New Card */}
             <div
               onClick={() => navigate('/dashboard/resumes/templates')}
-              className="rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex flex-col items-center justify-center h-full cursor-pointer hover:border-primary hover:bg-orange-50/50 dark:hover:bg-gray-700/50 transition-all group"
+              className="rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex flex-col items-center justify-center min-h-[450px] h-full cursor-pointer hover:border-primary hover:bg-orange-50/50 dark:hover:bg-gray-700/50 transition-all group"
             >
               <div className="w-12 h-12 rounded-full bg-orange-100 dark:bg-gray-700 flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-white transition-colors">
                 <span className="material-icons-round text-[24px] text-primary group-hover:text-white">add</span>
