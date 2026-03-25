@@ -182,6 +182,20 @@ export const resumeApi = api.injectEndpoints({
             ],
         }),
 
+        exportResumeToOriginal: builder.mutation({
+            query: ({ resumeId, payload }) => ({
+                url: `${API_VERSION}/resumes/${resumeId}/export`,
+                method: "POST",
+                body: payload,
+            }),
+            transformResponse: (response) => response?.data ?? response,
+            invalidatesTags: [
+                { type: "Resumes", id: RESUME_TYPES.ORIGINAL },
+                { type: "Resumes", id: RESUME_TYPES.TEMPLATE },
+                { type: "Resumes", id: "ALL" },
+            ],
+        }),
+
         parseCandidateResume: builder.mutation({
             query: ({ resumeId }) => ({
                 url: `${API_VERSION}/resumes/${resumeId}/parse`,
@@ -543,6 +557,7 @@ export const {
     useUploadCandidateResumeMutation,
     useCreateResumeBuilderMutation,
     useCloneResumeBuilderMutation,
+    useExportResumeToOriginalMutation,
     useParseCandidateResumeMutation,
     useDeleteCandidateResumeMutation,
     useUpdateCandidateResumeMutation,

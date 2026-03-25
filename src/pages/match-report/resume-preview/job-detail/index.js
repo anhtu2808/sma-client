@@ -34,7 +34,7 @@ const JobDetail = () => {
     return (
       <div className="mx-auto max-w-[820px] rounded-xl border border-neutral-200 bg-white p-8 shadow-soft lg:p-10">
         <h2 className="font-heading text-2xl font-bold text-neutral-900">Job Description</h2>
-        <p className="mt-3 text-sm leading-relaxed text-neutral-600">
+        <p className="mt-3 text-base leading-relaxed text-neutral-700">
           Unable to load job details. Please try again later.
         </p>
       </div>
@@ -54,7 +54,7 @@ const JobDetail = () => {
         </h1>
         
         {/* Company & Location */}
-        <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-neutral-600">
+        <div className="mt-3 flex flex-wrap items-center gap-4 text-base text-neutral-700">
           {job.company?.name && (
             <div className="flex items-center gap-1.5">
               <span className="material-icons-round text-[16px] text-neutral-400">business</span>
@@ -98,7 +98,7 @@ const JobDetail = () => {
             About
           </h2>
           <div 
-            className="mt-3 text-sm leading-relaxed text-neutral-600"
+            className="mt-3 text-base leading-relaxed text-neutral-700"
             dangerouslySetInnerHTML={{ __html: job.about }}
           />
         </div>
@@ -112,7 +112,7 @@ const JobDetail = () => {
             Responsibilities
           </h2>
           <div 
-            className="mt-3 text-sm leading-relaxed text-neutral-600"
+            className="mt-3 text-base leading-relaxed text-neutral-700"
             dangerouslySetInnerHTML={{ __html: job.responsibilities }}
           />
         </div>
@@ -126,7 +126,7 @@ const JobDetail = () => {
             Requirements
           </h2>
           <div 
-            className="mt-3 text-sm leading-relaxed text-neutral-600"
+            className="mt-3 text-base leading-relaxed text-neutral-700"
             dangerouslySetInnerHTML={{ __html: job.requirement }}
           />
         </div>
@@ -161,7 +161,7 @@ const JobDetail = () => {
           </h2>
           <ul className="mt-3 space-y-2">
             {job.benefits.map((benefit, idx) => (
-              <li key={idx} className="flex items-start gap-2 text-sm text-neutral-600">
+              <li key={idx} className="flex items-start gap-2 text-base text-neutral-700">
                 <span className="material-icons-round text-[16px] text-emerald-500">check</span>
                 <span>{benefit.name || benefit}</span>
               </li>
