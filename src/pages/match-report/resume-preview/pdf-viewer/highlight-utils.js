@@ -1,7 +1,7 @@
 const TEXT_LAYER_SELECTOR = ".rpv-core__text-layer-text";
 const TEXT_NODE_TYPE = typeof Node === "undefined" ? 3 : Node.TEXT_NODE;
 
-export const HOVER_MODAL_WIDTH_PX = 400;
+export const HOVER_MODAL_WIDTH_PX = 520;
 export const HOVER_MODAL_MIN_WIDTH_PX = 220;
 export const HOVER_MODAL_ESTIMATED_HEIGHT_PX = 280;
 export const HOVER_MODAL_GAP_PX = 12;

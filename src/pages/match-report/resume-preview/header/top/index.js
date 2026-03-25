@@ -65,6 +65,8 @@ const HeaderTop = () => {
         open={isReEvaluateModalOpen}
         onClose={() => setIsReEvaluateModalOpen(false)}
         jobId={evaluationData?.jobId}
+        currentResumeId={evaluationData?.resumeId}
+        currentScore={evaluationData?.overallScore}
       />
     </header>
   );

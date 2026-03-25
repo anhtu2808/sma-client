@@ -5,6 +5,7 @@ const ProfileSectionModal = ({
   open,
   title,
   onCancel,
+  onSubmit,
   loading = false,
   loadingText = "Saving...",
   submitText = "Save",
@@ -38,6 +39,7 @@ const ProfileSectionModal = ({
             <button
               type={formId ? "submit" : "button"}
               form={formId}
+              onClick={!formId ? onSubmit : undefined}
               disabled={loading || submitDisabled}
               className="px-5 h-10 rounded-lg bg-primary text-white hover:opacity-90 disabled:opacity-50"
             >

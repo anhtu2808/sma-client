@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   toggleExpandedItemId,
   setFocusedItemId,
-  toggleDetailFixed,
+  setDetailFixed,
   updateSuggestion,
   updateScoresAfterFixed,
 } from "@/store/slices/matchingReportSlice";
@@ -83,7 +83,7 @@ const ContentDetail = ({ item, isLast }) => {
 
     try {
       const response = await markDetailAsFixed({ detailId: item.id }).unwrap();
-      dispatch(toggleDetailFixed({ detailId: item.id }));
+      dispatch(setDetailFixed({ detailId: item.id }));
       
       // Update scores if response contains score data
       if (response) {

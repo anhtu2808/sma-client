@@ -7,6 +7,7 @@ import {
   useParseCandidateResumeMutation,
   useUploadCandidateResumeMutation,
   useUploadFilesMutation,
+  useDeleteCandidateResumeMutation,
 } from "@/apis/resumeApi";
 import { useStartMatchingDetailMutation } from "@/apis/matchingApi";
 import Loading from "@/components/Loading";
@@ -41,6 +42,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
   const [uploadCandidateResume, { isLoading: isSavingResume }] = useUploadCandidateResumeMutation();
   const [parseCandidateResume, { isLoading: isParsingResume }] = useParseCandidateResumeMutation();
   const [startMatchingDetail, { isLoading: isStartingMatching }] = useStartMatchingDetailMutation();
+  const [deleteCandidateResume] = useDeleteCandidateResumeMutation();
 
   const isResumesLoading = isLoadingResumes || isFetchingResumes;
 
@@ -133,6 +135,27 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
     }
   };
 
+  const handleDeleteResume = (resumeId) => {
+    Modal.confirm({
+      title: "Delete Resume",
+      content: "Are you sure you want to permanently delete this resume?",
+      okText: "Delete",
+      okType: "danger",
+      cancelText: "Cancel",
+      onOk: async () => {
+        try {
+          await deleteCandidateResume({ resumeId }).unwrap();
+          if (selectedResumeId === resumeId) {
+            setSelectedResumeId(null);
+          }
+          toastMessage.success("Resume deleted successfully.");
+        } catch (error) {
+          toastMessage.error(getErrorMessage(error, "Failed to delete resume."));
+        }
+      },
+    });
+  };
+
   const handleCheckMatch = async () => {
     if (!canSubmit || !selectedResume || !effectiveJobId) {
       toastMessage.warning("Please select a resume to continue.");
@@ -217,6 +240,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
                   onSelect={setSelectedResumeId}
                   onParse={handleParseResume}
                   onViewHistory={handleViewHistory}
+                  onDelete={handleDeleteResume}
                 />
               );
             })}

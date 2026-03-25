@@ -20,6 +20,7 @@ export const matchingApi = api.injectEndpoints({
         params: { jobId, resumeId },
       }),
       transformResponse: (response) => response?.data ?? null,
+      invalidatesTags: ["FeatureUsage"],
     }),
 
     getMatchingDetail: builder.query({

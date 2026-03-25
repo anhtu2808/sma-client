@@ -16,6 +16,7 @@ const FilesList = ({
   onOpenSetProfileConfirm,
   onDeleteResume,
   onRename,
+  onViewParsedResult,
   uploadQuota,
 }) => (
   <div className="bg-white dark:bg-surface-dark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
@@ -116,6 +117,19 @@ const FilesList = ({
                 >
                   <i className="material-icons-round text-[18px]">download</i>
                 </Button>
+
+                {canSetAsProfile && (
+                  <Button
+                    mode="ghost"
+                    size="sm"
+                    shape="rounded"
+                    btnIcon
+                    tooltip="View parsed result"
+                    onClick={() => onViewParsedResult(file.id)}
+                  >
+                    <i className="material-icons-round text-[18px]">visibility</i>
+                  </Button>
+                )}
 
                 {normalizedStatus !== "FINISH" && (
                   <Button

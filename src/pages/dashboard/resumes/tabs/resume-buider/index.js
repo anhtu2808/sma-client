@@ -103,7 +103,7 @@ const ResumeBuilderTab = () => {
                   onClick={() => {
                     navigate(`/dashboard/resumes/builder?template=${templateId}&resumeId=${resume.id}`);
                   }}
-                  className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-surface-dark flex flex-col cursor-pointer hover:shadow-lg hover:border-primary/30 transition-all group relative overflow-hidden"
+                  className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-surface-dark flex flex-col h-full cursor-pointer hover:shadow-lg hover:border-primary/30 transition-all group relative overflow-hidden"
                 >
                   {/* Delete button */}
                   <Popconfirm

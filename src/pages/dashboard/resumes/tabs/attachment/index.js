@@ -16,6 +16,7 @@ import FilesList from "./files-list";
 import RenameResumeModal from "../../components/RenameResumeModal";
 import ParseConsentModal from "./parse-consent-modal";
 import SetProfileConfirmModal from "./set-profile-confirm-modal";
+import ParsedResultModal from "./parsed-result-modal";
 import UploadPanel from "./upload-panel";
 import ReplaceResumeModal from "./replace-resume-modal";
 import {
@@ -66,10 +67,10 @@ const AttachmentsTab = () => {
   const [settingProfileId, setSettingProfileId] = useState(null);
   const [parseStatusOverrides, setParseStatusOverrides] = useState({});
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [confirmValue, setConfirmValue] = useState("");
   const [confirmResumeId, setConfirmResumeId] = useState(null);
   const [isConfirmLoading, setIsConfirmLoading] = useState(false);
   const [renameResume, setRenameResume] = useState(null);
+  const [previewResumeId, setPreviewResumeId] = useState(null);
 
   const files = useMemo(
     () =>
@@ -156,6 +157,9 @@ const AttachmentsTab = () => {
 
           if (TERMINAL_PARSE_STATUSES.has(status)) {
             stopPolling(resumeId);
+            if (status === "FINISH") {
+              setPreviewResumeId(resumeId);
+            }
           }
         } catch (error) {
           stopPolling(resumeId);
@@ -374,7 +378,6 @@ const AttachmentsTab = () => {
 
   const openSetProfileConfirm = (resumeId) => {
     setConfirmResumeId(resumeId);
-    setConfirmValue("");
     setIsConfirmOpen(true);
   };
 
@@ -382,7 +385,6 @@ const AttachmentsTab = () => {
     if (isSettingProfile) return;
     setIsConfirmOpen(false);
     setConfirmResumeId(null);
-    setConfirmValue("");
   };
 
   const handleConfirmSetProfile = async () => {
@@ -405,7 +407,6 @@ const AttachmentsTab = () => {
 
   const isUploading =
     isUploadingFile || isSavingResume || (consentModal.mode === "upload" && isConsentLoading);
-  const canConfirmSetProfile = confirmValue.trim().toLowerCase() === "continue";
 
   return (
     <section className="space-y-6">
@@ -429,6 +430,7 @@ const AttachmentsTab = () => {
         onOpenParseConsent={openParseConsent}
         onOpenSetProfileConfirm={openSetProfileConfirm}
         onDeleteResume={handleDeleteResume}
+        onViewParsedResult={(id) => setPreviewResumeId(id)}
         onRename={(fileId) => {
           const resume = resumes.find((r) => r.id === fileId);
           if (resume) setRenameResume(resume);
@@ -463,13 +465,21 @@ const AttachmentsTab = () => {
         onCancel={handleReplaceCancel}
       />
 
+      <ParsedResultModal
+        open={Boolean(previewResumeId)}
+        resumeId={previewResumeId}
+        onClose={() => setPreviewResumeId(null)}
+        onSetAsProfile={(id) => {
+          setPreviewResumeId(null);
+          openSetProfileConfirm(id);
+        }}
+      />
+
       <SetProfileConfirmModal
         open={isConfirmOpen}
-        confirmValue={confirmValue}
+        resumeId={confirmResumeId}
         isSettingProfile={isSettingProfile}
         isConfirmLoading={isConfirmLoading}
-        canConfirmSetProfile={canConfirmSetProfile}
-        onChangeConfirmValue={setConfirmValue}
         onCancel={closeSetProfileConfirm}
         onConfirm={handleConfirmSetProfile}
       />
