@@ -88,7 +88,7 @@ const CTAButtons = () => {
     return (
         <>
             <div className="mt-6 pt-6 font-body space-y-3">
-                {attempt === 1 && !config.disabled && (
+                {attempt === 2 && !config.disabled && (
                     <div className="mb-6 p-5 bg-amber-50 border border-amber-100 rounded-2xl flex items-start gap-4 shadow-sm animate-in fade-in slide-in-from-top-2 duration-500">
                         <AlertCircle className="text-amber-500 shrink-0 mt-0.5" size={20} />
                         <div className="space-y-1.5">
