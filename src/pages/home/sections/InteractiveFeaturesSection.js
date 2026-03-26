@@ -416,7 +416,6 @@ const InteractiveFeaturesSection = () => {
                         return (
                             <div
                                 key={tab.id}
-                                onMouseEnter={() => setActiveTabId(tab.id)}
                                 onClick={() => setActiveTabId(tab.id)}
                                 className={`flex-1 flex flex-col justify-between p-5 rounded-2xl border-2 transition-all duration-300 cursor-pointer ${isActive
                                     ? 'border-orange-500 bg-orange-50/50 dark:bg-orange-900/10 shadow-md ring-4 ring-orange-500/10'

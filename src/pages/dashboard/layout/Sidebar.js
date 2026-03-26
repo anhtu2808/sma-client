@@ -16,8 +16,7 @@ const Sidebar = () => {
 
     const sidebarItems = [
 
-        { to: "/dashboard", icon: "grid_view", label: "Overview", end: true },
-        { to: "/dashboard/profile", icon: "person", label: "Profile" },
+        { to: "/dashboard", icon: "person", label: "Profile", end: true },
         { to: "/dashboard/resumes", icon: <i className="fa-solid fa-file-lines"></i>, label: "Resumes" },
         { to: "/dashboard/cv-template", icon: <i className="fa-solid fa-file-invoice"></i>, label: "CV Template", badge: "New" },
         { to: "/dashboard/matching-history", icon: "fact_check", label: "Resume Checker", badge: "New" },

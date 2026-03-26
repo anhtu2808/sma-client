@@ -10,12 +10,15 @@ import {
   useUploadCandidateResumeMutation,
   useUploadFilesMutation,
 } from "@/apis/resumeApi";
+import { useGetFeatureUsageQuery } from "@/apis/featureUsageApi";
 import { RESUME_TYPES } from "@/constant";
 import FilesList from "./files-list";
 import RenameResumeModal from "../../components/RenameResumeModal";
 import ParseConsentModal from "./parse-consent-modal";
 import SetProfileConfirmModal from "./set-profile-confirm-modal";
+import ParsedResultModal from "./parsed-result-modal";
 import UploadPanel from "./upload-panel";
+import ReplaceResumeModal from "./replace-resume-modal";
 import {
   POLL_INTERVAL_MS,
   POLL_TIMEOUT_MS,
@@ -41,6 +44,15 @@ const AttachmentsTab = () => {
     resumeId: null,
   });
   const [isConsentLoading, setIsConsentLoading] = useState(false);
+  const [replaceModal, setReplaceModal] = useState({ open: false, pendingUploadPayload: null });
+
+  const { data: featureUsageData } = useGetFeatureUsageQuery();
+
+  const uploadFeature = useMemo(
+    () => (featureUsageData || []).find((item) => item?.featureKey === "CV_UPLOAD_LIMIT"),
+    [featureUsageData]
+  );
+  const uploadExhausted = uploadFeature?.maxQuota != null && uploadFeature?.remaining === 0;
 
   const { data: resumes = [], isLoading: isLoadingResumes } = useGetCandidateResumesQuery({
     type: RESUME_TYPES.ORIGINAL,
@@ -55,10 +67,10 @@ const AttachmentsTab = () => {
   const [settingProfileId, setSettingProfileId] = useState(null);
   const [parseStatusOverrides, setParseStatusOverrides] = useState({});
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [confirmValue, setConfirmValue] = useState("");
   const [confirmResumeId, setConfirmResumeId] = useState(null);
   const [isConfirmLoading, setIsConfirmLoading] = useState(false);
   const [renameResume, setRenameResume] = useState(null);
+  const [previewResumeId, setPreviewResumeId] = useState(null);
 
   const files = useMemo(
     () =>
@@ -145,6 +157,9 @@ const AttachmentsTab = () => {
 
           if (TERMINAL_PARSE_STATUSES.has(status)) {
             stopPolling(resumeId);
+            if (status === "FINISH") {
+              setPreviewResumeId(resumeId);
+            }
           }
         } catch (error) {
           stopPolling(resumeId);
@@ -235,12 +250,16 @@ const AttachmentsTab = () => {
         resumeUrl: uploadedFile.downloadUrl,
       };
 
-      setConsentModal({
-        open: true,
-        mode: "upload",
-        pendingUploadPayload: payload,
-        resumeId: null,
-      });
+      if (uploadExhausted) {
+        setReplaceModal({ open: true, pendingUploadPayload: payload });
+      } else {
+        setConsentModal({
+          open: true,
+          mode: "upload",
+          pendingUploadPayload: payload,
+          resumeId: null,
+        });
+      }
     } catch (error) {
       toastMessage.error(getErrorMessage(error, "Upload resume failed"));
     } finally {
@@ -305,6 +324,27 @@ const AttachmentsTab = () => {
     }
   };
 
+  const handleReplaceSelect = async (resumeIdToDelete) => {
+    try {
+      setIsConsentLoading(true);
+      stopPolling(resumeIdToDelete);
+      await deleteCandidateResume({ resumeId: resumeIdToDelete }).unwrap();
+
+      const payload = replaceModal.pendingUploadPayload;
+      setReplaceModal({ open: false, pendingUploadPayload: null });
+      setConsentModal({ open: true, mode: "upload", pendingUploadPayload: payload, resumeId: null });
+    } catch (error) {
+      toastMessage.error(getErrorMessage(error, "Failed to replace resume."));
+    } finally {
+      setIsConsentLoading(false);
+    }
+  };
+
+  const handleReplaceCancel = () => {
+    if (isConsentLoading) return;
+    setReplaceModal({ open: false, pendingUploadPayload: null });
+  };
+
   const handleDeleteResume = (resumeId) => {
     const resume = resumes.find((r) => r.id === resumeId);
     const resumeName = resume?.resumeName || `Resume #${resumeId}`;
@@ -338,7 +378,6 @@ const AttachmentsTab = () => {
 
   const openSetProfileConfirm = (resumeId) => {
     setConfirmResumeId(resumeId);
-    setConfirmValue("");
     setIsConfirmOpen(true);
   };
 
@@ -346,7 +385,6 @@ const AttachmentsTab = () => {
     if (isSettingProfile) return;
     setIsConfirmOpen(false);
     setConfirmResumeId(null);
-    setConfirmValue("");
   };
 
   const handleConfirmSetProfile = async () => {
@@ -369,7 +407,6 @@ const AttachmentsTab = () => {
 
   const isUploading =
     isUploadingFile || isSavingResume || (consentModal.mode === "upload" && isConsentLoading);
-  const canConfirmSetProfile = confirmValue.trim().toLowerCase() === "continue";
 
   return (
     <section className="space-y-6">
@@ -380,7 +417,7 @@ const AttachmentsTab = () => {
         </div>
       </div>
 
-      <UploadPanel inputRef={inputRef} isUploading={isUploading} onUploadFile={handleUploadFile} />
+      <UploadPanel inputRef={inputRef} isUploading={isUploading} onUploadFile={handleUploadFile} exhausted={uploadExhausted} />
 
       <FilesList
         files={files}
@@ -393,10 +430,16 @@ const AttachmentsTab = () => {
         onOpenParseConsent={openParseConsent}
         onOpenSetProfileConfirm={openSetProfileConfirm}
         onDeleteResume={handleDeleteResume}
+        onViewParsedResult={(id) => setPreviewResumeId(id)}
         onRename={(fileId) => {
           const resume = resumes.find((r) => r.id === fileId);
           if (resume) setRenameResume(resume);
         }}
+        uploadQuota={uploadFeature?.maxQuota != null ? {
+          used: uploadFeature.maxQuota - (uploadFeature.remaining ?? 0),
+          max: uploadFeature.maxQuota,
+          exhausted: uploadExhausted,
+        } : null}
       />
 
       <ParseConsentModal
@@ -405,6 +448,7 @@ const AttachmentsTab = () => {
         isConsentLoading={isConsentLoading}
         onCancel={handleConsentCancel}
         onSubmit={handleConsentSubmit}
+        featureUsageData={featureUsageData}
       />
 
       <RenameResumeModal
@@ -413,13 +457,29 @@ const AttachmentsTab = () => {
         resume={renameResume}
       />
 
+      <ReplaceResumeModal
+        open={replaceModal.open}
+        files={files}
+        loading={isConsentLoading}
+        onSelect={handleReplaceSelect}
+        onCancel={handleReplaceCancel}
+      />
+
+      <ParsedResultModal
+        open={Boolean(previewResumeId)}
+        resumeId={previewResumeId}
+        onClose={() => setPreviewResumeId(null)}
+        onSetAsProfile={(id) => {
+          setPreviewResumeId(null);
+          openSetProfileConfirm(id);
+        }}
+      />
+
       <SetProfileConfirmModal
         open={isConfirmOpen}
-        confirmValue={confirmValue}
+        resumeId={confirmResumeId}
         isSettingProfile={isSettingProfile}
         isConfirmLoading={isConfirmLoading}
-        canConfirmSetProfile={canConfirmSetProfile}
-        onChangeConfirmValue={setConfirmValue}
         onCancel={closeSetProfileConfirm}
         onConfirm={handleConfirmSetProfile}
       />

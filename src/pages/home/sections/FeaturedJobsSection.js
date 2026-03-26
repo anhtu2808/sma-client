@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Building2 } from 'lucide-react';
 import { useGetJobsQuery } from '@/apis/jobApi';
 
 const FeaturedJobsSection = () => {
@@ -11,9 +12,9 @@ const FeaturedJobsSection = () => {
         return rawJobs
             .filter(job => job.isHighlight === true)
             .map(job => {
-                const salary = job.salaryStart && job.salaryEnd
-                    ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} VND`
-                    : 'Thoả thuận';
+                const salary = (job.salaryStart && job.salaryEnd
+                        ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} VND`
+                        : 'Thỏa thuận');
 
                 const locationCity = job.locations?.length > 0
                     ? job.locations.map(l => l.city || l.name).filter(Boolean).join(', ')
@@ -93,9 +94,7 @@ const FeaturedJobsSection = () => {
                                                 className="w-full h-full object-contain"
                                             />
                                         ) : (
-                                            <span className="text-lg font-bold text-gray-400 dark:text-gray-600">
-                                                {job.company?.charAt(0) || 'C'}
-                                            </span>
+                                            <Building2 className="text-gray-400 dark:text-gray-600" size={22} />
                                         )}
                                     </div>
 

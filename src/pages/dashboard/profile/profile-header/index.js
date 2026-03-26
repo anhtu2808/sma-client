@@ -74,8 +74,8 @@ const ProfileHeader = () => {
             {profile?.avatar ? (
               <img src={profile.avatar} alt={displayName} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-500 text-2xl font-semibold">
-                {avatarLetter}
+              <div className="w-full h-full flex items-center justify-center">
+                <span className="material-icons-round text-3xl text-gray-400">person</span>
               </div>
             )}
           </div>

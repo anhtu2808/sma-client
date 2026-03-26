@@ -1,4 +1,4 @@
-import reducer, { toggleDetailFixed, updateSuggestion } from "./matchingReportSlice";
+import reducer, { setDetailFixed, updateSuggestion } from "./matchingReportSlice";
 
 const createState = () => ({
   data: {
@@ -39,8 +39,8 @@ describe("matchingReportSlice", () => {
     ]);
   });
 
-  it("keeps toggleDetailFixed behavior unchanged", () => {
-    const nextState = reducer(createState(), toggleDetailFixed({ detailId: 10 }));
+  it("setDetailFixed sets isFixed to true", () => {
+    const nextState = reducer(createState(), setDetailFixed({ detailId: 10 }));
 
     expect(nextState.data.criteriaScores[0].details[0].isFixed).toBe(true);
   });

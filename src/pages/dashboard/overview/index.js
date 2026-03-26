@@ -41,7 +41,7 @@ const DashboardOverview = () => {
               {user?.avatar ? (
                 <img alt="User avatar" className="w-full h-full object-cover opacity-90" src={user.avatar} />
               ) : (
-                <span className="text-white text-2xl font-semibold">{avatarLetter}</span>
+                <span className="material-icons-round text-3xl text-gray-400">person</span>
               )}
             </div>
           </Col>

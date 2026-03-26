@@ -5,9 +5,11 @@ import { api } from "@/apis/baseApi";
 import toastMessage from "@/utils/toastMessage";
 import Loading from "@/components/Loading";
 import dayjs from "dayjs";
+import html2canvas from "html2canvas-pro";
+import { jsPDF } from "jspdf";
 import {
     ArrowUp, ArrowDown, Trash2, Plus,
-    Download, Save,
+    Download, Save, FileCheck,
 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import ModernMinimalistTemplate from "./templates/ModernMinimalistTemplate";
@@ -37,6 +39,7 @@ import {
     useUpdateResumeSkillMutation,
     useDeleteResumeSkillMutation,
     useUpdateCandidateResumeMutation,
+    useExportResumeToOriginalMutation,
 } from "@/apis/resumeApi";
 import { useGetSkillsQuery } from "@/apis/skillApi";
 
@@ -87,7 +90,9 @@ export default function CvBuilder({ onBack }) {
     const [deleteEducation] = useDeleteResumeEducationMutation();
     const [deleteCertification] = useDeleteResumeCertificationMutation();
     const [updateCandidateResume] = useUpdateCandidateResumeMutation();
+    const [exportResumeToOriginal] = useExportResumeToOriginalMutation();
     const [isSaving, setIsSaving] = useState(false);
+    const [isExporting, setIsExporting] = useState(false);
     const [activeSection, setActiveSection] = useState(null);
 
 
@@ -98,6 +103,78 @@ export default function CvBuilder({ onBack }) {
 
     const handleDownloadPdf = () => {
         window.print();
+    };
+
+    const handleExportToApply = async () => {
+        if (!resumeId) return toastMessage.error("Resume not found.");
+        setIsExporting(true);
+        try {
+            const element = pdfRef.current;
+
+            // Convert cross-origin avatar to inline base64 so html2canvas can render it
+            const avatarImg = element.querySelector('img[alt="Avatar"]');
+            let originalSrc = null;
+            if (avatarImg && avatarImg.src && !avatarImg.src.startsWith('data:')) {
+                originalSrc = avatarImg.src;
+                try {
+                    const response = await fetch(avatarImg.src);
+                    const blob = await response.blob();
+                    const dataUrl = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result);
+                        reader.readAsDataURL(blob);
+                    });
+                    avatarImg.src = dataUrl;
+                } catch (e) {
+                    console.warn("Could not convert avatar to base64, it may be missing in PDF:", e);
+                }
+            }
+
+            const canvas = await html2canvas(element, { scale: 2, useCORS: true, logging: false });
+
+            // Restore original avatar src after capture
+            if (originalSrc) {
+                avatarImg.src = originalSrc;
+            }
+
+            const imgData = canvas.toDataURL("image/png");
+            const pdf = new jsPDF("p", "mm", "a4");
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+            const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+            let heightLeft = imgHeight, position = 0;
+            pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
+            heightLeft -= pdfHeight;
+            while (heightLeft > 0) {
+                position -= pdfHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
+                heightLeft -= pdfHeight;
+            }
+
+            const pdfBlob = pdf.output("blob");
+            const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+            if (pdfBlob.size > MAX_FILE_SIZE) {
+                toastMessage.error("Exported PDF exceeds 10MB. Please reduce CV content and try again.");
+                return;
+            }
+
+            const fileName = `${cvData.personalInfo?.fullName || "Resume"}_CV.pdf`;
+            const formData = new FormData();
+            formData.append("files", new File([pdfBlob], fileName, { type: "application/pdf" }));
+            const uploadResult = await uploadFiles(formData).unwrap();
+            const uploadedUrl = (Array.isArray(uploadResult) ? uploadResult[0] : uploadResult)?.downloadUrl;
+            if (!uploadedUrl) throw new Error("Upload failed");
+
+            await exportResumeToOriginal({ resumeId, payload: { resumeUrl: uploadedUrl, fileName } }).unwrap();
+            toastMessage.success("CV exported! You can now use it to apply for jobs.");
+            navigate("/dashboard/resumes");
+        } catch (err) {
+            console.error("Export to apply error:", err);
+            toastMessage.error("Failed to export CV. Please try again.");
+        } finally {
+            setIsExporting(false);
+        }
     };
 
     // Initial State with API-compatible field names
@@ -791,6 +868,16 @@ export default function CvBuilder({ onBack }) {
                                 onClick={handleDownloadPdf}
                                 className="px-4 py-2 bg-[#1F8A70] text-white rounded-md text-sm font-medium hover:bg-[#19755f] flex items-center gap-2">
                                 <Download size={16} /> Download PDF
+                            </Button>
+                            <Button
+                                mode="primary"
+                                shape="rounded"
+                                onClick={handleExportToApply}
+                                disabled={isExporting || isSaving}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 flex items-center gap-2"
+                            >
+                                {isExporting ? <Loading size={16} inline /> : <FileCheck size={16} />}
+                                {isExporting ? "Exporting..." : "Export to Apply"}
                             </Button>
                         </div>
                     </div>

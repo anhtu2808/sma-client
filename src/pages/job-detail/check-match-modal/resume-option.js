@@ -11,6 +11,7 @@ const ResumeOption = ({
   onSelect,
   onParse,
   onViewHistory,
+  onDelete,
 }) => {
   const status = normalizeParseStatus(resume?.parseStatus);
   const statusView = getParseStatusView(status, false);
@@ -48,11 +49,6 @@ const ResumeOption = ({
             <h4 className="text-base font-semibold text-gray-900 truncate">
               {resume.resumeName || resume.fileName || `Resume #${resume.id}`}
             </h4>
-            {resume.type === "PROFILE" && (
-              <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-semibold text-blue-700">
-                Built-in
-              </span>
-            )}
             {hasEvaluationHistory && (
               <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
                 Matched before
@@ -84,7 +80,7 @@ const ResumeOption = ({
           )}
         </div>
 
-        <div className="flex w-[112px] shrink-0 items-center justify-end">
+        <div className="flex shrink-0 items-center justify-end gap-2">
           {hasEvaluationHistory ? (
             <button
               type="button"
@@ -97,15 +93,30 @@ const ResumeOption = ({
               View score
             </button>
           ) : isSelectable ? (
-            <input
-              type="radio"
-              checked={isSelected}
-              disabled={!isSelectable}
-              onChange={() => isSelectable && onSelect(resume.id)}
-              className="h-5 w-5 cursor-pointer border-gray-300 focus:ring-primary disabled:cursor-not-allowed"
-              style={{ accentColor: "#ff5722" }}
-              aria-label={`Select resume ${resume.resumeName || resume.fileName || resume.id}`}
-            />
+            <>
+              {onDelete && (
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onDelete(resume.id);
+                  }}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"
+                  aria-label="Delete resume"
+                >
+                  <span className="material-icons-round text-[18px]">delete_outline</span>
+                </button>
+              )}
+              <input
+                type="radio"
+                checked={isSelected}
+                disabled={!isSelectable}
+                onChange={() => isSelectable && onSelect(resume.id)}
+                className="h-5 w-5 cursor-pointer border-gray-300 focus:ring-primary disabled:cursor-not-allowed"
+                style={{ accentColor: "#ff5722" }}
+                aria-label={`Select resume ${resume.resumeName || resume.fileName || resume.id}`}
+              />
+            </>
           ) : isWaiting ? (
             <button
               type="button"

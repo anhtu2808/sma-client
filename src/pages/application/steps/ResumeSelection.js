@@ -35,7 +35,9 @@ const ResumeSelection = ({
                                 </div>
                                 <div className="min-w-0">
                                     <p className="text-sm font-semibold text-gray-900 truncate" title={resume.resumeName || resume.fileName}>{resume.resumeName || resume.fileName}</p>
-                                    <p className="text-[11px] text-gray-500 mt-1">Verified by AI</p>
+                                    <p className="text-[11px] text-gray-500 mt-1">
+                                        {resume.createdAt ? new Date(resume.createdAt).toLocaleDateString('vi-VN') : ''}
+                                    </p>
                                 </div>
                             </div>
                             {isSelected && (

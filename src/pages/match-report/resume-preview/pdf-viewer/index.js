@@ -4,7 +4,8 @@ import toastMessage from "@/utils/toastMessage";
 import { useDispatch, useSelector } from "react-redux";
 import {
   focusItemWithTabSwitch,
-  toggleDetailFixed,
+  setDetailFixed,
+  updateScoresAfterFixed,
   updateSuggestion,
 } from "@/store/slices/matchingReportSlice";
 import {
@@ -121,8 +122,15 @@ const PdfViewer = ({ resumeUrl, activeDetails = [], renderError }) => {
     setMarkingDetailId(detail.id);
 
     try {
-      await markDetailAsFixed({ detailId: detail.id }).unwrap();
-      dispatch(toggleDetailFixed({ detailId: detail.id }));
+      const response = await markDetailAsFixed({ detailId: detail.id }).unwrap();
+      dispatch(setDetailFixed({ detailId: detail.id }));
+      if (response) {
+        dispatch(updateScoresAfterFixed({
+          afterOverallScore: response.afterOverallScore,
+          criteriaScoreId: response.criteriaScoreId,
+          afterCriteriaScore: response.afterCriteriaScore,
+        }));
+      }
       closeHoverOverlay();
       toastMessage.success("Marked as fixed successfully.");
     } catch (error) {

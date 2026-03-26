@@ -1,4 +1,4 @@
-import { createBrowserRouter, createRoutesFromElements, Route } from "react-router-dom";
+import { createBrowserRouter, createRoutesFromElements, Navigate, Route } from "react-router-dom";
 import Layout from '@/pages/layout';
 import UiKit from '@/pages/ui-kit';
 import Home from '@/pages/home';
@@ -8,7 +8,6 @@ import ForgotPassword from '@/pages/forgot-password';
 import Jobs from '@/pages/jobs';
 import JobDetail from '@/pages/job-detail';
 import DashboardLayout from '@/pages/dashboard/layout';
-import DashboardOverview from '@/pages/dashboard/overview';
 import DashboardJobs from '@/pages/dashboard/jobs';
 import NotificationSettings from '@/pages/dashboard/setting';
 import Notification from '@/pages/dashboard/notification';
@@ -56,7 +55,7 @@ export const routes = createBrowserRouter(
             <Route path="match-report/:evaluationId" element={<MatchReport />} />
 
             <Route path="dashboard" element={<DashboardLayout />}>
-                <Route index element={<DashboardOverview />} />
+                <Route index element={<Profile />} />
                 <Route path="jobs" element={<DashboardJobs />} />
                 <Route path="matching-history" element={<MatchingHistory />} />
                 <Route path="setting" element={<NotificationSettings />} />
@@ -66,7 +65,7 @@ export const routes = createBrowserRouter(
                     <Route index element={<Resumes />} />
                     <Route path="templates" element={<TemplateSelection />} />
                 </Route>
-                <Route path="profile" element={<Profile />} />
+                <Route path="profile" element={<Navigate to="/dashboard" replace />} />
                 <Route path="billing-plans" element={<BillingPlans />} />
                 <Route path="usage" element={<Usage />} />
                 <Route path="cv-template" element={<CVTemplate />} />

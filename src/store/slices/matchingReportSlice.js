@@ -75,14 +75,14 @@ const matchingReportSlice = createSlice({
       state.ui.activeDocumentTab = action.payload;
     },
 
-    toggleDetailFixed: (state, action) => {
+    setDetailFixed: (state, action) => {
       const { detailId } = action.payload;
       if (!state.data) return;
 
       state.data.criteriaScores.forEach((criteria) => {
         const detail = criteria.details.find((d) => d.id === detailId);
         if (detail) {
-          detail.isFixed = !detail.isFixed;
+          detail.isFixed = true;
         }
       });
     },
@@ -131,7 +131,7 @@ export const {
   toggleExpandedItemId,
   expandItemId,
   setActiveDocumentTab,
-  toggleDetailFixed,
+  setDetailFixed,
   updateSuggestion,
   updateScoresAfterFixed,
 } = matchingReportSlice.actions;

@@ -5,6 +5,7 @@ import {
   useGetCandidateResumesQuery,
   useUploadFilesMutation,
   useUploadCandidateResumeMutation,
+  useDeleteCandidateResumeMutation,
 } from "@/apis/resumeApi";
 import { useStartMatchingDetailMutation } from "@/apis/matchingApi";
 import { useNavigate } from "react-router-dom";
@@ -19,48 +20,24 @@ dayjs.extend(relativeTime);
 const isSupportedResumeFile = (fileName = "") =>
   /\.(pdf|doc|docx)$/i.test(`${fileName}`.trim());
 
-const mergeAndSortResumes = (profileResumes = [], originalResumes = []) => {
-  const mergedMap = new Map();
-
-  [...profileResumes, ...originalResumes].forEach((resume) => {
-    if (!resume?.id) return;
-    const existing = mergedMap.get(resume.id);
-    if (!existing || resume.type === "PROFILE") {
-      mergedMap.set(resume.id, resume);
-    }
-  });
-
-  return [...mergedMap.values()]
-    .map((resume) => ({
-      ...resume,
-      parseStatus: normalizeParseStatus(resume.parseStatus || "WAITING"),
-    }))
-    .sort((left, right) => {
-      const leftParsed = left.parseStatus === "FINISH";
-      const rightParsed = right.parseStatus === "FINISH";
-      if (leftParsed !== rightParsed) return leftParsed ? -1 : 1;
-
-      if (left.type === "PROFILE" && right.type !== "PROFILE") return -1;
-      if (left.type !== "PROFILE" && right.type === "PROFILE") return 1;
-      return Number(right.id || 0) - Number(left.id || 0);
-    });
-};
-
-const ResumeOption = ({ resume, isSelected, onSelect }) => {
+const ResumeOption = ({ resume, isSelected, isCurrent, currentScore, onSelect, onDelete }) => {
   const status = normalizeParseStatus(resume?.parseStatus);
   const isParsed = status === "FINISH";
 
-  const cardClassName = isSelected
+  const cardClassName = isCurrent
+    ? "border-2 border-amber-400 bg-amber-50/50"
+    : isSelected
     ? "border-2 border-primary bg-orange-50/40"
     : "border border-gray-200 bg-white hover:border-primary";
 
   return (
     <div
-      className={`rounded-xl p-5 transition-all cursor-pointer ${cardClassName}`}
-      role="button"
-      tabIndex={0}
-      onClick={() => onSelect(resume.id)}
+      className={`rounded-xl p-5 transition-all ${isCurrent ? "" : "cursor-pointer"} ${cardClassName}`}
+      role={isCurrent ? undefined : "button"}
+      tabIndex={isCurrent ? -1 : 0}
+      onClick={() => !isCurrent && onSelect(resume.id)}
       onKeyDown={(event) => {
+        if (isCurrent) return;
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
           onSelect(resume.id);
@@ -73,9 +50,9 @@ const ResumeOption = ({ resume, isSelected, onSelect }) => {
             <h4 className="text-base font-semibold text-gray-900 truncate">
               {resume.resumeName || resume.fileName || `Resume #${resume.id}`}
             </h4>
-            {resume.type === "PROFILE" && (
-              <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-semibold text-blue-700">
-                Built-in
+            {isCurrent && (
+              <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
+                Current resume
               </span>
             )}
           </div>
@@ -97,37 +74,58 @@ const ResumeOption = ({ resume, isSelected, onSelect }) => {
                 : "Recently uploaded"}
             </span>
           </div>
+
+          {isCurrent && currentScore != null && (
+            <div className="mt-3">
+              <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
+                Current score: {currentScore}%
+              </span>
+            </div>
+          )}
         </div>
 
-        <div className="flex w-[112px] shrink-0 items-center justify-end">
-          <input
-            type="radio"
-            checked={isSelected}
-            onChange={() => onSelect(resume.id)}
-            className="h-5 w-5 cursor-pointer border-gray-300 focus:ring-primary"
-            style={{ accentColor: "#ff5722" }}
-            aria-label={`Select resume ${resume.originalName || resume.name || resume.id}`}
-          />
+        <div className="flex shrink-0 items-center gap-2">
+          {isCurrent ? (
+            <span className="text-xs font-medium text-amber-600">Currently viewing</span>
+          ) : (
+            <>
+              {onDelete && (
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onDelete(resume.id);
+                  }}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"
+                  aria-label="Delete resume"
+                >
+                  <span className="material-icons-round text-[18px]">delete_outline</span>
+                </button>
+              )}
+              <input
+                type="radio"
+                checked={isSelected}
+                onChange={() => onSelect(resume.id)}
+                className="h-5 w-5 cursor-pointer border-gray-300 focus:ring-primary"
+                style={{ accentColor: "#ff5722" }}
+                aria-label={`Select resume ${resume.originalName || resume.name || resume.id}`}
+              />
+            </>
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-const ReEvaluateModal = ({ open, onClose, jobId }) => {
+const ReEvaluateModal = ({ open, onClose, jobId, currentResumeId, currentScore }) => {
   const navigate = useNavigate();
   const inputRef = useRef(null);
 
   const [selectedResumeId, setSelectedResumeId] = useState(null);
   const [uploadedResume, setUploadedResume] = useState(null);
 
-  const { data: profileResumes = [], isLoading: isProfileLoading } =
-    useGetCandidateResumesQuery(
-      { type: RESUME_TYPES.PROFILE, jobId },
-      { skip: !open || !jobId }
-    );
-
-  const { data: originalResumes = [], isLoading: isOriginalLoading } =
+  const { data: resumes = [], isLoading: isLoadingResumes } =
     useGetCandidateResumesQuery(
       { type: RESUME_TYPES.ORIGINAL, jobId },
       { skip: !open || !jobId }
@@ -139,13 +137,8 @@ const ReEvaluateModal = ({ open, onClose, jobId }) => {
     useUploadCandidateResumeMutation();
   const [startMatchingDetail, { isLoading: isStartingMatching }] =
     useStartMatchingDetailMutation();
+  const [deleteCandidateResume] = useDeleteCandidateResumeMutation();
 
-  const resumes = useMemo(
-    () => mergeAndSortResumes(profileResumes, originalResumes),
-    [profileResumes, originalResumes]
-  );
-
-  const isLoadingResumes = isProfileLoading || isOriginalLoading;
 
   useEffect(() => {
     if (!open) {
@@ -154,11 +147,14 @@ const ReEvaluateModal = ({ open, onClose, jobId }) => {
       return;
     }
 
-    // Auto-select first resume if available and none selected
+    // Auto-select first non-current resume if available and none selected
     if (resumes.length > 0 && !selectedResumeId && !uploadedResume) {
-      setSelectedResumeId(resumes[0].id);
+      const firstSelectable = resumes.find((r) => r.id !== currentResumeId);
+      if (firstSelectable) {
+        setSelectedResumeId(firstSelectable.id);
+      }
     }
-  }, [open, resumes, selectedResumeId, uploadedResume]);
+  }, [open, resumes, selectedResumeId, uploadedResume, currentResumeId]);
 
   const handleClose = () => {
     setSelectedResumeId(null);
@@ -229,8 +225,32 @@ const ReEvaluateModal = ({ open, onClose, jobId }) => {
   const selectedResume = effectiveResumes.find(
     (resume) => resume.id === selectedResumeId
   );
-  const canSubmit = !!selectedResume && !!jobId;
+  const canSubmit = !!selectedResume && !!jobId && selectedResumeId !== currentResumeId;
   const isUploading = isUploadingFile || isSavingResume;
+
+  const handleDeleteResume = (resumeId) => {
+    Modal.confirm({
+      title: "Delete Resume",
+      content: "Are you sure you want to permanently delete this resume?",
+      okText: "Delete",
+      okType: "danger",
+      cancelText: "Cancel",
+      onOk: async () => {
+        try {
+          await deleteCandidateResume({ resumeId }).unwrap();
+          if (selectedResumeId === resumeId) {
+            setSelectedResumeId(null);
+          }
+          if (uploadedResume?.id === resumeId) {
+            setUploadedResume(null);
+          }
+          toastMessage.success("Resume deleted successfully.");
+        } catch (error) {
+          toastMessage.error(getErrorMessage(error, "Failed to delete resume."));
+        }
+      },
+    });
+  };
 
   const handleCheckMatch = async () => {
     if (!canSubmit || !selectedResume || !jobId) {
@@ -299,7 +319,10 @@ const ReEvaluateModal = ({ open, onClose, jobId }) => {
                 key={resume.id}
                 resume={resume}
                 isSelected={selectedResumeId === resume.id}
+                isCurrent={resume.id === currentResumeId}
+                currentScore={currentScore}
                 onSelect={setSelectedResumeId}
+                onDelete={resume.id !== currentResumeId ? handleDeleteResume : undefined}
               />
             ))}
           </div>

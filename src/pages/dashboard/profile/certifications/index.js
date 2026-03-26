@@ -1,8 +1,10 @@
 import React, { useMemo, useState } from "react";
+import { Modal } from "antd";
 import toastMessage from "@/utils/toastMessage";
 import { useCandidateDashboardProfileQuery } from "@/apis/candidateApi";
 import {
   useCreateResumeCertificationMutation,
+  useDeleteResumeCertificationMutation,
   useUpdateResumeCertificationMutation,
 } from "@/apis/resumeApi";
 import { getHostLabel, getValidLink } from "@/utils/profileUtils";
@@ -18,7 +20,26 @@ const Certifications = () => {
 
   const [createCertification, { isLoading: isCreating }] = useCreateResumeCertificationMutation();
   const [updateCertification, { isLoading: isUpdating }] = useUpdateResumeCertificationMutation();
+  const [deleteCertification] = useDeleteResumeCertificationMutation();
   const isSaving = isCreating || isUpdating;
+
+  const handleDelete = (certificationId) => {
+    Modal.confirm({
+      title: "Delete certification?",
+      content: "This action cannot be undone.",
+      okText: "Delete",
+      okType: "danger",
+      cancelText: "Cancel",
+      onOk: async () => {
+        try {
+          await deleteCertification({ resumeId: profileResumeId, certificationId }).unwrap();
+          toastMessage.success("Certification deleted successfully.");
+        } catch (error) {
+          toastMessage.error(error?.data?.message || "Failed to delete certification.");
+        }
+      },
+    });
+  };
 
   const openCreateModal = () => {
     setEditingCertification(null);
@@ -121,14 +142,24 @@ const Certifications = () => {
                       </a>
                     ) : null}
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => openEditModal(certification)}
-                    className="text-gray-400 hover:text-primary transition-colors"
-                    title="Edit"
-                  >
-                    <span className="material-icons-round text-[18px]">edit</span>
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => openEditModal(certification)}
+                      className="text-gray-400 hover:text-primary transition-colors"
+                      title="Edit"
+                    >
+                      <span className="material-icons-round text-[18px]">edit</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(certification.id)}
+                      className="text-gray-400 hover:text-red-500 transition-colors"
+                      title="Delete"
+                    >
+                      <span className="material-icons-round text-[18px]">delete</span>
+                    </button>
+                  </div>
                 </div>
                 {certification?.description ? (
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{certification.description}</p>

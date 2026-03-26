@@ -1,3 +1,27 @@
+export const INDUSTRY_LABELS = {
+    INFORMATION_TECHNOLOGY: 'Information Technology',
+    FINTECH: 'Fintech',
+    ECOMMERCE: 'E-Commerce',
+    HEALTHCARE: 'Healthcare',
+    EDUCATION: 'Education',
+    LOGISTICS: 'Logistics',
+    MANUFACTURING: 'Manufacturing',
+    REAL_ESTATE: 'Real Estate',
+    GAMING: 'Gaming',
+    TELECOMMUNICATION: 'Telecommunication',
+    ARTIFICIAL_INTELLIGENCE: 'Artificial Intelligence',
+    CYBER_SECURITY: 'Cyber Security',
+    BLOCKCHAIN: 'Blockchain',
+    IOT: 'Internet of Things',
+    FINANCE: 'Finance',
+    MARKETING: 'Marketing',
+    CONSTRUCTION: 'Construction',
+    OTHER: 'Other',
+};
+
+export const getIndustryLabel = (value) =>
+    INDUSTRY_LABELS[value] || (value ? value.replace(/_/g, ' ') : '');
+
 export const JOB_LEVEL_LABELS = {
     INTERN: "Intern",
     JUNIOR: "Junior",

@@ -12,9 +12,9 @@ const MetaInfo = () => {
 
     // Formatting logic
     const location = apiJob.workingModel || apiJob.company?.country || "Remote";
-    const salaryFormatted = apiJob.salaryStart && apiJob.salaryEnd
-        ? `${new Intl.NumberFormat('vi-VN').format(apiJob.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(apiJob.salaryEnd)} VND`
-        : "Negotiable";
+    const salaryFormatted = (apiJob.salaryStart && apiJob.salaryEnd
+            ? `${new Intl.NumberFormat('vi-VN').format(apiJob.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(apiJob.salaryEnd)} VND`
+            : "Negotiable");
     const experienceTime = apiJob.experienceTime ? `${apiJob.experienceTime} years` : null;
     const expDate = apiJob.expDate ? new Date(apiJob.expDate).toLocaleDateString() : null;
 
@@ -42,6 +42,12 @@ const MetaInfo = () => {
                 <span className="material-icons-round text-gray-400 text-[20px]">apartment</span>
                 <span>{apiJob.workingModel}</span>
             </div>
+            {apiJob.quantity > 0 && (
+                <div className="flex items-center gap-2">
+                    <span className="material-icons-round text-gray-400 text-[20px]">people</span>
+                    <span>{apiJob.quantity} positions</span>
+                </div>
+            )}
             {expDate && (
                 <div className="flex items-center gap-2">
                     <span className="material-icons-round text-gray-400 text-[20px]">event</span>

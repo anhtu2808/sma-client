@@ -1,8 +1,10 @@
 import React, { useMemo, useState } from "react";
+import { Modal } from "antd";
 import toastMessage from "@/utils/toastMessage";
 import { useCandidateDashboardProfileQuery } from "@/apis/candidateApi";
 import {
   useCreateResumeProjectMutation,
+  useDeleteResumeProjectMutation,
   useUpdateResumeProjectMutation,
 } from "@/apis/resumeApi";
 import {
@@ -23,7 +25,26 @@ const Projects = () => {
 
   const [createProject, { isLoading: isCreating }] = useCreateResumeProjectMutation();
   const [updateProject, { isLoading: isUpdating }] = useUpdateResumeProjectMutation();
+  const [deleteProject] = useDeleteResumeProjectMutation();
   const isSaving = isCreating || isUpdating;
+
+  const handleDelete = (projectId) => {
+    Modal.confirm({
+      title: "Delete project?",
+      content: "This action cannot be undone.",
+      okText: "Delete",
+      okType: "danger",
+      cancelText: "Cancel",
+      onOk: async () => {
+        try {
+          await deleteProject({ resumeId: profileResumeId, projectId }).unwrap();
+          toastMessage.success("Project deleted successfully.");
+        } catch (error) {
+          toastMessage.error(error?.data?.message || "Failed to delete project.");
+        }
+      },
+    });
+  };
 
   const openCreateModal = () => {
     setEditingProject(null);
@@ -133,6 +154,14 @@ const Projects = () => {
                     title="Edit"
                   >
                     <span className="material-icons-round text-[18px]">edit</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(project.id)}
+                    className="text-gray-400 hover:text-red-500 transition-colors"
+                    title="Delete"
+                  >
+                    <span className="material-icons-round text-[18px]">delete</span>
                   </button>
                 </div>
               </div>

@@ -18,15 +18,15 @@ const Home = () => {
             </Reveal>
 
             <Reveal delay={0.2}>
+                <AIMatchingSection />
+            </Reveal>
+
+            <Reveal delay={0.2}>
                 <DashboardPreviewSection />
             </Reveal>
 
             <Reveal delay={0.2}>
                 <FeaturesSection />
-            </Reveal>
-
-            <Reveal delay={0.2}>
-                <AIMatchingSection />
             </Reveal>
 
             <Reveal delay={0.2}>

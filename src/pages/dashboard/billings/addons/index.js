@@ -1,4 +1,6 @@
+import { useState } from "react";
 import Button from "@/components/Button";
+import PaymentModal from "@/pages/checkout/components/PaymentModal";
 
 const formatCurrency = (amount) => {
   if (amount == null || Number.isNaN(Number(amount))) return "-";
@@ -10,6 +12,25 @@ const formatCurrency = (amount) => {
 };
 
 const Addons = ({ plans = [] }) => {
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [selectedAddonForModal, setSelectedAddonForModal] = useState(null);
+
+  const handleAddToPlan = (addon, priceObj) => {
+    setSelectedAddonForModal({
+      id: addon.id,
+      name: addon.name,
+      priceId: priceObj.id,
+      price: formatCurrency(priceObj.salePrice ?? priceObj.originalPrice ?? 0),
+      durations: [],
+    });
+    setIsPaymentModalOpen(true);
+  };
+
+  const handleClosePaymentModal = () => {
+    setIsPaymentModalOpen(false);
+    setSelectedAddonForModal(null);
+  };
+
   if (!plans || plans.length === 0) return null;
 
   return (
@@ -52,6 +73,7 @@ const Addons = ({ plans = [] }) => {
                   mode={isAdded ? "secondary" : "primary"}
                   shape="rounded"
                   className="!text-sm !font-semibold"
+                  {...(!isAdded && { onClick: () => handleAddToPlan(addon, priceObj) })}
                 >
                   {isAdded ? "Manage" : "Add to plan"}
                 </Button>
@@ -60,6 +82,12 @@ const Addons = ({ plans = [] }) => {
           );
         })}
       </div>
+      <PaymentModal
+        isOpen={isPaymentModalOpen}
+        onClose={handleClosePaymentModal}
+        plan={selectedAddonForModal}
+        selectedDuration={null}
+      />
     </div>
   );
 };

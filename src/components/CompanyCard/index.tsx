@@ -1,5 +1,6 @@
-
+import { Building2 } from 'lucide-react';
 import PropTypes from 'prop-types';
+import { getIndustryLabel } from '@/constant/job';
 
 const CompanyCard = ({
     logo,
@@ -36,9 +37,7 @@ const CompanyCard = ({
                             className="w-full h-full object-contain"
                         />
                     ) : (
-                        <span className="text-xl font-bold text-slate-400">
-                            {name?.charAt(0) || 'C'}
-                        </span>
+                        <Building2 className="text-slate-400" size={24} />
                     )}
                 </div>
             </div>
@@ -60,7 +59,7 @@ const CompanyCard = ({
                     {industry && (
                         <div className="flex items-center gap-2 text-slate-500 text-xs">
                             <span className="material-icons-round text-[16px]">business</span>
-                            <span className="truncate uppercase font-medium">{industry}</span>
+                            <span className="truncate uppercase font-medium">{getIndustryLabel(industry)}</span>
                         </div>
                     )}
                     <div className="flex items-center gap-2 text-slate-500 text-xs">

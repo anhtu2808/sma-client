@@ -1,7 +1,9 @@
 
 import React from 'react';
+import { Building2 } from 'lucide-react';
 import Button from '@/components/Button';
 import PropTypes from 'prop-types';
+import { getIndustryLabel } from '@/constant/job';
 
 const CompanyHeader = ({ company }) => {
     if (!company) return null;
@@ -18,8 +20,8 @@ const CompanyHeader = ({ company }) => {
                             className="w-full h-full object-contain rounded-xl"
                         />
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-slate-50 dark:bg-white/5 text-4xl font-bold text-slate-400">
-                            {company.name?.charAt(0) || 'C'}
+                        <div className="w-full h-full flex items-center justify-center bg-slate-50 dark:bg-white/5">
+                            <Building2 className="text-slate-400" size={40} />
                         </div>
                     )}
                 </div>
@@ -38,7 +40,7 @@ const CompanyHeader = ({ company }) => {
                                 {company.companyIndustry && (
                                     <div className="flex items-center gap-2">
                                         <span className="material-icons-round text-[20px]">business</span>
-                                        <span>{company.companyIndustry}</span>
+                                        <span>{getIndustryLabel(company.companyIndustry)}</span>
                                     </div>
                                 )}
                                 {company.country && (

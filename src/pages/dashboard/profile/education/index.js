@@ -1,8 +1,10 @@
 import React, { useMemo, useState } from "react";
+import { Modal } from "antd";
 import toastMessage from "@/utils/toastMessage";
 import { useCandidateDashboardProfileQuery } from "@/apis/candidateApi";
 import {
   useCreateResumeEducationMutation,
+  useDeleteResumeEducationMutation,
   useUpdateResumeEducationMutation,
 } from "@/apis/resumeApi";
 import { enumToLabel, formatRange, toMonthInputValue } from "@/utils/profileUtils";
@@ -18,6 +20,7 @@ const Education = () => {
 
   const [createEducation, { isLoading: isCreating }] = useCreateResumeEducationMutation();
   const [updateEducation, { isLoading: isUpdating }] = useUpdateResumeEducationMutation();
+  const [deleteEducation] = useDeleteResumeEducationMutation();
   const isSaving = isCreating || isUpdating;
 
   const modalInitialValues = useMemo(() => {
@@ -32,6 +35,24 @@ const Education = () => {
       isCurrent: !!editingEducation?.isCurrent,
     };
   }, [editingEducation]);
+
+  const handleDelete = (educationId) => {
+    Modal.confirm({
+      title: "Delete education?",
+      content: "This action cannot be undone.",
+      okText: "Delete",
+      okType: "danger",
+      cancelText: "Cancel",
+      onOk: async () => {
+        try {
+          await deleteEducation({ resumeId: profileResumeId, educationId }).unwrap();
+          toastMessage.success("Education deleted successfully.");
+        } catch (error) {
+          toastMessage.error(error?.data?.message || "Failed to delete education.");
+        }
+      },
+    });
+  };
 
   const openCreateModal = () => {
     setEditingEducation(null);
@@ -139,6 +160,14 @@ const Education = () => {
                       title="Edit"
                     >
                       <span className="material-icons-round text-[18px]">edit</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(education.id)}
+                      className="text-gray-400 hover:text-red-500 transition-colors"
+                      title="Delete"
+                    >
+                      <span className="material-icons-round text-[18px]">delete</span>
                     </button>
                   </div>
                 </div>

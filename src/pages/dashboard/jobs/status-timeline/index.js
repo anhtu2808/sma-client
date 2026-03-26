@@ -2,18 +2,12 @@ import React from "react";
 import { APPLICATION_STATUS_LABEL, APPLICATION_STATUS } from "@/constant/application";
 
 const StatusTimeline = ({ status }) => {
-  const isRejected = ['AUTO_REJECTED', 'NOT_SUITABLE'].includes(status);
-  const isViewed = ['VIEWED', 'SHORTLISTED'].includes(status);
+  const isViewed = status && status !== 'APPLIED';
 
-  let steps = isRejected
-    ? [
-        { label: APPLICATION_STATUS_LABEL[APPLICATION_STATUS.APPLIED] },
-        { label: APPLICATION_STATUS_LABEL[status], error: true },
-      ]
-    : [
-        { label: APPLICATION_STATUS_LABEL[APPLICATION_STATUS.APPLIED] },
-        { label: APPLICATION_STATUS_LABEL[APPLICATION_STATUS.VIEWED], done: isViewed },
-      ];
+  let steps = [
+    { label: APPLICATION_STATUS_LABEL[APPLICATION_STATUS.APPLIED] },
+    { label: APPLICATION_STATUS_LABEL[APPLICATION_STATUS.VIEWED], done: isViewed },
+  ];
 
   steps = [...steps].reverse();
 

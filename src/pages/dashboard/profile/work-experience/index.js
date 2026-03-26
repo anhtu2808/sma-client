@@ -1,9 +1,11 @@
 import React, { useMemo, useState } from "react";
+import { Modal } from "antd";
 import toastMessage from "@/utils/toastMessage";
 import { useCandidateDashboardProfileQuery } from "@/apis/candidateApi";
 import {
   useCreateResumeExperienceDetailMutation,
   useCreateResumeExperienceMutation,
+  useDeleteResumeExperienceMutation,
   useUpdateResumeExperienceDetailMutation,
   useUpdateResumeExperienceMutation,
 } from "@/apis/resumeApi";
@@ -31,7 +33,26 @@ const WorkExperience = () => {
   const [updateExperience, { isLoading: isUpdatingExperience }] = useUpdateResumeExperienceMutation();
   const [createExperienceDetail, { isLoading: isCreatingDetail }] = useCreateResumeExperienceDetailMutation();
   const [updateExperienceDetail, { isLoading: isUpdatingDetail }] = useUpdateResumeExperienceDetailMutation();
+  const [deleteExperience] = useDeleteResumeExperienceMutation();
   const isSaving = isCreatingExperience || isUpdatingExperience || isCreatingDetail || isUpdatingDetail;
+
+  const handleDelete = (experienceId) => {
+    Modal.confirm({
+      title: "Delete work experience?",
+      content: "This action cannot be undone.",
+      okText: "Delete",
+      okType: "danger",
+      cancelText: "Cancel",
+      onOk: async () => {
+        try {
+          await deleteExperience({ resumeId: profileResumeId, experienceId }).unwrap();
+          toastMessage.success("Work experience deleted successfully.");
+        } catch (error) {
+          toastMessage.error(error?.data?.message || "Failed to delete work experience.");
+        }
+      },
+    });
+  };
 
   const openCreateModal = () => {
     setEditingExperience(null);
@@ -166,14 +187,24 @@ const WorkExperience = () => {
                       ) : null}
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => openEditModal(experience)}
-                    className="text-gray-400 hover:text-primary transition-colors"
-                    title="Edit company experience"
-                  >
-                    <span className="material-icons-round text-[18px]">edit</span>
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => openEditModal(experience)}
+                      className="text-gray-400 hover:text-primary transition-colors"
+                      title="Edit company experience"
+                    >
+                      <span className="material-icons-round text-[18px]">edit</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(experience.id)}
+                      className="text-gray-400 hover:text-red-500 transition-colors"
+                      title="Delete company experience"
+                    >
+                      <span className="material-icons-round text-[18px]">delete</span>
+                    </button>
+                  </div>
                 </div>
 
                 {sortedDetails.length === 0 ? (

@@ -153,6 +153,7 @@ export const resumeApi = api.injectEndpoints({
                 { type: "Resumes", id: RESUME_TYPES.ORIGINAL },
                 { type: "Resumes", id: RESUME_TYPES.TEMPLATE },
                 { type: "Resumes", id: "ALL" },
+                "FeatureUsage",
             ],
         }),
 
@@ -181,6 +182,20 @@ export const resumeApi = api.injectEndpoints({
             ],
         }),
 
+        exportResumeToOriginal: builder.mutation({
+            query: ({ resumeId, payload }) => ({
+                url: `${API_VERSION}/resumes/${resumeId}/export`,
+                method: "POST",
+                body: payload,
+            }),
+            transformResponse: (response) => response?.data ?? response,
+            invalidatesTags: [
+                { type: "Resumes", id: RESUME_TYPES.ORIGINAL },
+                { type: "Resumes", id: RESUME_TYPES.TEMPLATE },
+                { type: "Resumes", id: "ALL" },
+            ],
+        }),
+
         parseCandidateResume: builder.mutation({
             query: ({ resumeId }) => ({
                 url: `${API_VERSION}/resumes/${resumeId}/parse`,
@@ -191,6 +206,7 @@ export const resumeApi = api.injectEndpoints({
                 { type: "Resumes", id: RESUME_TYPES.ORIGINAL },
                 { type: "Resumes", id: RESUME_TYPES.TEMPLATE },
                 { type: "Resumes", id: "ALL" },
+                "FeatureUsage",
             ],
         }),
 
@@ -203,6 +219,7 @@ export const resumeApi = api.injectEndpoints({
                 { type: "Resumes", id: RESUME_TYPES.ORIGINAL },
                 { type: "Resumes", id: RESUME_TYPES.TEMPLATE },
                 { type: "Resumes", id: "ALL" },
+                "FeatureUsage",
             ],
         }),
 
@@ -503,6 +520,17 @@ export const resumeApi = api.injectEndpoints({
                 method: "DELETE",
             }),
             transformResponse: (response) => response?.data ?? response,
+            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+                try {
+                    await queryFulfilled;
+                    patchCandidateProfile(dispatch, (draft) => {
+                        draft.educations = (draft.educations ?? []).filter(
+                            (e) => e.id !== arg.educationId
+                        );
+                    });
+                } catch (error) {
+                }
+            },
         }),
 
         deleteResumeExperience: builder.mutation({
@@ -511,6 +539,17 @@ export const resumeApi = api.injectEndpoints({
                 method: "DELETE",
             }),
             transformResponse: (response) => response?.data ?? response,
+            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+                try {
+                    await queryFulfilled;
+                    patchCandidateProfile(dispatch, (draft) => {
+                        draft.experiences = (draft.experiences ?? []).filter(
+                            (e) => e.id !== arg.experienceId
+                        );
+                    });
+                } catch (error) {
+                }
+            },
         }),
 
         deleteResumeProject: builder.mutation({
@@ -519,6 +558,17 @@ export const resumeApi = api.injectEndpoints({
                 method: "DELETE",
             }),
             transformResponse: (response) => response?.data ?? response,
+            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+                try {
+                    await queryFulfilled;
+                    patchCandidateProfile(dispatch, (draft) => {
+                        draft.projects = (draft.projects ?? []).filter(
+                            (e) => e.id !== arg.projectId
+                        );
+                    });
+                } catch (error) {
+                }
+            },
         }),
 
         deleteResumeCertification: builder.mutation({
@@ -527,6 +577,17 @@ export const resumeApi = api.injectEndpoints({
                 method: "DELETE",
             }),
             transformResponse: (response) => response?.data ?? response,
+            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+                try {
+                    await queryFulfilled;
+                    patchCandidateProfile(dispatch, (draft) => {
+                        draft.certifications = (draft.certifications ?? []).filter(
+                            (e) => e.id !== arg.certificationId
+                        );
+                    });
+                } catch (error) {
+                }
+            },
         }),
     }),
 });
@@ -540,6 +601,7 @@ export const {
     useUploadCandidateResumeMutation,
     useCreateResumeBuilderMutation,
     useCloneResumeBuilderMutation,
+    useExportResumeToOriginalMutation,
     useParseCandidateResumeMutation,
     useDeleteCandidateResumeMutation,
     useUpdateCandidateResumeMutation,

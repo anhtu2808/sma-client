@@ -58,7 +58,7 @@ const SuggestModal = ({
                         regeneratingSuggestionId === suggestion?.id
                         || !Number.isFinite(Number(suggestion?.id))
                       }
-                      onClick={() => onRegenerateSuggestion?.(suggestion?.id)}
+                      onClick={(e) => { e.stopPropagation(); onRegenerateSuggestion?.(suggestion?.id); }}
                       className="flex shrink-0 items-center justify-center rounded p-1.5 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       <span

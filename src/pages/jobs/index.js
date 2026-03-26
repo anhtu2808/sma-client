@@ -143,9 +143,9 @@ const Jobs = () => {
         const mappedJobs = dataToMap.map(job => {
             const normalizedJobId = Number(job.id);
             const isBookmarked = bookmarkOverrides[normalizedJobId] ?? markedJobIds.has(normalizedJobId);
-            const salary = job.salaryStart && job.salaryEnd
-                ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} VND`
-                : "Negotiable";
+            const salary = (job.salaryStart && job.salaryEnd
+                    ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} VND`
+                    : "Negotiable");
 
             // Format location from locations array
             const locationCity = job.locations?.length > 0
