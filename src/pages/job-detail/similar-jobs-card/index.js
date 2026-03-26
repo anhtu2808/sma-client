@@ -9,9 +9,9 @@ const SimilarJobsCard = () => {
 
     const jobs = useMemo(() => {
         return similarJobs.slice(0, 5).map(job => {
-            const salary = job.salaryStart && job.salaryEnd
-                ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} VND`
-                : 'Negotiable';
+            const salary = (job.salaryStart && job.salaryEnd
+                    ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} VND`
+                    : 'Negotiable');
 
             const locationCity = job.locations?.length > 0
                 ? job.locations.map(l => l.city || l.name).filter(Boolean).join(', ')

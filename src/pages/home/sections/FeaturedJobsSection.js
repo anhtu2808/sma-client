@@ -12,9 +12,9 @@ const FeaturedJobsSection = () => {
         return rawJobs
             .filter(job => job.isHighlight === true)
             .map(job => {
-                const salary = job.salaryStart && job.salaryEnd
-                    ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} VND`
-                    : 'Thoả thuận';
+                const salary = (job.salaryStart && job.salaryEnd
+                        ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} VND`
+                        : 'Thỏa thuận');
 
                 const locationCity = job.locations?.length > 0
                     ? job.locations.map(l => l.city || l.name).filter(Boolean).join(', ')

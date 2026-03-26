@@ -47,9 +47,9 @@ const HeroSection = () => {
             title: job.name,
             company: job.company?.name || 'Unknown Company',
             companyLogo: job.company?.logo,
-            salary: job.salaryStart && job.salaryEnd
-                ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} VND`
-                : 'Negotiable',
+            salary: (job.salaryStart && job.salaryEnd
+                    ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} VND`
+                    : 'Negotiable'),
         }));
     }, [jobData, debouncedKeyword]);
 
