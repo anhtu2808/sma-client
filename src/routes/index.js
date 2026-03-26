@@ -27,6 +27,7 @@ import Checkout from "@/pages/checkout";
 import MatchReport from "@/pages/match-report";
 import MatchingHistory from "@/pages/dashboard/matching-history";
 import ResetPassword from "@/pages/reset-password";
+import CVTemplate from "@/pages/match-report/template-sample";
 
 
 export const routes = createBrowserRouter(
@@ -67,6 +68,7 @@ export const routes = createBrowserRouter(
                 <Route path="profile" element={<Navigate to="/dashboard" replace />} />
                 <Route path="billing-plans" element={<BillingPlans />} />
                 <Route path="usage" element={<Usage />} />
+                <Route path="cv-template" element={<CVTemplate />} />
             </Route>
             <Route path="dashboard/resumes/builder" element={<CvBuilder />} />
             <Route path="dashboard/resumes/builder/:id" element={<CvBuilder />} />
