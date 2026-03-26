@@ -18,6 +18,7 @@ const Sidebar = () => {
 
         { to: "/dashboard", icon: "person", label: "Profile", end: true },
         { to: "/dashboard/resumes", icon: <i className="fa-solid fa-file-lines"></i>, label: "Resumes" },
+        { to: "/dashboard/cv-template", icon: <i className="fa-solid fa-file-invoice"></i>, label: "CV Template", badge: "New" },
         { to: "/dashboard/matching-history", icon: "fact_check", label: "Resume Checker", badge: "New" },
         { to: "/dashboard/jobs", icon: "work_history", label: "My Jobs" },
         {
