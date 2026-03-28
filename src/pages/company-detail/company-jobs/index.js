@@ -5,6 +5,7 @@ import toastMessage from "@/utils/toastMessage";
 import { useGetJobsQuery, useGetMarkedJobsQuery, useToggleMarkJobMutation } from '@/apis/jobApi';
 import JobCard from '@/components/JobCard';
 import Pagination from '@/components/Pagination';
+import { formatSalary } from '@/utils/salaryUtils';
 import DataList from '@/components/DataList';
 
 const ITEMS_PER_PAGE = 10;
@@ -82,9 +83,7 @@ const CompanyJobs = ({ companyId }) => {
         const mappedJobs = dataToMap.map(job => {
             const normalizedJobId = Number(job.id);
             const isBookmarked = bookmarkOverrides[normalizedJobId] ?? markedJobIds.has(normalizedJobId);
-            const salary = (job.salaryStart && job.salaryEnd
-                    ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} VND`
-                    : "Negotiable");
+            const salary = formatSalary(job.salaryStart, job.salaryEnd);
 
             const locationCity = job.locations?.length > 0
                 ? job.locations.map(l => l.city || l.name).filter(Boolean).join(', ')

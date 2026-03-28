@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Building2 } from 'lucide-react';
 import { useGetJobsQuery } from '@/apis/jobApi';
+import { formatSalary } from '@/utils/salaryUtils';
 
 const FeaturedJobsSection = () => {
     const navigate = useNavigate();
@@ -12,9 +13,7 @@ const FeaturedJobsSection = () => {
         return rawJobs
             .filter(job => job.isHighlight === true)
             .map(job => {
-                const salary = (job.salaryStart && job.salaryEnd
-                        ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} VND`
-                        : 'Thỏa thuận');
+                const salary = formatSalary(job.salaryStart, job.salaryEnd);
 
                 const locationCity = job.locations?.length > 0
                     ? job.locations.map(l => l.city || l.name).filter(Boolean).join(', ')

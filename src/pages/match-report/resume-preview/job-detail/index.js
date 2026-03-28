@@ -2,15 +2,7 @@ import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useLazyGetJobByIdQuery } from "@/apis/jobApi";
 import Loading from "@/components/Loading";
-
-const formatSalary = (start, end) => {
-  if (!start && !end) return null;
-  const format = (num) => num?.toLocaleString("vi-VN") || "";
-  if (start && end) {
-    return `${format(start)} - ${format(end)} VND`;
-  }
-  return `${format(start || end)} VND`;
-};
+import { formatSalary } from "@/utils/salaryUtils";
 
 const JobDetail = () => {
   const jobId = useSelector((state) => state.matchingReport.data?.jobId);

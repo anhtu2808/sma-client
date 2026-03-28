@@ -18,6 +18,7 @@ const FilesList = ({
   onDeleteResume,
   onRename,
   onViewParsedResult,
+  onEditResume,
   uploadQuota,
 }) => {
   const navigate = useNavigate();
@@ -131,6 +132,19 @@ const FilesList = ({
                     onClick={() => onViewParsedResult(file.id)}
                   >
                     <i className="material-icons-round text-[18px]">visibility</i>
+                  </Button>
+                )}
+
+                {canSetAsProfile && (
+                  <Button
+                    mode="ghost"
+                    size="sm"
+                    shape="rounded"
+                    btnIcon
+                    tooltip="Edit CV"
+                    onClick={() => onEditResume(file.id)}
+                  >
+                    <i className="material-icons-round text-[18px]">edit_note</i>
                   </Button>
                 )}
 
