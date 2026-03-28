@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
@@ -12,6 +12,7 @@ import MatchReportSidebar from '@/pages/match-report/sidebar';
 import Loading from '@/components/Loading';
 import { Result } from 'antd';
 import Button from '@/components/Button';
+import EditorContext from './EditorContext';
 import ResumeEditor from './resume-editor';
 
 const PARSED_STATUSES = ['FINISH', 'DONE', 'SUCCESS'];
@@ -22,6 +23,11 @@ const Enhancements = () => {
   const navigate = useNavigate();
   const { evaluationId } = useParams();
   const { resumeId, jobId } = location.state || {};
+
+  // Editor↔Sidebar communication via context
+  const [editorApi, setEditorApi] = useState({ fixInEditor: null, fixingDetailId: null });
+  const handleEditorReady = useCallback((api) => setEditorApi(api), []);
+  const editorContextValue = useMemo(() => editorApi, [editorApi]);
 
   // Load evaluation data into Redux for Sidebar (if not already loaded)
   const matchData = useSelector((state) => state.matchingReport.data);
@@ -95,18 +101,21 @@ const Enhancements = () => {
   }
 
   return (
-    <div className="min-h-screen bg-surface-light text-neutral-900 xl:h-screen">
-      <div className="flex min-h-screen flex-col xl:h-screen xl:flex-row">
-        <MatchReportSidebar />
-        <main className="flex min-w-0 flex-1 flex-col bg-surface-light">
-          <ResumeEditor
-            resumeId={resumeId}
-            enhancementId={enhancement?.id}
-            initialContent={enhancement?.content}
-          />
-        </main>
+    <EditorContext.Provider value={editorContextValue}>
+      <div className="min-h-screen bg-surface-light text-neutral-900 xl:h-screen">
+        <div className="flex min-h-screen flex-col xl:h-screen xl:flex-row">
+          <MatchReportSidebar />
+          <main className="flex min-w-0 flex-1 flex-col bg-surface-light">
+            <ResumeEditor
+              resumeId={resumeId}
+              enhancementId={enhancement?.id}
+              initialContent={enhancement?.content}
+              onEditorReady={handleEditorReady}
+            />
+          </main>
+        </div>
       </div>
-    </div>
+    </EditorContext.Provider>
   );
 };
 

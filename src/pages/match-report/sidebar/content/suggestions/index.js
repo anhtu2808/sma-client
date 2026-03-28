@@ -7,6 +7,8 @@ const Suggestions = ({
   canRegenerate = true,
   regeneratingSuggestionId = null,
   onRegenerateSuggestion,
+  context = null,
+  detailId = null,
 }) => {
   return (
     <div className={`space-y-3 px-4 pb-4 pl-11 pt-2 ${isFocused ? "bg-transparent" : "bg-white"}`}>
@@ -26,6 +28,8 @@ const Suggestions = ({
           canRegenerate={canRegenerate}
           isRegenerating={regeneratingSuggestionId === suggestion?.id}
           onRegenerate={onRegenerateSuggestion}
+          context={context}
+          detailId={detailId}
         />
       ))}
     </div>
