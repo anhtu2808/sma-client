@@ -20,6 +20,7 @@ const LinkItem = ({ icon, label, url }) => {
 const BasicInfoSection = ({ data }) => {
   const fullName = data?.fullName;
   const jobTitle = data?.jobTitle;
+  const summary = data?.summary;
   const address = data?.addressInResume;
   const email = data?.emailInResume;
   const phone = data?.phoneInResume;
@@ -29,7 +30,7 @@ const BasicInfoSection = ({ data }) => {
 
   const hasContact = email || phone || address;
   const hasLinks = github || linkedin || portfolio;
-  if (!fullName && !jobTitle && !hasContact && !hasLinks) return null;
+  if (!fullName && !jobTitle && !summary && !hasContact && !hasLinks) return null;
 
   return (
     <div className="space-y-3">
@@ -40,6 +41,9 @@ const BasicInfoSection = ({ data }) => {
       <div className="bg-gray-50 rounded-xl p-4 space-y-2">
         {fullName && <p className="text-lg font-bold text-gray-900">{fullName}</p>}
         {jobTitle && <p className="text-sm text-gray-600">{jobTitle}</p>}
+        {summary && (
+          <p className="text-sm text-gray-500 leading-relaxed mt-1">{summary}</p>
+        )}
 
         {hasContact && (
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600">

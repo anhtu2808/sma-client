@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 import { setActiveDocumentTab } from "@/store/slices/matchingReportSlice";
 import ReEvaluateModal from "@/pages/match-report/components/ReEvaluateModal";
@@ -7,6 +7,7 @@ import ReEvaluateModal from "@/pages/match-report/components/ReEvaluateModal";
 const HeaderTop = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { evaluationId } = useParams();
   const [isReEvaluateModalOpen, setIsReEvaluateModalOpen] = useState(false);
   const activeDocumentTab = useSelector((state) => state.matchingReport.ui.activeDocumentTab);
   const evaluationData = useSelector((state) => state.matchingReport.data);
@@ -36,6 +37,21 @@ const HeaderTop = () => {
         })}
       </nav>
       <div className="mb-2 flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            if (evaluationData?.resumeId) {
+              navigate(`/match-report/${evaluationId}/enhancements`, {
+                state: { resumeId: evaluationData.resumeId },
+              });
+            }
+          }}
+          disabled={!evaluationData?.resumeId}
+          className="rounded border border-primary bg-white px-3 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+        >
+          <span className="material-icons-round text-[16px]">edit_note</span>
+          Edit Resume
+        </button>
         <button
           type="button"
           onClick={() => setIsReEvaluateModalOpen(true)}

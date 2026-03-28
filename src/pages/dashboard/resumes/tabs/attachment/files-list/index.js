@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Tooltip } from "antd";
 import Button from "@/components/Button";
 import Loading from "@/components/Loading";
@@ -18,7 +19,10 @@ const FilesList = ({
   onRename,
   onViewParsedResult,
   uploadQuota,
-}) => (
+}) => {
+  const navigate = useNavigate();
+
+  return (
   <div className="bg-white dark:bg-surface-dark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
     <div className="flex items-center justify-between mb-4">
       <h3 className="text-base font-semibold text-gray-900 dark:text-white">Attached Files</h3>
@@ -68,14 +72,13 @@ const FilesList = ({
                 </div>
                 <div className="min-w-0">
                   {file.url ? (
-                    <a
-                      href={file.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm font-medium text-gray-900 dark:text-white truncate hover:text-primary hover:underline block cursor-pointer"
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/cv-preview/${file.id}`)}
+                      className="text-sm font-medium text-gray-900 dark:text-white truncate hover:text-primary hover:underline block cursor-pointer text-left bg-transparent border-none p-0"
                     >
                       {file.name}
-                    </a>
+                    </button>
                   ) : (
                     <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{file.name}</p>
                   )}
@@ -174,6 +177,7 @@ const FilesList = ({
       </div>
     )}
   </div>
-);
+  );
+};
 
 export default FilesList;

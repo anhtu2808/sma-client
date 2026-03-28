@@ -1,0 +1,149 @@
+/* Resume Editor - Tiptap content styles for CV template format */
+
+.resume-editor .ProseMirror {
+  outline: none !important;
+  min-height: 100%;
+}
+
+.resume-editor .ProseMirror:focus {
+  outline: none !important;
+}
+
+/* Base element overrides inside the editor */
+.resume-editor .tiptap-content {
+  outline: none;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color: #1f2937;
+  line-height: 1.5;
+}
+
+.resume-editor .tiptap-content h1 {
+  color: #2551A5;
+  font-size: 28px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin: 0 0 2px 0;
+  line-height: 1.2;
+}
+
+.resume-editor .tiptap-content h2 {
+  color: #2551A5;
+  font-size: 18px;
+  font-weight: bold;
+  margin: 16px 0 4px 0;
+  line-height: 1.3;
+}
+
+.resume-editor .tiptap-content h3 {
+  font-size: 15px;
+  font-weight: bold;
+  margin: 8px 0 4px 0;
+  line-height: 1.4;
+}
+
+.resume-editor .tiptap-content p {
+  font-size: 13px;
+  margin: 2px 0;
+  line-height: 1.5;
+  color: #1f2937;
+}
+
+.resume-editor .tiptap-content ul {
+  list-style-type: disc;
+  padding-left: 24px;
+  margin: 4px 0;
+  font-size: 13px;
+}
+
+.resume-editor .tiptap-content ol {
+  list-style-type: decimal;
+  padding-left: 24px;
+  margin: 4px 0;
+  font-size: 13px;
+}
+
+.resume-editor .tiptap-content li {
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 1px 0;
+}
+
+.resume-editor .tiptap-content li p {
+  margin: 0;
+}
+
+.resume-editor .tiptap-content hr {
+  border: none;
+  border-top: 1.5px solid #2551A5;
+  margin: 4px 0 8px 0;
+}
+
+.resume-editor .tiptap-content a {
+  color: #2551A5;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.resume-editor .tiptap-content a:hover {
+  color: #1a3d7a;
+}
+
+/* Entry header: company/title on left, date on right */
+.resume-editor .tiptap-content div[data-type="entryHeader"] {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  font-size: 14px;
+  margin: 8px 0 2px 0;
+}
+
+.resume-editor .tiptap-content div[data-type="entryHeader"] .entry-title {
+  font-weight: bold;
+}
+
+.resume-editor .tiptap-content div[data-type="entryHeader"] .entry-date {
+  font-weight: bold;
+  font-size: 13px;
+  color: #374151;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.resume-editor .tiptap-content strong {
+  font-weight: bold;
+}
+
+.resume-editor .tiptap-content em {
+  font-style: italic;
+}
+
+.resume-editor .tiptap-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.resume-editor .tiptap-content blockquote {
+  border-left: 3px solid #e5e7eb;
+  padding-left: 1rem;
+  margin: 0.5rem 0;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.resume-editor .tiptap-content pre {
+  background: #1f2937;
+  color: #fff;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin: 0.5rem 0;
+  overflow-x: auto;
+}
+
+.resume-editor .tiptap-content pre code {
+  color: inherit;
+  padding: 0;
+  background: none;
+  font-size: 0.875rem;
+}
