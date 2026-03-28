@@ -25,7 +25,7 @@ const Header = () => {
                 </h1>
                 <p className="text-sm text-gray-500 mt-1">{jobData?.company?.name} • {jobData?.workingModel}</p>
             </header>
-            {jobData?.appliedAttempt === 1 && (
+            {jobData?.appliedAttempt === 2 && (
                 <div className="mb-6 p-5 bg-amber-50 border border-amber-100 rounded-2xl flex items-start gap-4 shadow-sm">
                     <AlertCircle className="text-amber-500 shrink-0 mt-0.5" size={20} />
                     <div className="space-y-1">
