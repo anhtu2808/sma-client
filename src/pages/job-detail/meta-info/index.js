@@ -2,6 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useGetJobByIdQuery } from '@/apis/jobApi';
 import { JOB_LEVEL_LABELS } from '@/constant';
+import { formatSalary } from '@/utils/salaryUtils';
 
 const MetaInfo = () => {
     const { id } = useParams();
@@ -12,9 +13,7 @@ const MetaInfo = () => {
 
     // Formatting logic
     const location = apiJob.workingModel || apiJob.company?.country || "Remote";
-    const salaryFormatted = (apiJob.salaryStart && apiJob.salaryEnd
-            ? `${new Intl.NumberFormat('vi-VN').format(apiJob.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(apiJob.salaryEnd)} VND`
-            : "Negotiable");
+    const salaryFormatted = formatSalary(apiJob.salaryStart, apiJob.salaryEnd);
     const experienceTime = apiJob.experienceTime ? `${apiJob.experienceTime} years` : null;
     const expDate = apiJob.expDate ? new Date(apiJob.expDate).toLocaleDateString() : null;
 

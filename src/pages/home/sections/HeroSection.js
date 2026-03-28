@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Building2 } from 'lucide-react';
 import { useGetJobsQuery } from '@/apis/jobApi';
+import { formatSalary } from '@/utils/salaryUtils';
 import { VIETNAM_PROVINCES } from '@/constant/job';
 import FeaturedJobsSection from './FeaturedJobsSection';
 
@@ -47,9 +48,7 @@ const HeroSection = () => {
             title: job.name,
             company: job.company?.name || 'Unknown Company',
             companyLogo: job.company?.logo,
-            salary: (job.salaryStart && job.salaryEnd
-                    ? `${new Intl.NumberFormat('vi-VN').format(job.salaryStart)} - ${new Intl.NumberFormat('vi-VN').format(job.salaryEnd)} VND`
-                    : 'Negotiable'),
+            salary: formatSalary(job.salaryStart, job.salaryEnd),
         }));
     }, [jobData, debouncedKeyword]);
 

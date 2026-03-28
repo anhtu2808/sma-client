@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { useGetAppliedJobsQuery, useGetMarkedJobsQuery } from "@/apis/jobApi";
 import AppliedJobs from "./applied";
 import SavedJobs from "./saved";
+import { formatSalary } from "@/utils/salaryUtils";
 
 const JOB_TABS = [
   { key: "applied", label: "Applied Jobs" },
@@ -14,16 +15,6 @@ const getCompareDate = (job, tabKey) => {
   if (tabKey === "applied") return new Date(job.appliedAt || 0).getTime();
   if (tabKey === "saved") return new Date(job.savedAt || job.postedAt || 0).getTime();
   return 0;
-};
-
-const formatSalary = (salaryStart, salaryEnd) => {
-  if (!salaryStart && !salaryEnd) return "Negotiable";
-  const formatNumber = (value) => new Intl.NumberFormat("vi-VN").format(value);
-  if (salaryStart && salaryEnd) {
-    return `${formatNumber(salaryStart)} - ${formatNumber(salaryEnd)} VND`;
-  }
-  if (salaryStart) return `From ${formatNumber(salaryStart)} VND`;
-  return `Up to ${formatNumber(salaryEnd)} VND`;
 };
 
 const mapSavedJobFromApi = (job) => {

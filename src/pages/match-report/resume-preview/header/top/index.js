@@ -42,7 +42,7 @@ const HeaderTop = () => {
           onClick={() => {
             if (evaluationData?.resumeId) {
               navigate(`/match-report/${evaluationId}/enhancements`, {
-                state: { resumeId: evaluationData.resumeId },
+                state: { resumeId: evaluationData.resumeId, jobId: evaluationData.jobId },
               });
             }
           }}

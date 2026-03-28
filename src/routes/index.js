@@ -13,6 +13,7 @@ import NotificationSettings from '@/pages/dashboard/setting';
 import Notification from '@/pages/dashboard/notification';
 import Resumes from '@/pages/dashboard/resumes';
 import CvBuilder from '@/pages/dashboard/resumes/cv-builder';
+import ResumeEditor from '@/pages/dashboard/resumes/editor';
 import TemplateSelection from '@/pages/dashboard/resumes/template-selection';
 import Profile from '@/pages/dashboard/profile';
 import Invitations from '@/pages/dashboard/invitations';
@@ -76,6 +77,7 @@ export const routes = createBrowserRouter(
             </Route>
             <Route path="dashboard/resumes/builder" element={<CvBuilder />} />
             <Route path="dashboard/resumes/builder/:id" element={<CvBuilder />} />
+            <Route path="dashboard/resumes/editor/:resumeId" element={<ResumeEditor />} />
             <Route path="checkout" element={<Checkout />} />
         </>
     )

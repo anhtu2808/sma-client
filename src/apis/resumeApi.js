@@ -182,6 +182,14 @@ export const resumeApi = api.injectEndpoints({
             ],
         }),
 
+        updateRawText: builder.mutation({
+            query: ({ resumeId, rawText }) => ({
+                url: `${API_VERSION}/resumes/${resumeId}/raw-text`,
+                method: "PUT",
+                body: { rawText },
+            }),
+        }),
+
         exportResumeToOriginal: builder.mutation({
             query: ({ resumeId, payload }) => ({
                 url: `${API_VERSION}/resumes/${resumeId}/export`,
@@ -571,6 +579,25 @@ export const resumeApi = api.injectEndpoints({
             },
         }),
 
+        getOrCreateEnhancement: builder.query({
+            query: ({ resumeId, jobId }) => ({
+                url: `${API_VERSION}/resume-enhancements`,
+                method: "GET",
+                params: { resumeId, jobId },
+            }),
+            transformResponse: (response) => response?.data,
+            providesTags: (result) =>
+                result ? [{ type: "Enhancement", id: result.id }] : [],
+        }),
+
+        updateEnhancementContent: builder.mutation({
+            query: ({ id, content }) => ({
+                url: `${API_VERSION}/resume-enhancements/${id}/content`,
+                method: "PUT",
+                body: { content },
+            }),
+        }),
+
         deleteResumeCertification: builder.mutation({
             query: ({ resumeId, certificationId }) => ({
                 url: `${API_VERSION}/resumes/${resumeId}/certifications/${certificationId}`,
@@ -601,6 +628,7 @@ export const {
     useUploadCandidateResumeMutation,
     useCreateResumeBuilderMutation,
     useCloneResumeBuilderMutation,
+    useUpdateRawTextMutation,
     useExportResumeToOriginalMutation,
     useParseCandidateResumeMutation,
     useDeleteCandidateResumeMutation,
@@ -624,4 +652,6 @@ export const {
     useCreateResumeCertificationMutation,
     useUpdateResumeCertificationMutation,
     useDeleteResumeCertificationMutation,
+    useGetOrCreateEnhancementQuery,
+    useUpdateEnhancementContentMutation,
 } = resumeApi;

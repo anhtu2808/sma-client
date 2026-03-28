@@ -3,6 +3,7 @@ import { Alert, Col, Row } from 'antd';
 import toastMessage from "@/utils/toastMessage";
 import { useNavigate } from 'react-router-dom';
 import Loading from '@/components/Loading';
+import { formatSalary } from '@/utils/salaryUtils';
 import { 
   useGetMyInvitationsQuery, 
   useTakeActionOnInvitationMutation,
@@ -39,19 +40,6 @@ const STATUS_TO_TAB = {
   DECLINED: 'declined',
 };
 
-const formatSalary = (salaryStart, salaryEnd) => {
-  if (!salaryStart && !salaryEnd) return null;
-
-  const formatNumber = (value) => new Intl.NumberFormat('vi-VN').format(value);
-
-  if (salaryStart && salaryEnd) {
-    return `${formatNumber(salaryStart)} - ${formatNumber(salaryEnd)} VND`;
-  }
-
-  if (salaryStart) return `From ${formatNumber(salaryStart)} VND`;
-
-  return `Up to ${formatNumber(salaryEnd)} VND`;
-};
 
 const formatLocation = (locations, workModeLabel) => {
   const primaryLocation = Array.isArray(locations) ? locations[0] : null;
