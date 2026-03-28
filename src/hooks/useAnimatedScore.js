@@ -13,33 +13,35 @@ const useAnimatedScore = (targetScore, duration = 1000) => {
   useEffect(() => {
     const startScore = prevScoreRef.current;
     const diff = targetScore - startScore;
-    
+
     // If no change, don't animate
     if (diff === 0) return;
-    
+
     const startTime = performance.now();
+    let rafId;
 
     const animate = (currentTime) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      
+
       // Easing function: easeOutQuart for smooth deceleration
       const eased = 1 - Math.pow(1 - progress, 4);
       const current = startScore + diff * eased;
-      
+
       setDisplayScore(current);
 
       if (progress < 1) {
-        requestAnimationFrame(animate);
+        rafId = requestAnimationFrame(animate);
       } else {
         prevScoreRef.current = targetScore;
       }
     };
 
-    requestAnimationFrame(animate);
-    
-    // Cleanup: update ref when target changes
+    rafId = requestAnimationFrame(animate);
+
+    // Cleanup: cancel animation frame and update ref
     return () => {
+      cancelAnimationFrame(rafId);
       prevScoreRef.current = targetScore;
     };
   }, [targetScore, duration]);

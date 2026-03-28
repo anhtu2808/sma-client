@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useLazyGetMatchingDetailQuery, useLazyGetMatchingStatusQuery, useStartMatchingDetailMutation } from "@/apis/matchingApi";
 import useRequireLoginRedirect from "@/hooks/useRequireLoginRedirect";
 import MatchReportHeader from "@/pages/match-report/resume-preview/header";
 import { resetMatchingReportState, setMatchingReportData } from "@/store/slices/matchingReportSlice";
 import { mapEvaluationToStore } from "@/utils/matchingReportUtils";
-import MatchReportResumePreview from "@/pages/match-report/resume-preview";
-import MatchReportSidebar from "@/pages/match-report/sidebar";
+import MatchReportOverview from "@/pages/match-report/overview";
+import JobDetail from "@/pages/match-report/resume-preview/job-detail";
+import ReportSidebar from "@/pages/match-report/report-sidebar";
 import MatchingLoading from "@/pages/match-report/loading";
 import Loading from "@/components/Loading";
 import Button from "@/components/Button";
@@ -44,6 +45,7 @@ const MatchReport = () => {
   const [triggerGetMatchingDetail, { isLoading: isDetailLoading }] = useLazyGetMatchingDetailQuery();
   const [startMatchingDetail, { isLoading: isRetrying }] = useStartMatchingDetailMutation();
 
+  const activeDocumentTab = useSelector((state) => state.matchingReport.ui.activeDocumentTab);
   const { jobId, resumeId, matchSource } = location.state || {};
 
   const handleRetry = async () => {
@@ -288,11 +290,17 @@ const MatchReport = () => {
   return (
     <div className="min-h-screen bg-surface-light text-neutral-900 xl:h-screen">
       <div className="flex min-h-screen flex-col xl:h-screen xl:flex-row">
-        <MatchReportSidebar />
+        <ReportSidebar />
 
         <main className="flex min-w-0 flex-1 flex-col bg-surface-light">
           <MatchReportHeader />
-          <MatchReportResumePreview />
+          {activeDocumentTab === "resume" ? (
+            <MatchReportOverview />
+          ) : (
+            <section className="flex-1 overflow-y-auto">
+              <JobDetail />
+            </section>
+          )}
         </main>
       </div>
     </div>

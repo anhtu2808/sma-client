@@ -186,13 +186,15 @@ const ContentDetail = ({ item, isLast }) => {
       ) : null}
 
       {hasSuggestions && isExpanded ? (
-        <Suggestions 
-          itemKey={item.id} 
-          suggestions={item.suggestions} 
+        <Suggestions
+          itemKey={item.id}
+          suggestions={item.suggestions}
           isFocused={isFocused}
           canRegenerate={canRegenerate}
           regeneratingSuggestionId={regeneratingSuggestionId}
           onRegenerateSuggestion={handleRegenerateSuggestion}
+          context={item.context}
+          detailId={item.id}
         />
       ) : null}
     </div>

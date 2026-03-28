@@ -16,7 +16,7 @@ const HeaderTop = () => {
     <header className="border-b border-neutral-200 px-4 pt-3 pb-0 sm:px-6 flex justify-between items-end">
       <nav className="-mb-px flex flex-wrap gap-4 sm:gap-6">
         {[
-          { key: "resume", label: "Resume" },
+          { key: "resume", label: "Overview" },
           { key: "jobDescription", label: "Job Description" },
         ].map((tab) => {
           const isActive = tab.key === activeDocumentTab;

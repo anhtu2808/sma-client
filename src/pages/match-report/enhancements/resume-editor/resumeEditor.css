@@ -124,6 +124,88 @@
   border-radius: 4px;
 }
 
+/* AI suggestion highlights — ProseMirror decorations (view-only, never serialized) */
+.suggestion-highlight {
+  border-radius: 2px;
+  transition: background 0.2s;
+}
+
+.suggestion-highlight--missing {
+  background: rgba(239, 68, 68, 0.18);
+  border-bottom: 2px solid #ef4444;
+}
+
+.suggestion-highlight--matched {
+  background: rgba(16, 185, 129, 0.15);
+  border-bottom: 2px solid #10b981;
+}
+
+.suggestion-highlight--focused {
+  background: rgba(239, 68, 68, 0.30) !important;
+  outline: 2px solid rgba(239, 68, 68, 0.7);
+  outline-offset: 1px;
+}
+
+.suggestion-highlight--matched.suggestion-highlight--focused {
+  background: rgba(16, 185, 129, 0.30) !important;
+  outline-color: rgba(16, 185, 129, 0.7);
+}
+
+/* Tag overlay — flag/pennant badge floating above highlight (does not affect text flow) */
+.suggestion-has-tag {
+  position: relative;
+}
+
+.suggestion-has-tag::before {
+  content: var(--tag-number, "");
+  position: absolute;
+  top: -20px;
+  left: 0;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+  color: #fff;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 3px 3px 3px 0;
+  z-index: 2;
+  pointer-events: auto;
+}
+
+/* Pennant tail */
+.suggestion-has-tag::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 0 solid transparent;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.suggestion-tag--missing::before {
+  background: #F97316;
+}
+
+.suggestion-tag--missing::after {
+  border-top: 4px solid #c2610f;
+}
+
+.suggestion-tag--matched::before {
+  background: #10b981;
+}
+
+.suggestion-tag--matched::after {
+  border-top: 4px solid #0d9467;
+}
+
 .resume-editor .tiptap-content blockquote {
   border-left: 3px solid #e5e7eb;
   padding-left: 1rem;
