@@ -3,6 +3,8 @@ import { Modal } from "antd";
 import { useGetCandidateResumesQuery } from "@/apis/resumeApi";
 import Loading from "@/components/Loading";
 import { RESUME_TYPES } from "@/constant";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft, faArrowRight, faCirclePlus, faFileLines, faFilePdf, faFolderOpen, faInbox } from '../../../../utils/icons';
 
 const UseTemplateModal = ({ open, onCancel, template, onCreateNew, onSelectExisting, isCreating, isCloning }) => {
     const [step, setStep] = useState("choose"); // "choose" | "select-cv"
@@ -64,7 +66,7 @@ const UseTemplateModal = ({ open, onCancel, template, onCreateNew, onSelectExist
                         >
                             <div className="flex items-start gap-4">
                                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all">
-                                    {isCreating ? <Loading inline size={20} /> : <span className="material-icons-round text-white text-[24px]">add_circle</span>}
+                                    {isCreating ? <Loading inline size={20} /> : <FontAwesomeIcon icon={faCirclePlus} className="text-white text-[24px]" />}
                                 </div>
                                 <div className="min-w-0 flex-1">
                                     <h3 className="font-semibold text-gray-900 text-base mb-1 group-hover:text-orange-600 transition-colors">
@@ -74,9 +76,7 @@ const UseTemplateModal = ({ open, onCancel, template, onCreateNew, onSelectExist
                                         Start from scratch with this template. You will fill in your personal information, experience, and skills yourself.
                                     </p>
                                 </div>
-                                <span className="material-icons-round text-gray-300 group-hover:text-orange-400 text-[20px] mt-1 transition-colors">
-                                    arrow_forward
-                                </span>
+                                <FontAwesomeIcon icon={faArrowRight} className="text-gray-300 group-hover:text-orange-400 text-[20px] mt-1 transition-colors" />
                             </div>
                         </button>
 
@@ -88,7 +88,7 @@ const UseTemplateModal = ({ open, onCancel, template, onCreateNew, onSelectExist
                         >
                             <div className="flex items-start gap-4">
                                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all">
-                                    <span className="material-icons-round text-white text-[24px]">folder_open</span>
+                                    <FontAwesomeIcon icon={faFolderOpen} className="text-white text-[24px]" />
                                 </div>
                                 <div className="min-w-0 flex-1">
                                     <h3 className="font-semibold text-gray-900 text-base mb-1 group-hover:text-orange-600 transition-colors">
@@ -98,9 +98,7 @@ const UseTemplateModal = ({ open, onCancel, template, onCreateNew, onSelectExist
                                         Use data from CVs uploaded in the Attachments section to automatically fill in the template.
                                     </p>
                                 </div>
-                                <span className="material-icons-round text-gray-300 group-hover:text-orange-400 text-[20px] mt-1 transition-colors">
-                                    arrow_forward
-                                </span>
+                                <FontAwesomeIcon icon={faArrowRight} className="text-gray-300 group-hover:text-orange-400 text-[20px] mt-1 transition-colors" />
                             </div>
                         </button>
                     </div>
@@ -115,7 +113,7 @@ const UseTemplateModal = ({ open, onCancel, template, onCreateNew, onSelectExist
                             onClick={handleGoBack}
                             className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-3 transition-colors cursor-pointer"
                         >
-                            <span className="material-icons-round text-[18px]">arrow_back</span>
+                            <FontAwesomeIcon icon={faArrowLeft} className="text-[18px]" />
                             Back
                         </button>
                         <h2 className="text-lg font-bold text-gray-900 mb-1">Choose from uploaded CVs</h2>
@@ -130,7 +128,7 @@ const UseTemplateModal = ({ open, onCancel, template, onCreateNew, onSelectExist
                     ) : resumes.length === 0 ? (
                         <div className="text-center py-10">
                             <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
-                                <span className="material-icons-round text-gray-400 text-[32px]">inbox</span>
+                                <FontAwesomeIcon icon={faInbox} className="text-gray-400 text-[32px]" />
                             </div>
                             <p className="text-gray-500 font-medium mb-1">No CVs yet</p>
                             <p className="text-sm text-gray-400">Please upload CVs in the Attachments section first.</p>
@@ -149,9 +147,7 @@ const UseTemplateModal = ({ open, onCancel, template, onCreateNew, onSelectExist
                                         className={`w-full text-left p-4 rounded-xl border border-gray-100 hover:border-orange-300 hover:bg-orange-50/30 transition-all duration-200 group flex items-center gap-4 cursor-pointer ${isCloning ? 'opacity-70 pointer-events-none' : ''}`}
                                     >
                                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${isPdf ? "bg-red-50 text-red-500" : "bg-blue-50 text-blue-500"}`}>
-                                            <span className="material-icons-round text-[22px]">
-                                                {isPdf ? "picture_as_pdf" : "description"}
-                                            </span>
+                                            <FontAwesomeIcon icon={isPdf ? faFilePdf : faFileLines} className="text-[22px]" />
                                         </div>
                                         <div className="min-w-0 flex-1">
                                             <p className="font-medium text-gray-900 text-sm truncate group-hover:text-orange-600 transition-colors">
@@ -161,9 +157,7 @@ const UseTemplateModal = ({ open, onCancel, template, onCreateNew, onSelectExist
                                                 ID: {resume.id}
                                             </p>
                                         </div>
-                                        <span className="material-icons-round text-gray-300 group-hover:text-orange-400 text-[18px] transition-colors">
-                                            arrow_forward
-                                        </span>
+                                        <FontAwesomeIcon icon={faArrowRight} className="text-gray-300 group-hover:text-orange-400 text-[18px] transition-colors" />
                                     </button>
                                 );
                             })}

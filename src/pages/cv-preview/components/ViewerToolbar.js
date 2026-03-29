@@ -1,5 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft, faArrowUpRightFromSquare, faDownload } from '../../../utils/icons';
 
 const ViewerToolbar = ({ fileName, fileUrl }) => {
   const navigate = useNavigate();
@@ -31,7 +33,7 @@ const ViewerToolbar = ({ fileName, fileUrl }) => {
         onClick={handleBack}
         className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors"
       >
-        <span className="material-icons-round text-[20px]">arrow_back</span>
+        <FontAwesomeIcon icon={faArrowLeft} className="text-[20px]" />
         <span className="hidden sm:inline">Back</span>
       </button>
 
@@ -48,7 +50,7 @@ const ViewerToolbar = ({ fileName, fileUrl }) => {
           className="p-1.5 rounded-lg text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-200 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors disabled:opacity-40"
           title="Open in new tab"
         >
-          <span className="material-icons-round text-[20px]">open_in_new</span>
+          <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="text-[20px]" />
         </button>
         <button
           onClick={handleDownload}
@@ -56,7 +58,7 @@ const ViewerToolbar = ({ fileName, fileUrl }) => {
           className="p-1.5 rounded-lg text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-200 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors disabled:opacity-40"
           title="Download"
         >
-          <span className="material-icons-round text-[20px]">download</span>
+          <FontAwesomeIcon icon={faDownload} className="text-[20px]" />
         </button>
       </div>
     </div>

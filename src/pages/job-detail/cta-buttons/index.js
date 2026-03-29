@@ -6,6 +6,8 @@ import { useGetJobByIdQuery } from '@/apis/jobApi';
 import Loading from '@/components/Loading';
 import useRequireLoginRedirect from '@/hooks/useRequireLoginRedirect';
 import CheckMatchModal from '@/pages/job-detail/check-match-modal';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowUpRightFromSquare, faWandMagicSparkles } from '../../../utils/icons';
 
 const CTAButtons = () => {
     const navigate = useNavigate();
@@ -92,10 +94,10 @@ const CTAButtons = () => {
                     <div className="mb-6 p-5 bg-amber-50 border border-amber-100 rounded-2xl flex items-start gap-4 shadow-sm animate-in fade-in slide-in-from-top-2 duration-500">
                         <AlertCircle className="text-amber-500 shrink-0 mt-0.5" size={20} />
                         <div className="space-y-1.5">
-                            <h4 className="text-[11px] font-black text-amber-900 uppercase tracking-widest">
+                            <h4 className="text-sm font-black text-amber-900 uppercase tracking-widest">
                                 Re-application Notice
                             </h4>
-                            <p className="text-[10px] text-amber-700 leading-relaxed font-medium italic">
+                            <p className="text-sm text-amber-800 leading-relaxed font-medium">
                                 You have <strong>01 final attempt</strong> remaining for this position. Please note that frequent re-applications without significant profile updates may negatively impact the employer's perception of your candidacy. We highly recommend reviewing your resume and answers before proceeding.
                             </p>
                         </div>
@@ -109,7 +111,7 @@ const CTAButtons = () => {
                             disabled={config.disabled}
                             shape='rounded'
                             onClick={handleApplyClick}
-                            iconRight={!config.disabled && <span className="material-icons-round text-[20px]">arrow_outward</span>}
+                            iconRight={!config.disabled && <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="text-[20px]" />}
                         >
                             {config.text}
                         </Button>
@@ -121,7 +123,7 @@ const CTAButtons = () => {
                             className="h-12"
                             shape='rounded'
                             onClick={handleOpenCheckMatch}
-                            iconRight={<span className="material-icons-round text-[20px]">auto_awesome</span>}
+                            iconRight={<FontAwesomeIcon icon={faWandMagicSparkles} className="text-[20px]" />}
                         >
                             Check Match
                         </Button>

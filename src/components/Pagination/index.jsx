@@ -2,6 +2,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Button from '@/components/Button';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronLeft, faChevronRight } from '../../utils/icons';
 
 const Pagination = ({
     currentPage,
@@ -53,7 +55,7 @@ const Pagination = ({
                 onClick={() => onPageChange(currentPage - 1)}
                 className="!border-slate-200 dark:!border-[#4b2c20] hover:!bg-slate-50 dark:hover:!bg-[#3d241b]"
             >
-                <span className="material-icons-round text-slate-500 dark:text-slate-400">chevron_left</span>
+                <FontAwesomeIcon icon={faChevronLeft} className="text-slate-500 dark:text-slate-400" />
             </Button>
 
             {/* Page Numbers */}
@@ -97,7 +99,7 @@ const Pagination = ({
                 onClick={() => onPageChange(currentPage + 1)}
                 className="!border-slate-200 dark:!border-[#4b2c20] hover:!bg-slate-50 dark:hover:!bg-[#3d241b]"
             >
-                <span className="material-icons-round text-slate-500 dark:text-slate-400">chevron_right</span>
+                <FontAwesomeIcon icon={faChevronRight} className="text-slate-500 dark:text-slate-400" />
             </Button>
         </div>
     );

@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setActiveCriteriaId } from "@/store/slices/matchingReportSlice";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck, faSliders } from '../../../../../utils/icons';
 
 const DropDown = ({ items = [] }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -30,9 +32,7 @@ const DropDown = ({ items = [] }) => {
         }`}
         aria-label="More criteria"
       >
-        <span className={`material-icons-round text-[22px] transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`}>
-          tune
-        </span>
+        <FontAwesomeIcon icon={faSliders} className={`text-[22px] transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} />
         {items.length > 0 && (
           <span className="absolute right-2 top-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white shadow-sm ring-2 ring-white">
             {items.length}
@@ -86,7 +86,7 @@ const DropDown = ({ items = [] }) => {
                     </div>
                   </div>
                   {isActive && (
-                    <span className="material-icons-round text-primary text-[20px] shrink-0">check</span>
+                    <FontAwesomeIcon icon={faCheck} className="text-primary text-[20px] shrink-0" />
                   )}
                 </button>
               );

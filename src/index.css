@@ -63,7 +63,7 @@ code {
   @apply bg-primary;
 }
 
-.ant-tabs .ant-tabs-tab .material-icons-round {
+.ant-tabs .ant-tabs-tab .svg-inline--fa {
   color: inherit;
 }
 
@@ -181,10 +181,6 @@ code {
   }
 }
 
-/* Hide react-hot-toast animated icon indicator */
-[data-testid="toast-bar"] > div:first-child > div[style*="animation"] {
-  display: none !important;
-}
 
 /* Rich HTML content (job descriptions from API) */
 .job-detail-content ul {

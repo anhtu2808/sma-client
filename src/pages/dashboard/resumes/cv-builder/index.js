@@ -50,6 +50,8 @@ import { SectionWrapper } from "./components/SectionWrapper";
 import { EditableItemWrapper } from "./components/EditableItemWrapper";
 import { SkillSelector } from "./components/SkillSelector";
 import InlineSelect from "./components/InlineSelect";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft } from '../../../../utils/icons';
 
 // --- Date formatting helper ---
 
@@ -847,7 +849,7 @@ export default function CvBuilder({ onBack }) {
                     <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between sticky top-0 z-50 print:hidden">
                         <div className="flex items-center gap-6">
                             <Button mode="ghost" onClick={() => navigate('/dashboard/resumes')} className="text-gray-500 hover:text-gray-700 font-medium text-sm flex items-center gap-1">
-                                <span className="material-icons-round text-[16px]">arrow_back</span>
+                                <FontAwesomeIcon icon={faArrowLeft} className="text-[16px]" />
                                 Back
                             </Button>
                         </div>

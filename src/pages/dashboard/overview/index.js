@@ -1,10 +1,13 @@
 import { useCandidateProfileQuery } from "@/apis/candidateApi";
 import { Col, Row } from "antd";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCalendarDays, faCircleCheck, faEnvelope, faEye, faFilePdf, faLocationDot, faUser } from '../../../utils/icons';
+import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 
 const summaryCards = [
   {
     title: "Profile Views",
-    icon: "visibility",
+    icon: faEye,
     value: "1,248",
     suffix: "+12%",
     suffixStyle: "text-green-600 bg-green-50",
@@ -14,7 +17,7 @@ const summaryCards = [
   },
   {
     title: "Applications",
-    icon: "send",
+    icon: faPaperPlane,
     value: "42",
     suffix: "+5",
     suffixStyle: "text-green-600 bg-green-50",
@@ -41,7 +44,7 @@ const DashboardOverview = () => {
               {user?.avatar ? (
                 <img alt="User avatar" className="w-full h-full object-cover opacity-90" src={user.avatar} />
               ) : (
-                <span className="material-icons-round text-3xl text-gray-400">person</span>
+                <FontAwesomeIcon icon={faUser} className="text-3xl text-gray-400" />
               )}
             </div>
           </Col>
@@ -52,11 +55,11 @@ const DashboardOverview = () => {
               <p className="text-gray-600">Here is what’s happening with your job search applications today.</p>
               <div className="pt-2 flex flex-wrap justify-center md:justify-start gap-4 text-sm text-gray-500">
                 <span className="flex items-center gap-1">
-                  <span className="material-icons-round text-[18px]">location_on</span>
+                  <FontAwesomeIcon icon={faLocationDot} className="text-[18px]" />
                   Ho Chi Minh City
                 </span>
                 <span className="flex items-center gap-1">
-                  <span className="material-icons-round text-[18px]">calendar_month</span>
+                  <FontAwesomeIcon icon={faCalendarDays} className="text-[18px]" />
                   Joined Oct 2024
                 </span>
               </div>
@@ -75,11 +78,11 @@ const DashboardOverview = () => {
                 className={`bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between h-full relative overflow-hidden group transition-all ${card.hover}`}
               >
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <span className={`material-icons-round text-[80px] ${card.color.split(" ")[0]}`}>{card.icon}</span>
+                  <FontAwesomeIcon icon={card.icon} className={`text-[80px] ${card.color.split(" ")[0]}`} />
                 </div>
                 <div className="flex items-center gap-4 mb-4">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center ${card.color}`}>
-                    <span className="material-icons-round text-[20px]">{card.icon}</span>
+                    <FontAwesomeIcon icon={card.icon} className="text-[20px]" />
                   </div>
                   <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">{card.title}</span>
                 </div>
@@ -153,7 +156,7 @@ const DashboardOverview = () => {
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
                     <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0 text-blue-600">
-                      <span className="material-icons-round text-[16px]">mail</span>
+                      <FontAwesomeIcon icon={faEnvelope} className="text-[16px]" />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-900">TechCorp viewed your CV</p>
@@ -162,7 +165,7 @@ const DashboardOverview = () => {
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0 text-green-600">
-                      <span className="material-icons-round text-[16px]">check_circle</span>
+                      <FontAwesomeIcon icon={faCircleCheck} className="text-[16px]" />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-900">Application submitted to DevSoft</p>
@@ -186,7 +189,7 @@ const DashboardOverview = () => {
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
                   <div className="w-10 h-10 bg-white border border-gray-200 rounded flex items-center justify-center text-red-500 shadow-sm">
-                    <span className="material-icons-round text-[20px]">picture_as_pdf</span>
+                    <FontAwesomeIcon icon={faFilePdf} className="text-[20px]" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-gray-900 truncate">Backend_Dev_Final.pdf</p>

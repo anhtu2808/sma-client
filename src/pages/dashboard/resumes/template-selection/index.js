@@ -10,6 +10,8 @@ import ModernMinimalistImg from "@/assets/template/ModernMinimalist.png";
 import ExecutiveProfessionalImg from "@/assets/template/ExecutiveProfessional.png";
 import CreativeStudioImg from "@/assets/template/CreativeStudio.png";
 import TechInnovatorImg from "@/assets/template/TechInnovator.png";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft } from '../../../../utils/icons';
 
 export const CV_TEMPLATES = [
     {
@@ -99,7 +101,7 @@ const TemplateSelection = () => {
                                     onClick={() => navigate('/dashboard/resumes')}
                                     className="text-gray-500 hover:text-gray-700 transition-colors"
                                 >
-                                    <span className="material-icons-round text-[20px]">arrow_back</span>
+                                    <FontAwesomeIcon icon={faArrowLeft} className="text-[20px]" />
                                 </button>
                                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Choose a Template</h1>
                             </div>

@@ -31,6 +31,7 @@ import ResetPassword from "@/pages/reset-password";
 import CVTemplate from "@/pages/match-report/template-sample";
 import Enhancements from "@/pages/match-report/enhancements";
 import CvPreview from "@/pages/cv-preview";
+import ToastTest from "@/pages/ui-kit/toast";
 
 
 export const routes = createBrowserRouter(
@@ -45,6 +46,7 @@ export const routes = createBrowserRouter(
             <Route element={<Layout />}>
                 <Route index element={<Home />} />
                 <Route path="ui-kit" element={<UiKit />} />
+                <Route path="ui-kit/toast" element={<ToastTest />} />
                 <Route path="jobs" element={<Jobs />} />
                 <Route path="jobs/:id" element={<JobDetail />} />
                 <Route path="pricing" element={<PricingPage />} />

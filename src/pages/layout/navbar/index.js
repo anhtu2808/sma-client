@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import UserMenuDropdown from './UserMenuDropdown';
@@ -9,6 +9,9 @@ import { setRealtimePreview } from '@/pages/dashboard/notification/components/no
 import dayjs from 'dayjs';
 import Logo from "@/components/Logo";
 import { createPortal } from 'react-dom';
+import NotificationDrawer from './NotificationDrawer';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBell, faCircleExclamation } from '../../../utils/icons';
 
 const navItems = [
   { to: '/', label: 'Home', end: true },
@@ -20,6 +23,7 @@ const navItems = [
 const Navbar = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem('accessToken');
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const isLoggedIn = Boolean(token);
   const { data } = useGetNotificationsQuery({
@@ -103,9 +107,9 @@ const Navbar = () => {
             <div className="flex items-center gap-4">
               <button
                 className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-                onClick={() => navigate('/dashboard/notifications')}
+                onClick={() => setDrawerOpen(true)}
               >
-                <span className="material-icons-round text-gray-600 dark:text-gray-300 text-2xl">notifications</span>
+                <FontAwesomeIcon icon={faBell} className="text-gray-600 dark:text-gray-300 text-2xl" />
                 {/* <span className="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-white dark:border-gray-900"></span> */}
                 {unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
@@ -119,6 +123,7 @@ const Navbar = () => {
           )}
         </div>
       </div>
+      {isLoggedIn && <NotificationDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />}
       {showPreview && preview && preview.id && createPortal(
         <div className="fixed bottom-6 right-6 w-96 
               bg-white dark:bg-gray-900 
@@ -132,7 +137,7 @@ const Navbar = () => {
                   bg-orange-100 dark:bg-orange-900/30
                   text-orange-500 
                   flex items-center justify-center">
-              <span className="material-symbols-outlined text-red-500">error</span>
+              <FontAwesomeIcon icon={faCircleExclamation} className="text-red-500" />
             </div>
 
             {/* Content Section */}

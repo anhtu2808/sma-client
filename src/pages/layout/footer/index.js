@@ -1,6 +1,8 @@
 import Logo from '@/components/Logo';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTwitter, faFacebook, faLinkedin } from '@fortawesome/free-brands-svg-icons';
 
 const Footer = () => {
     return (
@@ -17,16 +19,16 @@ const Footer = () => {
                         </p>
                         <div className="flex gap-4">
                             {[
-                                { icon: "fa-twitter", link: "#" },
-                                { icon: "fa-facebook", link: "#" },
-                                { icon: "fa-linkedin", link: "#" }
+                                { icon: faTwitter, link: "#" },
+                                { icon: faFacebook, link: "#" },
+                                { icon: faLinkedin, link: "#" }
                             ].map((social, index) => (
                                 <Link
                                     key={index}
                                     to={social.link}
                                     className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-primary hover:text-white transition-all duration-300"
                                 >
-                                    <i className={`fa-brands ${social.icon} text-lg`}></i>
+                                    <FontAwesomeIcon icon={social.icon} className="text-lg" />
                                 </Link>
                             ))}
                         </div>

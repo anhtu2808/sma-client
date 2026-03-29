@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowRight, faBarsStaggered, faBolt, faCertificate, faChevronRight, faCircleCheck, faCircleExclamation, faCity, faLightbulb, faMagnifyingGlass, faPenToSquare, faStar, faThumbsDown, faThumbsUp, faUser, faWandMagicSparkles } from '../../../utils/icons';
 
 const InteractiveFeaturesSection = () => {
     const navigate = useNavigate();
@@ -24,7 +26,7 @@ const InteractiveFeaturesSection = () => {
     const tabs = [
         {
             id: 'jobs',
-            icon: 'search',
+            icon: faMagnifyingGlass,
             iconBg: 'bg-orange-500',
             iconColor: 'text-white',
             title: 'Find Jobs',
@@ -50,10 +52,10 @@ const InteractiveFeaturesSection = () => {
 
                         {/* Search Bar Mockup */}
                         <div className="absolute top-10 w-full max-w-sm bg-white dark:bg-surface-dark rounded-full shadow-lg border border-gray-100 dark:border-gray-800 p-2 flex items-center gap-2 z-10 transform -rotate-2">
-                            <span className="material-icons-round text-orange-500 ml-2">search</span>
+                            <FontAwesomeIcon icon={faMagnifyingGlass} className="text-orange-500 ml-2" />
                             <div className="flex-1 text-sm text-gray-400">Software Engineer...</div>
                             <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center">
-                                <span className="material-icons-round text-sm">arrow_forward</span>
+                                <FontAwesomeIcon icon={faArrowRight} className="text-sm" />
                             </div>
                         </div>
 
@@ -100,7 +102,7 @@ const InteractiveFeaturesSection = () => {
         },
         {
             id: 'companies',
-            icon: 'apartment',
+            icon: faCity,
             iconBg: 'bg-orange-50 dark:bg-orange-900/20',
             iconColor: 'text-orange-500',
             title: 'Companies',
@@ -133,14 +135,14 @@ const InteractiveFeaturesSection = () => {
                                 </div>
                                 <div className="mt-10 mb-4">
                                     <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                        Global Tech Inc. <span className="material-icons-round text-blue-500 text-sm">verified</span>
+                                        Global Tech Inc. <FontAwesomeIcon icon={faCertificate} className="text-blue-500 text-sm" />
                                     </h3>
                                     <div className="flex items-center gap-1 text-yellow-500 text-sm mt-1">
-                                        <span className="material-icons-round text-sm">star</span>
-                                        <span className="material-icons-round text-sm">star</span>
-                                        <span className="material-icons-round text-sm">star</span>
-                                        <span className="material-icons-round text-sm">star</span>
-                                        <span className="material-icons-round text-sm text-gray-300">star</span>
+                                        <FontAwesomeIcon icon={faStar} className="text-sm" />
+                                        <FontAwesomeIcon icon={faStar} className="text-sm" />
+                                        <FontAwesomeIcon icon={faStar} className="text-sm" />
+                                        <FontAwesomeIcon icon={faStar} className="text-sm" />
+                                        <FontAwesomeIcon icon={faStar} className="text-sm text-gray-300" />
                                         <span className="text-gray-500 text-xs ml-1">4.2 (1.2k reviews)</span>
                                     </div>
                                 </div>
@@ -159,7 +161,7 @@ const InteractiveFeaturesSection = () => {
         },
         {
             id: 'cv-analysis',
-            icon: 'check_circle',
+            icon: faCircleCheck,
             iconBg: 'bg-orange-50 dark:bg-orange-900/20',
             iconColor: 'text-orange-500',
             title: 'CV Analysis',
@@ -214,14 +216,14 @@ const InteractiveFeaturesSection = () => {
                                 </div>
                                 <div className="space-y-3">
                                     <div className="flex items-start gap-2">
-                                        <span className="material-icons-round text-red-500 text-sm mt-0.5">error_outline</span>
+                                        <FontAwesomeIcon icon={faCircleExclamation} className="text-red-500 text-sm mt-0.5" />
                                         <div>
                                             <div className="text-xs font-bold text-gray-800 dark:text-gray-200">Missing Keywords</div>
                                             <div className="text-[10px] text-gray-500">Add 'React', 'TypeScript'</div>
                                         </div>
                                     </div>
                                     <div className="flex items-start gap-2">
-                                        <span className="material-icons-round text-green-500 text-sm mt-0.5">check_circle</span>
+                                        <FontAwesomeIcon icon={faCircleCheck} className="text-green-500 text-sm mt-0.5" />
                                         <div>
                                             <div className="text-xs font-bold text-gray-800 dark:text-gray-200">Format & Length</div>
                                             <div className="text-[10px] text-gray-500">Perfect 1-page length</div>
@@ -236,7 +238,7 @@ const InteractiveFeaturesSection = () => {
         },
         {
             id: 'cv-builder',
-            icon: 'edit',
+            icon: faPenToSquare,
             iconBg: 'bg-orange-50 dark:bg-orange-900/20',
             iconColor: 'text-orange-500',
             title: 'CV Builder',
@@ -288,7 +290,7 @@ const InteractiveFeaturesSection = () => {
                                 </div>
 
                                 <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 mb-3 flex items-center justify-center">
-                                    <span className="material-icons-round text-blue-500 text-lg">person</span>
+                                    <FontAwesomeIcon icon={faUser} className="text-blue-500 text-lg" />
                                 </div>
                                 <div className="h-3 w-3/4 bg-gray-200 dark:bg-gray-700 rounded mb-1"></div>
                                 <div className="h-2 w-1/2 bg-blue-100 dark:bg-blue-900/50 rounded mb-4"></div>
@@ -314,7 +316,7 @@ const InteractiveFeaturesSection = () => {
         },
         {
             id: 'smart-ai',
-            icon: 'electric_bolt',
+            icon: faBolt,
             iconBg: 'bg-orange-500',
             iconColor: 'text-white',
             title: 'SmartRecruit AI',
@@ -340,7 +342,7 @@ const InteractiveFeaturesSection = () => {
                             {/* Header */}
                             <div className="flex items-center gap-3 mb-5 border-b border-gray-100 dark:border-gray-800 pb-4">
                                 <div className="w-10 h-10 rounded-xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-500">
-                                    <span className="material-icons-round">graphic_eq</span>
+                                    <FontAwesomeIcon icon={faBarsStaggered} />
                                 </div>
                                 <div className="flex-1">
                                     <h4 className="text-sm font-bold text-gray-900 dark:text-white">AI Resume Insights</h4>
@@ -355,7 +357,7 @@ const InteractiveFeaturesSection = () => {
                                 {/* Strong Points */}
                                 <div className="bg-green-50 dark:bg-green-900/10 border border-green-100 dark:border-green-800/30 rounded-xl p-3">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <span className="material-icons-round text-sm text-green-500">thumb_up</span>
+                                        <FontAwesomeIcon icon={faThumbsUp} className="text-sm text-green-500" />
                                         <h5 className="text-xs font-bold text-green-700 dark:text-green-400">Strong Points</h5>
                                     </div>
                                     <ul className="text-[11px] text-green-600 dark:text-green-300 space-y-1.5 ml-1">
@@ -367,7 +369,7 @@ const InteractiveFeaturesSection = () => {
                                 {/* Weak Points */}
                                 <div className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-800/30 rounded-xl p-3">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <span className="material-icons-round text-sm text-red-500">thumb_down</span>
+                                        <FontAwesomeIcon icon={faThumbsDown} className="text-sm text-red-500" />
                                         <h5 className="text-xs font-bold text-red-700 dark:text-red-400">Areas to Improve</h5>
                                     </div>
                                     <ul className="text-[11px] text-red-600 dark:text-red-300 space-y-1.5 ml-1">
@@ -379,10 +381,10 @@ const InteractiveFeaturesSection = () => {
                                 {/* AI Suggestion */}
                                 <div className="bg-orange-500 text-white rounded-xl p-3 shadow-md relative overflow-hidden">
                                     <div className="absolute top-0 right-0 p-2 opacity-20">
-                                        <span className="material-icons-round text-4xl">auto_awesome</span>
+                                        <FontAwesomeIcon icon={faWandMagicSparkles} className="text-4xl" />
                                     </div>
                                     <div className="flex items-start gap-2 relative z-10">
-                                        <span className="material-icons-round text-sm mt-0.5">lightbulb</span>
+                                        <FontAwesomeIcon icon={faLightbulb} className="text-sm mt-0.5" />
                                         <div>
                                             <h5 className="text-xs font-bold mb-1">AI Suggestion</h5>
                                             <p className="text-[10px] text-orange-50 opacity-90 leading-relaxed">
@@ -425,7 +427,7 @@ const InteractiveFeaturesSection = () => {
                             >
                                 <div>
                                     <div className={`w-10 h-10 rounded-xl mb-4 flex items-center justify-center ${tab.iconBg} ${tab.iconColor} shadow-sm`}>
-                                        <span className="material-icons-round">{tab.icon}</span>
+                                        <FontAwesomeIcon icon={tab.icon} />
                                     </div>
                                     <h3 className="font-bold text-gray-900 dark:text-white mb-1.5">{tab.title}</h3>
                                     <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed max-w-[90%]">
@@ -461,7 +463,7 @@ const InteractiveFeaturesSection = () => {
                                     className="inline-flex items-center gap-2 text-orange-600 dark:text-orange-400 font-semibold hover:gap-3 transition-all"
                                 >
                                     {activeTab.panel.linkText}
-                                    <span className="material-icons-round text-sm">chevron_right</span>
+                                    <FontAwesomeIcon icon={faChevronRight} className="text-sm" />
                                 </button>
                                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 italic">
                                     {activeTab.panel.subDesc}

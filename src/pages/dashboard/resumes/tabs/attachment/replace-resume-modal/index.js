@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Modal } from "antd";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleCheck, faFileLines, faFilePdf } from '../../../../../../utils/icons';
 
 const ReplaceResumeModal = ({ open, files, loading, onSelect, onCancel }) => {
   const [selectedId, setSelectedId] = useState(null);
@@ -38,16 +40,14 @@ const ReplaceResumeModal = ({ open, files, loading, onSelect, onCancel }) => {
               }`}
             >
               <div className="h-9 w-9 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center flex-none">
-                <span className={`material-icons-round text-sm ${file.type === "pdf" ? "text-red-500" : "text-blue-500"}`}>
-                  {file.type === "pdf" ? "picture_as_pdf" : "description"}
-                </span>
+                <FontAwesomeIcon icon={file.type === "pdf" ? faFilePdf : faFileLines} className={`text-sm ${file.type === "pdf" ? "text-red-500" : "text-blue-500"}`} />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{file.name}</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">Uploaded: {file.uploadTime}</p>
               </div>
               {selectedId === file.id && (
-                <span className="material-icons-round text-primary text-xl">check_circle</span>
+                <FontAwesomeIcon icon={faCircleCheck} className="text-primary text-xl" />
               )}
             </button>
           ))}

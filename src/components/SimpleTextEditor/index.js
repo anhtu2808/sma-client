@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import './SimpleTextEditor.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faList } from '../../utils/icons';
 
 const SimpleTextEditor = ({
     value,
@@ -146,7 +148,7 @@ const SimpleTextEditor = ({
                     aria-pressed={activeFormats.list}
                     disabled={disabled}
                 >
-                    <span className="material-icons-round">format_list_bulleted</span>
+                    <FontAwesomeIcon icon={faList} />
                 </button>
             </div>
             <div

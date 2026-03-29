@@ -1,5 +1,7 @@
 import React from "react";
 import { getValidLink } from "@/utils/profileUtils";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEnvelope, faLocationDot, faPhone, faUser } from '../../../../../../utils/icons';
 
 const LinkItem = ({ icon, label, url }) => {
   if (!url) return null;
@@ -11,7 +13,7 @@ const LinkItem = ({ icon, label, url }) => {
       rel="noreferrer"
       className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
     >
-      <span className="material-icons-round text-[16px]">{icon}</span>
+      <FontAwesomeIcon icon={icon} className="text-[16px]" />
       {label}
     </a>
   );
@@ -35,7 +37,7 @@ const BasicInfoSection = ({ data }) => {
   return (
     <div className="space-y-3">
       <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-        <span className="material-icons-round text-primary text-[18px]">person</span>
+        <FontAwesomeIcon icon={faUser} className="text-primary text-[18px]" />
         Basic Information
       </h3>
       <div className="bg-gray-50 rounded-xl p-4 space-y-2">
@@ -49,19 +51,19 @@ const BasicInfoSection = ({ data }) => {
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600">
             {email && (
               <span className="inline-flex items-center gap-1">
-                <span className="material-icons-round text-[14px] text-gray-400">email</span>
+                <FontAwesomeIcon icon={faEnvelope} className="text-[14px] text-gray-400" />
                 {email}
               </span>
             )}
             {phone && (
               <span className="inline-flex items-center gap-1">
-                <span className="material-icons-round text-[14px] text-gray-400">phone</span>
+                <FontAwesomeIcon icon={faPhone} className="text-[14px] text-gray-400" />
                 {phone}
               </span>
             )}
             {address && (
               <span className="inline-flex items-center gap-1">
-                <span className="material-icons-round text-[14px] text-gray-400">location_on</span>
+                <FontAwesomeIcon icon={faLocationDot} className="text-[14px] text-gray-400" />
                 {address}
               </span>
             )}

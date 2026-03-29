@@ -1,5 +1,7 @@
 import React from "react";
 import { enumToLabel, formatRange } from "@/utils/profileUtils";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCity, faGraduationCap, faStar } from '../../../../../../utils/icons';
 
 const EducationSection = ({ data }) => {
   const educations = data?.educations ?? [];
@@ -8,14 +10,14 @@ const EducationSection = ({ data }) => {
   return (
     <div className="space-y-3">
       <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-        <span className="material-icons-round text-primary text-[18px]">school</span>
+        <FontAwesomeIcon icon={faGraduationCap} className="text-primary text-[18px]" />
         Education
       </h3>
       <div className="space-y-3">
         {educations.map((edu) => (
           <div key={edu?.id} className="flex gap-3 items-start">
             <div className="w-10 h-10 bg-gray-50 rounded flex-shrink-0 flex items-center justify-center text-gray-400">
-              <span className="material-icons-round text-[20px]">apartment</span>
+              <FontAwesomeIcon icon={faCity} className="text-[20px]" />
             </div>
             <div className="flex-1 min-w-0">
               <h4 className="text-sm font-bold text-gray-900">{edu?.institution || "N/A"}</h4>
@@ -28,7 +30,7 @@ const EducationSection = ({ data }) => {
                 </span>
                 {edu?.gpa != null && (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-50 text-green-700 text-xs font-medium border border-green-100">
-                    <span className="material-icons-round text-[12px]">grade</span>
+                    <FontAwesomeIcon icon={faStar} className="text-[12px]" />
                     GPA: {edu.gpa}
                   </span>
                 )}

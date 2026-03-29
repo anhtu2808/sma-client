@@ -26,7 +26,7 @@ const mapSavedJobFromApi = (job) => {
     company: companyName,
     location: company?.address || job?.workingModel || "Location",
     salary: formatSalary(job?.salaryStart, job?.salaryEnd),
-    tags: job?.skills?.map((skill) => skill.name) || [],
+    tags: job?.skills ? [...job.skills].map(s => s.name).sort((a, b) => a.localeCompare(b)) : [],
     companyLogo:
       company?.logo ||
       company?.logoUrl ||
@@ -46,7 +46,7 @@ const mapAppliedJobFromApi = (job) => {
     company: companyName,
     location: company?.address || job?.workingModel || "Location",
     salary: formatSalary(job?.salaryStart, job?.salaryEnd),
-    tags: job?.skills?.map((skill) => skill.name) || [],
+    tags: job?.skills ? [...job.skills].map(s => s.name).sort((a, b) => a.localeCompare(b)) : [],
     companyLogo:
       company?.logo ||
       company?.logoUrl ||

@@ -9,6 +9,8 @@ import {
 } from "@/apis/resumeApi";
 import { enumToLabel, formatRange, toMonthInputValue } from "@/utils/profileUtils";
 import EducationFormModal from "@/pages/dashboard/profile/education/EducationFormModal";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCity, faGraduationCap, faPenToSquare, faPlus, faStar, faTrash } from '../../../../utils/icons';
 
 const Education = () => {
   const { data: profile } = useCandidateDashboardProfileQuery();
@@ -100,7 +102,7 @@ const Education = () => {
       <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="bg-orange-50 dark:bg-orange-900/20 p-2 rounded-lg text-primary">
-            <span className="material-icons-round">school</span>
+            <FontAwesomeIcon icon={faGraduationCap} />
           </div>
           <h2 className="text-lg font-bold text-gray-900 dark:text-white">Education</h2>
         </div>
@@ -109,9 +111,7 @@ const Education = () => {
           onClick={openCreateModal}
           className="inline-flex items-center gap-2 text-primary font-semibold hover:text-primary/80 transition-colors"
         >
-          <span className="material-icons-round text-[18px] border border-current rounded-full p-[1px]">
-            add
-          </span>
+          <FontAwesomeIcon icon={faPlus} className="text-[18px] border border-current rounded-full p-[1px]" />
           Add Education
         </button>
       </div>
@@ -127,9 +127,7 @@ const Education = () => {
               onClick={openCreateModal}
               className="inline-flex items-center gap-2 text-primary font-semibold hover:text-primary/80 transition-colors"
             >
-              <span className="material-icons-round text-[18px] border border-current rounded-full p-[1px]">
-                add
-              </span>
+              <FontAwesomeIcon icon={faPlus} className="text-[18px] border border-current rounded-full p-[1px]" />
               Add Education
             </button>
           </div>
@@ -137,7 +135,7 @@ const Education = () => {
           educations.map((education) => (
             <div key={education?.id} className="flex gap-4 items-start">
               <div className="w-12 h-12 bg-gray-50 dark:bg-gray-800 rounded flex-shrink-0 flex items-center justify-center text-gray-400">
-                <span className="material-icons-round text-[22px]">apartment</span>
+                <FontAwesomeIcon icon={faCity} className="text-[22px]" />
               </div>
 
               <div className="flex-1">
@@ -159,7 +157,7 @@ const Education = () => {
                       className="text-gray-400 hover:text-primary transition-colors"
                       title="Edit"
                     >
-                      <span className="material-icons-round text-[18px]">edit</span>
+                      <FontAwesomeIcon icon={faPenToSquare} className="text-[18px]" />
                     </button>
                     <button
                       type="button"
@@ -167,14 +165,14 @@ const Education = () => {
                       className="text-gray-400 hover:text-red-500 transition-colors"
                       title="Delete"
                     >
-                      <span className="material-icons-round text-[18px]">delete</span>
+                      <FontAwesomeIcon icon={faTrash} className="text-[18px]" />
                     </button>
                   </div>
                 </div>
 
                 <div className="mt-2 flex items-center gap-4 flex-wrap">
                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-xs font-medium border border-green-100 dark:border-green-800">
-                    <span className="material-icons-round text-[14px]">grade</span>
+                    <FontAwesomeIcon icon={faStar} className="text-[14px]" />
                     GPA: {education?.gpa ?? "N/A"}
                   </span>
                 </div>

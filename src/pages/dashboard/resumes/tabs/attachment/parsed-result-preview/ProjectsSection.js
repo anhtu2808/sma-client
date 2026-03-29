@@ -1,5 +1,7 @@
 import React from "react";
 import { enumToLabel, formatRange, getValidLink } from "@/utils/profileUtils";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowUpRightFromSquare, faRocket } from '../../../../../../utils/icons';
 
 const ProjectsSection = ({ data }) => {
   const projects = data?.projects ?? [];
@@ -8,7 +10,7 @@ const ProjectsSection = ({ data }) => {
   return (
     <div className="space-y-3">
       <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-        <span className="material-icons-round text-primary text-[18px]">rocket_launch</span>
+        <FontAwesomeIcon icon={faRocket} className="text-primary text-[18px]" />
         Projects
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -23,7 +25,7 @@ const ProjectsSection = ({ data }) => {
                   rel="noreferrer"
                   className="text-gray-500 hover:text-primary flex-shrink-0"
                 >
-                  <span className="material-icons-round text-[16px]">open_in_new</span>
+                  <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="text-[16px]" />
                 </a>
               )}
             </div>

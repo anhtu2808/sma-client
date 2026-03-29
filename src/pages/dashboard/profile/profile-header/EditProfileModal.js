@@ -4,6 +4,8 @@ import toastMessage from "@/utils/toastMessage";
 import ProfileSectionModal from "@/components/ProfileSectionModal";
 import Loading from "@/components/Loading";
 import { useUploadFilesMutation } from "@/apis/resumeApi";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCamera } from '../../../../utils/icons';
 
 const FORM_ID = "edit-profile-form";
 
@@ -147,7 +149,7 @@ const EditProfileModal = ({ open, loading, initialValues, onCancel, onSubmit }) 
                 />
               ) : (
                 <div className="flex h-full w-full flex-col items-center justify-center text-neutral-500">
-                  <span className="material-icons-round mb-1 text-2xl">add_a_photo</span>
+                  <FontAwesomeIcon icon={faCamera} className="mb-1 text-2xl" />
                   <div className="text-xs">Upload</div>
                 </div>
               )}

@@ -2,6 +2,8 @@ import React, { useMemo } from "react";
 import { Col, Row, Tabs } from "antd";
 import ResumeBuilderTab from "./tabs/resume-buider";
 import AttachmentsTab from "./tabs/attachment";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faNewspaper, faPaperclip } from '../../../utils/icons';
 
 const Resumes = () => {
   const tabItems = useMemo(
@@ -10,7 +12,7 @@ const Resumes = () => {
         key: "builder",
         label: (
           <span className="inline-flex items-center gap-2">
-            <span className="material-icons-round text-[20px]">article</span>
+            <FontAwesomeIcon icon={faNewspaper} className="text-[20px]" />
             Resume Builder
           </span>
         ),
@@ -22,7 +24,7 @@ const Resumes = () => {
         key: "attachments",
         label: (
           <span className="inline-flex items-center gap-2">
-            <span className="material-icons-round text-[20px]">attach_file</span>
+            <FontAwesomeIcon icon={faPaperclip} className="text-[20px]" />
             Attachments
           </span>
         ),

@@ -1,9 +1,11 @@
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBrain, faBolt, faUserShield } from '../../../utils/icons';
 
 const FeaturesSection = () => {
     const features = [
         {
-            icon: 'psychology',
+            icon: faBrain,
             title: 'Expert Matching',
             description: 'Our algorithm analyzes thousands of data points to match candidates not just on skills, but on culture fit and career goals.',
             color: 'orange',
@@ -11,7 +13,7 @@ const FeaturesSection = () => {
             iconColor: 'text-primary'
         },
         {
-            icon: 'bolt',
+            icon: faBolt,
             title: 'Fast Hiring',
             description: 'Reduce your time-to-hire by 60%. Schedule interviews instantly and manage your pipeline with our intuitive dashboard.',
             color: 'blue',
@@ -19,7 +21,7 @@ const FeaturesSection = () => {
             iconColor: 'text-blue-600 dark:text-blue-400'
         },
         {
-            icon: 'verified_user',
+            icon: faUserShield,
             title: 'Top Tech Roles',
             description: 'From AI Engineers to Full Stack Developers, access a pool of the top 1% of tech talent verified by industry experts.',
             color: 'purple',
@@ -50,7 +52,7 @@ const FeaturesSection = () => {
                             className="group bg-white dark:bg-surface-dark p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-xl hover:border-primary/20 dark:hover:border-primary/20 transition duration-300"
                         >
                             <div className={`w-14 h-14 ${feature.iconBg} ${feature.iconColor} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition duration-300`}>
-                                <span className="material-icons-round text-3xl">{feature.icon}</span>
+                                <FontAwesomeIcon icon={feature.icon} className="text-3xl" />
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{feature.title}</h3>
                             <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{feature.description}</p>

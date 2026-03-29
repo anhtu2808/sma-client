@@ -1,6 +1,8 @@
 import React from 'react';
 import { Form } from 'antd';
 import Button from "@/components/Button";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCirclePlus, faEyeSlash, faHandPointer, faSliders } from '../../../../utils/icons';
 
 const employmentTypeOptions = [
     { label: "Full-time", value: "FULL_TIME" },
@@ -64,7 +66,7 @@ export default function PropertiesSidebar({ activeSection, cvData, updateField, 
                 <div>
                     <div className="flex flex-col items-center justify-center text-gray-500 gap-4 mt-20">
                         <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
-                            <span className="material-icons-round text-3xl">touch_app</span>
+                            <FontAwesomeIcon icon={faHandPointer} className="text-3xl" />
                         </div>
                         <p>Select an item on the right to edit properties</p>
                     </div>
@@ -72,7 +74,7 @@ export default function PropertiesSidebar({ activeSection, cvData, updateField, 
                 {missingSections.length > 0 && (
                     <div className="mt-12 text-left bg-gray-50 p-4 rounded-xl border border-gray-100">
                         <h4 className="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
-                            <span className="material-icons-round text-[16px]">visibility_off</span>
+                            <FontAwesomeIcon icon={faEyeSlash} className="text-[16px]" />
                             Hidden Sections
                         </h4>
                         <div className="flex flex-col gap-2">
@@ -84,7 +86,7 @@ export default function PropertiesSidebar({ activeSection, cvData, updateField, 
                                     onClick={() => addSection(s.key)}
                                     className="!justify-start flex items-center gap-2 bg-white border border-gray-200 hover:border-[#1F8A70] hover:text-[#1F8A70] text-gray-600 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer w-full text-left shadow-sm hover:shadow"
                                 >
-                                    <span className="material-icons-round text-lg">add_circle</span>
+                                    <FontAwesomeIcon icon={faCirclePlus} className="text-lg" />
                                     {s.label}
                                 </Button>
                             ))}
@@ -123,7 +125,7 @@ export default function PropertiesSidebar({ activeSection, cvData, updateField, 
     return (
         <div className="w-80 bg-white border-r border-gray-200 h-full p-6 shadow-sm z-10 hidden lg:block overflow-y-auto shrink-0 sticky top-0 max-h-screen">
             <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
-                <span className="material-icons-round text-primary-600">tune</span>
+                <FontAwesomeIcon icon={faSliders} className="text-primary-600" />
                 Properties
             </h3>
 

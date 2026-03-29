@@ -2,6 +2,8 @@ import React from 'react';
 import toastMessage from "@/utils/toastMessage";
 import { useGetNotificationSettingsQuery, useUpdateNotificationSettingMutation, useResetSettingsMutation } from '@/apis/notificationApi';
 import Loading from '@/components/Loading';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBell, faBriefcase, faCertificate, faCreditCard, faEnvelope } from '../../../utils/icons';
 
 const NotificationSettings = () => {
     const { data: settingsResponse, isLoading } = useGetNotificationSettingsQuery();
@@ -54,10 +56,10 @@ const NotificationSettings = () => {
     ];
 
     const GROUPS = [
-        { id: 'applications', title: 'Applications', icon: 'work_outline' },
-        { id: 'invitations', title: 'Invitations', icon: 'forward_to_inbox' },
-        { id: 'payment', title: 'Payments', icon: 'account_balance_wallet' },
-        { id: 'system', title: 'System Alerts', icon: 'notifications_active' }
+        { id: 'applications', title: 'Applications', icon: faBriefcase },
+        { id: 'invitations', title: 'Invitations', icon: faEnvelope },
+        { id: 'payment', title: 'Payments', icon: faCreditCard },
+        { id: 'system', title: 'System Alerts', icon: faBell }
     ];
 
     const handleToggle = async (displayItem, field, value) => {
@@ -108,7 +110,7 @@ const NotificationSettings = () => {
                         <section key={group.id}>
                             <div className="flex items-center gap-3 mb-5">
                                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                                    <span className="material-symbols-outlined text-primary">{group.icon}</span>
+                                    <FontAwesomeIcon icon={group.icon} className="text-primary" />
                                 </div>
                                 <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200">{group.title}</h2>
                             </div>
@@ -154,7 +156,7 @@ const NotificationSettings = () => {
             </div>
 
             <div className="mt-12 p-4 bg-orange-50 dark:bg-orange-950/20 rounded-xl border border-orange-100 dark:border-orange-900/30 flex items-center gap-3">
-                <span className="material-symbols-outlined text-orange-500 text-xl">verified</span>
+                <FontAwesomeIcon icon={faCertificate} className="text-orange-500 text-xl" />
                 <p className="text-xs text-orange-700 dark:text-orange-400 font-medium italic">
                     Changes are synchronized instantly. You can always revert your choices at any time.
                 </p>

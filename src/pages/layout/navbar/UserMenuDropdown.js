@@ -3,6 +3,8 @@ import { Avatar, Dropdown } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useCandidateProfileQuery } from '@/apis/candidateApi';
 import authService from '@/services/authService';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBell, faChevronDown, faClipboardCheck, faClockRotateLeft, faCreditCard, faEnvelope, faFileLines, faGear, faRightFromBracket, faTableCells, faUser } from '../../../utils/icons';
 
 const UserMenuDropdown = () => {
   const navigate = useNavigate();
@@ -30,61 +32,61 @@ const UserMenuDropdown = () => {
     {
       key: 'overview',
       label: 'Overview',
-      icon: <span className="material-icons-round text-lg">grid_view</span>,
+      icon: <FontAwesomeIcon icon={faTableCells} className="text-lg" />,
       onClick: () => navigate('/dashboard'),
     },
     {
       key: 'profile',
       label: 'Profile',
-      icon: <span className="material-icons-round text-lg">person</span>,
+      icon: <FontAwesomeIcon icon={faUser} className="text-lg" />,
       onClick: () => navigate('/dashboard/profile'),
     },
     {
       key: 'resumes',
       label: 'Resumes',
-      icon: <span className="material-icons-round text-lg">description</span>,
+      icon: <FontAwesomeIcon icon={faFileLines} className="text-lg" />,
       onClick: () => navigate('/dashboard/resumes'),
     },
     {
       key: 'resume-checker',
       label: 'Resume Checker',
-      icon: <span className="material-icons-round text-lg">fact_check</span>,
+      icon: <FontAwesomeIcon icon={faClipboardCheck} className="text-lg" />,
       onClick: () => navigate('/dashboard/matching-history'),
     },
     {
       key: 'my-jobs',
       label: 'My Jobs',
-      icon: <span className="material-icons-round text-lg">work_history</span>,
+      icon: <FontAwesomeIcon icon={faClockRotateLeft} className="text-lg" />,
       onClick: () => navigate('/dashboard/jobs'),
     },
     {
       key: 'invitations',
       label: 'Job Invitation',
-      icon: <span className="material-icons-round text-lg">mail</span>,
+      icon: <FontAwesomeIcon icon={faEnvelope} className="text-lg" />,
       onClick: () => navigate('/dashboard/invitations'),
     },
     {
       key: 'notifications',
       label: 'Notifications',
-      icon: <span className="material-icons-round text-lg">notifications</span>,
+      icon: <FontAwesomeIcon icon={faBell} className="text-lg" />,
       onClick: () => navigate('/dashboard/notifications'),
     },
     {
       key: 'billing',
       label: 'Billing & Plans',
-      icon: <span className="material-icons-round text-lg">credit_card</span>,
+      icon: <FontAwesomeIcon icon={faCreditCard} className="text-lg" />,
       onClick: () => navigate('/dashboard/billing-plans'),
     },
     {
       key: 'usage',
       label: 'Usage',
-      icon: <span className="material-icons-round text-lg">history</span>,
+      icon: <FontAwesomeIcon icon={faClockRotateLeft} className="text-lg" />,
       onClick: () => navigate('/dashboard/usage'),
     },
     {
       key: 'settings',
       label: 'Settings',
-      icon: <span className="material-icons-round text-lg">settings</span>,
+      icon: <FontAwesomeIcon icon={faGear} className="text-lg" />,
       onClick: () => navigate('/dashboard/setting'),
     },
     {
@@ -94,7 +96,7 @@ const UserMenuDropdown = () => {
       key: 'logout',
       label: 'Sign out',
       danger: true,
-      icon: <span className="material-icons-round text-lg">logout</span>,
+      icon: <FontAwesomeIcon icon={faRightFromBracket} className="text-lg" />,
       onClick: handleLogout,
     },
   ];
@@ -109,10 +111,10 @@ const UserMenuDropdown = () => {
           size={36}
           src={avatar || undefined}
           className="bg-gray-800 text-white font-semibold"
-          icon={!avatar ? <span className="material-icons-round text-lg text-gray-400">person</span> : undefined}
+          icon={!avatar ? <FontAwesomeIcon icon={faUser} className="text-lg text-gray-400" /> : undefined}
         />
 
-        <span className="material-icons-round text-gray-500 text-lg">expand_more</span>
+        <FontAwesomeIcon icon={faChevronDown} className="text-gray-500 text-lg" />
       </button>
     </Dropdown>
   );

@@ -5,6 +5,8 @@ import { useRegenerateSuggestionMutation } from '@/apis/matchingApi';
 import { updateSuggestion } from '@/store/slices/matchingReportSlice';
 import { getErrorMessage } from '@/constant/attachment';
 import toastMessage from '@/utils/toastMessage';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowsRotate, faThumbsDown, faThumbsUp, faXmark } from '../../../../utils/icons';
 
 const HighlightDetailModal = ({ detail, open, onClose, onFixApplied }) => {
   const dispatch = useDispatch();
@@ -102,7 +104,7 @@ const HighlightDetailModal = ({ detail, open, onClose, onFixApplied }) => {
           onClick={onClose}
           className="flex h-6 w-6 items-center justify-center rounded text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-600"
         >
-          <span className="material-icons-round text-[16px]">close</span>
+          <FontAwesomeIcon icon={faXmark} className="text-[16px]" />
         </button>
       </div>
 
@@ -130,13 +132,13 @@ const HighlightDetailModal = ({ detail, open, onClose, onFixApplied }) => {
       <div className="flex items-center justify-between border-t border-neutral-100 px-4 py-2">
         <div className="flex items-center gap-2">
           <button type="button" className="flex h-7 w-7 items-center justify-center rounded text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600">
-            <span className="material-icons-round text-[16px]">autorenew</span>
+            <FontAwesomeIcon icon={faArrowsRotate} className="text-[16px]" />
           </button>
           <button type="button" className="flex h-7 w-7 items-center justify-center rounded text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600">
-            <span className="material-icons-round text-[16px]">thumb_up</span>
+            <FontAwesomeIcon icon={faThumbsUp} className="text-[16px]" />
           </button>
           <button type="button" className="flex h-7 w-7 items-center justify-center rounded text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600">
-            <span className="material-icons-round text-[16px]">thumb_down</span>
+            <FontAwesomeIcon icon={faThumbsDown} className="text-[16px]" />
           </button>
         </div>
         <div className="flex items-center gap-2">

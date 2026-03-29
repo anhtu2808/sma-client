@@ -3,6 +3,8 @@ import Loading from "@/components/Loading";
 import { useSelector } from "react-redux";
 import PdfViewer from "./pdf-viewer";
 import JobDetail from "./job-detail";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowUpRightFromSquare } from '../../../utils/icons';
 
 const openLinkClassName =
   "inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:opacity-90";
@@ -76,7 +78,7 @@ const MatchReportResumePreview = () => {
               rel="noreferrer"
               className={openLinkClassName}
             >
-              <span className="material-icons-round text-[18px]">open_in_new</span>
+              <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="text-[18px]" />
               Open file
             </a>
           }

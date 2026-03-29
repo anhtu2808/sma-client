@@ -1,6 +1,8 @@
 import { Dropdown } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import Button from '@/components/Button';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFilter, faSort } from '../../../../utils/icons';
 
 const Toolbar = ({
   filterMode,
@@ -36,7 +38,7 @@ const Toolbar = ({
             mode="secondary"
             shape="rounded"
             className="!px-4 !pt-[9px] !pb-[7px] !text-sm inline-flex items-center gap-2"
-            iconLeft={<span className="material-icons-round text-[18px]">filter_list</span>}
+            iconLeft={<FontAwesomeIcon icon={faFilter} className="text-[18px]" />}
           >
             <div className="flex items-center gap-1.5">
               <span>{currentFilterLabel}</span>
@@ -65,7 +67,7 @@ const Toolbar = ({
             mode="secondary"
             shape="rounded"
             className="!px-4 !pt-[9px] !pb-[7px] !text-sm inline-flex items-center gap-2"
-            iconLeft={<span className="material-icons-round text-[18px]">sort</span>}
+            iconLeft={<FontAwesomeIcon icon={faSort} className="text-[18px]" />}
           >
             <div className="flex items-center gap-1.5">
               <span>{currentSortLabel}</span>

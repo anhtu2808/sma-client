@@ -2,6 +2,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Loading from '@/components/Loading';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMagnifyingGlass } from '../../utils/icons';
 
 const DataList = ({
     isLoading,
@@ -32,7 +34,7 @@ const DataList = ({
     if (!data || data.length === 0) {
         return (
             <div className={`text-center py-20 bg-white dark:bg-[#2c1a14] rounded-2xl border border-slate-100 dark:border-[#3d241b] ${className}`}>
-                <span className="material-icons-round text-6xl text-slate-200 dark:text-slate-700 mb-4">search_off</span>
+                <FontAwesomeIcon icon={faMagnifyingGlass} className="text-6xl text-slate-200 dark:text-slate-700 mb-4" />
                 <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">{emptyMessage}</h3>
                 <p className="text-slate-500 dark:text-slate-400">{emptySubMessage}</p>
             </div>

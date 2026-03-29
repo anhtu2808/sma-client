@@ -9,6 +9,8 @@ import {
 } from "@/apis/resumeApi";
 import SkillFormModal from "@/pages/dashboard/profile/skills/SkillFormModal";
 import { formatYearsOfExperience } from "@/utils/profileUtils";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBrain, faPenToSquare, faPlus, faTrash } from '../../../../utils/icons';
 
 const Skills = () => {
   const { data: profile } = useCandidateDashboardProfileQuery();
@@ -162,7 +164,7 @@ const Skills = () => {
       <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="bg-orange-50 dark:bg-orange-900/20 p-2 rounded-lg text-primary">
-            <span className="material-icons-round">psychology</span>
+            <FontAwesomeIcon icon={faBrain} />
           </div>
           <h2 className="text-lg font-bold text-gray-900 dark:text-white">Skills</h2>
         </div>
@@ -171,9 +173,7 @@ const Skills = () => {
           onClick={openCreateModal}
           className="inline-flex items-center gap-2 text-primary font-semibold hover:text-primary/80 transition-colors"
         >
-          <span className="material-icons-round text-[18px] border border-current rounded-full p-[1px]">
-            add
-          </span>
+          <FontAwesomeIcon icon={faPlus} className="text-[18px] border border-current rounded-full p-[1px]" />
           Add Group
         </button>
       </div>
@@ -189,9 +189,7 @@ const Skills = () => {
               onClick={openCreateModal}
               className="inline-flex items-center gap-2 text-primary font-semibold hover:text-primary/80 transition-colors"
             >
-              <span className="material-icons-round text-[18px] border border-current rounded-full p-[1px]">
-                add
-              </span>
+              <FontAwesomeIcon icon={faPlus} className="text-[18px] border border-current rounded-full p-[1px]" />
               Add Group
             </button>
           </div>
@@ -209,7 +207,7 @@ const Skills = () => {
                     className="text-gray-400 hover:text-primary transition-colors"
                     title="Edit group"
                   >
-                    <span className="material-icons-round text-[18px]">edit</span>
+                    <FontAwesomeIcon icon={faPenToSquare} className="text-[18px]" />
                   </button>
                   <Popconfirm
                     title="Delete this group?"
@@ -223,7 +221,7 @@ const Skills = () => {
                       className="text-gray-400 hover:text-red-500 transition-colors"
                       title="Delete group"
                     >
-                      <span className="material-icons-round text-[18px]">delete</span>
+                      <FontAwesomeIcon icon={faTrash} className="text-[18px]" />
                     </button>
                   </Popconfirm>
                 </div>

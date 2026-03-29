@@ -3,6 +3,8 @@ import { Outlet, Link } from 'react-router-dom';
 import Navbar from './navbar';
 import Footer from './footer';
 import { useNotificationSocket } from '@/hooks/useNotificationSocket';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPalette } from '../../utils/icons';
 
 const Layout = () => {
     // useNotificationSocket();
@@ -19,7 +21,7 @@ const Layout = () => {
                 className="fixed bottom-2 right-2 p-2 bg-gray-100 dark:bg-gray-800 rounded-full opacity-20 hover:opacity-100 transition-opacity z-[100]"
                 title="UI Kit"
             >
-                <span className="material-icons-round text-xs">palette</span>
+                <FontAwesomeIcon icon={faPalette} className="text-xs" />
             </Link>
         </div>
     );

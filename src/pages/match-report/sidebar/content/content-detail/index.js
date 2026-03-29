@@ -13,12 +13,14 @@ import {
   useRegenerateSuggestionMutation,
 } from "@/apis/matchingApi";
 import { getErrorMessage } from "@/constant/attachment";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowsRotate, faChevronDown, faCircleCheck, faCirclePlus, faCircleXmark } from '../../../../../utils/icons';
 import Suggestions from "../suggestions";
 
 const getStatusConfig = (status) => {
   if (status === "MISSING" || status === "missing") {
     return {
-      icon: "cancel",
+      icon: faCircleXmark,
       iconClassName: "text-red-500",
       tagClassName: "text-sm font-medium text-neutral-900",
       progressClassName:
@@ -27,7 +29,7 @@ const getStatusConfig = (status) => {
   }
 
   return {
-    icon: "check_circle",
+    icon: faCircleCheck,
     iconClassName: "text-emerald-500",
     tagClassName:
       "rounded border border-emerald-200 bg-emerald-100 px-2 py-1 text-sm font-medium text-emerald-700",
@@ -114,9 +116,7 @@ const ContentDetail = ({ item, isLast }) => {
   const rowContent = (
     <>
       <div className="flex min-w-0 items-center gap-3">
-        <span className={`material-icons-round text-[18px] ${statusConfig.iconClassName}`}>
-          {statusConfig.icon}
-        </span>
+        <FontAwesomeIcon icon={statusConfig.icon} className={`text-[18px] ${statusConfig.iconClassName}`} />
         {item.status === "FIXED" || item.status === "fixed" ? (
           <span className={statusConfig.tagClassName}>{item.label}</span>
         ) : (
@@ -136,21 +136,18 @@ const ContentDetail = ({ item, isLast }) => {
                 : "bg-white text-neutral-500 ring-neutral-200 hover:bg-neutral-50 hover:text-neutral-900"
             }`}
           >
-            <span className={`material-icons-round text-[14px] ${isMarkingFixed ? "animate-spin" : ""}`}>
-              {isMarkingFixed ? "autorenew" : item.isFixed ? "check_circle" : "check_circle_outline"}
-            </span>
+            <FontAwesomeIcon icon={isMarkingFixed ? faArrowsRotate : item.isFixed ? faCircleCheck : faCirclePlus} className={`text-[14px] ${isMarkingFixed ? "animate-spin" : ""}`} />
             <span className="whitespace-nowrap">{item.isFixed ? "Fixed" : "Fix"}</span>
           </button>
         )}
         
         {(hasSuggestions || item.description) ? (
-          <span
-            className={`material-icons-round text-sm text-neutral-400 transition-transform ${
+          <FontAwesomeIcon
+            icon={faChevronDown}
+            className={`text-sm text-neutral-400 transition-transform ${
               isExpanded ? "rotate-180" : ""
             }`}
-          >
-            expand_more
-          </span>
+          />
         ) : null}
       </div>
     </>

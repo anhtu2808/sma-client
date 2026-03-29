@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import MapEmbed from '../map-embed';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleInfo, faImages, faLocationDot, faMap } from '../../../utils/icons';
 
 export const AboutSection = ({ company }) => {
     const photos = company.images || [];
@@ -9,7 +11,7 @@ export const AboutSection = ({ company }) => {
     return (
         <div className="bg-white dark:bg-[#2c1a14] rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100 dark:border-[#3d241b] mb-6">
             <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                <span className="material-icons-round text-orange-500">info</span>
+                <FontAwesomeIcon icon={faCircleInfo} className="text-orange-500" />
                 About {company.name}
             </h3>
             <div
@@ -51,7 +53,7 @@ export const LifeAtSection = ({ company }) => {
     return (
         <div className="bg-white dark:bg-[#2c1a14] rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100 dark:border-[#3d241b] mb-6">
             <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-                <span className="material-icons-round text-orange-500">collections</span>
+                <FontAwesomeIcon icon={faImages} className="text-orange-500" />
                 Life at {company.name}
             </h3>
 
@@ -98,7 +100,7 @@ export const LocationsSection = ({ company }) => {
     return (
         <div className="bg-white dark:bg-[#2c1a14] rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100 dark:border-[#3d241b] mb-6">
             <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-                <span className="material-icons-round text-orange-500">place</span>
+                <FontAwesomeIcon icon={faLocationDot} className="text-orange-500" />
                 Office Locations
             </h3>
 
@@ -122,7 +124,7 @@ export const LocationsSection = ({ company }) => {
                                         ? 'bg-orange-500 text-white border-orange-500 shadow-sm'
                                         : 'bg-white dark:bg-white/5 text-slate-400 border-slate-200 dark:border-white/10'
                                         }`}>
-                                        <span className="material-icons-round text-sm">place</span>
+                                        <FontAwesomeIcon icon={faLocationDot} className="text-sm" />
                                     </div>
                                     <div>
                                         <h4 className={`font-bold text-sm transition-colors ${isActive ? 'text-orange-600 dark:text-orange-400' : 'text-slate-900 dark:text-white'}`}>
@@ -141,7 +143,7 @@ export const LocationsSection = ({ company }) => {
                         <div className="relative pl-4 md:pl-4 p-3 rounded-lg bg-orange-50 dark:bg-orange-500/5">
                             <div className="flex items-start gap-3">
                                 <div className="shrink-0 size-8 rounded-full flex items-center justify-center border bg-orange-500 text-white border-orange-500 shadow-sm">
-                                    <span className="material-icons-round text-sm">place</span>
+                                    <FontAwesomeIcon icon={faLocationDot} className="text-sm" />
                                 </div>
                                 <div>
                                     <h4 className="font-bold text-sm text-orange-600 dark:text-orange-400">Headquarters</h4>
@@ -168,7 +170,7 @@ export const LocationsSection = ({ company }) => {
                     ) : (
                         <div className="w-full h-full flex items-center justify-center bg-slate-50 dark:bg-[#1a100c] text-slate-400">
                             <div className="text-center">
-                                <span className="material-icons-round text-4xl mb-2">map</span>
+                                <FontAwesomeIcon icon={faMap} className="text-4xl mb-2" />
                                 <p>Select a location to view on map</p>
                             </div>
                         </div>

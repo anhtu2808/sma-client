@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Building2 } from 'lucide-react';
 import { useGetJobsQuery } from '@/apis/jobApi';
 import { formatSalary } from '@/utils/salaryUtils';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowRight, faFire, faLocationDot } from '../../../utils/icons';
 
 const FeaturedJobsSection = () => {
     const navigate = useNavigate();
@@ -57,7 +59,7 @@ const FeaturedJobsSection = () => {
                         onClick={() => navigate('/jobs')}
                         className="mt-4 md:mt-0 text-primary font-semibold hover:underline inline-flex items-center gap-1 text-sm"
                     >
-                        View All Jobs <span className="material-icons-round text-sm">arrow_forward</span>
+                        View All Jobs <FontAwesomeIcon icon={faArrowRight} className="text-sm" />
                     </button>
                 </div>
 
@@ -77,7 +79,7 @@ const FeaturedJobsSection = () => {
                                 {/* HOT badge */}
                                 {job.isHot && (
                                     <span className="absolute bottom-4 right-3 inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wide border border-primary/20">
-                                        <span className="material-icons-round text-xs">local_fire_department</span>
+                                        <FontAwesomeIcon icon={faFire} className="text-xs" />
                                         HOT
                                     </span>
                                 )}
@@ -114,7 +116,7 @@ const FeaturedJobsSection = () => {
                                         <span className="font-semibold text-primary whitespace-nowrap">{job.salary}</span>
                                         {job.locationCity && (
                                             <span className="inline-flex items-center gap-0.5 truncate">
-                                                <span className="material-icons-round text-xs">location_on</span>
+                                                <FontAwesomeIcon icon={faLocationDot} className="text-xs" />
                                                 {job.locationCity}
                                             </span>
                                         )}

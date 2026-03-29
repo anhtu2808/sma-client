@@ -12,6 +12,8 @@ import ReportSidebar from "@/pages/match-report/report-sidebar";
 import MatchingLoading from "@/pages/match-report/loading";
 import Loading from "@/components/Loading";
 import Button from "@/components/Button";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft, faArrowRotateLeft, faArrowsRotate, faRotate, faTriangleExclamation } from '../../utils/icons';
 
 const MATCHING_POLL_INTERVAL_MS = 2_000;
 const MATCHING_POLL_TIMEOUT_MS = 180_000;
@@ -239,7 +241,7 @@ const MatchReport = () => {
       <div className="flex min-h-screen items-center justify-center bg-[#F8FAFC] px-6 py-10">
         <div className="w-full max-w-[480px] overflow-hidden rounded-2xl bg-white text-center shadow-sm p-8 ring-1 ring-gray-900/5 transition-all">
           <div className="mx-auto flex h-[64px] w-[64px] items-center justify-center rounded-2xl bg-red-50 mb-5">
-            <span className="material-icons-round text-[32px] text-red-500">warning_amber</span>
+            <FontAwesomeIcon icon={faTriangleExclamation} className="text-[32px] text-red-500" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-gray-900">
             Oops, something went wrong!
@@ -248,7 +250,7 @@ const MatchReport = () => {
             {errorMessage || "AI matching failed. Please go back and try matching again."}
           </p>
           <div className="mt-6 rounded-xl bg-orange-50 p-4 border border-orange-100 flex items-center justify-center gap-2">
-            <span className="material-icons-round text-orange-500 text-[18px]">replay_circle_filled</span>
+            <FontAwesomeIcon icon={faArrowRotateLeft} className="text-orange-500 text-[18px]" />
             <p className="text-[14px] font-semibold text-orange-700 tracking-tight">Your AI credit has been refunded.</p>
           </div>
           
@@ -262,9 +264,9 @@ const MatchReport = () => {
               disabled={isRetrying}
               iconLeft={
                 isRetrying ? (
-                  <span className="material-icons-round animate-spin text-[18px]">autorenew</span>
+                  <FontAwesomeIcon icon={faArrowsRotate} className="animate-spin text-[18px]" />
                 ) : (
-                  <span className="material-icons-round text-[18px] group-hover:-rotate-90 transition-transform duration-300">refresh</span>
+                  <FontAwesomeIcon icon={faRotate} className="text-[18px] group-hover:-rotate-90 transition-transform duration-300" />
                 )
               }
             >
@@ -277,7 +279,7 @@ const MatchReport = () => {
               className="py-2.5 text-[14px] bg-white text-gray-700 ring-1 ring-inset ring-gray-200 hover:bg-gray-50 hover:text-gray-900 whitespace-nowrap"
               onClick={() => jobId ? navigate(`/jobs/${jobId}`) : navigate(-1)}
               disabled={isRetrying}
-              iconLeft={<span className="material-icons-round text-[18px] text-gray-500">arrow_back</span>}
+              iconLeft={<FontAwesomeIcon icon={faArrowLeft} className="text-[18px] text-gray-500" />}
             >
               Back to Job Detail
             </Button>

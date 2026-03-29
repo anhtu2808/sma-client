@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 import Lottie from "lottie-react";
 import aiLoadingAnimation from "@/assets/lottie/ai-loading.json";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBrain, faBriefcase, faChartSimple, faCircleCheck, faFileLines, faWandMagicSparkles } from '../../../utils/icons';
 
 const ANALYSIS_STEPS = [
-  { icon: "description", label: "Parsing resume content", delay: 0 },
-  { icon: "work_outline", label: "Analyzing job requirements", delay: 2500 },
-  { icon: "psychology", label: "Evaluating skill alignment", delay: 5500 },
-  { icon: "bar_chart", label: "Calculating match score", delay: 8500 },
-  { icon: "auto_awesome", label: "Generating insights", delay: 11500 },
+  { icon: faFileLines, label: "Parsing resume content", delay: 0 },
+  { icon: faBriefcase, label: "Analyzing job requirements", delay: 2500 },
+  { icon: faBrain, label: "Evaluating skill alignment", delay: 5500 },
+  { icon: faChartSimple, label: "Calculating match score", delay: 8500 },
+  { icon: faWandMagicSparkles, label: "Generating insights", delay: 11500 },
 ];
 
 const TIPS = [
@@ -100,9 +102,9 @@ const MatchingLoading = ({ status = "WAITING" }) => {
                     }`}
                   >
                     {isVisible && !isActive ? (
-                      <span className="material-icons-round text-[20px]">check_circle</span>
+                      <FontAwesomeIcon icon={faCircleCheck} className="text-[20px]" />
                     ) : (
-                      <span className="material-icons-round text-[20px]">{step.icon}</span>
+                      <FontAwesomeIcon icon={step.icon} className="text-[20px]" />
                     )}
                   </div>
 

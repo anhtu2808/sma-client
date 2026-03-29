@@ -1,5 +1,7 @@
 import Logo from "@/components/Logo";
 import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCloudArrowUp, faCode, faDiagramProject, faMicrochip, faShieldHalved } from '../../../utils/icons';
 
 const SideDecorator = () => {
     return (
@@ -11,11 +13,11 @@ const SideDecorator = () => {
             }}
         >
             <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
-                <span className="material-icons-round text-9xl absolute -top-10 -left-10 transform rotate-12">code</span>
-                <span className="material-icons-round text-8xl absolute top-1/4 right-10 transform -rotate-12">memory</span>
-                <span className="material-icons-round text-9xl absolute bottom-1/3 left-20 transform rotate-45">hub</span>
-                <span className="material-icons-round text-9xl absolute -bottom-10 right-20 transform -rotate-6">cloud_upload</span>
-                <span className="material-icons-round text-6xl absolute top-1/2 left-1/2 transform translate-x-10 translate-y-20 rotate-12">security</span>
+                <FontAwesomeIcon icon={faCode} className="text-9xl absolute -top-10 -left-10 transform rotate-12" />
+                <FontAwesomeIcon icon={faMicrochip} className="text-8xl absolute top-1/4 right-10 transform -rotate-12" />
+                <FontAwesomeIcon icon={faDiagramProject} className="text-9xl absolute bottom-1/3 left-20 transform rotate-45" />
+                <FontAwesomeIcon icon={faCloudArrowUp} className="text-9xl absolute -bottom-10 right-20 transform -rotate-6" />
+                <FontAwesomeIcon icon={faShieldHalved} className="text-6xl absolute top-1/2 left-1/2 transform translate-x-10 translate-y-20 rotate-12" />
             </div>
             <Logo className="relative z-10" iconColor="white" />
 

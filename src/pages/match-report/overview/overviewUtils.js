@@ -1,3 +1,5 @@
+import { faCircleInfo, faCircleQuestion, faMedal, faThumbsUp, faTriangleExclamation } from '../../../utils/icons';
+
 /**
  * Parse AI-generated text into individual bullet items.
  * Handles: newline-separated, numbered lists, semicolon-separated, dash-prefixed.
@@ -23,7 +25,7 @@ export const getMatchLevelConfig = (matchLevel) => {
     case "EXCELLENT":
       return {
         label: "Excellent Match",
-        icon: "emoji_events",
+        icon: faMedal,
         ringColor: "#10B981",
         badgeBg: "bg-emerald-50",
         badgeText: "text-emerald-700",
@@ -31,7 +33,7 @@ export const getMatchLevelConfig = (matchLevel) => {
     case "GOOD":
       return {
         label: "Good Match",
-        icon: "thumb_up",
+        icon: faThumbsUp,
         ringColor: "#3B82F6",
         badgeBg: "bg-blue-50",
         badgeText: "text-blue-700",
@@ -39,7 +41,7 @@ export const getMatchLevelConfig = (matchLevel) => {
     case "FAIR":
       return {
         label: "Fair Match",
-        icon: "info",
+        icon: faCircleInfo,
         ringColor: "#F59E0B",
         badgeBg: "bg-amber-50",
         badgeText: "text-amber-700",
@@ -47,7 +49,7 @@ export const getMatchLevelConfig = (matchLevel) => {
     case "POOR":
       return {
         label: "Poor Match",
-        icon: "warning",
+        icon: faTriangleExclamation,
         ringColor: "#EF4444",
         badgeBg: "bg-red-50",
         badgeText: "text-red-700",
@@ -55,7 +57,7 @@ export const getMatchLevelConfig = (matchLevel) => {
     default:
       return {
         label: level || "Unknown",
-        icon: "help_outline",
+        icon: faCircleQuestion,
         ringColor: "#6B7280",
         badgeBg: "bg-neutral-50",
         badgeText: "text-neutral-700",

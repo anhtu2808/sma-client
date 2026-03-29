@@ -1,4 +1,6 @@
 import React from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowsRotate } from '../../../../utils/icons';
 
 const SuggestModal = ({
   status,
@@ -61,13 +63,12 @@ const SuggestModal = ({
                       onClick={(e) => { e.stopPropagation(); onRegenerateSuggestion?.(suggestion?.id); }}
                       className="flex shrink-0 items-center justify-center rounded p-1.5 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      <span
-                        className={`material-icons-round text-[18px] ${
+                      <FontAwesomeIcon
+                        icon={faArrowsRotate}
+                        className={`text-[18px] ${
                           regeneratingSuggestionId === suggestion?.id ? "animate-spin" : ""
                         }`}
-                      >
-                        autorenew
-                      </span>
+                      />
                     </button>
                   ) : null}
                 </div>

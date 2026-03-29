@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { renderAsync } from "docx-preview";
 import ViewerLoading from "../components/ViewerLoading";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faDownload, faFileLines } from '../../../utils/icons';
 
 const DocxViewer = ({ fileUrl, fileName }) => {
   const containerRef = useRef(null);
@@ -48,9 +50,7 @@ const DocxViewer = ({ fileUrl, fileName }) => {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-full py-16 px-6 text-center gap-3">
-        <span className="material-icons-round text-4xl text-gray-300 dark:text-neutral-600">
-          description
-        </span>
+        <FontAwesomeIcon icon={faFileLines} className="text-4xl text-gray-300 dark:text-neutral-600" />
         <p className="text-sm text-gray-500 dark:text-neutral-400">
           Unable to preview this DOCX file
         </p>
@@ -61,7 +61,7 @@ const DocxViewer = ({ fileUrl, fileName }) => {
             download={fileName || "document.docx"}
             className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
           >
-            <span className="material-icons-round text-base">download</span>
+            <FontAwesomeIcon icon={faDownload} className="text-base" />
             Download instead
           </a>
         )}

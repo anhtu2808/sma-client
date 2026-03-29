@@ -6,6 +6,8 @@ import { useGetJobsQuery } from '@/apis/jobApi';
 import { formatSalary } from '@/utils/salaryUtils';
 import { VIETNAM_PROVINCES } from '@/constant/job';
 import FeaturedJobsSection from './FeaturedJobsSection';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowRight, faBriefcase, faChevronDown, faCity, faLocationDot, faMagnifyingGlass, faPeopleGroup, faWandMagicSparkles, faXmark } from '../../../utils/icons';
 
 const popularKeywords = [
     'Frontend', 'Backend', 'React', 'Java', 'Python', 'DevOps',
@@ -121,7 +123,7 @@ const HeroSection = () => {
 
                 {/* Badge */}
                 <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-orange-100/80 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 text-sm font-medium mb-6">
-                    <span className="material-icons-round text-base">auto_awesome</span>
+                    <FontAwesomeIcon icon={faWandMagicSparkles} className="text-base" />
                     AI-Powered Job Matching
                 </div>
 
@@ -142,7 +144,7 @@ const HeroSection = () => {
                     <div className="relative bg-white dark:bg-surface-dark p-3 sm:p-2 rounded-2xl sm:rounded-full shadow-xl shadow-gray-200/50 dark:shadow-orange-500/5 ring-1 ring-gray-100 dark:ring-orange-500/10 flex flex-col sm:flex-row gap-3 sm:gap-2">
                         {/* Keyword Input */}
                         <div className="flex-1 h-12 flex items-center px-4 border-b sm:border-b-0 sm:border-r border-gray-100 dark:border-gray-700">
-                            <span className="material-icons-round text-gray-400 mr-2">search</span>
+                            <FontAwesomeIcon icon={faMagnifyingGlass} className="text-gray-400 mr-2" />
                             <input
                                 ref={keywordInputRef}
                                 className="w-full bg-transparent border-none focus:ring-0 text-gray-800 dark:text-white placeholder-gray-400 text-sm outline-none"
@@ -155,7 +157,7 @@ const HeroSection = () => {
                             />
                             {keyword && (
                                 <button type="button" onClick={() => setKeyword('')} className="text-gray-300 hover:text-gray-500 dark:hover:text-gray-300 transition p-0.5">
-                                    <span className="material-icons-round text-base">close</span>
+                                    <FontAwesomeIcon icon={faXmark} className="text-base" />
                                 </button>
                             )}
                         </div>
@@ -165,7 +167,7 @@ const HeroSection = () => {
                             className="relative h-12 flex items-center px-4 cursor-pointer shrink-0 w-full sm:w-48"
                             onClick={handleLocationClick}
                         >
-                            <span className="material-icons-round text-gray-400 mr-2">location_on</span>
+                            <FontAwesomeIcon icon={faLocationDot} className="text-gray-400 mr-2" />
                             <span className={`flex-1 text-left text-sm truncate ${location ? 'text-gray-800 dark:text-white' : 'text-gray-400'}`}>
                                 {location || 'All locations'}
                             </span>
@@ -175,10 +177,10 @@ const HeroSection = () => {
                                     onClick={(e) => { e.stopPropagation(); setLocation(''); }}
                                     className="text-gray-300 hover:text-gray-500 dark:hover:text-gray-300 transition p-0.5"
                                 >
-                                    <span className="material-icons-round text-base">close</span>
+                                    <FontAwesomeIcon icon={faXmark} className="text-base" />
                                 </button>
                             ) : (
-                                <span className="material-icons-round text-gray-400 text-lg">expand_more</span>
+                                <FontAwesomeIcon icon={faChevronDown} className="text-gray-400 text-lg" />
                             )}
 
                             {/* Location Dropdown */}
@@ -186,7 +188,7 @@ const HeroSection = () => {
                                 <div className="absolute left-0 right-0 top-full mt-3 w-full min-w-[240px] bg-white dark:bg-surface-dark rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden text-left z-50" onClick={(e) => e.stopPropagation()}>
                                     <div className="p-2 border-b border-gray-100 dark:border-gray-700">
                                         <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                                            <span className="material-icons-round text-gray-400 text-sm">search</span>
+                                            <FontAwesomeIcon icon={faMagnifyingGlass} className="text-gray-400 text-sm" />
                                             <input
                                                 ref={locationInputRef}
                                                 type="text"
@@ -288,7 +290,7 @@ const HeroSection = () => {
                                                             {job.company} &middot; <span className="text-primary font-medium">{job.salary}</span>
                                                         </p>
                                                     </div>
-                                                    <span className="material-icons-round text-gray-300 dark:text-gray-600 text-sm shrink-0">arrow_forward</span>
+                                                    <FontAwesomeIcon icon={faArrowRight} className="text-gray-300 dark:text-gray-600 text-sm shrink-0" />
                                                 </button>
                                             ))}
                                         </div>
@@ -307,17 +309,17 @@ const HeroSection = () => {
                 {/* Trust indicators */}
                 <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-8 mb-4">
                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                        <span className="material-icons-round text-orange-500 text-lg">work</span>
+                        <FontAwesomeIcon icon={faBriefcase} className="text-orange-500 text-lg" />
                         <span className="font-semibold text-gray-900 dark:text-white">10,000+</span> Active Jobs
                     </div>
                     <div className="hidden sm:block w-px h-5 bg-gray-200 dark:bg-gray-700" />
                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                        <span className="material-icons-round text-orange-500 text-lg">apartment</span>
+                        <FontAwesomeIcon icon={faCity} className="text-orange-500 text-lg" />
                         <span className="font-semibold text-gray-900 dark:text-white">5,000+</span> Companies
                     </div>
                     <div className="hidden sm:block w-px h-5 bg-gray-200 dark:bg-gray-700" />
                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                        <span className="material-icons-round text-orange-500 text-lg">groups</span>
+                        <FontAwesomeIcon icon={faPeopleGroup} className="text-orange-500 text-lg" />
                         <span className="font-semibold text-gray-900 dark:text-white">50,000+</span> Candidates
                     </div>
                 </div>

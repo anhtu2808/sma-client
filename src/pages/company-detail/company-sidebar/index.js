@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBuilding } from '../../../utils/icons';
 
 const CompanySidebar = ({ company }) => {
     if (!company) return null;
@@ -9,7 +11,7 @@ const CompanySidebar = ({ company }) => {
             {/* Company Information */}
             <div className="bg-white dark:bg-[#2c1a14] rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-[#3d241b]">
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-                    <span className="material-icons-round text-orange-500">business</span>
+                    <FontAwesomeIcon icon={faBuilding} className="text-orange-500" />
                     Company Information
                 </h3>
 

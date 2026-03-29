@@ -5,6 +5,8 @@ import { useMarkAsReadMutation } from '@/apis/notificationApi';
 import { useNavigate } from 'react-router-dom';
 import { hidePreview } from '../../notification/components/notification-slice';
 import { useDispatch } from 'react-redux';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleExclamation, faCircleCheck, faCreditCard, faBriefcase, faEnvelope, faBell } from '../../../../utils/icons';
 
 
 dayjs.extend(relativeTime);
@@ -17,19 +19,19 @@ const NotificationItem = ({ noti }) => {
     const getIconConfig = (type) => {
         switch (type) {
             case 'CV_PARSE_FAILED':
-                return { icon: 'error', color: 'text-red-500' };
+                return { icon: faCircleExclamation, color: 'text-red-500' };
             case 'PAYMENT_SUCCESS':
-                return { icon: 'check_circle', color: 'text-green-500' };
+                return { icon: faCircleCheck, color: 'text-green-500' };
             case 'PAYMENT_FAILURE':
-                return { icon: 'payments', color: 'text-red-500' };
+                return { icon: faCreditCard, color: 'text-red-500' };
             case 'APPLICATION_STATUS':
-                return { icon: 'work', color: 'text-blue-500' };
+                return { icon: faBriefcase, color: 'text-blue-500' };
             case 'SYSTEM':
-                return { icon: 'error_outline', color: 'text-red-500' };
+                return { icon: faCircleExclamation, color: 'text-red-500' };
             case 'INVITATION':
-                return { icon: 'mail', color: 'text-indigo-500', bg: 'bg-indigo-50' };
+                return { icon: faEnvelope, color: 'text-indigo-500', bg: 'bg-indigo-50' };
             default:
-                return { icon: 'notifications', color: 'text-orange-500' };
+                return { icon: faBell, color: 'text-orange-500' };
         }
     };
 
@@ -97,7 +99,7 @@ const NotificationItem = ({ noti }) => {
                 <div className="flex-shrink-0">
                     <div className={`h-10 w-10 rounded-full flex items-center justify-center shadow-sm ${!noti.isRead ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-800'
                         }`}>
-                        <span className={`material-symbols-outlined ${config.color}`}>{config.icon}</span>
+                        <FontAwesomeIcon icon={config.icon} className={`${config.color}`} />
                     </div>
                 </div>
 

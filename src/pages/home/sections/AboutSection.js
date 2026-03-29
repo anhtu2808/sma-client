@@ -1,4 +1,6 @@
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleCheck, faPeopleGroup } from '../../../utils/icons';
 
 const AboutSection = () => {
     const checklistItems = [
@@ -16,7 +18,7 @@ const AboutSection = () => {
                     <div className="w-full lg:w-1/2 relative">
                         <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 min-h-[400px] flex items-center justify-center">
                             <div className="text-center p-8">
-                                <span className="material-icons-round text-8xl text-gray-300 dark:text-gray-600">groups</span>
+                                <FontAwesomeIcon icon={faPeopleGroup} className="text-8xl text-gray-300 dark:text-gray-600" />
                                 <p className="text-gray-400 mt-4 text-lg">Team Collaboration</p>
                             </div>
                             
@@ -47,7 +49,7 @@ const AboutSection = () => {
                         <ul className="space-y-4 mb-10">
                             {checklistItems.map((item, index) => (
                                 <li key={index} className="flex items-center gap-3">
-                                    <span className="material-icons-round text-primary">check_circle</span>
+                                    <FontAwesomeIcon icon={faCircleCheck} className="text-primary" />
                                     <span className="text-gray-700 dark:text-gray-300 font-medium">{item}</span>
                                 </li>
                             ))}

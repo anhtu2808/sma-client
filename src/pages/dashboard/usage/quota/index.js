@@ -1,4 +1,6 @@
 import Loading from "@/components/Loading";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChartPie, faCircleExclamation } from '../../../../utils/icons';
 
 const formatDate = (dateString) => {
   if (!dateString) return null;
@@ -16,9 +18,7 @@ const RenewTooltip = ({ renewDate }) => {
 
   return (
     <span className="group relative inline-flex items-center ml-1">
-      <span className="material-icons-round text-[14px] text-orange-500 cursor-help">
-        error_outline
-      </span>
+      <FontAwesomeIcon icon={faCircleExclamation} className="text-[14px] text-orange-500 cursor-help" />
       <span className="invisible group-hover:visible absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded-lg whitespace-nowrap z-10">
         Resets: {formattedDate}
         <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900"></span>
@@ -32,7 +32,7 @@ const Quota = ({ quotas, isQuotaLoading, isQuotaError }) => {
     <section className="bg-white dark:bg-surface-dark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 md:p-8">
       <div className="flex items-center gap-3 mb-6">
         <div className="w-11 h-11 rounded-xl bg-orange-100 text-primary flex items-center justify-center">
-          <span className="material-icons-round text-[22px]">pie_chart</span>
+          <FontAwesomeIcon icon={faChartPie} className="text-[22px]" />
         </div>
         <div>
           <h2 className="text-lg font-bold text-gray-900 dark:text-white">Current Quotas</h2>

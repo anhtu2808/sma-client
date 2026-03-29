@@ -1,6 +1,8 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck, faChevronDown, faMagnifyingGlass, faXmark } from '../../utils/icons';
 
 const MultiSelect = ({
     options = [],
@@ -92,7 +94,7 @@ const MultiSelect = ({
                                 onClick={(e) => handleRemoveTag(opt.value, e)}
                                 className="ml-0.5 hover:text-red-500 transition-colors rounded-full"
                             >
-                                <span className="material-icons-round" style={{ fontSize: '14px' }}>close</span>
+                                <FontAwesomeIcon icon={faXmark} />
                             </button>
                         </span>
                     ))
@@ -103,11 +105,10 @@ const MultiSelect = ({
                 )}
 
                 {/* Arrow */}
-                <span
-                    className={`material-icons-round text-slate-400 ml-auto transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
-                >
-                    keyboard_arrow_down
-                </span>
+                <FontAwesomeIcon
+                    icon={faChevronDown}
+                    className={`text-slate-400 ml-auto transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                />
             </div>
 
             {/* Dropdown */}
@@ -116,9 +117,7 @@ const MultiSelect = ({
                     {/* Search input */}
                     <div className="p-2 border-b border-slate-100 dark:border-[#3d241b]">
                         <div className="relative">
-                            <span className="material-icons-round absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg">
-                                search
-                            </span>
+                            <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg" />
                             <input
                                 ref={searchInputRef}
                                 type="text"
@@ -161,7 +160,7 @@ const MultiSelect = ({
                                                 }
                                             `}>
                                                 {isSelected && (
-                                                    <span className="material-icons-round text-white" style={{ fontSize: '14px' }}>check</span>
+                                                    <FontAwesomeIcon icon={faCheck} className="text-white" />
                                                 )}
                                             </div>
                                             <span className="truncate">{opt.label}</span>

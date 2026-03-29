@@ -2,6 +2,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Button from '@/components/Button';
 import PropTypes from 'prop-types';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck, faChevronDown } from '../../utils/icons';
 
 const Select = ({
     options,
@@ -43,9 +45,7 @@ const Select = ({
                 onClick={() => setIsOpen(!isOpen)}
                 className={`!justify-between !px-4 !py-3 h-auto !bg-slate-50 dark:!bg-[#3d241b] !border-slate-200 dark:!border-[#4b2c20] !rounded-xl transition-all font-medium ${isOpen ? '!ring-2 !ring-primary/20 !border-primary' : ''}`}
                 iconRight={
-                    <span className={`material-icons-round text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
-                        keyboard_arrow_down
-                    </span>
+                    <FontAwesomeIcon icon={faChevronDown} className={`text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
                 }
             >
                 <span className={`truncate text-base normal-case font-medium ${!value ? 'text-slate-700 dark:text-gray-300' : 'text-slate-900 dark:text-white'}`}>
@@ -72,7 +72,7 @@ const Select = ({
                                                 ? '!bg-primary !text-white !font-medium'
                                                 : 'text-slate-700 dark:text-gray-200 hover:!bg-orange-50 dark:hover:!bg-[#3d241b] hover:!text-primary'
                                             }`}
-                                        iconRight={isSelected && <span className="material-icons-round text-sm">check</span>}
+                                        iconRight={isSelected && <FontAwesomeIcon icon={faCheck} className="text-sm" />}
                                     >
                                         <span className="truncate">{opt.label}</span>
                                     </Button>

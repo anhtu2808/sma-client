@@ -3,6 +3,8 @@ import { Checkbox, DatePicker, Form, Input, Select } from "antd";
 import dayjs from "dayjs";
 import ProfileSectionModal from "@/components/ProfileSectionModal";
 import SimpleTextEditor from "@/components/SimpleTextEditor";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus } from '../../../../utils/icons';
 
 const FORM_ID = "experience-form";
 
@@ -195,9 +197,7 @@ const ExperienceFormModal = ({
               }}
               className="inline-flex items-center gap-2 text-primary font-semibold hover:text-primary/80 transition-colors"
             >
-              <span className="material-icons-round text-[18px] border border-current rounded-full p-[1px]">
-                add
-              </span>
+              <FontAwesomeIcon icon={faPlus} className="text-[18px] border border-current rounded-full p-[1px]" />
               Add Role
             </button>
           </div>

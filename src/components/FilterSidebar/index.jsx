@@ -2,6 +2,8 @@
 import React from 'react';
 import Button from '@/components/Button';
 import PropTypes from 'prop-types';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFilter } from '../../utils/icons';
 
 const FilterSidebar = ({
     title = "Filters",
@@ -14,7 +16,7 @@ const FilterSidebar = ({
             <div className="bg-white dark:bg-[#2c1a14] p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-[#3d241b]">
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                        <span className="material-icons-round text-primary">filter_list</span>
+                        <FontAwesomeIcon icon={faFilter} className="text-primary" />
                         {title}
                     </h2>
                     {onReset && (
