@@ -26,7 +26,7 @@ const JobDetail = () => {
 
   if (isError || !response?.data) {
     return (
-      <div className="mx-auto max-w-[820px] rounded-xl border border-neutral-200 bg-white p-8 shadow-soft lg:p-10">
+      <div className="mx-4 rounded-xl border border-neutral-200 bg-white p-8 shadow-soft lg:p-10">
         <h2 className="font-heading text-2xl font-bold text-neutral-900">Job Description</h2>
         <p className="mt-3 text-base leading-relaxed text-neutral-700">
           Unable to load job details. Please try again later.
@@ -40,7 +40,7 @@ const JobDetail = () => {
   const salary = formatSalary(job.salaryStart, job.salaryEnd);
 
   return (
-    <div className="mx-auto max-w-[820px] rounded-xl border border-neutral-200 bg-white p-8 shadow-soft lg:p-10">
+    <div className="m-4 rounded-xl border border-neutral-200 bg-white p-8 shadow-soft lg:p-10">
       {/* Header */}
       <div className="border-b border-neutral-200 pb-6">
         <h1 className="font-heading text-2xl font-bold text-neutral-900">

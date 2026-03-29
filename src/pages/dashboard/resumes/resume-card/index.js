@@ -52,9 +52,6 @@ export const ResumeCard = ({ resume }) => {
             {resume.tag}
           </span>
         ) : null}
-        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
-          {resume.status}
-        </span>
       </div>
 
       <div className="w-3/4 h-full bg-white dark:bg-gray-700 rounded-t-lg p-4 border-x border-t border-gray-200 dark:border-gray-600">
@@ -184,9 +181,6 @@ export const ResumeListItem = ({ resume }) => {
               {resume.tag}
             </span>
           ) : null}
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
-            {resume.status}
-          </span>
         </div>
         <div className="flex items-center gap-1">
           <button 

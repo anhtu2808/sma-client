@@ -20,7 +20,7 @@ const ScoreCard = ({ score = 88 }) => {
           cy={size / 2}
         />
         <circle
-          stroke="#10B981"
+          stroke="#FF6B35"
           fill="transparent"
           strokeWidth={strokeWidth}
           strokeDasharray={circumference}
@@ -32,7 +32,7 @@ const ScoreCard = ({ score = 88 }) => {
           className="transition-all duration-1000 ease-out"
         />
       </svg>
-      <span className="absolute font-heading text-[22px] font-bold text-[#10B981] leading-none">
+      <span className="absolute font-heading text-[22px] font-bold text-[#FF6B35] leading-none">
         {animatedScore}
       </span>
     </div>

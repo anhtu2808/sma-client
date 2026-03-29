@@ -155,7 +155,7 @@ const HighlightDetailModal = ({ detail, open, onClose, onFixApplied }) => {
               onFixApplied?.();
               onClose();
             }}
-            className="rounded bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-emerald-700"
+            className="rounded bg-primary px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-primary-dark"
           >
             Confirm
           </button>

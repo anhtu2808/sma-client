@@ -13,7 +13,7 @@ const MatchReportOverview = () => {
 
   return (
     <section className="flex-1 overflow-y-auto">
-      <div className="mx-auto max-w-[960px] space-y-4 px-4 py-4 lg:px-6">
+      <div className="mx-auto space-y-4 px-4 py-4 lg:px-6">
         {/* Score + Radar: 2-column on lg+ */}
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <OverviewScoreSection score={aiOverallScore} matchLevel={matchLevel} summary={summary} />

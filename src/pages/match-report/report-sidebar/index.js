@@ -102,7 +102,7 @@ const ReportSidebar = () => {
         <button
           type="button"
           onClick={handleEditResume}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-dark"
         >
           <FontAwesomeIcon icon={faPen} className="text-[18px]" />
           Edit Resume
