@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { Building2 } from 'lucide-react';
 import { useGetJobByIdQuery } from '@/apis/jobApi';
 import { getIndustryLabel } from '@/constant/job';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowUpRightFromSquare } from '../../../utils/icons';
 
 const CompanyInfoCard = () => {
     const { id } = useParams();
@@ -34,7 +36,7 @@ const CompanyInfoCard = () => {
                     <Link to={`/companies/${company.id}`} className="text-gray-900 font-bold hover:text-primary transition-colors">{company.name}</Link>
                     {company.link && (
                         <a className="text-primary text-sm font-medium hover:underline flex items-center gap-1" href={company.link} target="_blank" rel="noreferrer">
-                            Visit Website <span className="material-icons-round text-[14px]">open_in_new</span>
+                            Visit Website <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="text-[14px]" />
                         </a>
                     )}
                 </div>

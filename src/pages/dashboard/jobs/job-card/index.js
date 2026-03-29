@@ -5,6 +5,8 @@ import toastMessage from "@/utils/toastMessage";
 import { useToggleMarkJobMutation } from "@/apis/jobApi";
 import Button from "@/components/Button";
 import StatusTimeline from "../status-timeline";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowRight, faArrowUpRightFromSquare, faBookmarkSolid, faFileLines, faThumbsUp } from '../../../../utils/icons';
 
 const formatDate = (dateString) => {
   if (!dateString) return "N/A";
@@ -79,7 +81,7 @@ const DashboardJobCard = ({ job, activeTab }) => {
                     className="shrink-0 !p-2 hover:!bg-slate-100 dark:hover:!bg-[#4b2c20] !text-primary"
                     aria-label="Remove from saved"
                   >
-                    <span className="material-icons-round text-[24px]">bookmark</span>
+                    <FontAwesomeIcon icon={faBookmarkSolid} className="text-[24px]" />
                   </Button>
                 )}
               </div>
@@ -97,7 +99,7 @@ const DashboardJobCard = ({ job, activeTab }) => {
                       className="inline-flex items-center gap-1 text-[12px] font-bold text-primary hover:text-primary/80 transition-colors"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <span className="material-icons-round text-[16px]">description</span>
+                      <FontAwesomeIcon icon={faFileLines} className="text-[16px]" />
                       View Applied Resume
                     </a>
                   </>
@@ -106,7 +108,7 @@ const DashboardJobCard = ({ job, activeTab }) => {
                   <>
                     <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" />
                     <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded bg-green-50 text-green-700">
-                      <span className="material-icons-round text-[14px]">thumb_up</span>
+                      <FontAwesomeIcon icon={faThumbsUp} className="text-[14px]" />
                       Match
                     </span>
                   </>
@@ -164,9 +166,7 @@ const DashboardJobCard = ({ job, activeTab }) => {
           }}
         >
           {job.ctaLabel}
-          <span className="material-icons-round text-[18px]">
-            {isPrimaryCta ? "arrow_outward" : "arrow_forward"}
-          </span>
+          <FontAwesomeIcon icon={isPrimaryCta ? faArrowUpRightFromSquare : faArrowRight} className="text-[18px]" />
         </button>
       </div> */}
     </article>

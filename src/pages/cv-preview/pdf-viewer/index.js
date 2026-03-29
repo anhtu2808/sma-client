@@ -6,6 +6,8 @@ import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/toolbar/lib/styles/index.css";
 import "@react-pdf-viewer/search/lib/styles/index.css";
 import ViewerLoading from "../components/ViewerLoading";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faDownload, faFilePdf } from '../../../utils/icons';
 
 const PDF_WORKER_URL =
   "https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
@@ -17,9 +19,7 @@ const PdfCvViewer = ({ fileUrl, onError }) => {
 
   const renderError = () => (
     <div className="flex flex-col items-center justify-center py-16 px-6 text-center gap-3">
-      <span className="material-icons-round text-4xl text-gray-300 dark:text-neutral-600">
-        picture_as_pdf
-      </span>
+      <FontAwesomeIcon icon={faFilePdf} className="text-4xl text-gray-300 dark:text-neutral-600" />
       <p className="text-sm text-gray-500 dark:text-neutral-400">
         Unable to load PDF preview
       </p>
@@ -30,7 +30,7 @@ const PdfCvViewer = ({ fileUrl, onError }) => {
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
         >
-          <span className="material-icons-round text-base">download</span>
+          <FontAwesomeIcon icon={faDownload} className="text-base" />
           Download PDF
         </a>
       )}

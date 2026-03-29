@@ -37,7 +37,7 @@
     min-width: 32px;
 }
 
-.ste-btn .material-icons-round {
+.ste-btn .svg-inline--fa {
     font-size: 18px;
 }
 
@@ -98,10 +98,10 @@
 }
 
 .simple-text-editor__content li::before {
-    content: "\e061";
-    font-family: "Material Icons Round";
+    content: "\2022";
     color: #ef4444;
-    font-size: 14px;
+    font-size: 18px;
+    font-weight: bold;
     width: 14px;
     height: 14px;
     display: inline-flex;

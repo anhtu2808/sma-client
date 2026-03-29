@@ -2,6 +2,8 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleCheck, faMagnifyingGlass } from '../../../utils/icons';
 
 const ApplicationSuccess = () => {
     const navigate = useNavigate();
@@ -18,7 +20,7 @@ const ApplicationSuccess = () => {
                     <div className="relative w-24 h-24 mx-auto mb-8">
                         <div className="absolute inset-0 bg-green-500/15 rounded-full animate-ping" />
                         <div className="relative flex items-center justify-center w-full h-full bg-gradient-to-br from-green-500 to-emerald-400 rounded-full shadow-[0_8px_20px_rgba(16,185,129,0.3)]">
-                            <span className="material-icons-round text-white text-5xl">task_alt</span>
+                            <FontAwesomeIcon icon={faCircleCheck} className="text-white text-5xl" />
                         </div>
                     </div>
                     <h2 className="text-3xl font-extrabold text-neutral-900 mb-4 font-heading tracking-tight italic">
@@ -47,7 +49,7 @@ const ApplicationSuccess = () => {
                             onClick={() => navigate('/jobs')}
                             className="flex items-center justify-center gap-2 mx-auto text-[10px] font-black text-gray-400 uppercase hover:text-primary transition-all tracking-[0.2em]"
                         >
-                            <span className="material-icons-round text-sm">search</span>
+                            <FontAwesomeIcon icon={faMagnifyingGlass} className="text-sm" />
                             Explore More Jobs
                         </button>
                     </div>

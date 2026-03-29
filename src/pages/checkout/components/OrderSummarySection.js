@@ -1,4 +1,6 @@
 import React from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleInfo } from '../../../utils/icons';
 
 const OrderSummarySection = ({
     planName,
@@ -26,7 +28,7 @@ const OrderSummarySection = ({
             <div className="flex flex-col gap-6">
                 <div className="flex items-center gap-2 mb-2">
                     <div className="w-5 h-5 rounded-full bg-[#ff7e5f] text-white flex items-center justify-center">
-                        <span className="material-icons-round text-[13px]">info</span>
+                        <FontAwesomeIcon icon={faCircleInfo} className="text-[13px]" />
                     </div>
                     <span className="text-[#3b4356] font-bold text-[14px]">Payment Instructions</span>
                 </div>

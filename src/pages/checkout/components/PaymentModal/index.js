@@ -3,6 +3,8 @@ import { Modal, Result } from "antd";
 import { useCreateSubscriptionMutation } from "@/apis/subscriptionApi";
 import { useGetPaymentStatusQuery } from "@/apis/paymentApi";
 import Button from "@/components/Button";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft, faCircleCheck, faQrcode, faRotate } from '../../../../utils/icons';
 
 const PaymentModal = ({ isOpen, onClose, plan, selectedDuration }) => {
     const [createSubscription, { isLoading: isApiLoading }] = useCreateSubscriptionMutation();
@@ -123,7 +125,7 @@ const PaymentModal = ({ isOpen, onClose, plan, selectedDuration }) => {
                     )}
                     <div className="pt-4 space-y-3">
                         <div className="flex items-center gap-2">
-                            <span className="material-icons-round text-primary text-sm">check_circle</span>
+                            <FontAwesomeIcon icon={faCircleCheck} className="text-primary text-sm" />
                             <span className="text-primary font-medium text-sm">Cancel anytime</span>
                         </div>
                     </div>
@@ -161,7 +163,7 @@ const PaymentModal = ({ isOpen, onClose, plan, selectedDuration }) => {
                         <div className="bg-[#fc9c82] w-full h-full rounded-2xl flex items-center justify-center p-6">
                             {isApiLoading ? (
                                 <div className="text-white flex flex-col items-center justify-center gap-2">
-                                    <span className="material-icons-round animate-spin">refresh</span>
+                                    <FontAwesomeIcon icon={faRotate} className="animate-spin" />
                                     <span className="text-sm font-medium">Loading QR...</span>
                                 </div>
                             ) : qrCodeUrl ? (
@@ -172,7 +174,7 @@ const PaymentModal = ({ isOpen, onClose, plan, selectedDuration }) => {
                                 />
                             ) : (
                                 <div className="bg-white w-full h-full rounded-xl flex flex-col items-center justify-center text-gray-400 gap-2 p-4">
-                                    <span className="material-icons-round text-3xl">qr_code_scanner</span>
+                                    <FontAwesomeIcon icon={faQrcode} className="text-3xl" />
                                     <span className="text-[13px] font-medium text-center">QR Code not available</span>
                                 </div>
                             )}
@@ -180,7 +182,7 @@ const PaymentModal = ({ isOpen, onClose, plan, selectedDuration }) => {
                     </div>
 
                     <div className="flex items-center gap-2 text-[#fc9c82] font-semibold bg-[#fff1ed] px-4 py-2 rounded-lg mb-4">
-                        <span className="material-icons-round text-xl">qr_code_scanner</span>
+                        <FontAwesomeIcon icon={faQrcode} className="text-xl" />
                         <span>Scan to pay {totalPrice}</span>
                     </div>
 
@@ -191,7 +193,7 @@ const PaymentModal = ({ isOpen, onClose, plan, selectedDuration }) => {
                         size="lg"
                         className="text-[#8492a6] hover:text-[#3b4356] text-sm font-semibold flex items-center gap-1.5"
                     >
-                        <span className="material-icons-round text-[16px]">arrow_back</span>
+                        <FontAwesomeIcon icon={faArrowLeft} className="text-[16px]" />
                         Cancel & Go back
                     </Button>
                 </div>

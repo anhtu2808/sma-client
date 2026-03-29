@@ -4,18 +4,19 @@ import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 import { api } from '@/apis/baseApi';
 import { setRealtimePreview } from '@/pages/dashboard/notification/components/notification-slice';
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 import NotificationToast from '@/components/NotificationToast';
+import { faBell, faBriefcase, faCircleCheck, faCircleExclamation, faCircleInfo, faCreditCard, faEnvelope } from '../utils/icons';
 
 const ICON_MAP = {
-    APPLICATION_STATUS: "fa-solid fa-briefcase",
-    PAYMENT_SUCCESS: "fa-solid fa-circle-check",
-    PAYMENT_FAILURE: "fa-solid fa-credit-card",
-    INVITATION: "fa-solid fa-envelope",
-    CV_PARSE_FAILED: "fa-solid fa-circle-exclamation",
-    SYSTEM: "fa-solid fa-circle-info",
+    APPLICATION_STATUS: faBriefcase,
+    PAYMENT_SUCCESS: faCircleCheck,
+    PAYMENT_FAILURE: faCreditCard,
+    INVITATION: faEnvelope,
+    CV_PARSE_FAILED: faCircleExclamation,
+    SYSTEM: faCircleInfo,
 };
-const DEFAULT_ICON = "fa-solid fa-bell";
+const DEFAULT_ICON = faBell;
 
 export const useNotificationSocket = () => {
     const dispatch = useDispatch();
@@ -27,7 +28,7 @@ export const useNotificationSocket = () => {
         console.log("Checking token in Socket Hook...");
 
         if (!token) {
-            console.warn("No token found! Socket connection aborted. ❌");
+            console.warn("No token found! Socket connection aborted.");
             return;
         }
 
@@ -43,25 +44,24 @@ export const useNotificationSocket = () => {
                 Authorization: `Bearer ${token}`
             },
             onConnect: () => {
-                console.log('Connected ✅');
-                console.log("Connected WS 🔥");
+                console.log('Connected');
 
                 client.subscribe('/user/queue/notifications', (message) => {
-                    console.log("🔥 WS RECEIVED:", message.body);
+                    console.log("WS RECEIVED:", message.body);
                     const newNoti = JSON.parse(message.body);
                     if (!newNoti?.title && !newNoti?.message) {
                         return;
                     }
                     const icon = getIcon(newNoti.notificationType);
 
-                    toast.custom((t) => (
+                    toast(
                         <NotificationToast
-                            t={t}
                             icon={icon}
                             title={newNoti.title}
                             message={newNoti.message}
-                        />
-                    ), { duration: 5000 });
+                        />,
+                        { icon: false, autoClose: 5000, hideProgressBar: true }
+                    );
 
                     dispatch(api.util.invalidateTags(['Notifications']));
                 });

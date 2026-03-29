@@ -1,5 +1,6 @@
 import useAnimatedScore from "@/hooks/useAnimatedScore";
 import { getMatchLevelConfig } from "./overviewUtils";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const OverviewScoreSection = ({ score = 0, matchLevel = "FAIR", summary = "" }) => {
   const animatedScore = useAnimatedScore(score, 1200);
@@ -49,7 +50,7 @@ const OverviewScoreSection = ({ score = 0, matchLevel = "FAIR", summary = "" }) 
           <div
             className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${levelConfig.badgeBg} ${levelConfig.badgeText}`}
           >
-            <span className="material-icons-round text-[14px]">{levelConfig.icon}</span>
+            <FontAwesomeIcon icon={levelConfig.icon} className="text-[14px]" />
             {levelConfig.label}
           </div>
         </div>

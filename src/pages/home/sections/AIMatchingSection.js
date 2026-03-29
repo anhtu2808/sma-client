@@ -1,4 +1,6 @@
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleCheck, faUser, faWandMagicSparkles } from '../../../utils/icons';
 
 const AIMatchingSection = () => {
     return (
@@ -40,7 +42,7 @@ const AIMatchingSection = () => {
                                     </div>
                                 </div>
                                 <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 text-xs font-semibold border border-green-100 dark:border-green-800/30">
-                                    <span className="material-icons-round text-sm">check_circle</span>
+                                    <FontAwesomeIcon icon={faCircleCheck} className="text-sm" />
                                     Strong Fit
                                 </span>
                             </div>
@@ -81,7 +83,7 @@ const AIMatchingSection = () => {
 
                             {/* AI Analysis Footer */}
                             <div className="flex items-center gap-2.5 p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/30">
-                                <span className="material-icons-round text-blue-500 text-lg">auto_awesome</span>
+                                <FontAwesomeIcon icon={faWandMagicSparkles} className="text-blue-500 text-lg" />
                                 <div>
                                     <p className="text-xs font-semibold text-gray-800 dark:text-gray-200">AI Analysis</p>
                                     <p className="text-[10px] text-gray-500 dark:text-gray-400">Deep learning model v2.1</p>
@@ -95,7 +97,7 @@ const AIMatchingSection = () => {
                             <div className="flex items-start justify-between mb-6">
                                 <div className="flex items-center gap-3">
                                     <div className="w-12 h-12 rounded-xl bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                        <span className="material-icons-round text-gray-400 dark:text-gray-500 text-2xl">person</span>
+                                        <FontAwesomeIcon icon={faUser} className="text-gray-400 dark:text-gray-500 text-2xl" />
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-gray-900 dark:text-white">Sarah Johnson</h3>

@@ -8,6 +8,8 @@ import { useMarkDetailAsFixedMutation } from "@/apis/matchingApi";
 import { getErrorMessage } from "@/constant/attachment";
 import toastMessage from "@/utils/toastMessage";
 import EditorContext from "@/pages/match-report/enhancements/EditorContext";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowsRotate, faCheck, faCircleCheck, faWandMagicSparkles } from '../../../../../utils/icons';
 
 const SuggestionCard = ({
   suggestion,
@@ -93,17 +95,12 @@ const SuggestionCard = ({
               onClick={handleFixInEditor}
               className="flex shrink-0 items-center justify-center rounded p-1 text-neutral-500 transition-colors hover:bg-amber-50 hover:text-amber-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <span
-                className={`material-icons-round text-[18px] ${
+              <FontAwesomeIcon
+                icon={isFixingThis ? faArrowsRotate : fixApplied ? faCircleCheck : faWandMagicSparkles}
+                className={`text-[18px] ${
                   isFixingThis ? "animate-spin" : ""
                 } ${fixApplied ? "text-emerald-500" : ""}`}
-              >
-                {isFixingThis
-                  ? "autorenew"
-                  : fixApplied
-                  ? "check_circle"
-                  : "auto_fix_high"}
-              </span>
+              />
             </button>
           ) : null}
 
@@ -121,13 +118,12 @@ const SuggestionCard = ({
               }}
               className="flex shrink-0 items-center justify-center rounded p-1 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <span
-                className={`material-icons-round text-[18px] ${
+              <FontAwesomeIcon
+                icon={faArrowsRotate}
+                className={`text-[18px] ${
                   isRegenerating ? "animate-spin" : ""
                 }`}
-              >
-                autorenew
-              </span>
+              />
             </button>
           ) : null}
         </div>
@@ -135,7 +131,7 @@ const SuggestionCard = ({
 
       {copied && (
         <div className="absolute bottom-0 right-0 flex items-center gap-0.5 rounded-tl-md bg-emerald-500 px-2 py-1 text-[10px] font-medium text-white animate-in fade-in zoom-in duration-200">
-          <span className="material-icons-round text-[10px]">check</span>
+          <FontAwesomeIcon icon={faCheck} className="text-[10px]" />
           <span>Copied</span>
         </div>
       )}

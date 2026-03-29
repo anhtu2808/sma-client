@@ -1,18 +1,20 @@
 import InvitationCard from '@/pages/dashboard/invitations/invitation-card';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleCheck, faCircleXmark, faEnvelope } from '../../../../utils/icons';
 
 const EMPTY_STATE_BY_TAB = {
   new: {
-    icon: 'mark_email_unread',
+    icon: faEnvelope,
     title: 'No new invitations',
     description: 'New invitations from recruiters will show up here.',
   },
   accepted: {
-    icon: 'check_circle',
+    icon: faCircleCheck,
     title: 'No accepted invitations',
     description: 'Invitations you accept will appear in this tab.',
   },
   declined: {
-    icon: 'cancel',
+    icon: faCircleXmark,
     title: 'No declined invitations',
     description: 'Invitations you decline will appear in this tab.',
   },
@@ -24,7 +26,7 @@ const InvitationList = ({ items, activeTab, onViewDetails, onAccept, onDecline, 
 
     return (
       <section className="bg-white dark:bg-surface-dark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-12 text-center">
-        <span className="material-icons-round text-5xl text-gray-300 dark:text-gray-600">{emptyState.icon}</span>
+        <FontAwesomeIcon icon={emptyState.icon} className="text-5xl text-gray-300 dark:text-gray-600" />
         <h3 className="mt-3 text-xl font-bold text-gray-900 dark:text-white">{emptyState.title}</h3>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{emptyState.description}</p>
       </section>

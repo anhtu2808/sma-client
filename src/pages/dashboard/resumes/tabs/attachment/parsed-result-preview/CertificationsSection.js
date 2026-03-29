@@ -1,5 +1,7 @@
 import React from "react";
 import { getHostLabel, getValidLink } from "@/utils/profileUtils";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMedal, faStar } from '../../../../../../utils/icons';
 
 const CertificationsSection = ({ data }) => {
   const certifications = data?.certifications ?? [];
@@ -8,13 +10,13 @@ const CertificationsSection = ({ data }) => {
   return (
     <div className="space-y-3">
       <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-        <span className="material-icons-round text-primary text-[18px]">workspace_premium</span>
+        <FontAwesomeIcon icon={faMedal} className="text-primary text-[18px]" />
         Certifications
       </h3>
       <div className="space-y-2">
         {certifications.map((cert) => (
           <div key={cert?.id} className="flex gap-2.5 items-start">
-            <span className="material-icons-round text-yellow-500 text-[16px] mt-0.5">star</span>
+            <FontAwesomeIcon icon={faStar} className="text-yellow-500 text-[16px] mt-0.5" />
             <div className="flex-1 min-w-0">
               <h4 className="text-sm font-bold text-gray-900">{cert?.name || "N/A"}</h4>
               <p className="text-xs text-gray-500">{cert?.issuer || "N/A"}</p>

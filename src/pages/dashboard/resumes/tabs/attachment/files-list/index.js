@@ -4,6 +4,8 @@ import { Tooltip } from "antd";
 import Button from "@/components/Button";
 import Loading from "@/components/Loading";
 import { getParseStatusView, normalizeParseStatus } from "@/constant/attachment";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowsRotate, faBrain, faCircleInfo, faCircleUser, faDownload, faEye, faFileLines, faFilePdf, faPen, faPenToSquare, faTrash } from '../../../../../../utils/icons';
 
 const FilesList = ({
   files,
@@ -36,9 +38,7 @@ const FilesList = ({
             ? "Upload limit reached. Upload a new resume to replace an existing one."
             : "Upgrade your plan to unlock more uploads"
           }>
-            <span className={`material-icons-round text-[16px] cursor-help ${uploadQuota.exhausted ? "text-red-400" : "text-gray-400 dark:text-gray-500"}`}>
-              info
-            </span>
+            <FontAwesomeIcon icon={faCircleInfo} className={`text-[16px] cursor-help ${uploadQuota.exhausted ? "text-red-400" : "text-gray-400 dark:text-gray-500"}`} />
           </Tooltip>
         </div>
       ) : (
@@ -67,9 +67,7 @@ const FilesList = ({
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div className="h-10 w-10 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center flex-none">
-                  <span className={`material-icons-round ${file.type === "pdf" ? "text-red-500" : "text-blue-500"}`}>
-                    {file.type === "pdf" ? "picture_as_pdf" : "description"}
-                  </span>
+                  <FontAwesomeIcon icon={file.type === "pdf" ? faFilePdf : faFileLines} className={`${file.type === "pdf" ? "text-red-500" : "text-blue-500"}`} />
                 </div>
                 <div className="min-w-0">
                   {file.url ? (
@@ -92,7 +90,7 @@ const FilesList = ({
                       className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium ${statusView.className}`}
                     >
                       {(isPolling || normalizedStatus === "PARTIAL") && (
-                        <i className="material-icons-round animate-spin text-[12px] leading-none">autorenew</i>
+                        <FontAwesomeIcon icon={faArrowsRotate} className="animate-spin text-[12px] leading-none" />
                       )}
                       {statusView.label}
                     </span>
@@ -108,7 +106,7 @@ const FilesList = ({
                   tooltip="Rename"
                   onClick={() => onRename(file.id)}
                 >
-                  <i className="material-icons-round text-[18px]">edit</i>
+                  <FontAwesomeIcon icon={faPenToSquare} className="text-[18px]" />
                 </Button>
                 <Button
                   mode="ghost"
@@ -119,7 +117,7 @@ const FilesList = ({
                   disabled={!file.url}
                   onClick={() => file.url && window.open(file.url, "_blank", "noopener,noreferrer")}
                 >
-                  <i className="material-icons-round text-[18px]">download</i>
+                  <FontAwesomeIcon icon={faDownload} className="text-[18px]" />
                 </Button>
 
                 {canSetAsProfile && (
@@ -131,7 +129,7 @@ const FilesList = ({
                     tooltip="View parsed result"
                     onClick={() => onViewParsedResult(file.id)}
                   >
-                    <i className="material-icons-round text-[18px]">visibility</i>
+                    <FontAwesomeIcon icon={faEye} className="text-[18px]" />
                   </Button>
                 )}
 
@@ -144,7 +142,7 @@ const FilesList = ({
                     tooltip="Edit CV"
                     onClick={() => onEditResume(file.id)}
                   >
-                    <i className="material-icons-round text-[18px]">edit_note</i>
+                    <FontAwesomeIcon icon={faPen} className="text-[18px]" />
                   </Button>
                 )}
 
@@ -158,7 +156,7 @@ const FilesList = ({
                     disabled={isParseBusy}
                     onClick={() => onOpenParseConsent(file.id)}
                   >
-                    <i className="material-icons-round text-[18px]">psychology</i>
+                    <FontAwesomeIcon icon={faBrain} className="text-[18px]" />
                   </Button>
                 )}
 
@@ -171,7 +169,7 @@ const FilesList = ({
                   disabled={!canSetAsProfile || isSettingProfile || settingProfileId === file.id}
                   onClick={() => onOpenSetProfileConfirm(file.id)}
                 >
-                  <i className="material-icons-round text-[18px]">account_circle</i>
+                  <FontAwesomeIcon icon={faCircleUser} className="text-[18px]" />
                 </Button>
                 <Button
                   mode="ghost"
@@ -182,7 +180,7 @@ const FilesList = ({
                   disabled={deletingId === file.id}
                   onClick={() => onDeleteResume(file.id)}
                 >
-                  <i className="material-icons-round text-[18px]">delete</i>
+                  <FontAwesomeIcon icon={faTrash} className="text-[18px]" />
                 </Button>
               </div>
             </div>

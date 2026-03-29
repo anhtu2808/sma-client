@@ -1,4 +1,6 @@
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBookmarkRegular, faBookmarkSolid, faBriefcase, faCheck, faChevronDown, faChevronLeft, faChevronRight, faCircleCheck, faLocationDot, faMagnifyingGlass } from '../../../utils/icons';
 
 const DashboardPreviewSection = () => {
     return (
@@ -34,7 +36,7 @@ const DashboardPreviewSection = () => {
                                 {/* Search */}
                                 <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Search</p>
                                 <div className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 mb-5">
-                                    <span className="material-icons-round text-gray-400 text-sm">search</span>
+                                    <FontAwesomeIcon icon={faMagnifyingGlass} className="text-gray-400 text-sm" />
                                     <span className="text-xs text-gray-400">Job title, keywords...</span>
                                 </div>
 
@@ -42,7 +44,7 @@ const DashboardPreviewSection = () => {
                                 <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Location</p>
                                 <div className="flex items-center justify-between px-2.5 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 mb-5">
                                     <span className="text-xs text-gray-700 dark:text-gray-300">New York, NY</span>
-                                    <span className="material-icons-round text-gray-400 text-sm">expand_more</span>
+                                    <FontAwesomeIcon icon={faChevronDown} className="text-gray-400 text-sm" />
                                 </div>
 
                                 {/* Job Level */}
@@ -54,13 +56,13 @@ const DashboardPreviewSection = () => {
                                     </label>
                                     <label className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300 font-medium">
                                         <span className="w-3.5 h-3.5 rounded bg-primary flex items-center justify-center">
-                                            <span className="material-icons-round text-white" style={{ fontSize: '10px' }}>check</span>
+                                            <FontAwesomeIcon icon={faCheck} className="text-white" />
                                         </span>
                                         Mid Level
                                     </label>
                                     <label className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300 font-medium">
                                         <span className="w-3.5 h-3.5 rounded bg-primary flex items-center justify-center">
-                                            <span className="material-icons-round text-white" style={{ fontSize: '10px' }}>check</span>
+                                            <FontAwesomeIcon icon={faCheck} className="text-white" />
                                         </span>
                                         Senior Level
                                     </label>
@@ -102,12 +104,12 @@ const DashboardPreviewSection = () => {
                                             </div>
                                             <p className="text-xs text-primary font-medium mb-1.5">TechFlow Solutions</p>
                                             <div className="flex items-center gap-3 text-[11px] text-gray-500 dark:text-gray-400 mb-2.5">
-                                                <span className="inline-flex items-center gap-0.5"><span className="material-icons-round text-xs">location_on</span> Remote / San Francisco</span>
-                                                <span className="inline-flex items-center gap-0.5"><span className="material-icons-round text-xs">work_outline</span> Full-time</span>
+                                                <span className="inline-flex items-center gap-0.5"><FontAwesomeIcon icon={faLocationDot} className="text-xs" /> Remote / San Francisco</span>
+                                                <span className="inline-flex items-center gap-0.5"><FontAwesomeIcon icon={faBriefcase} className="text-xs" /> Full-time</span>
                                             </div>
                                             <div className="flex items-center justify-between">
                                                 <span className="text-[11px] text-gray-400">Posted 2 days ago</span>
-                                                <span className="material-icons-round text-gray-300 dark:text-gray-600 text-lg">bookmark_border</span>
+                                                <FontAwesomeIcon icon={faBookmarkRegular} className="text-gray-300 dark:text-gray-600 text-lg" />
                                             </div>
                                         </div>
                                     </div>
@@ -122,12 +124,12 @@ const DashboardPreviewSection = () => {
                                             </div>
                                             <p className="text-xs text-primary font-medium mb-1.5">DesignStudio Global</p>
                                             <div className="flex items-center gap-3 text-[11px] text-gray-500 dark:text-gray-400 mb-2.5">
-                                                <span className="inline-flex items-center gap-0.5"><span className="material-icons-round text-xs">location_on</span> New York, NY (Hybrid)</span>
-                                                <span className="inline-flex items-center gap-0.5"><span className="material-icons-round text-xs">work_outline</span> Contract</span>
+                                                <span className="inline-flex items-center gap-0.5"><FontAwesomeIcon icon={faLocationDot} className="text-xs" /> New York, NY (Hybrid)</span>
+                                                <span className="inline-flex items-center gap-0.5"><FontAwesomeIcon icon={faBriefcase} className="text-xs" /> Contract</span>
                                             </div>
                                             <div className="flex items-center justify-between">
                                                 <span className="text-[11px] text-gray-400">Posted 5 hours ago</span>
-                                                <span className="material-icons-round text-primary text-lg">bookmark</span>
+                                                <FontAwesomeIcon icon={faBookmarkSolid} className="text-primary text-lg" />
                                             </div>
                                         </div>
                                     </div>
@@ -142,12 +144,12 @@ const DashboardPreviewSection = () => {
                                             </div>
                                             <p className="text-xs text-primary font-medium mb-1.5">EcoSphere Systems</p>
                                             <div className="flex items-center gap-3 text-[11px] text-gray-500 dark:text-gray-400 mb-2.5">
-                                                <span className="inline-flex items-center gap-0.5"><span className="material-icons-round text-xs">location_on</span> Austin, TX</span>
-                                                <span className="inline-flex items-center gap-0.5"><span className="material-icons-round text-xs">work_outline</span> Full-time</span>
+                                                <span className="inline-flex items-center gap-0.5"><FontAwesomeIcon icon={faLocationDot} className="text-xs" /> Austin, TX</span>
+                                                <span className="inline-flex items-center gap-0.5"><FontAwesomeIcon icon={faBriefcase} className="text-xs" /> Full-time</span>
                                             </div>
                                             <div className="flex items-center justify-between">
                                                 <span className="text-[11px] text-gray-400">Posted 1 day ago</span>
-                                                <span className="material-icons-round text-primary text-lg">bookmark</span>
+                                                <FontAwesomeIcon icon={faBookmarkSolid} className="text-primary text-lg" />
                                             </div>
                                         </div>
                                     </div>
@@ -156,7 +158,7 @@ const DashboardPreviewSection = () => {
                                 {/* Pagination */}
                                 <div className="flex items-center justify-center gap-1.5 mt-6">
                                     <span className="w-7 h-7 rounded-lg flex items-center justify-center text-xs text-gray-400 border border-gray-200 dark:border-gray-700 cursor-pointer hover:border-primary/30 transition">
-                                        <span className="material-icons-round text-sm">chevron_left</span>
+                                        <FontAwesomeIcon icon={faChevronLeft} className="text-sm" />
                                     </span>
                                     <span className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-white bg-primary">1</span>
                                     <span className="w-7 h-7 rounded-lg flex items-center justify-center text-xs text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 cursor-pointer hover:border-primary/30 transition">2</span>
@@ -164,7 +166,7 @@ const DashboardPreviewSection = () => {
                                     <span className="text-xs text-gray-400 px-1">...</span>
                                     <span className="w-7 h-7 rounded-lg flex items-center justify-center text-xs text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 cursor-pointer hover:border-primary/30 transition">12</span>
                                     <span className="w-7 h-7 rounded-lg flex items-center justify-center text-xs text-gray-400 border border-gray-200 dark:border-gray-700 cursor-pointer hover:border-primary/30 transition">
-                                        <span className="material-icons-round text-sm">chevron_right</span>
+                                        <FontAwesomeIcon icon={faChevronRight} className="text-sm" />
                                     </span>
                                 </div>
                             </div>
@@ -175,7 +177,7 @@ const DashboardPreviewSection = () => {
                     <div className="absolute -right-12 top-16 bg-white dark:bg-surface-dark p-4 rounded-2xl shadow-xl animate-bounce hidden lg:block border border-gray-100 dark:border-gray-700 z-20">
                         <div className="flex items-center gap-3">
                             <div className="bg-green-100 dark:bg-green-900/30 p-2 rounded-full text-green-600 dark:text-green-400">
-                                <span className="material-icons-round text-lg">check_circle</span>
+                                <FontAwesomeIcon icon={faCircleCheck} className="text-lg" />
                             </div>
                             <div>
                                 <p className="text-xs text-gray-500 font-medium">Offer Accepted</p>

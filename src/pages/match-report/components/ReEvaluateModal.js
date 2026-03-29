@@ -14,6 +14,8 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import Loading from "@/components/Loading";
 import { getErrorMessage, normalizeParseStatus } from "@/constant/attachment";
 import { RESUME_TYPES } from "@/constant";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCloudArrowUp, faFileArrowUp, faTrashCan, faWandMagicSparkles } from '../../../utils/icons';
 
 dayjs.extend(relativeTime);
 
@@ -99,7 +101,7 @@ const ResumeOption = ({ resume, isSelected, isCurrent, currentScore, onSelect, o
                   className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"
                   aria-label="Delete resume"
                 >
-                  <span className="material-icons-round text-[18px]">delete_outline</span>
+                  <FontAwesomeIcon icon={faTrashCan} className="text-[18px]" />
                 </button>
               )}
               <input
@@ -293,7 +295,7 @@ const ReEvaluateModal = ({ open, onClose, jobId, currentResumeId, currentScore }
     >
       <div className="-mx-6 -mt-2 rounded-t-xl border-b border-gray-100 bg-gray-50/80 px-6 pb-5">
         <h3 className="flex items-center gap-2 text-2xl font-bold text-gray-900">
-          <span className="material-icons-round text-primary">upload_file</span>
+          <FontAwesomeIcon icon={faFileArrowUp} className="text-primary" />
           Re-evaluate with New Resume
         </h3>
         <p className="mt-1 text-sm text-gray-600">
@@ -330,9 +332,7 @@ const ReEvaluateModal = ({ open, onClose, jobId, currentResumeId, currentScore }
 
         <div className="mt-4">
           <label className="group flex w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 py-4 text-gray-500 transition-all hover:border-primary hover:bg-gray-50 hover:text-primary">
-            <span className="material-icons-round mb-1 transition-transform group-hover:scale-110">
-              cloud_upload
-            </span>
+            <FontAwesomeIcon icon={faCloudArrowUp} className="mb-1 transition-transform group-hover:scale-110" />
             <span className="text-sm font-semibold">
               {isUploading ? "Uploading..." : "Upload a new resume"}
             </span>
@@ -362,7 +362,7 @@ const ReEvaluateModal = ({ open, onClose, jobId, currentResumeId, currentScore }
           disabled={!canSubmit || isStartingMatching}
           className="inline-flex h-11 items-center gap-2 rounded-lg bg-primary px-6 text-sm font-semibold text-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <span className="material-icons-round text-[18px]">auto_awesome</span>
+          <FontAwesomeIcon icon={faWandMagicSparkles} className="text-[18px]" />
           {isStartingMatching ? "Starting..." : "Check Match with AI"}
         </button>
       </div>

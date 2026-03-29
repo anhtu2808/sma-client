@@ -1,10 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowRight, faCode, faPaintbrush, faDiagramProject, faChartSimple } from '../../../utils/icons';
 
 const CategoriesSection = () => {
     const categories = [
         {
-            icon: 'code',
+            icon: faCode,
             title: 'Software Engineering',
             count: '1,240+',
             color: 'indigo',
@@ -13,7 +15,7 @@ const CategoriesSection = () => {
             hoverBg: 'group-hover:bg-indigo-600'
         },
         {
-            icon: 'brush',
+            icon: faPaintbrush,
             title: 'Product Design',
             count: '850+',
             color: 'pink',
@@ -22,7 +24,7 @@ const CategoriesSection = () => {
             hoverBg: 'group-hover:bg-pink-600'
         },
         {
-            icon: 'dns',
+            icon: faDiagramProject,
             title: 'DevOps & Cloud',
             count: '620+',
             color: 'teal',
@@ -31,7 +33,7 @@ const CategoriesSection = () => {
             hoverBg: 'group-hover:bg-teal-600'
         },
         {
-            icon: 'analytics',
+            icon: faChartSimple,
             title: 'Data Science',
             count: '940+',
             color: 'orange',
@@ -51,7 +53,7 @@ const CategoriesSection = () => {
                         <p className="text-gray-600 dark:text-gray-400">Browse the most in-demand tech categories.</p>
                     </div>
                     <Link to="/categories" className="text-primary font-semibold hover:underline mt-4 md:mt-0 inline-flex items-center gap-1">
-                        View all categories <span className="material-icons-round text-sm">arrow_forward</span>
+                        View all categories <FontAwesomeIcon icon={faArrowRight} className="text-sm" />
                     </Link>
                 </div>
 
@@ -64,7 +66,7 @@ const CategoriesSection = () => {
                             className="group p-6 bg-white dark:bg-surface-dark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition"
                         >
                             <div className={`w-10 h-10 ${category.iconBg} rounded-lg flex items-center justify-center ${category.iconColor} mb-4 ${category.hoverBg} group-hover:text-white transition`}>
-                                <span className="material-icons-round">{category.icon}</span>
+                                <FontAwesomeIcon icon={category.icon} />
                             </div>
                             <h3 className="font-bold text-gray-900 dark:text-white mb-1">{category.title}</h3>
                             <p className="text-sm text-gray-500 dark:text-gray-400">{category.count} Active Candidates</p>

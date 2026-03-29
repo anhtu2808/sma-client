@@ -24,6 +24,7 @@ export const getIndustryLabel = (value) =>
 
 export const JOB_LEVEL_LABELS = {
     INTERN: "Intern",
+    FRESHER: "Fresher",
     JUNIOR: "Junior",
     MIDDLE: "Middle",
     SENIOR: "Senior",
@@ -44,11 +45,15 @@ export const jobLevelOptions = [
     ...Object.entries(JOB_LEVEL_LABELS).map(([key, value]) => ({ label: value, value: key }))
 ];
 
+export const WORKING_MODEL_LABELS = {
+    REMOTE: "Remote",
+    ONSITE: "On-site",
+    HYBRID: "Hybrid",
+};
+
 export const workingModelOptions = [
     { label: "All Models", value: "" },
-    { label: "Remote", value: "REMOTE" },
-    { label: "On-site", value: "ONSITE" },
-    { label: "Hybrid", value: "HYBRID" }
+    ...Object.entries(WORKING_MODEL_LABELS).map(([key, value]) => ({ label: value, value: key }))
 ];
 
 export const VIETNAM_PROVINCES = [

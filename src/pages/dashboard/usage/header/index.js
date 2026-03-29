@@ -1,4 +1,6 @@
 import Button from "@/components/Button";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faDownload } from '../../../../utils/icons';
 
 const Header = () => {
   return (
@@ -13,7 +15,7 @@ const Header = () => {
         <Button
           type="button"
           mode="secondary"
-          iconLeft={<span className="material-icons-round text-[18px]">download</span>}
+          iconLeft={<FontAwesomeIcon icon={faDownload} className="text-[18px]" />}
         >
           Export CSV
         </Button>

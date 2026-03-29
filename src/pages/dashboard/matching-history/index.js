@@ -6,6 +6,8 @@ import Loading from "@/components/Loading";
 import { Pagination, Dropdown } from "antd";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBolt, faChartSimple, faCircleExclamation, faClipboardCheck, faClock, faDownload, faEllipsisVertical, faFileLines, faLightbulb, faMagnifyingGlass, faPenToSquare, faTriangleExclamation } from '../../../utils/icons';
 dayjs.extend(relativeTime);
 
 const getScoreColor = (score) => {
@@ -49,10 +51,10 @@ const formatRelativeDate = (dateString) => {
 
 const getEvaluationTypeLabel = (type) => {
   if (type === "OVERVIEW") {
-    return { label: "Quick Scan", icon: "bolt", bg: "bg-purple-100", text: "text-purple-700" };
+    return { label: "Quick Scan", icon: faBolt, bg: "bg-purple-100", text: "text-purple-700" };
   }
   if (type === "DETAIL") {
-    return { label: "Detailed", icon: "analytics", bg: "bg-indigo-100", text: "text-indigo-700" };
+    return { label: "Detailed", icon: faChartSimple, bg: "bg-indigo-100", text: "text-indigo-700" };
   }
   return null;
 };
@@ -76,18 +78,18 @@ const MatchingHistoryItem = ({ item, onViewReport }) => {
     {
       key: "view",
       label: "View Report",
-      icon: <i className="material-icons-round text-[16px]">description</i>,
+      icon: <FontAwesomeIcon icon={faFileLines} className="text-[16px]" />,
       onClick: () => onViewReport(item.id),
     },
     {
       key: "edit",
       label: "Edit Resume",
-      icon: <i className="material-icons-round text-[16px]">edit</i>,
+      icon: <FontAwesomeIcon icon={faPenToSquare} className="text-[16px]" />,
     },
     {
       key: "pdf",
       label: "Download PDF",
-      icon: <i className="material-icons-round text-[16px]">download</i>,
+      icon: <FontAwesomeIcon icon={faDownload} className="text-[16px]" />,
     },
   ];
 
@@ -119,7 +121,7 @@ const MatchingHistoryItem = ({ item, onViewReport }) => {
               <span
                 className={`shrink-0 px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1 ${evalType.bg} ${evalType.text}`}
               >
-                <i className="material-icons-round text-[12px]">{evalType.icon}</i>
+                <FontAwesomeIcon icon={evalType.icon} className="text-[12px]" />
                 {evalType.label}
               </span>
             )}
@@ -129,25 +131,25 @@ const MatchingHistoryItem = ({ item, onViewReport }) => {
           </p>
           {resumeName && (
             <p className="text-xs text-gray-400 dark:text-gray-500 mb-1 flex items-center gap-1 truncate">
-              <i className="material-icons-round text-[14px]">description</i>
+              <FontAwesomeIcon icon={faFileLines} className="text-[14px]" />
               Resume: {resumeName}
             </p>
           )}
           <div className="flex items-center gap-3 text-xs text-gray-400 dark:text-gray-500">
             <span className="flex items-center gap-1">
-              <i className="material-icons-round text-[14px]">schedule</i>
+              <FontAwesomeIcon icon={faClock} className="text-[14px]" />
               {formatRelativeDate(item.scoreAt)}
             </span>
             <span className="text-gray-300 dark:text-gray-600">&middot;</span>
             <span className="flex items-center gap-1">
-              <i className="material-icons-round text-[14px]">lightbulb</i>
+              <FontAwesomeIcon icon={faLightbulb} className="text-[14px]" />
               {strengthCount}
             </span>
             {weaknessCount > 0 && (
               <>
                 <span className="text-gray-300 dark:text-gray-600">&middot;</span>
                 <span className="flex items-center gap-1">
-                  <i className="material-icons-round text-[14px]">warning</i>
+                  <FontAwesomeIcon icon={faTriangleExclamation} className="text-[14px]" />
                   {weaknessCount}
                 </span>
               </>
@@ -171,7 +173,7 @@ const MatchingHistoryItem = ({ item, onViewReport }) => {
             placement="bottomRight"
           >
             <Button mode="ghost" size="sm">
-              <i className="material-icons-round text-[16px]">more_vert</i>
+              <FontAwesomeIcon icon={faEllipsisVertical} className="text-[16px]" />
             </Button>
           </Dropdown>
         </div>
@@ -228,9 +230,7 @@ const MatchingHistory = () => {
         </div>
 
         <div className="relative max-w-md">
-          <i className="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[20px]">
-            search
-          </i>
+          <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[20px]" />
           <input
             type="text"
             placeholder="Search by job title, company, or resume..."
@@ -249,13 +249,13 @@ const MatchingHistory = () => {
             </div>
           ) : isError ? (
             <div className="bg-white dark:bg-surface-dark rounded-2xl border border-gray-100 dark:border-gray-800 p-12 text-center">
-              <i className="material-icons-round text-[48px] text-red-400 mb-3">error_outline</i>
+              <FontAwesomeIcon icon={faCircleExclamation} className="text-[48px] text-red-400 mb-3" />
               <p className="text-gray-900 dark:text-white font-medium">Failed to load scan history</p>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Please try again later</p>
             </div>
           ) : filteredList.length === 0 ? (
             <div className="bg-white dark:bg-surface-dark rounded-2xl border border-gray-100 dark:border-gray-800 p-12 text-center">
-              <i className="material-icons-round text-[48px] text-gray-300 dark:text-gray-600 mb-3">fact_check</i>
+              <FontAwesomeIcon icon={faClipboardCheck} className="text-[48px] text-gray-300 dark:text-gray-600 mb-3" />
               <p className="text-gray-900 dark:text-white font-medium">No scan history found</p>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-4">
                 Start scanning your resume against jobs to see results here

@@ -1,14 +1,14 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleExclamation, faDownload } from '../../../utils/icons';
 
 const ViewerError = ({ message, fileUrl, fileName }) => {
   const navigate = useNavigate();
 
   return (
     <div className="flex flex-col items-center justify-center h-full py-20 px-6 text-center gap-4">
-      <span className="material-icons-round text-5xl text-gray-300 dark:text-neutral-600">
-        error_outline
-      </span>
+      <FontAwesomeIcon icon={faCircleExclamation} className="text-5xl text-gray-300 dark:text-neutral-600" />
       <div>
         <p className="text-base font-medium text-gray-700 dark:text-neutral-300">
           Unable to load document
@@ -24,7 +24,7 @@ const ViewerError = ({ message, fileUrl, fileName }) => {
             download={fileName || "resume"}
             className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90 transition-colors"
           >
-            <span className="material-icons-round text-[16px]">download</span>
+            <FontAwesomeIcon icon={faDownload} className="text-[16px]" />
             Download instead
           </a>
         )}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import toast from 'react-hot-toast';
+import { toast } from 'react-toastify';
 import Button from '@/components/Button';
 import NotificationToast from '@/components/NotificationToast';
 import SectionHeader from '@/components/SectionHeader';
@@ -11,6 +11,8 @@ import Checkbox from '@/components/Checkbox';
 import Switch from '@/components/Switch';
 import JobCard from '@/components/JobCard';
 import SimpleTextEditor from '@/components/SimpleTextEditor';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowRight, faBell, faBriefcase, faEnvelopeRegular, faFilter, faPalette, faPlus } from '../../utils/icons';
 
 const UiKit = () => {
     const defaultHtml = `
@@ -222,7 +224,7 @@ const UiKit = () => {
                                 </Button>
                                 <Button 
                                     mode="primary" 
-                                    iconLeft={<span className="material-icons-round text-base">add</span>}
+                                    iconLeft={<FontAwesomeIcon icon={faPlus} className="text-base" />}
                                 >
                                     With Icon
                                 </Button>
@@ -240,7 +242,7 @@ const UiKit = () => {
                                 </Button>
                                 <Button 
                                     mode="secondary"
-                                    iconLeft={<span className="material-icons-round text-base">filter_list</span>}
+                                    iconLeft={<FontAwesomeIcon icon={faFilter} className="text-base" />}
                                 >
                                     Filter
                                 </Button>
@@ -266,7 +268,7 @@ const UiKit = () => {
                                 </div>
                                 <button className="text-primary font-semibold hover:underline inline-flex items-center gap-1 text-sm bg-transparent border-0 cursor-pointer p-0">
                                     Text Link 
-                                    <span className="material-icons-round text-sm">arrow_forward</span>
+                                    <FontAwesomeIcon icon={faArrowRight} className="text-sm" />
                                 </button>
                             </div>
                         </Card>
@@ -289,7 +291,7 @@ const UiKit = () => {
                                     label="Input with Icon"
                                     type="email"
                                     placeholder="name@smartrecruit.com"
-                                    prefix={<span className="material-icons-round text-neutral-400 text-xl">mail_outline</span>}
+                                    prefix={<FontAwesomeIcon icon={faEnvelopeRegular} className="text-neutral-400 text-xl" />}
                                 />
                                 <Input
                                     label="Error State"
@@ -421,15 +423,15 @@ const UiKit = () => {
                             </Button>
                             <Button
                                 mode="primary"
-                                iconLeft={<span className="material-icons-round text-base">notifications</span>}
-                                onClick={() => toast.custom((t) => (
+                                iconLeft={<FontAwesomeIcon icon={faBell} className="text-base" />}
+                                onClick={() => toast(
                                     <NotificationToast
-                                        t={t}
-                                        icon="fa-solid fa-briefcase"
+                                        icon={faBriefcase}
                                         title="New Job Application"
                                         message="TechFlow Systems has reviewed your application for Senior UX/UI Designer."
-                                    />
-                                ), { duration: 5000 })}
+                                    />,
+                                    { icon: false, autoClose: 5000 }
+                                )}
                             >
                                 Notification Toast
                             </Button>
@@ -459,7 +461,7 @@ const UiKit = () => {
                     <div>
                         <button className="flex items-center gap-2 group mb-2 bg-transparent border-0 cursor-pointer p-0">
                             <div className="w-6 h-6 bg-primary rounded flex items-center justify-center text-white">
-                                <span className="material-icons-round text-sm">palette</span>
+                                <FontAwesomeIcon icon={faPalette} className="text-sm" />
                             </div>
                             <span className="font-bold text-neutral-900 dark:text-white tracking-tight font-heading">
                                 Talentora Design System

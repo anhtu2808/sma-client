@@ -2,6 +2,8 @@ import React, { useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGetSimilarJobsQuery } from '@/apis/jobApi';
 import { formatSalary } from '@/utils/salaryUtils';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFire, faLocationDot, faMagnifyingGlass } from '../../../utils/icons';
 
 const SimilarJobsCard = () => {
     const { id } = useParams();
@@ -53,7 +55,7 @@ const SimilarJobsCard = () => {
                 </div>
             ) : jobs.length === 0 ? (
                 <div className="text-sm text-gray-400 text-center py-8 flex flex-col items-center gap-2">
-                    <span className="material-icons-round text-3xl text-gray-200">search_off</span>
+                    <FontAwesomeIcon icon={faMagnifyingGlass} className="text-3xl text-gray-200" />
                     No similar jobs found
                 </div>
             ) : (
@@ -83,7 +85,7 @@ const SimilarJobsCard = () => {
                                     </h5>
                                     {job.isHot && (
                                         <span className="shrink-0 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-primary/10 text-primary text-[9px] font-bold uppercase tracking-wide mt-0.5">
-                                            <span className="material-icons-round" style={{ fontSize: '10px' }}>local_fire_department</span>
+                                            <FontAwesomeIcon icon={faFire} />
                                             HOT
                                         </span>
                                     )}
@@ -95,7 +97,7 @@ const SimilarJobsCard = () => {
                                         <>
                                             <span>•</span>
                                             <span className="inline-flex items-center gap-0.5 truncate">
-                                                <span className="material-icons-round" style={{ fontSize: '12px' }}>location_on</span>
+                                                <FontAwesomeIcon icon={faLocationDot} />
                                                 {job.locationCity}
                                             </span>
                                         </>

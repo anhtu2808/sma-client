@@ -3,6 +3,8 @@ import { useSelector } from "react-redux";
 import { useLazyGetJobByIdQuery } from "@/apis/jobApi";
 import Loading from "@/components/Loading";
 import { formatSalary } from "@/utils/salaryUtils";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowTrendUp, faBrain, faBuilding, faCheck, faCircleCheck, faClipboard, faClock, faCreditCard, faFileLines, faGift, faLocationDot } from '../../../../utils/icons';
 
 const JobDetail = () => {
   const jobId = useSelector((state) => state.matchingReport.data?.jobId);
@@ -49,25 +51,25 @@ const JobDetail = () => {
         <div className="mt-3 flex flex-wrap items-center gap-4 text-base text-neutral-700">
           {job.company?.name && (
             <div className="flex items-center gap-1.5">
-              <span className="material-icons-round text-[16px] text-neutral-400">business</span>
+              <FontAwesomeIcon icon={faBuilding} className="text-[16px] text-neutral-400" />
               <span>{job.company.name}</span>
             </div>
           )}
           {location?.city && (
             <div className="flex items-center gap-1.5">
-              <span className="material-icons-round text-[16px] text-neutral-400">location_on</span>
+              <FontAwesomeIcon icon={faLocationDot} className="text-[16px] text-neutral-400" />
               <span>{location.city}</span>
             </div>
           )}
           {job.workingModel && (
             <div className="flex items-center gap-1.5">
-              <span className="material-icons-round text-[16px] text-neutral-400">schedule</span>
+              <FontAwesomeIcon icon={faClock} className="text-[16px] text-neutral-400" />
               <span>{job.workingModel}</span>
             </div>
           )}
           {job.jobLevel && (
             <div className="flex items-center gap-1.5">
-              <span className="material-icons-round text-[16px] text-neutral-400">trending_up</span>
+              <FontAwesomeIcon icon={faArrowTrendUp} className="text-[16px] text-neutral-400" />
               <span>{job.jobLevel}</span>
             </div>
           )}
@@ -76,7 +78,7 @@ const JobDetail = () => {
         {/* Salary */}
         {salary && (
           <div className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-700">
-            <span className="material-icons-round text-[16px]">payments</span>
+            <FontAwesomeIcon icon={faCreditCard} className="text-[16px]" />
             <span>{salary}</span>
           </div>
         )}
@@ -86,7 +88,7 @@ const JobDetail = () => {
       {job.about && (
         <div className="mt-6">
           <h2 className="flex items-center gap-2 font-heading text-lg font-semibold text-neutral-900">
-            <span className="material-icons-round text-primary">description</span>
+            <FontAwesomeIcon icon={faFileLines} className="text-primary" />
             About
           </h2>
           <div 
@@ -100,7 +102,7 @@ const JobDetail = () => {
       {job.responsibilities && (
         <div className="mt-6">
           <h2 className="flex items-center gap-2 font-heading text-lg font-semibold text-neutral-900">
-            <span className="material-icons-round text-primary">assignment</span>
+            <FontAwesomeIcon icon={faClipboard} className="text-primary" />
             Responsibilities
           </h2>
           <div 
@@ -114,7 +116,7 @@ const JobDetail = () => {
       {job.requirement && (
         <div className="mt-6">
           <h2 className="flex items-center gap-2 font-heading text-lg font-semibold text-neutral-900">
-            <span className="material-icons-round text-primary">check_circle</span>
+            <FontAwesomeIcon icon={faCircleCheck} className="text-primary" />
             Requirements
           </h2>
           <div 
@@ -128,7 +130,7 @@ const JobDetail = () => {
       {job.skills?.length > 0 && (
         <div className="mt-6">
           <h2 className="flex items-center gap-2 font-heading text-lg font-semibold text-neutral-900">
-            <span className="material-icons-round text-primary">psychology</span>
+            <FontAwesomeIcon icon={faBrain} className="text-primary" />
             Skills
           </h2>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -148,13 +150,13 @@ const JobDetail = () => {
       {job.benefits?.length > 0 && (
         <div className="mt-6">
           <h2 className="flex items-center gap-2 font-heading text-lg font-semibold text-neutral-900">
-            <span className="material-icons-round text-primary">redeem</span>
+            <FontAwesomeIcon icon={faGift} className="text-primary" />
             Benefits
           </h2>
           <ul className="mt-3 space-y-2">
             {job.benefits.map((benefit, idx) => (
               <li key={idx} className="flex items-start gap-2 text-base text-neutral-700">
-                <span className="material-icons-round text-[16px] text-emerald-500">check</span>
+                <FontAwesomeIcon icon={faCheck} className="text-[16px] text-emerald-500" />
                 <span>{benefit.name || benefit}</span>
               </li>
             ))}

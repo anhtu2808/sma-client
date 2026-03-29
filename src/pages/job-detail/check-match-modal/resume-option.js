@@ -1,6 +1,8 @@
 import React from "react";
 import { getParseStatusView, normalizeParseStatus } from "@/constant/attachment";
 import { getEvaluationHistoryId, getEvaluationHistoryScore } from "./matchHistory";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBrain, faTrashCan } from '../../../utils/icons';
 
 const ResumeOption = ({
   resume,
@@ -104,7 +106,7 @@ const ResumeOption = ({
                   className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"
                   aria-label="Delete resume"
                 >
-                  <span className="material-icons-round text-[18px]">delete_outline</span>
+                  <FontAwesomeIcon icon={faTrashCan} className="text-[18px]" />
                 </button>
               )}
               <input
@@ -127,7 +129,7 @@ const ResumeOption = ({
                 onParse(resume.id);
               }}
             >
-              <i className="material-icons-round text-[14px]">psychology</i>
+              <FontAwesomeIcon icon={faBrain} className="text-[14px]" />
               Parse CV
             </button>
           ) : (

@@ -1,6 +1,8 @@
 import React from "react";
 import Button from "@/components/Button";
 import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleCheck } from '../../../utils/icons';
 
 const CheckoutSuccess = ({ planName, totalPrice, durationMonths }) => {
     const navigate = useNavigate();
@@ -8,7 +10,7 @@ const CheckoutSuccess = ({ planName, totalPrice, durationMonths }) => {
     return (
         <div className="w-full max-w-2xl bg-white rounded-[2rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] border border-[#f1f3f9] p-8 sm:p-12 text-center mx-auto mt-12">
             <div className="w-20 h-20 rounded-full bg-green-100 text-green-500 flex items-center justify-center mx-auto mb-6">
-                <span className="material-icons-round text-4xl">check_circle</span>
+                <FontAwesomeIcon icon={faCircleCheck} className="text-4xl" />
             </div>
 
             <h2 className="text-3xl font-extrabold text-[#111e3b] mb-4 tracking-tight">Payment Successful!</h2>

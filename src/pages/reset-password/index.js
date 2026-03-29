@@ -6,6 +6,8 @@ import Button from "@/components/Button";
 import SideDecorator from "@/pages/forgot-password/side-decorator";
 
 import authService from "@/services/authService";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEnvelope, faKey, faLock } from '../../utils/icons';
 
 const ResetPassword = () => {
     const location = useLocation();
@@ -98,7 +100,7 @@ const ResetPassword = () => {
                                 value={email}
                                 disabled
                                 className="bg-gray-100 dark:bg-gray-800 text-gray-500 cursor-not-allowed"
-                                prefix={<span className="material-icons-round text-gray-400" style={{ fontSize: '20px' }}>mail</span>}
+                                prefix={<FontAwesomeIcon icon={faEnvelope} className="text-gray-400" />}
                             />
                         </div>
 
@@ -112,7 +114,7 @@ const ResetPassword = () => {
                                 value={otp}
                                 onChange={(e) => setOtp(e.target.value)}
                                 required
-                                prefix={<span className="material-icons-round text-gray-400" style={{ fontSize: '20px' }}>vpn_key</span>}
+                                prefix={<FontAwesomeIcon icon={faKey} className="text-gray-400" />}
                             />
                         </div>
 
@@ -125,7 +127,7 @@ const ResetPassword = () => {
                                 value={newPassword}
                                 onChange={(e) => setNewPassword(e.target.value)}
                                 required
-                                prefix={<span className="material-icons-round text-gray-400" style={{ fontSize: '20px' }}>lock</span>}
+                                prefix={<FontAwesomeIcon icon={faLock} className="text-gray-400" />}
                             />
                         </div>
 
@@ -138,7 +140,7 @@ const ResetPassword = () => {
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 required
-                                prefix={<span className="material-icons-round text-gray-400" style={{ fontSize: '20px' }}>lock</span>}
+                                prefix={<FontAwesomeIcon icon={faLock} className="text-gray-400" />}
                             />
                         </div>
 

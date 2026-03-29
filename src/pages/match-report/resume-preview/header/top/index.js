@@ -3,6 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 import { setActiveDocumentTab } from "@/store/slices/matchingReportSlice";
 import ReEvaluateModal from "@/pages/match-report/components/ReEvaluateModal";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFileArrowUp, faPen } from '../../../../../utils/icons';
 
 const HeaderTop = () => {
   const dispatch = useDispatch();
@@ -49,7 +51,7 @@ const HeaderTop = () => {
           disabled={!evaluationData?.resumeId}
           className="rounded border border-primary bg-white px-3 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
         >
-          <span className="material-icons-round text-[16px]">edit_note</span>
+          <FontAwesomeIcon icon={faPen} className="text-[16px]" />
           Edit Resume
         </button>
         <button
@@ -58,7 +60,7 @@ const HeaderTop = () => {
           disabled={!evaluationData?.jobId}
           className="rounded border border-primary bg-white px-3 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
         >
-          <span className="material-icons-round text-[16px]">upload_file</span>
+          <FontAwesomeIcon icon={faFileArrowUp} className="text-[16px]" />
           Re-evaluate
         </button>
         <button

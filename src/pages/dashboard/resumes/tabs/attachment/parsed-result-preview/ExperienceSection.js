@@ -1,5 +1,7 @@
 import React from "react";
 import { enumToLabel, formatRange } from "@/utils/profileUtils";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBriefcase } from '../../../../../../utils/icons';
 
 const ExperienceSection = ({ data }) => {
   const experiences = data?.experiences ?? [];
@@ -8,7 +10,7 @@ const ExperienceSection = ({ data }) => {
   return (
     <div className="space-y-3">
       <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-        <span className="material-icons-round text-primary text-[18px]">work</span>
+        <FontAwesomeIcon icon={faBriefcase} className="text-primary text-[18px]" />
         Work Experience
       </h3>
       <div className="space-y-4">

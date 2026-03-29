@@ -1,6 +1,8 @@
 import Button from '@/components/Button';
 import { Building2 } from 'lucide-react';
 import PropTypes from 'prop-types';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowTrendUp, faBookmarkRegular, faBookmarkSolid, faCircleCheck, faCity, faClock, faClockRotateLeft, faFire, faLocationDot } from '../../utils/icons';
 
 const JobCard = ({
     title,
@@ -25,10 +27,10 @@ const JobCard = ({
 }) => {
     // Build info items for the metadata row
     const infoItems = [
-        locationCity && { icon: 'location_on', text: locationCity },
-        experienceTime && { icon: 'work_history', text: experienceTime },
-        workingModel && { icon: 'apartment', text: workingModel },
-        jobLevel && { icon: 'trending_up', text: jobLevel },
+        locationCity && { icon: faLocationDot, text: locationCity },
+        experienceTime && { icon: faClockRotateLeft, text: experienceTime },
+        workingModel && { icon: faCity, text: workingModel },
+        jobLevel && { icon: faArrowTrendUp, text: jobLevel },
     ].filter(Boolean);
 
     // Build tag items: expertise first, then skills
@@ -64,13 +66,13 @@ const JobCard = ({
                         </h3>
                         {isHot && (
                             <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded bg-primary/10 text-primary text-[11px] font-bold uppercase tracking-wide border border-primary/20 shrink-0">
-                                <span className="material-icons-round text-[13px]">local_fire_department</span>
+                                <FontAwesomeIcon icon={faFire} className="text-[13px]" />
                                 HOT
                             </span>
                         )}
                         {isApplied && (
                             <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded bg-green-500/10 text-green-600 dark:text-green-400 text-[11px] font-bold uppercase tracking-wide border border-green-500/20 shrink-0">
-                                <span className="material-icons-round text-[13px]">check_circle</span>
+                                <FontAwesomeIcon icon={faCircleCheck} className="text-[13px]" />
                                 Applied
                             </span>
                         )}
@@ -91,7 +93,7 @@ const JobCard = ({
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[13px] text-slate-500 dark:text-[#a88373]">
                         {infoItems.map((item, idx) => (
                             <span key={idx} className="inline-flex items-center gap-1">
-                                <span className="material-icons-round text-[15px] text-slate-400 dark:text-[#8c6b5d]">{item.icon}</span>
+                                <FontAwesomeIcon icon={item.icon} className="text-[15px] text-slate-400 dark:text-[#8c6b5d]" />
                                 {item.text}
                             </span>
                         ))}
@@ -118,7 +120,7 @@ const JobCard = ({
                 {/* Row 5: Footer - Posted date + Bookmark + CTA */}
                 <div className="flex items-center justify-between mt-1 pt-2.5 border-t border-slate-100 dark:border-[#3d241b]">
                     <span className="flex items-center gap-1.5 text-xs text-slate-400 dark:text-[#8c6b5d]">
-                        <span className="material-icons-round text-[15px]">schedule</span>
+                        <FontAwesomeIcon icon={faClock} className="text-[15px]" />
                         Posted {postedTime}
                     </span>
 
@@ -139,9 +141,7 @@ const JobCard = ({
                                 }`}
                             aria-label="Bookmark job"
                         >
-                            <span className="material-icons-round text-[22px]">
-                                {isBookmarked ? "bookmark" : "bookmark_border"}
-                            </span>
+                            <FontAwesomeIcon icon={isBookmarked ? faBookmarkSolid : faBookmarkRegular} className="text-[22px]" />
                         </Button>
                     </div>
                 </div>

@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Dropdown } from "antd";
 import Button from "@/components/Button";
 import RenameResumeModal from "../components/RenameResumeModal";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faDownload, faEllipsisVertical, faFileLines, faMedal, faPenToSquare, faPlus, faShareNodes, faTrash } from '../../../../utils/icons';
 
 const scoreClassName = (score) => {
   if (score >= 85) return "bg-green-500";
@@ -16,18 +18,18 @@ export const ResumeCard = ({ resume }) => {
     {
       key: "rename",
       label: "Rename",
-      icon: <span className="material-icons-round text-[18px]">edit</span>,
+      icon: <FontAwesomeIcon icon={faPenToSquare} className="text-[18px]" />,
       onClick: () => setIsRenameModalOpen(true),
     },
     {
       key: "download",
       label: "Download",
-      icon: <span className="material-icons-round text-[18px]">download</span>,
+      icon: <FontAwesomeIcon icon={faDownload} className="text-[18px]" />,
     },
     {
       key: "share",
       label: "Share",
-      icon: <span className="material-icons-round text-[18px]">share</span>,
+      icon: <FontAwesomeIcon icon={faShareNodes} className="text-[18px]" />,
     },
     {
       type: "divider",
@@ -35,7 +37,7 @@ export const ResumeCard = ({ resume }) => {
     {
       key: "delete",
       label: "Delete",
-      icon: <span className="material-icons-round text-[18px] text-red-500">delete</span>,
+      icon: <FontAwesomeIcon icon={faTrash} className="text-[18px] text-red-500" />,
       danger: true,
     },
   ];
@@ -79,7 +81,7 @@ export const ResumeCard = ({ resume }) => {
           trigger={["click"]}
         >
           <button type="button" className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-            <span className="material-icons-round text-[20px]">more_vert</span>
+            <FontAwesomeIcon icon={faEllipsisVertical} className="text-[20px]" />
           </button>
         </Dropdown>
       </div>
@@ -98,7 +100,7 @@ export const ResumeCard = ({ resume }) => {
           mode="secondary"
           size="sm"
           shape="rounded"
-          iconLeft={<span className="material-icons-round text-[18px]">edit</span>}
+          iconLeft={<FontAwesomeIcon icon={faPenToSquare} className="text-[18px]" />}
         >
           Edit
         </Button>
@@ -108,21 +110,21 @@ export const ResumeCard = ({ resume }) => {
             size="sm"
             shape="rounded"
             btnIcon
-            iconLeft={<span className="material-icons-round text-[18px]">download</span>}
+            iconLeft={<FontAwesomeIcon icon={faDownload} className="text-[18px]" />}
           />
           <Button
             mode="ghost"
             size="sm"
             shape="rounded"
             btnIcon
-            iconLeft={<span className="material-icons-round text-[18px]">share</span>}
+            iconLeft={<FontAwesomeIcon icon={faShareNodes} className="text-[18px]" />}
           />
           <Button
             mode="ghost"
             size="sm"
             shape="rounded"
             btnIcon
-            iconLeft={<span className="material-icons-round text-[18px]">delete</span>}
+            iconLeft={<FontAwesomeIcon icon={faTrash} className="text-[18px]" />}
           />
         </div>
       </div>
@@ -146,7 +148,7 @@ export const CreateResumeCard = ({ onCreate }) => (
       onClick={onCreate}
       className="w-14 h-14 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-4 hover:bg-primary hover:text-white dark:hover:bg-gray-600 transition-colors"
     >
-      <span className="material-icons-round text-[24px] text-gray-700 dark:text-gray-100">add</span>
+      <FontAwesomeIcon icon={faPlus} className="text-[24px] text-gray-700 dark:text-gray-100" />
     </button>
     <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Create New Resume</h3>
     <p className="text-sm text-center text-gray-500 dark:text-gray-400">Start from a template or import data</p>
@@ -160,7 +162,7 @@ export const ResumeListItem = ({ resume }) => {
     <>
       <div className="bg-white dark:bg-surface-dark rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5 flex items-center gap-4">
     <div className="h-12 w-12 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center flex-none">
-      <span className="material-icons-round text-gray-500 dark:text-gray-300">description</span>
+      <FontAwesomeIcon icon={faFileLines} className="text-gray-500 dark:text-gray-300" />
     </div>
     <div className="min-w-0 flex-1">
       <div className="flex items-start justify-between gap-3">
@@ -193,16 +195,16 @@ export const ResumeListItem = ({ resume }) => {
             title="Rename"
             onClick={() => setIsRenameModalOpen(true)}
           >
-            <span className="material-icons-round text-[18px]">edit</span>
+            <FontAwesomeIcon icon={faPenToSquare} className="text-[18px]" />
           </button>
           <button type="button" className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:text-gray-400 dark:hover:bg-gray-700 rounded-lg transition-colors" title="Download">
-            <span className="material-icons-round text-[18px]">download</span>
+            <FontAwesomeIcon icon={faDownload} className="text-[18px]" />
           </button>
           <button type="button" className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 dark:text-gray-400 dark:hover:bg-gray-700 rounded-lg transition-colors" title="Share">
-            <span className="material-icons-round text-[18px]">share</span>
+            <FontAwesomeIcon icon={faShareNodes} className="text-[18px]" />
           </button>
           <button type="button" className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:text-gray-400 dark:hover:bg-gray-700 rounded-lg transition-colors" title="Delete">
-            <span className="material-icons-round text-[18px]">delete</span>
+            <FontAwesomeIcon icon={faTrash} className="text-[18px]" />
           </button>
         </div>
       </div>
@@ -229,7 +231,7 @@ export const TemplateCard = ({ template, onSelect }) => (
         />
       ) : (
         <div className="w-[200px] h-[286px] bg-white rounded-md shadow-sm border border-gray-200 flex items-center justify-center transform transition-transform duration-300 group-hover:scale-105">
-          <span className="material-icons-round text-gray-300 text-[48px]">description</span>
+          <FontAwesomeIcon icon={faFileLines} className="text-gray-300 text-[48px]" />
         </div>
       )}
 
@@ -241,7 +243,7 @@ export const TemplateCard = ({ template, onSelect }) => (
 
       {template.isPremium && (
         <div className="absolute top-3 right-3 text-amber-500 bg-white/80 dark:bg-gray-800/80 rounded-full p-1 shadow-sm backdrop-blur inline-flex items-center justify-center !w-8 !h-8 z-20">
-          <i className="material-icons-round text-[20px] drop-shadow-sm">workspace_premium</i>
+          <FontAwesomeIcon icon={faMedal} className="text-[20px] drop-shadow-sm" />
         </div>
       )}
     </div>

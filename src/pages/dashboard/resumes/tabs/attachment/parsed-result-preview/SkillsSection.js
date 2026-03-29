@@ -1,5 +1,7 @@
 import React from "react";
 import { formatYearsOfExperience } from "@/utils/profileUtils";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBrain } from '../../../../../../utils/icons';
 
 const SkillsSection = ({ data }) => {
   const skillGroups = (data?.skillGroups ?? []).filter((g) => (g?.skills ?? []).length > 0);
@@ -8,7 +10,7 @@ const SkillsSection = ({ data }) => {
   return (
     <div className="space-y-3">
       <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-        <span className="material-icons-round text-primary text-[18px]">psychology</span>
+        <FontAwesomeIcon icon={faBrain} className="text-primary text-[18px]" />
         Skills
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

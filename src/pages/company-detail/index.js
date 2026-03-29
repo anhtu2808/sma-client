@@ -8,6 +8,8 @@ import CompanyHeader from './company-header';
 import CompanySidebar from './company-sidebar';
 import { AboutSection, LifeAtSection, LocationsSection } from './content-sections';
 import CompanyJobs from './company-jobs';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBriefcase, faBuilding, faNewspaper } from '../../utils/icons';
 
 const CompanyDetail = () => {
     const { id } = useParams();
@@ -32,7 +34,7 @@ const CompanyDetail = () => {
     if (isError || !company) {
         return (
             <div className="min-h-screen bg-slate-50 dark:bg-[#1a100c] flex flex-col items-center justify-center text-center p-4">
-                <span className="material-icons-round text-6xl text-slate-300 mb-4">business</span>
+                <FontAwesomeIcon icon={faBuilding} className="text-6xl text-slate-300 mb-4" />
                 <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">Company Not Found</h2>
                 <p className="text-slate-500 mb-6">The company you are looking for does not exist or has been removed.</p>
                 <Link to="/companies" className="text-primary hover:underline font-bold">
@@ -43,8 +45,8 @@ const CompanyDetail = () => {
     }
 
     const tabs = [
-        { id: 'overview', label: 'Overview', icon: 'subject' },
-        { id: 'jobs', label: 'Jobs', icon: 'work', count: publishedJobsCount || 0 },
+        { id: 'overview', label: 'Overview', icon: faNewspaper },
+        { id: 'jobs', label: 'Jobs', icon: faBriefcase, count: publishedJobsCount || 0 },
     ];
 
     return (
@@ -73,9 +75,7 @@ const CompanyDetail = () => {
                                     : 'border-transparent text-slate-500 dark:text-[#8c6b5d] hover:text-slate-800 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-[#3d241b]'
                                     }`}
                             >
-                                <span className={`material-icons-round text-[20px] ${activeTab === tab.id ? 'text-primary' : 'text-slate-400'}`}>
-                                    {tab.icon}
-                                </span>
+                                <FontAwesomeIcon icon={tab.icon} className={`text-[20px] ${activeTab === tab.id ? 'text-primary' : 'text-slate-400'}`} />
                                 {tab.label}
                                 {tab.count > 0 && (
                                     <span className={`text-xs ml-1 px-2 py-0.5 rounded-full ${activeTab === tab.id

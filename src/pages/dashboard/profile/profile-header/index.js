@@ -5,6 +5,8 @@ import Button from "@/components/Button";
 import { useCandidateDashboardProfileQuery, useUpdateCandidateDashboardProfileMutation } from "@/apis/candidateApi";
 import { getValidLink, getHostLabel } from "@/utils/profileUtils";
 import EditProfileModal from "@/pages/dashboard/profile/profile-header/EditProfileModal";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEnvelope, faFilePdf, faLink, faLinkSlash, faLocationDot, faPenToSquare, faPhone, faUser } from '../../../../utils/icons';
 
 const ProfileHeader = () => {
   const { data: profile } = useCandidateDashboardProfileQuery();
@@ -54,14 +56,14 @@ const ProfileHeader = () => {
           className="text-gray-400 hover:text-primary p-2 rounded-full hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
           title="Export PDF"
         >
-          <span className="material-icons-round">picture_as_pdf</span>
+          <FontAwesomeIcon icon={faFilePdf} />
         </button>
         <Button
           mode="secondary"
           size="sm"
           shape="rounded"
           className="!border-gray-200 dark:!border-gray-600 dark:!text-gray-200"
-          iconLeft={<span className="material-icons-round text-[18px]">edit</span>}
+          iconLeft={<FontAwesomeIcon icon={faPenToSquare} className="text-[18px]" />}
           onClick={openEdit}
         >
           Edit Profile
@@ -75,7 +77,7 @@ const ProfileHeader = () => {
               <img src={profile.avatar} alt={displayName} className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <span className="material-icons-round text-3xl text-gray-400">person</span>
+                <FontAwesomeIcon icon={faUser} className="text-3xl text-gray-400" />
               </div>
             )}
           </div>
@@ -88,28 +90,26 @@ const ProfileHeader = () => {
           <Row gutter={[16, 12]}>
             <Col xs={24} md={12}>
               <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                <span className="material-icons-round text-[18px]">mail</span>
+                <FontAwesomeIcon icon={faEnvelope} className="text-[18px]" />
                 {profile?.email || "N/A"}
               </div>
             </Col>
             <Col xs={24} md={12}>
               <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                <span className="material-icons-round text-[18px]">call</span>
+                <FontAwesomeIcon icon={faPhone} className="text-[18px]" />
                 {profile?.phone || "N/A"}
               </div>
             </Col>
             <Col xs={24} md={12}>
               <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                <span className="material-icons-round text-[18px]">location_on</span>
+                <FontAwesomeIcon icon={faLocationDot} className="text-[18px]" />
                 {profile?.address || "N/A"}
               </div>
             </Col>
             <Col xs={24} md={12}>
               {profile?.githubUrl ? (
                 <div className="flex items-center gap-2 text-sm">
-                  <span className="material-icons-round text-[18px] text-gray-500 dark:text-gray-400">
-                    link
-                  </span>
+                  <FontAwesomeIcon icon={faLink} className="text-[18px] text-gray-500 dark:text-gray-400" />
                   <a
                     className="text-primary hover:underline"
                     href={getValidLink(profile.githubUrl)}
@@ -121,7 +121,7 @@ const ProfileHeader = () => {
                 </div>
               ) : (
                 <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                  <span className="material-icons-round text-[18px]">link_off</span>
+                  <FontAwesomeIcon icon={faLinkSlash} className="text-[18px]" />
                   N/A
                 </div>
               )}

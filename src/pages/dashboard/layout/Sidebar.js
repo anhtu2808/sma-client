@@ -1,7 +1,13 @@
 import React from 'react';
 import { NavLink } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useGetNotificationsQuery } from '@/apis/notificationApi';
 import CvVisibilityControl from "@/pages/dashboard/layout/cv-visibility-control";
+import {
+    faUser, faFileLines, faClipboardCheck, faClockRotateLeft, faEnvelope,
+    faBell, faCreditCard, faGear,
+} from '../../../utils/icons';
+import { faFileInvoice } from '@fortawesome/free-solid-svg-icons';
 
 
 const Sidebar = () => {
@@ -16,21 +22,21 @@ const Sidebar = () => {
 
     const sidebarItems = [
 
-        { to: "/dashboard", icon: "person", label: "Profile", end: true },
-        { to: "/dashboard/resumes", icon: <i className="fa-solid fa-file-lines"></i>, label: "Resumes" },
-        { to: "/dashboard/cv-template", icon: <i className="fa-solid fa-file-invoice"></i>, label: "CV Template", badge: "New" },
-        { to: "/dashboard/matching-history", icon: "fact_check", label: "Resume Checker", badge: "New" },
-        { to: "/dashboard/jobs", icon: "work_history", label: "My Jobs" },
+        { to: "/dashboard", icon: faUser, label: "Profile", end: true },
+        { to: "/dashboard/resumes", icon: faFileLines, label: "Resumes" },
+        { to: "/dashboard/cv-template", icon: faFileInvoice, label: "CV Template", badge: "New" },
+        { to: "/dashboard/matching-history", icon: faClipboardCheck, label: "Resume Checker", badge: "New" },
+        { to: "/dashboard/jobs", icon: faClockRotateLeft, label: "My Jobs" },
         {
             to: "/dashboard/invitations",
-            icon: "mail",
+            icon: faEnvelope,
             label: "Job Invitation",
             badge: 3,
         },
-        { to: "/dashboard/notifications", icon: "notifications", label: "Notifications", badge: unreadCount > 0 ? unreadCount : null },
-        { to: "/dashboard/billing-plans", icon: "credit_card", label: "Billing & Plans" },
-        { to: "/dashboard/usage", icon: "history", label: "Usage" },
-        { to: "/dashboard/setting", icon: "settings", label: "Settings" },
+        { to: "/dashboard/notifications", icon: faBell, label: "Notifications", badge: unreadCount > 0 ? unreadCount : null },
+        { to: "/dashboard/billing-plans", icon: faCreditCard, label: "Billing & Plans" },
+        { to: "/dashboard/usage", icon: faClockRotateLeft, label: "Usage" },
+        { to: "/dashboard/setting", icon: faGear, label: "Settings" },
     ];
 
     return (
@@ -48,14 +54,13 @@ const Sidebar = () => {
                                         : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
                                         }`}
                                 >
-                                    <span
-                                        className={`${typeof item.icon === 'string' ? 'material-icons-round' : ''} text-[20px] transition-colors ${isActive
+                                    <FontAwesomeIcon
+                                        icon={item.icon}
+                                        className={`text-[20px] transition-colors ${isActive
                                             ? "text-white"
                                             : "text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300"
                                             }`}
-                                    >
-                                        {item.icon}
-                                    </span>
+                                    />
                                     <span className="flex-1">{item.label}</span>
                                     {item.badge ? (
                                         <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">

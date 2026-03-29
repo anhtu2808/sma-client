@@ -5,6 +5,8 @@ import ProfileSectionModal from "@/components/ProfileSectionModal";
 import { useGetSkillsQuery } from "@/apis/skillApi";
 import { formatYearsOfExperience } from "@/utils/profileUtils";
 import Button from "@/components/Button";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLightbulb, faPlus, faXmark } from '../../../../utils/icons';
 
 const FORM_ID = "skill-form";
 const MAX_SKILLS_PER_GROUP = 20;
@@ -161,7 +163,7 @@ const SkillFormModal = ({
       <Form id={FORM_ID} form={form} layout="vertical" onFinish={submitForm}>
         <div className="rounded-lg bg-orange-50 border border-orange-100 p-4 mb-4">
           <div className="flex items-start gap-3">
-            <span className="material-icons-round text-primary mt-[2px]">lightbulb</span>
+            <FontAwesomeIcon icon={faLightbulb} className="text-primary mt-[2px]" />
             <div className="text-sm text-gray-700">
               <span className="font-semibold">Tips:</span> Organize your skills into groups to help recruiters scan faster.
             </div>
@@ -212,7 +214,7 @@ const SkillFormModal = ({
               title="Add skill"
               btnIcon
             >
-              {<span className="material-icons-round">add</span>}
+              {<FontAwesomeIcon icon={faPlus} />}
             </Button>
           </div>
         </div>
@@ -233,7 +235,7 @@ const SkillFormModal = ({
                 onClick={() => removePendingSkill(item.skillId)}
                 title="Remove"
               >
-                <span className="material-icons-round text-[16px]">close</span>
+                <FontAwesomeIcon icon={faXmark} className="text-[16px]" />
               </button>
             </span>
           ))}

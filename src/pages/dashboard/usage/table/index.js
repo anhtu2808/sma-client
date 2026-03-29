@@ -4,6 +4,8 @@ import Button from "@/components/Button";
 import Loading from "@/components/Loading";
 import Pagination from "@/components/Pagination";
 import { formatDateTime } from "@/utils/dateTimeUtils";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMagnifyingGlass } from '../../../../utils/icons';
 
 const Table = ({
   searchValue,
@@ -22,9 +24,7 @@ const Table = ({
     <section className="bg-white dark:bg-surface-dark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
       <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="relative w-full lg:max-w-sm">
-          <span className="material-icons-round text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 text-[20px]">
-            search
-          </span>
+          <FontAwesomeIcon icon={faMagnifyingGlass} className="text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 text-[20px]" />
           <input
             type="text"
             placeholder="Search activity logs..."

@@ -1,6 +1,8 @@
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import ScoreCard from '@/pages/match-report/sidebar/header/ScoreCard';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleCheck, faPen } from '../../../utils/icons';
 
 const getBarColor = (score) => {
   if (score >= 80) return 'bg-blue-500';
@@ -82,7 +84,7 @@ const ReportSidebar = () => {
                 <div className="mt-1.5 text-xs text-neutral-500">
                   {isComplete ? (
                     <span className="inline-flex items-center gap-1 text-emerald-600">
-                      <span className="material-icons-round text-[13px]">check_circle</span>
+                      <FontAwesomeIcon icon={faCircleCheck} className="text-[13px]" />
                       Complete
                     </span>
                   ) : (
@@ -102,7 +104,7 @@ const ReportSidebar = () => {
           onClick={handleEditResume}
           className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700"
         >
-          <span className="material-icons-round text-[18px]">edit_note</span>
+          <FontAwesomeIcon icon={faPen} className="text-[18px]" />
           Edit Resume
         </button>
       </div>

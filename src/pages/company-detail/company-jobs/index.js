@@ -7,6 +7,8 @@ import JobCard from '@/components/JobCard';
 import Pagination from '@/components/Pagination';
 import { formatSalary } from '@/utils/salaryUtils';
 import DataList from '@/components/DataList';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBriefcase } from '../../../utils/icons';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -140,7 +142,7 @@ const CompanyJobs = ({ companyId }) => {
     return (
         <div className="bg-white dark:bg-[#2c1a14] rounded-2xl p-6 md:p-8 border border-slate-100 dark:border-[#3d241b]">
             <div className="flex items-center gap-3 mb-6 pb-6 border-b border-slate-100 dark:border-[#3d241b]">
-                <span className="material-icons-round text-primary text-2xl">work</span>
+                <FontAwesomeIcon icon={faBriefcase} className="text-primary text-2xl" />
                 <h2 className="text-xl font-bold text-slate-800 dark:text-white">Open Positions</h2>
             </div>
 

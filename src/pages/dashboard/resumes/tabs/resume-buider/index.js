@@ -6,6 +6,8 @@ import { useGetCandidateResumesQuery, useDeleteCandidateResumeMutation, useUpdat
 import Loading from "@/components/Loading";
 import { RESUME_TYPES } from "@/constant";
 import { CV_TEMPLATES } from "../../template-selection";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFileLines, faPen, faPenToSquare, faPlus, faXmark } from '../../../../../utils/icons';
 
 
 const ResumeBuilderTab = () => {
@@ -83,7 +85,7 @@ const ResumeBuilderTab = () => {
               className="rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex flex-col items-center justify-center min-h-[450px] h-full cursor-pointer hover:border-primary hover:bg-orange-50/50 dark:hover:bg-gray-700/50 transition-all group"
             >
               <div className="w-12 h-12 rounded-full bg-orange-100 dark:bg-gray-700 flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-white transition-colors">
-                <span className="material-icons-round text-[24px] text-primary group-hover:text-white">add</span>
+                <FontAwesomeIcon icon={faPlus} className="text-[24px] text-primary group-hover:text-white" />
               </div>
               <h3 className="font-bold text-sm text-gray-900 dark:text-white">Create New</h3>
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Start from scratch</p>
@@ -119,7 +121,7 @@ const ResumeBuilderTab = () => {
                       onClick={(e) => e.stopPropagation()}
                       className="absolute top-2 right-2 z-20 w-7 h-7 rounded-full bg-white/90 dark:bg-gray-800/90 shadow-sm flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
                     >
-                      <span className="material-icons-round text-[16px]">close</span>
+                      <FontAwesomeIcon icon={faXmark} className="text-[16px]" />
                     </button>
                   </Popconfirm>
 
@@ -133,13 +135,13 @@ const ResumeBuilderTab = () => {
                       />
                     ) : (
                       <div className="w-full max-w-[120px] bg-white dark:bg-gray-700 rounded shadow-sm border border-gray-100 dark:border-gray-600 aspect-[3/4] flex items-center justify-center">
-                        <span className="material-icons-round text-gray-300 text-[32px]">description</span>
+                        <FontAwesomeIcon icon={faFileLines} className="text-gray-300 text-[32px]" />
                       </div>
                     )}
                     {/* Hover overlay that only covers the preview area */}
                     <div className="absolute inset-0 bg-gray-900/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[1px] z-10 pointer-events-none">
                       <span className="bg-white text-gray-800 px-3 py-1.5 rounded-full text-xs font-semibold shadow flex items-center gap-1.5">
-                        <span className="material-icons-round text-[14px]">edit</span>
+                        <FontAwesomeIcon icon={faPenToSquare} className="text-[14px]" />
                         Edit Resume
                       </span>
                     </div>
@@ -174,7 +176,7 @@ const ResumeBuilderTab = () => {
                             className="p-1 text-gray-400 hover:text-primary transition-colors cursor-pointer rounded-md hover:bg-gray-100"
                             title="Rename"
                           >
-                            <span className="material-icons-round text-[14px]">edit_note</span>
+                            <FontAwesomeIcon icon={faPen} className="text-[14px]" />
                           </button>
                         </div>
                       )}

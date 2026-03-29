@@ -10,7 +10,7 @@ import {
 import { useApplyJobMutation } from '@/apis/applicationApi';
 import Card from '@/components/Card';
 import Loading from '@/components/Loading';
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 import { APPLICATION_ERROR_CODE } from '@/constant';
 
 import ResumeSelection from '@/pages/application/steps/ResumeSelection';

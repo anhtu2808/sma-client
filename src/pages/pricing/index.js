@@ -1,6 +1,8 @@
 import Plans from "./plans";
 import FeaturesTable from "./features";
 import PricingFAQ from "./faq";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUserPlus } from '../../utils/icons';
 
 const PricingPage = () => {
   return (
@@ -21,7 +23,7 @@ const PricingPage = () => {
 
           <section className="bg-primary rounded-3xl p-10 md:p-16 text-center text-white relative overflow-hidden shadow-2xl">
             <div className="absolute top-0 right-0 p-12 opacity-10">
-              <span className="material-icons-round text-[120px]">group_add</span>
+              <FontAwesomeIcon icon={faUserPlus} className="text-[120px]" />
             </div>
             <div className="relative z-10">
               <h2 className="text-3xl md:text-4xl font-extrabold mb-4">Not ready to subscribe?</h2>

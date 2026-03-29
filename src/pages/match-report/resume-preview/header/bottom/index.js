@@ -1,5 +1,7 @@
 import { useSelector } from "react-redux";
 import Button from "@/components/Button";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleCheck, faRectangleList, faRotateLeft, faRotateRight } from '../../../../../utils/icons';
 
 const HeaderBottom = () => {
   const { totalCount, resolvedCount } = useSelector((state) => {
@@ -21,21 +23,21 @@ const HeaderBottom = () => {
     <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-1.5 sm:px-6">
       <div className="flex flex-wrap items-center gap-3 sm:gap-4">
         <span className="inline-flex items-center gap-2 px-2 text-sm font-medium text-neutral-600">
-          <span className="material-icons-round text-[18px] text-primary">check_circle</span>
+          <FontAwesomeIcon icon={faCircleCheck} className="text-[18px] text-primary" />
           <span className="text-neutral-900">{`AI Suggestions (${resolvedCount}/${totalCount})`}</span>
         </span>
       </div>
 
       <div className="flex flex-wrap items-center gap-1 sm:gap-2">
         <Button mode="ghost" size="sm" btnIcon tooltip="Undo">
-          <span className="material-icons-round text-[20px]">undo</span>
+          <FontAwesomeIcon icon={faRotateLeft} className="text-[20px]" />
         </Button>
         <Button mode="ghost" size="sm" btnIcon tooltip="Redo">
-          <span className="material-icons-round text-[20px]">redo</span>
+          <FontAwesomeIcon icon={faRotateRight} className="text-[20px]" />
         </Button>
         <div className="mx-1 h-4 w-px bg-neutral-300" />
         <Button mode="ghost" size="sm" btnIcon tooltip="Layout">
-          <span className="material-icons-round text-[20px]">view_agenda</span>
+          <FontAwesomeIcon icon={faRectangleList} className="text-[20px]" />
         </Button>
       </div>
     </div>

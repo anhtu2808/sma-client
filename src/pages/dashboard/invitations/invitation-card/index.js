@@ -1,18 +1,20 @@
 import { useState } from 'react';
 import Button from '@/components/Button';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleCheck, faCircleXmark, faClock, faCreditCard, faLocationDot, faRotate } from '../../../../utils/icons';
 
 const STATUS_META = {
   accepted: {
     label: 'Accepted',
     classes:
       'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-100 dark:border-green-800',
-    icon: 'check_circle',
+    icon: faCircleCheck,
   },
   declined: {
     label: 'Declined',
     classes:
       'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-100 dark:border-red-800',
-    icon: 'cancel',
+    icon: faCircleXmark,
   },
 };
 
@@ -48,19 +50,19 @@ const InvitationCard = ({ item, activeTab, onViewDetails, onAccept, onDecline, i
               <div className="flex flex-wrap gap-2.5">
                 {item.salaryText ? (
                   <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-lg">
-                    <span className="material-icons-round text-[16px]">payments</span>
+                    <FontAwesomeIcon icon={faCreditCard} className="text-[16px]" />
                     {item.salaryText}
                   </span>
                 ) : null}
                 {item.locationText ? (
                   <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-lg">
-                    <span className="material-icons-round text-[16px]">location_on</span>
+                    <FontAwesomeIcon icon={faLocationDot} className="text-[16px]" />
                     {item.locationText}
                   </span>
                 ) : null}
                 {item.workModeLabel ? (
                   <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-lg">
-                    <span className="material-icons-round text-[16px]">schedule</span>
+                    <FontAwesomeIcon icon={faClock} className="text-[16px]" />
                     {item.workModeLabel}
                   </span>
                 ) : null}
@@ -83,7 +85,7 @@ const InvitationCard = ({ item, activeTab, onViewDetails, onAccept, onDecline, i
                 >
                   {isCurrentProcessing ? (
                     <span className="inline-flex items-center gap-2">
-                      <span className="material-icons-round animate-spin text-[16px]">refresh</span>
+                      <FontAwesomeIcon icon={faRotate} className="animate-spin text-[16px]" />
                       Processing...
                     </span>
                   ) : (
@@ -100,7 +102,7 @@ const InvitationCard = ({ item, activeTab, onViewDetails, onAccept, onDecline, i
                 >
                   {isCurrentProcessing ? (
                     <span className="inline-flex items-center gap-2">
-                      <span className="material-icons-round animate-spin text-[16px]">refresh</span>
+                      <FontAwesomeIcon icon={faRotate} className="animate-spin text-[16px]" />
                       Processing...
                     </span>
                   ) : (
@@ -111,7 +113,7 @@ const InvitationCard = ({ item, activeTab, onViewDetails, onAccept, onDecline, i
             ) : (
               statusMeta && (
                 <div className={`w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-semibold ${statusMeta.classes}`}>
-                  <span className="material-icons-round text-[16px]">{statusMeta.icon}</span>
+                  <FontAwesomeIcon icon={statusMeta.icon} className="text-[16px]" />
                   {statusMeta.label}
                 </div>
               )

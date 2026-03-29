@@ -9,7 +9,7 @@ const SkillsAndDomains = () => {
 
     if (!job) return null;
 
-    const skills = job.skills || [];
+    const skills = [...(job.skills || [])].sort((a, b) => a.name.localeCompare(b.name));
     const expertise = job.expertise;
     const domains = job.domains || [];
 

@@ -1,4 +1,6 @@
 import { parseTextToItems } from "./overviewUtils";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleCheck } from '../../../utils/icons';
 
 const OverviewStrengths = ({ text }) => {
   const items = parseTextToItems(text);
@@ -8,7 +10,7 @@ const OverviewStrengths = ({ text }) => {
   return (
     <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-md">
       <div className="mb-4 flex items-center gap-2">
-        <span className="material-icons-round text-[20px] text-emerald-500">check_circle</span>
+        <FontAwesomeIcon icon={faCircleCheck} className="text-[20px] text-emerald-500" />
         <h3 className="text-base font-bold text-neutral-900">Strengths</h3>
       </div>
       <ul className="space-y-2.5">

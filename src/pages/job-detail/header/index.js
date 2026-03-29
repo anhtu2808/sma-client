@@ -3,6 +3,7 @@ import { Button as AntButton } from 'antd';
 import toastMessage from "@/utils/toastMessage";
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGetJobByIdQuery, useGetMarkedJobsQuery, useToggleMarkJobMutation } from '@/apis/jobApi';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const Header = () => {
     const { id } = useParams();
@@ -82,7 +83,7 @@ const Header = () => {
                 disabled={bookmarkLoading}
                 type="button"
             >
-                <span className="material-icons-round">{isMarked ? 'bookmark' : 'bookmark_border'}</span>
+                <FontAwesomeIcon icon={isMarked ? 'bookmark' : 'bookmark_border'} />
             </button>
         </div>
     );

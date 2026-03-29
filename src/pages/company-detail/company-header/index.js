@@ -4,6 +4,8 @@ import { Building2 } from 'lucide-react';
 import Button from '@/components/Button';
 import PropTypes from 'prop-types';
 import { getIndustryLabel } from '@/constant/job';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBuilding, faGlobe, faPlus, faUsers } from '../../../utils/icons';
 
 const CompanyHeader = ({ company }) => {
     if (!company) return null;
@@ -39,19 +41,19 @@ const CompanyHeader = ({ company }) => {
                             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-slate-500 dark:text-[#ce9e8d] text-sm md:text-base">
                                 {company.companyIndustry && (
                                     <div className="flex items-center gap-2">
-                                        <span className="material-icons-round text-[20px]">business</span>
+                                        <FontAwesomeIcon icon={faBuilding} className="text-[20px]" />
                                         <span>{getIndustryLabel(company.companyIndustry)}</span>
                                     </div>
                                 )}
                                 {company.country && (
                                     <div className="flex items-center gap-2">
-                                        <span className="material-icons-round text-[20px]">public</span>
+                                        <FontAwesomeIcon icon={faGlobe} className="text-[20px]" />
                                         <span>{company.country}</span>
                                     </div>
                                 )}
                                 {(company.minSize || company.maxSize) && (
                                     <div className="flex items-center gap-2">
-                                        <span className="material-icons-round text-[20px]">people</span>
+                                        <FontAwesomeIcon icon={faUsers} className="text-[20px]" />
                                         <span>{company.minSize && company.maxSize ? `${company.minSize} - ${company.maxSize}` : (company.minSize || company.maxSize)} Employees</span>
                                     </div>
                                 )}
@@ -62,7 +64,7 @@ const CompanyHeader = ({ company }) => {
                             variant="outline"
                             className="!rounded-full !px-6 border-orange-500 text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-500/10"
                         >
-                            <span className="material-icons-round mr-2">add</span>
+                            <FontAwesomeIcon icon={faPlus} className="mr-2" />
                             Follow
                         </Button>
                     </div>
