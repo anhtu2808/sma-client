@@ -7,9 +7,11 @@ import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
 import { TextStyleKit } from '@tiptap/extension-text-style';
 import { message } from 'antd';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { useGetResumeQuery, useUpdateEnhancementContentMutation } from '@/apis/resumeApi';
+import { useMarkDetailAsFixedMutation } from '@/apis/matchingApi';
+import { setDetailFixed, updateScoresAfterFixed } from '@/store/slices/matchingReportSlice';
 import Loading from '@/components/Loading';
 import EntryHeader from './EntryHeaderNode';
 import SuggestionHighlight from './extensions/SuggestionHighlight';
@@ -18,9 +20,11 @@ import MenuBar from './MenuBar';
 import HighlightDetailModal from './HighlightDetailModal';
 import useEditorHighlights from './hooks/useEditorHighlights';
 import useTypewriterFix from './hooks/useTypewriterFix';
+import { findTextInDoc } from './utils/prosemirrorSearch';
 import './resumeEditor.css';
 
-const AUTOSAVE_DELAY = 4000;
+const AUTOSAVE_DEBOUNCE = 3000;
+const AUTOSAVE_INTERVAL = 3000;
 
 const EXTENSIONS = [
   StarterKit,
@@ -34,6 +38,7 @@ const EXTENSIONS = [
 ];
 
 const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, onInitialContentSaved }) => {
+  const dispatch = useDispatch();
   const { data: resumeData, isLoading } = useGetResumeQuery(
     { resumeId },
     { skip: !resumeId }
@@ -95,21 +100,34 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
     }
   }, [resumeData, editor, initialHtml, initialContent, saveContent, onInitialContentSaved]);
 
-  // Auto-save on editor update (debounced)
+  // Auto-save: debounce after edit + periodic interval
   useEffect(() => {
-    if (!editor) return;
+    if (!editor || !enhancementId) return;
+
+    // Debounce: save 3s after last edit
     const handleUpdate = () => {
       if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
       autoSaveTimerRef.current = setTimeout(() => {
         saveContent(editor.getHTML());
-      }, AUTOSAVE_DELAY);
+      }, AUTOSAVE_DEBOUNCE);
     };
     editor.on('update', handleUpdate);
+
+    // Periodic: save every 3s if there are unsaved changes
+    const intervalId = setInterval(() => {
+      if (editor.isDestroyed) return;
+      const html = editor.getHTML();
+      if (html && html !== lastSavedHtmlRef.current) {
+        saveContent(html);
+      }
+    }, AUTOSAVE_INTERVAL);
+
     return () => {
       editor.off('update', handleUpdate);
       if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+      clearInterval(intervalId);
     };
-  }, [editor, saveContent]);
+  }, [editor, enhancementId, saveContent]);
 
   const handleManualSave = () => {
     if (!editor) return;
@@ -158,9 +176,15 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
       .find((d) => d.id === tagModalDetailId) ?? null;
   }, [tagModalDetailId, criteriaScores]);
 
-  // Auto-close modal when detail becomes fixed
+  // Auto-close modal when detail transitions to fixed (not if already fixed on open)
+  const wasFixedOnOpenRef = useRef(false);
   useEffect(() => {
-    if (resolvedModalDetail?.isFixed) {
+    // Track whether detail was already fixed when modal opened
+    wasFixedOnOpenRef.current = !!resolvedModalDetail?.isFixed;
+  }, [tagModalDetailId]); // reset on modal open/change
+
+  useEffect(() => {
+    if (resolvedModalDetail?.isFixed && !wasFixedOnOpenRef.current) {
       const timer = setTimeout(() => setTagModalDetail(null), 500);
       return () => clearTimeout(timer);
     }
@@ -190,6 +214,86 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
     return () => cancelAnimation();
   }, [cancelAnimation]);
 
+  // One-click optimize: apply first suggestion for all findable contexts
+  const [markDetailAsFixed] = useMarkDetailAsFixedMutation();
+  const [isOptimizing, setIsOptimizing] = useState(false);
+
+  const handleOptimizeAll = useCallback(async () => {
+    if (!editor || !criteriaScores || isOptimizing) return;
+
+    setIsOptimizing(true);
+
+    // Collect all unique contexts with their details (dedup by context text)
+    const seen = new Set();
+    const items = [];
+    for (const cs of criteriaScores) {
+      for (const detail of cs.details || []) {
+        if (!detail.context || detail.isFixed || seen.has(detail.context)) continue;
+        if (!detail.suggestions?.length) continue;
+        seen.add(detail.context);
+        items.push(detail);
+      }
+    }
+
+    let applied = 0;
+
+    for (const detail of items) {
+      const suggestionText = detail.suggestions[0]?.suggestion;
+      if (!suggestionText) continue;
+
+      // Check if text exists in current doc state
+      const ranges = findTextInDoc(editor.state.doc, detail.context);
+      if (ranges.length === 0) continue;
+
+      // Scroll to the text before replacing
+      const { from } = ranges[0];
+      const resolvedPos = editor.state.doc.resolve(from);
+      const domPos = editor.view.domAtPos(resolvedPos.pos);
+      const targetNode = domPos.node?.nodeType === 1 ? domPos.node : domPos.node?.parentElement;
+      if (targetNode) {
+        targetNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Brief pause so user can see where the edit happens
+        await new Promise((r) => setTimeout(r, 400));
+      }
+
+      // Apply typewriter animation (sequential — waits for each to finish)
+      const success = await applyFix(editor, detail.context, suggestionText, detail.id);
+      if (!success) continue;
+
+      // Collect all detail IDs sharing same contextId for marking
+      const detailIds = detail.contextId
+        ? criteriaScores.flatMap((cs) => cs.details || []).filter((d) => d.contextId === detail.contextId && !d.isFixed).map((d) => d.id)
+        : [detail.id];
+
+      for (const id of detailIds) {
+        try {
+          const response = await markDetailAsFixed({ detailId: id }).unwrap();
+          dispatch(setDetailFixed({ detailId: id }));
+          if (response) {
+            dispatch(updateScoresAfterFixed({
+              afterOverallScore: response.afterOverallScore,
+              criteriaScoreId: response.criteriaScoreId,
+              afterCriteriaScore: response.afterCriteriaScore,
+            }));
+          }
+        } catch { /* continue with next */ }
+      }
+
+      applied++;
+
+      // Small pause between items so user can follow
+      await new Promise((r) => setTimeout(r, 300));
+    }
+
+    setIsOptimizing(false);
+    if (applied > 0) {
+      message.success(`Optimized ${applied} suggestion${applied > 1 ? 's' : ''} successfully.`);
+      saveContent(editor.getHTML());
+    } else {
+      message.info('No suggestions could be applied automatically.');
+    }
+  }, [editor, criteriaScores, isOptimizing, markDetailAsFixed, dispatch, saveContent, applyFix]);
+
   // Expose fixInEditor + fixingDetailId + editor to parent via callback
   useEffect(() => {
     onEditorReady?.({ fixInEditor, fixingDetailId, editor });
@@ -201,7 +305,7 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
 
   return (
     <div className="resume-editor flex flex-col h-full">
-      <MenuBar editor={editor} onSave={handleManualSave} isSaving={isSaving} saveStatus={saveStatus} />
+      <MenuBar editor={editor} onSave={handleManualSave} isSaving={isSaving} saveStatus={saveStatus} onOptimizeAll={handleOptimizeAll} isOptimizing={isOptimizing} />
       <div className="relative flex-1 overflow-y-auto bg-gray-200 py-10 flex justify-center">
         <div
           className="w-[210mm] min-h-[297mm] h-fit bg-white shadow-2xl px-[50px] py-[40px] cursor-text"

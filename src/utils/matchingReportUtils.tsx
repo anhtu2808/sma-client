@@ -117,7 +117,7 @@ const normalizeCriteriaScores = (criteriaScores?: CriteriaScore[] | null): Crite
 export const mapEvaluationToStore = (evaluationData: EvaluationData): MatchingReportState => {
   const normalizedEvaluationData = {
     ...evaluationData,
-    criteriaScores: normalizeCriteriaScores(evaluationData?.criteriaScores),
+    criteriaScores: normalizeCriteriaScores(evaluationData?.criteriaScores).sort((a, b) => a.id - b.id),
   };
 
   return {
@@ -196,7 +196,7 @@ export const mapSuggestionsToStore = (response: SuggestionsResponse): MatchingRe
     }
   }
 
-  const criteriaScores = Array.from(criteriaMap.values());
+  const criteriaScores = Array.from(criteriaMap.values()).sort((a, b) => a.id - b.id);
 
   return {
     data: {

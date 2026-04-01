@@ -17,8 +17,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRotateLeft, faRotateRight } from '../../../../utils/icons';
-import Button from '@/components/Button';
+import { faRotateLeft, faRotateRight, faWandMagicSparkles } from '../../../../utils/icons';
 import ColorPicker from './ColorPicker';
 
 const ToolbarButton = ({ onClick, isActive, icon: Icon, disabled }) => (
@@ -43,7 +42,7 @@ const formatOptions = [
   { value: 'h3', label: 'Heading 3' },
 ];
 
-const MenuBar = ({ editor, onSave, isSaving, saveStatus }) => {
+const MenuBar = ({ editor, onSave, isSaving, saveStatus, onOptimizeAll, isOptimizing }) => {
   if (!editor) return null;
 
   const currentFormat = editor.isActive('heading', { level: 1 })
@@ -118,17 +117,37 @@ const MenuBar = ({ editor, onSave, isSaving, saveStatus }) => {
             <Check size={14} /> {saveStatus}
           </span>
         )}
-        <Button
-          mode="primary"
-          size="sm"
-          shape="rounded"
+        {onOptimizeAll && (
+          <button
+            type="button"
+            onClick={onOptimizeAll}
+            disabled={isOptimizing}
+            className="optimize-all-btn relative overflow-hidden flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold text-white transition-all disabled:opacity-60 disabled:cursor-not-allowed bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 hover:from-violet-600 hover:via-purple-600 hover:to-fuchsia-600 shadow-sm hover:shadow-md"
+          >
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2.5s_infinite]" />
+            <FontAwesomeIcon
+              icon={faWandMagicSparkles}
+              className={`text-[13px] relative z-10 ${isOptimizing ? 'animate-spin' : ''}`}
+            />
+            <span className="relative z-10">{isOptimizing ? 'Optimizing...' : 'Optimize All'}</span>
+          </button>
+        )}
+        <button
+          type="button"
           onClick={onSave}
           disabled={isSaving}
-          iconLeft={isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+          className="flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold text-white transition-all disabled:opacity-60 disabled:cursor-not-allowed bg-primary hover:bg-primary-dark shadow-sm"
         >
+          {isSaving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
           Save
-        </Button>
+        </button>
       </div>
+
+      <style>{`
+        @keyframes shimmer {
+          100% { transform: translateX(200%); }
+        }
+      `}</style>
     </div>
   );
 };

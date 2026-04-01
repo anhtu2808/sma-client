@@ -121,8 +121,8 @@ const HighlightDetailModal = ({ detail, open, onClose, onFixApplied }) => {
       <div className="max-h-[300px] overflow-y-auto">
         {detail.description && (
           <div className="mx-4 mt-3 mb-1 rounded-md bg-amber-50 border border-amber-100 px-3 py-2">
-            <p className="text-xs font-medium text-amber-800 mb-0.5">{detail.label}</p>
-            <p className="text-[12px] leading-relaxed text-amber-700">{detail.description}</p>
+            <p className="text-sm font-medium text-amber-800 mb-0.5">{detail.label}</p>
+            <p className="text-[13px] leading-relaxed text-amber-700">{detail.description}</p>
           </div>
         )}
 
@@ -131,6 +131,7 @@ const HighlightDetailModal = ({ detail, open, onClose, onFixApplied }) => {
             itemKey={detail.id}
             suggestions={detail.suggestions}
             isFocused={false}
+            compact
             canRegenerate={canRegenerate}
             regeneratingSuggestionId={regeneratingSuggestionId}
             onRegenerateSuggestion={handleRegenerateSuggestion}
