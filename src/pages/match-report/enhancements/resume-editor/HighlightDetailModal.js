@@ -42,35 +42,40 @@ const HighlightDetailModal = ({ detail, open, onClose, onFixApplied }) => {
     popover.style.left = `${Math.min(left, maxLeft)}px`;
   }, [open, detail]);
 
-  // Close on click outside — use mouseup to avoid conflicts with inner clicks
+  // Close on click outside — use pointerdown for reliable detection before DOM mutations
   useEffect(() => {
     if (!open) return;
 
+    let attached = false;
+
     // Delay attaching to avoid closing from the same click that opened
     const timeoutId = setTimeout(() => {
-      const handleClick = (e) => {
+      attached = true;
+
+      const handlePointerDown = (e) => {
         if (!popoverRef.current) return;
         if (popoverRef.current.contains(e.target)) return;
         // Don't close if clicking a tag (will open a different popover)
-        if (e.target.closest('[data-tag="true"]')) return;
+        if (e.target.closest?.('[data-tag="true"]')) return;
         onClose();
       };
       const handleEsc = (e) => {
         if (e.key === 'Escape') onClose();
       };
-      document.addEventListener('mouseup', handleClick);
+      document.addEventListener('pointerdown', handlePointerDown, true);
       document.addEventListener('keydown', handleEsc);
 
-      // Store for cleanup
       cleanupRef.current = () => {
-        document.removeEventListener('mouseup', handleClick);
+        document.removeEventListener('pointerdown', handlePointerDown, true);
         document.removeEventListener('keydown', handleEsc);
       };
-    }, 100);
+    }, 250);
 
     return () => {
       clearTimeout(timeoutId);
-      cleanupRef.current?.();
+      if (attached) {
+        cleanupRef.current?.();
+      }
     };
   }, [open, onClose]);
 
