@@ -1,7 +1,8 @@
 import { useCallback, useRef, useState } from 'react';
 import { findTextInDoc } from '../utils/prosemirrorSearch';
 
-const TYPING_DELAY = 30; // ms per character
+const TYPING_DELAY = 8; // ms per character
+const CHARS_PER_TICK = 3; // characters inserted per animation frame
 
 /**
  * Hook that provides a typewriter-style text replacement in a TipTap editor.
@@ -70,7 +71,7 @@ const useTypewriterFix = () => {
             return;
           }
 
-          charIndex++;
+          charIndex = Math.min(charIndex + CHARS_PER_TICK, suggestionText.length);
           const textSoFar = suggestionText.slice(0, charIndex);
 
           try {

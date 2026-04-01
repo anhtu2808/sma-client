@@ -16,6 +16,8 @@ import {
   Check,
   Loader2,
 } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faRotateLeft, faRotateRight } from '../../../../utils/icons';
 import Button from '@/components/Button';
 import ColorPicker from './ColorPicker';
 
@@ -61,6 +63,25 @@ const MenuBar = ({ editor, onSave, isSaving, saveStatus }) => {
 
   return (
     <div className="sticky top-0 z-10 flex flex-wrap items-center gap-1 p-2 border-b border-neutral-200 bg-white">
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().undo().run()}
+        disabled={!editor.can().undo()}
+        className="p-1.5 flex items-center justify-center rounded text-gray-700 hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <FontAwesomeIcon icon={faRotateLeft} className="text-[16px]" />
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().redo().run()}
+        disabled={!editor.can().redo()}
+        className="p-1.5 flex items-center justify-center rounded text-gray-700 hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <FontAwesomeIcon icon={faRotateRight} className="text-[16px]" />
+      </button>
+
+      <Divider />
+
       <Select
         value={currentFormat}
         onChange={handleFormatChange}

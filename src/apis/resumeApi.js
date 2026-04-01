@@ -598,6 +598,14 @@ export const resumeApi = api.injectEndpoints({
             }),
         }),
 
+        generateEnhancementSuggestion: builder.mutation({
+            query: ({ enhancementId }) => ({
+                url: `${API_VERSION}/resume-enhancements/${enhancementId}/suggestion`,
+                method: "POST",
+            }),
+            transformResponse: (response) => response?.data ?? null,
+        }),
+
         deleteResumeCertification: builder.mutation({
             query: ({ resumeId, certificationId }) => ({
                 url: `${API_VERSION}/resumes/${resumeId}/certifications/${certificationId}`,
@@ -654,4 +662,5 @@ export const {
     useDeleteResumeCertificationMutation,
     useGetOrCreateEnhancementQuery,
     useUpdateEnhancementContentMutation,
+    useGenerateEnhancementSuggestionMutation,
 } = resumeApi;

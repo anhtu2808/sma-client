@@ -13,6 +13,7 @@ export interface SuggestionItem {
 
 export interface DetailItem {
   id: number;
+  contextId?: number;
   label: string;
   status: MatchStatus;
   description: string | null;
@@ -123,6 +124,87 @@ export const mapEvaluationToStore = (evaluationData: EvaluationData): MatchingRe
     data: normalizedEvaluationData,
     ui: {
       activeCriteriaId: normalizedEvaluationData.criteriaScores?.[0]?.id ?? null,
+      expandedItemIds: [],
+      activeDocumentTab: "resume",
+    },
+  };
+};
+
+// --- Contexts-based suggestion response transformer ---
+
+interface ContextDetail {
+  id: number;
+  evaluationCriteriaScoreId: number;
+  scoringCriteriaId: number;
+  criteriaName: string;
+  label: string;
+  description: string;
+  impactScore: number;
+}
+
+interface ContextItem {
+  id: number;
+  context: string;
+  details: ContextDetail[];
+  suggestions: SuggestionItem[];
+}
+
+interface SuggestionsResponse {
+  evaluationId: number;
+  jobId: number;
+  jobName: string;
+  resumeId: number;
+  resumeFullName: string;
+  aiOverallScore: number;
+  criteriaScores: CriteriaScore[];
+  contexts: ContextItem[];
+}
+
+export const mapSuggestionsToStore = (response: SuggestionsResponse): MatchingReportState => {
+  if (!response) {
+    return { data: null, ui: { activeCriteriaId: null, expandedItemIds: [], activeDocumentTab: "resume" } };
+  }
+
+  // Build a map of criteriaScore id → criteriaScore with empty details array
+  const criteriaMap = new Map<number, CriteriaScore & { details: DetailItem[] }>();
+  for (const cs of response.criteriaScores ?? []) {
+    criteriaMap.set(cs.id, { ...cs, details: [] });
+  }
+
+  // Distribute context details into their parent criteria
+  for (const ctx of response.contexts ?? []) {
+    const suggestions = normalizeSuggestions(ctx.suggestions);
+
+    for (const detail of ctx.details ?? []) {
+      const criteria = criteriaMap.get(detail.evaluationCriteriaScoreId);
+      if (!criteria) continue;
+
+      criteria.details.push({
+        id: detail.id,
+        contextId: ctx.id,
+        label: detail.label,
+        status: "MISSING" as MatchStatus,
+        description: detail.description ?? null,
+        requiredLevel: null,
+        candidateLevel: null,
+        isRequired: null,
+        isFixed: false,
+        context: ctx.context,
+        impactScore: detail.impactScore ?? null,
+        suggestions,
+      });
+    }
+  }
+
+  const criteriaScores = Array.from(criteriaMap.values());
+
+  return {
+    data: {
+      ...response,
+      criteriaScores,
+    } as unknown as EvaluationData,
+    ui: {
+      activeCriteriaId: criteriaScores[0]?.id ?? null,
       expandedItemIds: [],
       activeDocumentTab: "resume",
     },

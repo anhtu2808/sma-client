@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import Suggestions from '@/pages/match-report/sidebar/content/suggestions';
-import { useRegenerateSuggestionMutation } from '@/apis/matchingApi';
-import { updateSuggestion } from '@/store/slices/matchingReportSlice';
+import { useMarkDetailAsFixedMutation, useRegenerateSuggestionMutation } from '@/apis/matchingApi';
+import { setDetailFixed, updateScoresAfterFixed, updateSuggestion } from '@/store/slices/matchingReportSlice';
 import { getErrorMessage } from '@/constant/attachment';
 import toastMessage from '@/utils/toastMessage';
+import EditorContext from '@/pages/match-report/enhancements/EditorContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowsRotate, faThumbsDown, faThumbsUp, faXmark } from '../../../../utils/icons';
 
@@ -13,7 +14,10 @@ const HighlightDetailModal = ({ detail, open, onClose, onFixApplied }) => {
   const popoverRef = useRef(null);
   const cleanupRef = useRef(null);
   const [regenerateSuggestion] = useRegenerateSuggestionMutation();
+  const [markDetailAsFixed] = useMarkDetailAsFixedMutation();
   const [regeneratingSuggestionId, setRegeneratingSuggestionId] = useState(null);
+  const [isApplying, setIsApplying] = useState(false);
+  const { fixInEditor } = useContext(EditorContext);
 
   // Position popover near the highlight element in the editor
   useEffect(() => {
@@ -110,6 +114,13 @@ const HighlightDetailModal = ({ detail, open, onClose, onFixApplied }) => {
 
       {/* Content */}
       <div className="max-h-[300px] overflow-y-auto">
+        {detail.description && (
+          <div className="mx-4 mt-3 mb-1 rounded-md bg-amber-50 border border-amber-100 px-3 py-2">
+            <p className="text-xs font-medium text-amber-800 mb-0.5">{detail.label}</p>
+            <p className="text-[12px] leading-relaxed text-amber-700">{detail.description}</p>
+          </div>
+        )}
+
         {hasSuggestions && (
           <Suggestions
             itemKey={detail.id}
@@ -121,10 +132,6 @@ const HighlightDetailModal = ({ detail, open, onClose, onFixApplied }) => {
             context={detail.context}
             detailId={detail.id}
           />
-        )}
-
-        {!hasSuggestions && detail.description && (
-          <p className="px-4 py-3 text-sm leading-relaxed text-neutral-600">{detail.description}</p>
         )}
       </div>
 
@@ -151,13 +158,35 @@ const HighlightDetailModal = ({ detail, open, onClose, onFixApplied }) => {
           </button>
           <button
             type="button"
-            onClick={() => {
-              onFixApplied?.();
+            disabled={isApplying || isPositiveStatus || !hasSuggestions}
+            onClick={async () => {
+              const firstSuggestion = detail.suggestions?.[0]?.suggestion;
+              if (!firstSuggestion || !fixInEditor || !detail.context) return;
+
+              setIsApplying(true);
+              const success = await fixInEditor(detail.context, firstSuggestion, detail.id);
+              if (success) {
+                try {
+                  const response = await markDetailAsFixed({ detailId: detail.id }).unwrap();
+                  dispatch(setDetailFixed({ detailId: detail.id }));
+                  if (response) {
+                    dispatch(updateScoresAfterFixed({
+                      afterOverallScore: response.afterOverallScore,
+                      criteriaScoreId: response.criteriaScoreId,
+                      afterCriteriaScore: response.afterCriteriaScore,
+                    }));
+                  }
+                  toastMessage.success('Fix applied successfully.');
+                } catch (error) {
+                  toastMessage.error(getErrorMessage(error, 'Fix applied but failed to update status.'));
+                }
+              }
+              setIsApplying(false);
               onClose();
             }}
-            className="rounded bg-primary px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-primary-dark"
+            className="rounded bg-primary px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Confirm
+            {isApplying ? 'Applying...' : 'Apply'}
           </button>
         </div>
       </div>

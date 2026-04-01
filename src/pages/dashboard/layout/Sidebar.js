@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useGetNotificationsQuery } from '@/apis/notificationApi';
+import { useCandidateDashboardProfileQuery } from '@/apis/candidateApi';
 import CvVisibilityControl from "@/pages/dashboard/layout/cv-visibility-control";
 import {
     faUser, faFileLines, faClipboardCheck, faClockRotateLeft, faEnvelope,
@@ -19,6 +20,9 @@ const Sidebar = () => {
         isRead: false
     });
     const unreadCount = data?.data?.unreadCount || 0;
+
+    const { data: profile } = useCandidateDashboardProfileQuery();
+    const profileCompleteness = profile?.profileCompleteness ?? 0;
 
     const sidebarItems = [
 
@@ -77,9 +81,9 @@ const Sidebar = () => {
                     <div className="p-4 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border border-gray-100 dark:border-gray-700/50 text-center">
                         <p className="text-xs text-gray-500 mb-3">Complete your profile to get more visibility</p>
                         <div className="h-1.5 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mb-1">
-                            <div className="h-full bg-primary w-[75%] rounded-full"></div>
+                            <div className="h-full bg-primary rounded-full" style={{ width: `${profileCompleteness}%` }}></div>
                         </div>
-                        <span className="text-[10px] font-bold text-primary">75% Completed</span>
+                        <span className="text-[10px] font-bold text-primary">{profileCompleteness}% Completed</span>
                     </div>
                 </div>
             </div>

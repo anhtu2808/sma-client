@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import {
   setDetailFixed,
@@ -8,6 +8,7 @@ import { useMarkDetailAsFixedMutation } from "@/apis/matchingApi";
 import { getErrorMessage } from "@/constant/attachment";
 import toastMessage from "@/utils/toastMessage";
 import EditorContext from "@/pages/match-report/enhancements/EditorContext";
+import { findTextInDoc } from "@/pages/match-report/enhancements/resume-editor/utils/prosemirrorSearch";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowsRotate, faCheck, faCircleCheck, faWandMagicSparkles } from '../../../../../utils/icons';
 
@@ -18,15 +19,26 @@ const SuggestionCard = ({
   onRegenerate,
   context = null,
   detailId = null,
+  allDetailIds = null,
 }) => {
   const dispatch = useDispatch();
   const [copied, setCopied] = useState(false);
   const [fixApplied, setFixApplied] = useState(false);
-  const { fixInEditor, fixingDetailId } = useContext(EditorContext);
+  const { fixInEditor, fixingDetailId, editor } = useContext(EditorContext);
   const [markDetailAsFixed] = useMarkDetailAsFixedMutation();
   const text = suggestion?.suggestion || "";
 
-  const canFixInEditor = !!fixInEditor && !!context && !!text;
+  // Check if context text is findable in the editor document
+  const isTextFoundInEditor = useMemo(() => {
+    if (!editor || !context || editor.isDestroyed) return false;
+    try {
+      return findTextInDoc(editor.state.doc, context).length > 0;
+    } catch {
+      return false;
+    }
+  }, [editor, context, editor?.state?.doc]);
+
+  const canFixInEditor = !!fixInEditor && !!context && !!text && isTextFoundInEditor;
   const isFixingThis = fixingDetailId === detailId;
 
   const handleCopy = async () => {
@@ -50,19 +62,22 @@ const SuggestionCard = ({
 
     setFixApplied(true);
 
-    // Mark as fixed via API
+    // Mark as fixed via API — handle both single detail and context group
+    const idsToMark = allDetailIds ?? [detailId];
     try {
-      const response = await markDetailAsFixed({ detailId }).unwrap();
-      dispatch(setDetailFixed({ detailId }));
+      for (const id of idsToMark) {
+        const response = await markDetailAsFixed({ detailId: id }).unwrap();
+        dispatch(setDetailFixed({ detailId: id }));
 
-      if (response) {
-        dispatch(
-          updateScoresAfterFixed({
-            afterOverallScore: response.afterOverallScore,
-            criteriaScoreId: response.criteriaScoreId,
-            afterCriteriaScore: response.afterCriteriaScore,
-          })
-        );
+        if (response) {
+          dispatch(
+            updateScoresAfterFixed({
+              afterOverallScore: response.afterOverallScore,
+              criteriaScoreId: response.criteriaScoreId,
+              afterCriteriaScore: response.afterCriteriaScore,
+            })
+          );
+        }
       }
 
       toastMessage.success("Fix applied successfully.");
