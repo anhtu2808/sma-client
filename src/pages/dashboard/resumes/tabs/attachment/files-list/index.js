@@ -5,7 +5,7 @@ import Button from "@/components/Button";
 import Loading from "@/components/Loading";
 import { getParseStatusView, normalizeParseStatus } from "@/constant/attachment";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowsRotate, faBrain, faCircleInfo, faCircleUser, faDownload, faEye, faFileLines, faFilePdf, faPen, faPenToSquare, faTrash } from '../../../../../../utils/icons';
+import { faArrowsRotate, faCircleInfo, faCircleUser, faDownload, faEye, faFileLines, faFilePdf, faPen, faPenToSquare, faTrash, faWandMagicSparkles } from '../../../../../../utils/icons';
 
 const FilesList = ({
   files,
@@ -156,7 +156,7 @@ const FilesList = ({
                     disabled={isParseBusy}
                     onClick={() => onOpenParseConsent(file.id)}
                   >
-                    <FontAwesomeIcon icon={faBrain} className="text-[18px]" />
+                    <FontAwesomeIcon icon={faWandMagicSparkles} className="text-[18px]" />
                   </Button>
                 )}
 

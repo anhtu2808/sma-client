@@ -347,6 +347,23 @@ export function resolveIcon(name) {
   return materialToFA[name] || faCircleQuestionFallback;
 }
 
+/**
+ * Replace <span class="material-icons">icon_name</span> in raw HTML
+ * with inline Font Awesome SVGs so Material Icons font is not needed.
+ */
+export function replaceMaterialIconsInHtml(html) {
+  if (!html) return html;
+  return html.replace(
+    /<span\s+class="material-icons[^"]*"[^>]*>([^<]+)<\/span>/gi,
+    (_, iconName) => {
+      const def = materialToFA[iconName.trim()];
+      if (!def) return iconName.trim();
+      const [width, height, , , svgPath] = def.icon;
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" fill="currentColor" style="width:1em;height:1em;vertical-align:-0.125em;display:inline-block"><path d="${Array.isArray(svgPath) ? svgPath.join(' ') : svgPath}"/></svg>`;
+    }
+  );
+}
+
 // Re-export everything for convenient imports
 export {
   faArrowLeft,

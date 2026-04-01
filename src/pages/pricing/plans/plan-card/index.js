@@ -1,7 +1,7 @@
 import Button from "@/components/Button";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faXmark } from '../../../../utils/icons';
+import { faXmark, replaceMaterialIconsInHtml } from '../../../../utils/icons';
 
 const getSaveClass = (save) => {
   if (save >= 40) return "text-primary";
@@ -78,7 +78,7 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
           )}
 
           {plan.detailsHtml ? (
-            <div className="flex-1" dangerouslySetInnerHTML={{ __html: plan.detailsHtml }} />
+            <div className="flex-1" dangerouslySetInnerHTML={{ __html: replaceMaterialIconsInHtml(plan.detailsHtml) }} />
           ) : null}
         </>
       ) : (

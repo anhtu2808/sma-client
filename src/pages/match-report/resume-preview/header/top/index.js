@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 import { setActiveDocumentTab } from "@/store/slices/matchingReportSlice";
 import ReEvaluateModal from "@/pages/match-report/components/ReEvaluateModal";
+import { useGetOrCreateEnhancementQuery } from '@/apis/resumeApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileArrowUp, faPen } from '../../../../../utils/icons';
 
@@ -13,6 +14,10 @@ const HeaderTop = () => {
   const [isReEvaluateModalOpen, setIsReEvaluateModalOpen] = useState(false);
   const activeDocumentTab = useSelector((state) => state.matchingReport.ui.activeDocumentTab);
   const evaluationData = useSelector((state) => state.matchingReport.data);
+  const { data: enhancement } = useGetOrCreateEnhancementQuery(
+    { resumeId: evaluationData?.resumeId, jobId: evaluationData?.jobId },
+    { skip: !evaluationData?.resumeId || !evaluationData?.jobId }
+  );
 
   return (
     <header className="border-b border-neutral-200 px-4 pt-3 pb-0 sm:px-6 flex justify-between items-end">
@@ -42,13 +47,13 @@ const HeaderTop = () => {
         <button
           type="button"
           onClick={() => {
-            if (evaluationData?.resumeId) {
-              navigate(`/match-report/${evaluationId}/enhancements`, {
+            if (evaluationData?.resumeId && enhancement?.id) {
+              navigate(`/match-report/${evaluationId}/enhancements/${enhancement.id}`, {
                 state: { resumeId: evaluationData.resumeId, jobId: evaluationData.jobId },
               });
             }
           }}
-          disabled={!evaluationData?.resumeId}
+          disabled={!evaluationData?.resumeId || !enhancement?.id}
           className="rounded border border-primary bg-white px-3 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
         >
           <FontAwesomeIcon icon={faPen} className="text-[16px]" />

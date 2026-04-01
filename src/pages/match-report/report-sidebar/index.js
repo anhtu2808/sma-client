@@ -1,6 +1,7 @@
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import ScoreCard from '@/pages/match-report/sidebar/header/ScoreCard';
+import { useGetOrCreateEnhancementQuery } from '@/apis/resumeApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleCheck, faPen } from '../../../utils/icons';
 
@@ -15,6 +16,10 @@ const ReportSidebar = () => {
   const navigate = useNavigate();
   const { evaluationId } = useParams();
   const matchData = useSelector((state) => state.matchingReport.data);
+  const { data: enhancement } = useGetOrCreateEnhancementQuery(
+    { resumeId: matchData?.resumeId, jobId: matchData?.jobId },
+    { skip: !matchData?.resumeId || !matchData?.jobId }
+  );
 
   if (!matchData) return null;
 
@@ -29,8 +34,8 @@ const ReportSidebar = () => {
   }, 0);
 
   const handleEditResume = () => {
-    if (!matchData.resumeId || !matchData.jobId) return;
-    navigate(`/enhancements/${evaluationId}`, {
+    if (!matchData.resumeId || !matchData.jobId || !enhancement?.id) return;
+    navigate(`/match-report/${evaluationId}/enhancements/${enhancement.id}`, {
       state: { resumeId: matchData.resumeId, jobId: matchData.jobId },
     });
   };

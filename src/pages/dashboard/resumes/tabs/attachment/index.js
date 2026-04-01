@@ -16,7 +16,8 @@ import { useGetFeatureUsageQuery } from "@/apis/featureUsageApi";
 import { RESUME_TYPES } from "@/constant";
 import FilesList from "./files-list";
 import RenameResumeModal from "../../components/RenameResumeModal";
-import ParseConsentModal from "./parse-consent-modal";
+// [FREE PARSING] Consent modal no longer needed - parsing is free and auto-triggered
+// import ParseConsentModal from "./parse-consent-modal";
 import SetProfileConfirmModal from "./set-profile-confirm-modal";
 import ParsedResultModal from "./parsed-result-modal";
 import UploadPanel from "./upload-panel";
@@ -40,13 +41,14 @@ const AttachmentsTab = () => {
   const [activeParsingResumeId, setActiveParsingResumeId] = useState(null);
   const [pollingByResumeId, setPollingByResumeId] = useState({});
 
-  const [consentModal, setConsentModal] = useState({
-    open: false,
-    mode: null,
-    pendingUploadPayload: null,
-    resumeId: null,
-  });
-  const [isConsentLoading, setIsConsentLoading] = useState(false);
+  // [FREE PARSING] Consent modal state no longer needed
+//  const [consentModal, setConsentModal] = useState({
+//    open: false,
+//    mode: null,
+//    pendingUploadPayload: null,
+//    resumeId: null,
+//  });
+//  const [isConsentLoading, setIsConsentLoading] = useState(false);
   const [replaceModal, setReplaceModal] = useState({ open: false, pendingUploadPayload: null });
 
   const { data: featureUsageData } = useGetFeatureUsageQuery();
@@ -204,14 +206,15 @@ const AttachmentsTab = () => {
     []
   );
 
-  const resetConsentModal = () => {
-    setConsentModal({
-      open: false,
-      mode: null,
-      pendingUploadPayload: null,
-      resumeId: null,
-    });
-  };
+  // [FREE PARSING] Consent modal reset no longer needed
+//  const resetConsentModal = () => {
+//    setConsentModal({
+//      open: false,
+//      mode: null,
+//      pendingUploadPayload: null,
+//      resumeId: null,
+//    });
+//  };
 
   const createUploadedResume = async (payload) => uploadCandidateResume(payload).unwrap();
 
@@ -258,12 +261,24 @@ const AttachmentsTab = () => {
       if (uploadExhausted) {
         setReplaceModal({ open: true, pendingUploadPayload: payload });
       } else {
-        setConsentModal({
-          open: true,
-          mode: "upload",
-          pendingUploadPayload: payload,
-          resumeId: null,
-        });
+        // [FREE PARSING] Auto-parse on upload - no consent modal
+//        setConsentModal({
+//          open: true,
+//          mode: "upload",
+//          pendingUploadPayload: payload,
+//          resumeId: null,
+//        });
+        try {
+          const createdResume = await createUploadedResume(payload);
+          const parseStarted = await triggerResumeParsing(createdResume?.id, { silentError: true });
+          if (parseStarted) {
+            toastMessage.success("Upload completed. Resume parsing has started.");
+          } else {
+            toastMessage.warning("Upload completed, but parsing could not start. You can parse this resume manually later.");
+          }
+        } catch (error) {
+          toastMessage.error(getErrorMessage(error, "Upload resume failed"));
+        }
       }
     } catch (error) {
       toastMessage.error(getErrorMessage(error, "Upload resume failed"));
@@ -287,81 +302,87 @@ const AttachmentsTab = () => {
     }
   };
 
-  const openParseConsent = (resumeId) => {
-    setConsentModal({
-      open: true,
-      mode: "manual",
-      pendingUploadPayload: null,
-      resumeId,
-    });
-  };
+  // [FREE PARSING] Consent modal no longer needed - parse directly
+//  const openParseConsent = (resumeId) => {
+//    setConsentModal({
+//      open: true,
+//      mode: "manual",
+//      pendingUploadPayload: null,
+//      resumeId,
+//    });
+//  };
 
-  const handleConsentSubmit = async () => {
-    if (isConsentLoading) return;
-
-    try {
-      setIsConsentLoading(true);
-
-      if (consentModal.mode === "upload" && consentModal.pendingUploadPayload) {
-        const createdResume = await createUploadedResume(consentModal.pendingUploadPayload);
-        const parseStarted = await triggerResumeParsing(createdResume?.id, { silentError: true });
-        if (parseStarted) {
-          toastMessage.success("Upload completed. Resume parsing has started.");
-        } else {
-          toastMessage.warning("Upload completed, but parsing could not start. You can parse this resume manually later.");
-        }
-      } else if (consentModal.mode === "manual" && consentModal.resumeId) {
-        const parseStarted = await triggerResumeParsing(consentModal.resumeId);
-        if (parseStarted) {
-          toastMessage.success("Resume parsing has started.");
-        }
-      }
-    } catch (error) {
-      toastMessage.error(getErrorMessage(error, "Unable to continue."));
-    } finally {
-      resetConsentModal();
-      setIsConsentLoading(false);
-    }
-  };
-
-  const handleConsentCancel = async () => {
-    if (isConsentLoading) return;
-
-    if (consentModal.mode !== "upload" || !consentModal.pendingUploadPayload) {
-      resetConsentModal();
-      return;
-    }
-
-    try {
-      setIsConsentLoading(true);
-      await createUploadedResume(consentModal.pendingUploadPayload);
-      toastMessage.success("Upload resume successfully");
-    } catch (error) {
-      toastMessage.error(getErrorMessage(error, "Upload resume failed"));
-    } finally {
-      resetConsentModal();
-      setIsConsentLoading(false);
-    }
-  };
+  // [FREE PARSING] Consent modal handlers no longer needed
+//  const handleConsentSubmit = async () => {
+//    if (isConsentLoading) return;
+//
+//    try {
+//      setIsConsentLoading(true);
+//
+//      if (consentModal.mode === "upload" && consentModal.pendingUploadPayload) {
+//        const createdResume = await createUploadedResume(consentModal.pendingUploadPayload);
+//        const parseStarted = await triggerResumeParsing(createdResume?.id, { silentError: true });
+//        if (parseStarted) {
+//          toastMessage.success("Upload completed. Resume parsing has started.");
+//        } else {
+//          toastMessage.warning("Upload completed, but parsing could not start. You can parse this resume manually later.");
+//        }
+//      } else if (consentModal.mode === "manual" && consentModal.resumeId) {
+//        const parseStarted = await triggerResumeParsing(consentModal.resumeId);
+//        if (parseStarted) {
+//          toastMessage.success("Resume parsing has started.");
+//        }
+//      }
+//    } catch (error) {
+//      toastMessage.error(getErrorMessage(error, "Unable to continue."));
+//    } finally {
+//      resetConsentModal();
+//      setIsConsentLoading(false);
+//    }
+//  };
+//
+//  const handleConsentCancel = async () => {
+//    if (isConsentLoading) return;
+//
+//    if (consentModal.mode !== "upload" || !consentModal.pendingUploadPayload) {
+//      resetConsentModal();
+//      return;
+//    }
+//
+//    try {
+//      setIsConsentLoading(true);
+//      await createUploadedResume(consentModal.pendingUploadPayload);
+//      toastMessage.success("Upload resume successfully");
+//    } catch (error) {
+//      toastMessage.error(getErrorMessage(error, "Upload resume failed"));
+//    } finally {
+//      resetConsentModal();
+//      setIsConsentLoading(false);
+//    }
+//  };
 
   const handleReplaceSelect = async (resumeIdToDelete) => {
     try {
-      setIsConsentLoading(true);
       stopPolling(resumeIdToDelete);
       await deleteCandidateResume({ resumeId: resumeIdToDelete }).unwrap();
 
       const payload = replaceModal.pendingUploadPayload;
       setReplaceModal({ open: false, pendingUploadPayload: null });
-      setConsentModal({ open: true, mode: "upload", pendingUploadPayload: payload, resumeId: null });
+      // [FREE PARSING] Auto-parse after replace - no consent modal
+//      setConsentModal({ open: true, mode: "upload", pendingUploadPayload: payload, resumeId: null });
+      const createdResume = await createUploadedResume(payload);
+      const parseStarted = await triggerResumeParsing(createdResume?.id, { silentError: true });
+      if (parseStarted) {
+        toastMessage.success("Upload completed. Resume parsing has started.");
+      } else {
+        toastMessage.warning("Upload completed, but parsing could not start. You can parse this resume manually later.");
+      }
     } catch (error) {
       toastMessage.error(getErrorMessage(error, "Failed to replace resume."));
-    } finally {
-      setIsConsentLoading(false);
     }
   };
 
   const handleReplaceCancel = () => {
-    if (isConsentLoading) return;
     setReplaceModal({ open: false, pendingUploadPayload: null });
   };
 
@@ -425,8 +446,7 @@ const AttachmentsTab = () => {
     }
   };
 
-  const isUploading =
-    isUploadingFile || isSavingResume || (consentModal.mode === "upload" && isConsentLoading);
+  const isUploading = isUploadingFile || isSavingResume;
 
   return (
     <section className="space-y-6">
@@ -447,7 +467,7 @@ const AttachmentsTab = () => {
         deletingId={deletingId}
         isSettingProfile={isSettingProfile}
         settingProfileId={settingProfileId}
-        onOpenParseConsent={openParseConsent}
+        onOpenParseConsent={(resumeId) => triggerResumeParsing(resumeId)}
         onOpenSetProfileConfirm={openSetProfileConfirm}
         onDeleteResume={handleDeleteResume}
         onViewParsedResult={(id) => setPreviewResumeId(id)}
@@ -463,14 +483,15 @@ const AttachmentsTab = () => {
         } : null}
       />
 
-      <ParseConsentModal
+      {/* [FREE PARSING] Consent modal no longer needed */}
+      {/*<ParseConsentModal
         open={consentModal.open}
         mode={consentModal.mode}
         isConsentLoading={isConsentLoading}
         onCancel={handleConsentCancel}
         onSubmit={handleConsentSubmit}
         featureUsageData={featureUsageData}
-      />
+      />*/}
 
       <RenameResumeModal
         open={Boolean(renameResume)}
@@ -481,7 +502,7 @@ const AttachmentsTab = () => {
       <ReplaceResumeModal
         open={replaceModal.open}
         files={files}
-        loading={isConsentLoading}
+        loading={false}
         onSelect={handleReplaceSelect}
         onCancel={handleReplaceCancel}
       />
