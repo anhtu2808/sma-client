@@ -21,7 +21,7 @@ const Enhancements = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
-  const { evaluationId } = useParams();
+  const { evaluationId, enhancementId } = useParams();
   const { resumeId, jobId } = location.state || {};
 
   // Editor↔Sidebar communication via context

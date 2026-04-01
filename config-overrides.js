@@ -20,6 +20,28 @@ module.exports = override(
       ".ts",
       ".tsx"
     ];
+
+    // Suppress noisy source-map warnings from docx-preview's published package.
+    config.module.rules.forEach((rule) => {
+      if (Array.isArray(rule.oneOf)) {
+        rule.oneOf.forEach((oneOfRule) => {
+          if (
+            oneOfRule &&
+            oneOfRule.loader &&
+            oneOfRule.loader.includes("source-map-loader")
+          ) {
+            oneOfRule.exclude = [
+              ...(Array.isArray(oneOfRule.exclude)
+                ? oneOfRule.exclude
+                : oneOfRule.exclude
+                  ? [oneOfRule.exclude]
+                  : []),
+              /node_modules\/docx-preview/
+            ];
+          }
+        });
+      }
+    });
     
     return config;
   }

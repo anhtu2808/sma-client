@@ -59,7 +59,7 @@ export const routes = createBrowserRouter(
             </Route>
             <Route path="cv-preview/:id" element={<CvPreview />} />
             <Route path="match-report/:evaluationId" element={<MatchReport />} />
-            <Route path="match-report/:evaluationId/enhancements" element={<Enhancements />} />
+            <Route path="match-report/:evaluationId/enhancements/:enhancementId" element={<Enhancements />} />
 
             <Route path="dashboard" element={<DashboardLayout />}>
                 <Route index element={<Profile />} />
