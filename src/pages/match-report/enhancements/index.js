@@ -94,12 +94,17 @@ const Enhancements = () => {
     if (enhancement.generateSuggestion === 'FINISH') {
       // Suggestions already generated, just load them
       setPhase('loading-suggestions');
-    } else if (enhancement.content) {
-      // Content exists but suggestions not yet generated
-      setPhase('generating');
+    } else if (enhancement.generateSuggestion === 'NONE') {
+      // Needs generation
+      if (enhancement.content) {
+        setPhase('generating');
+      } else {
+        // No content yet — wait for editor to save it first
+        setPhase('waiting-for-content');
+      }
     } else {
-      // No content yet — wait for editor to save it first
-      setPhase('waiting-for-content');
+      // Other statuses (WAITING, etc.) — just load suggestions if available, or wait
+      setPhase('loading-suggestions');
     }
   }, [enhancement, phase]);
 

@@ -12,9 +12,10 @@ const Suggestions = ({
   context = null,
   detailId = null,
   allDetailIds = null,
+  compact = false,
 }) => {
   return (
-    <div className={`space-y-3 px-4 pb-4 pl-11 pt-2 ${isFocused ? "bg-transparent" : "bg-white"}`}>
+    <div className={`space-y-3 px-4 pb-4 pt-2 ${compact ? "" : "pl-11"} ${isFocused ? "bg-transparent" : "bg-white"}`}>
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex items-center gap-2 text-[13.5px] font-semibold text-neutral-800">
           <FontAwesomeIcon icon={faWandMagicSparkles} className="text-[16px] text-primary" />
