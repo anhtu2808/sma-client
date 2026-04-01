@@ -33,7 +33,7 @@ const EXTENSIONS = [
   Image,
 ];
 
-const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady }) => {
+const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, onInitialContentSaved }) => {
   const { data: resumeData, isLoading } = useGetResumeQuery(
     { resumeId },
     { skip: !resumeId }
@@ -79,17 +79,21 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady }
     }
   }, [enhancementId, updateContent]);
 
-  // First visit (content null): save generated HTML immediately
+  // First visit (content null): save generated HTML immediately, then notify parent
   useEffect(() => {
     if (!resumeData || !editor || initialSaveDoneRef.current) return;
     if (!initialContent && initialHtml) {
       initialSaveDoneRef.current = true;
-      saveContent(initialHtml);
+      saveContent(initialHtml).then(() => {
+        onInitialContentSaved?.();
+      });
     } else {
       initialSaveDoneRef.current = true;
       lastSavedHtmlRef.current = initialContent;
+      // Content already exists, notify immediately
+      onInitialContentSaved?.();
     }
-  }, [resumeData, editor, initialHtml, initialContent, saveContent]);
+  }, [resumeData, editor, initialHtml, initialContent, saveContent, onInitialContentSaved]);
 
   // Auto-save on editor update (debounced)
   useEffect(() => {
