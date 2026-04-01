@@ -186,10 +186,10 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady }
     return () => cancelAnimation();
   }, [cancelAnimation]);
 
-  // Expose fixInEditor + fixingDetailId to parent via callback
+  // Expose fixInEditor + fixingDetailId + editor to parent via callback
   useEffect(() => {
-    onEditorReady?.({ fixInEditor, fixingDetailId });
-  }, [fixInEditor, fixingDetailId, onEditorReady]);
+    onEditorReady?.({ fixInEditor, fixingDetailId, editor });
+  }, [fixInEditor, fixingDetailId, editor, onEditorReady]);
 
   if (isLoading || !resumeData) {
     return <Loading className="py-20" />;

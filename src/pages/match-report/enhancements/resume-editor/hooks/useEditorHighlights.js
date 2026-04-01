@@ -19,12 +19,17 @@ const useEditorHighlights = (editor) => {
     if (!editor || !criteriaScores) return;
 
     const highlights = [];
+    const seenContexts = new Set();
 
     for (const criteria of criteriaScores) {
       if (!Array.isArray(criteria.details)) continue;
 
       for (const detail of criteria.details) {
         if (!detail.context) continue;
+
+        // Deduplicate: a context shared across criteria should only highlight once
+        if (seenContexts.has(detail.context)) continue;
+        seenContexts.add(detail.context);
 
         const isPositive =
           detail.isFixed ||

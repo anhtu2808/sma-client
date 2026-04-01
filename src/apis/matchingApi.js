@@ -54,6 +54,14 @@ export const matchingApi = api.injectEndpoints({
       }),
       transformResponse: (response) => response?.data ?? null,
     }),
+
+    getMatchingSuggestions: builder.query({
+      query: ({ evaluationId }) => ({
+        url: `${API_VERSION}/matching/${evaluationId}/suggestions`,
+        method: "GET",
+      }),
+      transformResponse: (response) => response?.data ?? null,
+    }),
   }),
 });
 
@@ -67,4 +75,5 @@ export const {
   useLazyGetMatchingDetailQuery,
   useRegenerateSuggestionMutation,
   useMarkDetailAsFixedMutation,
+  useLazyGetMatchingSuggestionsQuery,
 } = matchingApi;
