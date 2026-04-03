@@ -1,15 +1,40 @@
 import React from "react";
-import Loading from "@/components/Loading";
 import Button from "@/components/Button";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faQrcode, faRotate } from '../../../utils/icons';
+import { faArrowLeft, faCircleCheck, faQrcode, faRotate } from '../../../utils/icons';
+import formatCurrency from "@/utils/formatCurrency";
 
 const QRPaymentSection = ({
     totalPrice,
     isLoading,
     qrCodeUrl,
     onBack,
+    previewData,
+    onScheduleConfirm,
 }) => {
+    if (previewData?.isScheduled && !qrCodeUrl && !isLoading) {
+        return (
+            <div className="lg:col-span-6 flex flex-col items-center justify-center text-center py-8">
+                <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mb-4">
+                    <FontAwesomeIcon icon={faCircleCheck} className="text-3xl text-amber-500" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">Plan Scheduled</h3>
+                <p className="text-sm text-gray-500 mb-2">
+                    Your current plan ({previewData.currentPlanName}) is still active.
+                </p>
+                <p className="text-sm text-gray-500">
+                    {previewData.newPlanName} will start on{' '}
+                    <span className="font-semibold">
+                        {new Date(previewData.currentPlanEndDate).toLocaleDateString('vi-VN')}
+                    </span>
+                </p>
+                <Button mode="primary" onClick={onScheduleConfirm || onBack} className="px-8 mt-6">
+                    Got it
+                </Button>
+            </div>
+        );
+    }
+
     return (
         <div className="lg:col-span-6 flex flex-col items-center justify-center text-center relative py-4 lg:py-8 lg:px-12">
             <h2 className="text-[#111e3b] text-[1.35rem] font-extrabold mb-10 tracking-tight">Scan to Pay</h2>
@@ -40,7 +65,7 @@ const QRPaymentSection = ({
             {/* Scan to Pay Target */}
             <div className="flex items-center gap-2 text-[#fc9c82] font-semibold bg-[#fff1ed] px-4 py-2 rounded-lg mb-8">
                 <FontAwesomeIcon icon={faQrcode} className="text-xl" />
-                <span>Scan to pay {totalPrice}</span>
+                <span>Scan to pay {previewData?.isUpgrade ? formatCurrency(previewData.upgradePrice) : totalPrice}</span>
             </div>
 
             {/* Back Button */}

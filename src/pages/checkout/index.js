@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, Navigate } from "react-router-dom";
 import toastMessage from "@/utils/toastMessage";
-import { useCreateSubscriptionMutation } from "@/apis/subscriptionApi";
+import { useCreateSubscriptionMutation, usePreviewSubscriptionMutation } from "@/apis/subscriptionApi";
 import { useGetPaymentStatusQuery } from "@/apis/paymentApi";
 import QRPaymentSection from "./components/QRPaymentSection";
 import OrderSummarySection from "./components/OrderSummarySection";
@@ -17,9 +17,11 @@ const Checkout = () => {
 
     // API logic
     const [createSubscription, { isLoading: isApiLoading }] = useCreateSubscriptionMutation();
+    const [previewSubscription] = usePreviewSubscriptionMutation();
     const [qrCodeUrl, setQrCodeUrl] = useState(null);
     const [paymentId, setPaymentId] = useState(null);
     const [paymentStatus, setPaymentStatus] = useState("PENDING"); // PENDING, SUCCESS, FAILED
+    const [previewData, setPreviewData] = useState(null);
 
     const { data: statusRes } = useGetPaymentStatusQuery(paymentId, {
         skip: !paymentId || paymentStatus === 'SUCCESS' || paymentStatus === 'FAILED',
@@ -44,20 +46,31 @@ const Checkout = () => {
         setPaymentStatus("PENDING");
         setQrCodeUrl(null);
         setPaymentId(null);
+        setPreviewData(null);
 
         const duration = plan.durations?.find((d) => d.key === selectedDuration);
         const planId = plan.id;
         const planPriceId = duration ? Number(selectedDuration) : Number(plan.priceId);
+        const payload = { planId, planPriceId };
 
         try {
-            const payload = { planId, planPriceId };
-            const res = await createSubscription(payload).unwrap();
+            const [previewRes, subRes] = await Promise.allSettled([
+                previewSubscription(payload).unwrap(),
+                createSubscription(payload).unwrap(),
+            ]);
 
-            if (res?.data?.payment) {
-                if (res.data.payment.qr) setQrCodeUrl(res.data.payment.qr);
-                if (res.data.payment.id) setPaymentId(res.data.payment.id);
-            } else if (typeof res?.data === 'string') {
-                setQrCodeUrl(res.data);
+            if (previewRes.status === 'fulfilled' && previewRes.value?.data) {
+                setPreviewData(previewRes.value.data);
+            }
+
+            if (subRes.status === 'fulfilled') {
+                const res = subRes.value;
+                if (res?.data?.payment) {
+                    if (res.data.payment.qr) setQrCodeUrl(res.data.payment.qr);
+                    if (res.data.payment.id) setPaymentId(res.data.payment.id);
+                } else if (typeof res?.data === 'string') {
+                    setQrCodeUrl(res.data);
+                }
             }
         } catch (error) {
             toastMessage.error("We couldn't generate the QR code at this time.");
@@ -81,7 +94,6 @@ const Checkout = () => {
     const planDescription = duration
         ? `${duration.months} months subscription`
         : "Lifetime / Standard subscription";
-    console.log("asdasd", planDescription);
     return (
         <div className="flex justify-center w-full min-h-screen pt-12 pb-24 px-4 bg-[#f8f9fa]">
             {paymentStatus === "SUCCESS" ? (
@@ -105,6 +117,7 @@ const Checkout = () => {
                             totalPrice={totalPrice}
                             durationMonths={duration?.months}
                             isLoadingQR={isApiLoading}
+                            previewData={previewData}
                         />
 
                         <QRPaymentSection
@@ -113,6 +126,8 @@ const Checkout = () => {
                             isLoading={isApiLoading}
                             qrCodeUrl={qrCodeUrl}
                             onBack={() => navigate(-1)}
+                            previewData={previewData}
+                            onScheduleConfirm={() => navigate(-1)}
                         />
                     </div>
                 </div>

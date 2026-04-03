@@ -1,11 +1,13 @@
 import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleInfo } from '../../../utils/icons';
+import formatCurrency from "@/utils/formatCurrency";
 
 const OrderSummarySection = ({
     planName,
     planDescription,
-    totalPrice
+    totalPrice,
+    previewData,
 }) => {
     const formattedTotal = totalPrice?.toString().replace("₫", "đ");
 
@@ -22,7 +24,30 @@ const OrderSummarySection = ({
 
             <div className="mb-12 w-full">
                 <span className="text-[13px] font-bold text-[#8492a6] tracking-wide inline-block mb-1">Total Amount</span>
-                <div className="text-[2rem] font-extrabold text-[#111e3b] tracking-tight">{formattedTotal}</div>
+                {previewData?.isUpgrade ? (
+                    <>
+                        <div className="flex items-baseline gap-3">
+                            <span className="text-lg text-gray-400 line-through">
+                                {formatCurrency(previewData.originalPrice)}
+                            </span>
+                            <span className="text-[2rem] font-extrabold text-[#111e3b] tracking-tight">
+                                {formatCurrency(previewData.upgradePrice)}
+                            </span>
+                        </div>
+                        <p className="text-xs text-green-600 mt-1 font-medium">
+                            Upgrade discount applied — prorated from {previewData.currentPlanName}
+                        </p>
+                    </>
+                ) : previewData?.isScheduled ? (
+                    <>
+                        <div className="text-[2rem] font-extrabold text-[#111e3b] tracking-tight">{formattedTotal}</div>
+                        <p className="text-xs text-amber-600 mt-1 font-medium">
+                            Your new plan will activate after your current plan ({previewData.currentPlanName}) expires
+                        </p>
+                    </>
+                ) : (
+                    <div className="text-[2rem] font-extrabold text-[#111e3b] tracking-tight">{formattedTotal}</div>
+                )}
             </div>
 
             <div className="flex flex-col gap-6">

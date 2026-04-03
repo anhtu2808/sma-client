@@ -10,7 +10,14 @@ export const subscriptionApi = api.injectEndpoints({
             }),
             invalidatesTags: ["Plans"], // Assuming subscribing might affect current plan status
         }),
+        previewSubscription: builder.mutation({
+            query: (body) => ({
+                url: `${API_VERSION}/subscriptions/preview`,
+                method: "POST",
+                body,
+            }),
+        }),
     }),
 });
 
-export const { useCreateSubscriptionMutation } = subscriptionApi;
+export const { useCreateSubscriptionMutation, usePreviewSubscriptionMutation } = subscriptionApi;
