@@ -55,6 +55,14 @@ export const matchingApi = api.injectEndpoints({
       transformResponse: (response) => response?.data ?? null,
     }),
 
+    unmarkDetailAsFixed: builder.mutation({
+      query: ({ detailId }) => ({
+        url: `${API_VERSION}/criteria-score/detail/${detailId}/unmark-as-fixed`,
+        method: "PUT",
+      }),
+      transformResponse: (response) => response?.data ?? null,
+    }),
+
     getMatchingSuggestions: builder.query({
       query: ({ evaluationId }) => ({
         url: `${API_VERSION}/matching/${evaluationId}/suggestions`,
@@ -75,5 +83,6 @@ export const {
   useLazyGetMatchingDetailQuery,
   useRegenerateSuggestionMutation,
   useMarkDetailAsFixedMutation,
+  useUnmarkDetailAsFixedMutation,
   useLazyGetMatchingSuggestionsQuery,
 } = matchingApi;

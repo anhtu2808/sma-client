@@ -146,13 +146,13 @@ const ContentDetail = ({ items, isLast }) => {
       return (
         <div className="flex min-w-0 flex-col gap-1.5">
           <div className="flex flex-wrap gap-1">
-            {items.map((item) => (
+            {[...items].sort((a, b) => a.label.length - b.label.length).map((item) => (
               <span
                 key={item.id}
-                className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${
+                className={`inline-flex items-center rounded border px-2.5 py-0.5 text-xs font-semibold ${
                   allFixed
-                    ? "bg-emerald-50 text-emerald-600 line-through decoration-emerald-300"
-                    : "bg-neutral-100 text-neutral-700"
+                    ? "border-emerald-200 bg-emerald-50 text-emerald-600 line-through decoration-emerald-300"
+                    : "border-neutral-200 bg-white text-neutral-700"
                 }`}
               >
                 {item.label}
@@ -160,7 +160,7 @@ const ContentDetail = ({ items, isLast }) => {
             ))}
           </div>
           {primaryItem.context && (
-            <p className={`text-xs line-clamp-2 italic ${allFixed ? "text-emerald-500/60" : "text-neutral-500"}`}>
+            <p className={`text-sm line-clamp-2 italic ${allFixed ? "text-emerald-500/60" : "text-neutral-600"}`}>
               &ldquo;{primaryItem.context}&rdquo;
             </p>
           )}
@@ -262,9 +262,9 @@ const ContentDetail = ({ items, isLast }) => {
           {descriptions.map((desc) => (
             <div key={desc.id} className="mb-2 last:mb-0">
               {descriptions.length > 1 && (
-                <p className="text-xs font-semibold text-neutral-500 mb-0.5">{desc.label}</p>
+                <p className="text-sm font-semibold text-neutral-700 mb-0.5">{desc.label}</p>
               )}
-              <p className="text-[13.5px] text-neutral-700 leading-relaxed">{desc.description}</p>
+              <p className="text-sm text-neutral-800 leading-relaxed">{desc.description}</p>
             </div>
           ))}
         </div>

@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-import { findTextInDoc } from '../utils/prosemirrorSearch';
+import { findTextInDocFuzzy } from '../utils/prosemirrorSearch';
 
 const TYPING_DELAY = 8; // ms per character
 const CHARS_PER_TICK = 3; // characters inserted per animation frame
@@ -44,7 +44,7 @@ const useTypewriterFix = () => {
         cancelAnimation();
 
         // Find context text in the document
-        const ranges = findTextInDoc(editor.state.doc, context);
+        const ranges = findTextInDocFuzzy(editor.state.doc, context);
         if (ranges.length === 0) {
           resolve(false);
           return;

@@ -87,6 +87,46 @@ const matchingReportSlice = createSlice({
       });
     },
 
+    setDetailUnfixed: (state, action) => {
+      const { detailId } = action.payload;
+      if (!state.data) return;
+
+      state.data.criteriaScores.forEach((criteria) => {
+        const detail = criteria.details.find((d) => d.id === detailId);
+        if (detail) {
+          detail.isFixed = false;
+        }
+      });
+    },
+
+    revertScoresAfterUnfixed: (state, action) => {
+      const { beforeOverallScore, criteriaScoreId, beforeCriteriaScore } = action.payload;
+      if (!state.data) return;
+
+      if (beforeOverallScore !== undefined) {
+        state.data.aiOverallScore = beforeOverallScore;
+      }
+
+      if (criteriaScoreId !== undefined && beforeCriteriaScore !== undefined) {
+        const criteria = state.data.criteriaScores.find((c) => c.id === criteriaScoreId);
+        if (criteria) {
+          criteria.aiScore = beforeCriteriaScore;
+        }
+      }
+    },
+
+    setDetailContext: (state, action) => {
+      const { detailId, context } = action.payload;
+      if (!state.data) return;
+
+      state.data.criteriaScores.forEach((criteria) => {
+        const detail = criteria.details.find((d) => d.id === detailId);
+        if (detail) {
+          detail.context = context;
+        }
+      });
+    },
+
     updateScoresAfterFixed: (state, action) => {
       const { afterOverallScore, criteriaScoreId, afterCriteriaScore } = action.payload;
       if (!state.data) return;
@@ -132,8 +172,11 @@ export const {
   expandItemId,
   setActiveDocumentTab,
   setDetailFixed,
+  setDetailUnfixed,
+  setDetailContext,
   updateSuggestion,
   updateScoresAfterFixed,
+  revertScoresAfterUnfixed,
 } = matchingReportSlice.actions;
 
 export default matchingReportSlice.reducer;

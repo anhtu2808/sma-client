@@ -143,7 +143,7 @@
 }
 
 .suggestion-highlight--matched.suggestion-highlight--focused {
-  background: rgba(16, 185, 129, 0.10) !important;
+  background: rgba(16, 185, 129, 0.28) !important;
 }
 
 /* Tag overlay — flag/pennant badge floating above highlight (does not affect text flow) */

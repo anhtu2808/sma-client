@@ -5,7 +5,40 @@ import {
   PolarRadiusAxis,
   Radar,
   ResponsiveContainer,
+  Tooltip,
 } from "recharts";
+
+const CustomTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white/90 p-3 rounded-lg shadow-lg border border-gray-100 text-sm">
+        <p className="font-bold text-gray-800">{payload[0]?.payload?.fullName}</p>
+        <p className="text-gray-600">Score: <span className="font-bold">{payload[0]?.value}</span></p>
+      </div>
+    );
+  }
+  return null;
+};
+
+const CustomTick = ({ payload, x, y, cx, cy, textAnchor }) => {
+  const OFFSET = 18;
+  const dx = x - cx;
+  const dy = y - cy;
+  const length = Math.sqrt(dx * dx + dy * dy) || 1;
+  const nx = dx / length;
+  const ny = dy / length;
+  return (
+    <text
+      x={x + nx * OFFSET}
+      y={y + ny * OFFSET}
+      textAnchor={textAnchor}
+      fill="#111827"
+      style={{ fontSize: 15, fontWeight: 800 }}
+    >
+      {payload.value}
+    </text>
+  );
+};
 
 const OverviewRadarChart = ({ criteriaScores = [] }) => {
   const radarData = criteriaScores
@@ -46,21 +79,22 @@ const OverviewRadarChart = ({ criteriaScores = [] }) => {
     <div className="flex items-center justify-center rounded-xl border border-neutral-200 bg-white p-5 shadow-md">
       <ResponsiveContainer width="100%" height={300}>
         <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="70%">
-          <PolarGrid stroke="#E5E7EB" />
-          <PolarAngleAxis dataKey="criteriaName" tick={{ fontSize: 11, fill: "#6B7280" }} />
+          <PolarGrid stroke="#CEDBEA" strokeDasharray="2 2" />
+          <PolarAngleAxis dataKey="criteriaName" tick={<CustomTick />} />
           <PolarRadiusAxis
             angle={90}
             domain={[0, 100]}
-            tick={{ fontSize: 10, fill: "#9CA3AF" }}
-            tickCount={5}
+            tick={{ fill: "#374151", fontSize: 12, fontWeight: 600 }}
+            tickCount={6}
           />
+          <Tooltip content={<CustomTooltip />} />
           <Radar
             dataKey="score"
-            stroke="#F97316"
-            fill="#F97316"
-            fillOpacity={0.25}
-            strokeWidth={2}
-            dot={{ r: 3, fill: "#F97316" }}
+            stroke="#002EB9"
+            fill="#87A5FF"
+            fillOpacity={0.4}
+            strokeWidth={1.56}
+            dot={{ r: 4, fill: "#002EB9", strokeWidth: 0 }}
           />
         </RadarChart>
       </ResponsiveContainer>

@@ -98,8 +98,11 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
         resumeUrl: uploadedFile.downloadUrl,
       }).unwrap();
 
+      if (createdResume?.id) {
+        parseCandidateResume({ resumeId: createdResume.id });
+      }
       setSelectedResumeId(createdResume?.id ?? null);
-      toastMessage.success("Resume uploaded successfully.");
+      toastMessage.success("Resume uploaded successfully. Parsing started automatically.");
     } catch (error) {
       toastMessage.error(getErrorMessage(error, "Upload resume failed"));
     } finally {

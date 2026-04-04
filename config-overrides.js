@@ -21,25 +21,32 @@ module.exports = override(
       ".tsx"
     ];
 
-    // Suppress noisy source-map warnings from docx-preview's published package.
+    // docx-preview ships .map files pointing at ./src/*.ts that is not in the npm package.
+    // CRA 5 registers source-map-loader as a top-level rule (not inside oneOf); patch that.
+    const docxPreviewSourceMapExclude = /node_modules[\\/]docx-preview/;
+    const patchSourceMapLoaderRule = (rule) => {
+      if (!rule || !rule.loader || !String(rule.loader).includes("source-map-loader")) {
+        return;
+      }
+      const extra = docxPreviewSourceMapExclude;
+      if (!rule.exclude) {
+        rule.exclude = extra;
+        return;
+      }
+      if (Array.isArray(rule.exclude)) {
+        if (!rule.exclude.some((e) => String(e) === String(extra))) {
+          rule.exclude = [...rule.exclude, extra];
+        }
+        return;
+      }
+      rule.exclude = [rule.exclude, extra];
+    };
+
     config.module.rules.forEach((rule) => {
+      if (!rule) return;
+      patchSourceMapLoaderRule(rule);
       if (Array.isArray(rule.oneOf)) {
-        rule.oneOf.forEach((oneOfRule) => {
-          if (
-            oneOfRule &&
-            oneOfRule.loader &&
-            oneOfRule.loader.includes("source-map-loader")
-          ) {
-            oneOfRule.exclude = [
-              ...(Array.isArray(oneOfRule.exclude)
-                ? oneOfRule.exclude
-                : oneOfRule.exclude
-                  ? [oneOfRule.exclude]
-                  : []),
-              /node_modules\/docx-preview/
-            ];
-          }
-        });
+        rule.oneOf.forEach(patchSourceMapLoaderRule);
       }
     });
     

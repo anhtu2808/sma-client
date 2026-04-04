@@ -1,4 +1,5 @@
 import React from "react";
+import dayjs from "dayjs";
 import { getParseStatusView, normalizeParseStatus } from "@/constant/attachment";
 import { getEvaluationHistoryId, getEvaluationHistoryScore } from "./matchHistory";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -26,10 +27,10 @@ const ResumeOption = ({
   const cardClassName = isSelected
     ? "border-2 border-primary bg-orange-50/40"
     : hasEvaluationHistory
-    ? "border border-amber-200 bg-amber-50/40"
+    ? "border-2 border-amber-200 bg-amber-50/40"
     : isSelectable
-    ? "border border-gray-200 bg-white hover:border-primary"
-    : "border border-gray-200 bg-gray-50/80 opacity-80";
+    ? "border-2 border-gray-200 bg-white hover:border-primary"
+    : "border-2 border-gray-200 bg-gray-50/80 opacity-80";
 
   return (
     <div
@@ -52,7 +53,7 @@ const ResumeOption = ({
               {resume.resumeName || resume.fileName || `Resume #${resume.id}`}
             </h4>
             {hasEvaluationHistory && (
-              <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
+              <span className="inline-flex items-center rounded-md bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
                 Matched before
               </span>
             )}
@@ -60,40 +61,58 @@ const ResumeOption = ({
 
           <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-600">
             <span
-              className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 font-medium ${statusView.className}`}
+              className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 font-medium ${statusView.className}`}
             >
               {statusView.label}
             </span>
-            <span className="text-gray-400">•</span>
-            <span>{resume.fileName || "No file name"}</span>
-          </div>
-
-          {hasEvaluationHistory && (
-            <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
-              {evaluationHistoryScore != null && (
-                <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-semibold text-emerald-700">
-                  Previous score: {evaluationHistoryScore}%
-                </span>
-              )}
-              <span className="text-amber-700">
-                This resume already has a saved match result for this job.
+            {!hasEvaluationHistory && (
+              <>
+                <span className="text-gray-400">•</span>
+                <span>{resume.fileName || "No file name"}</span>
+              </>
+            )}
+            {resume.createdAt && (
+              <>
+                <span className="text-gray-400">•</span>
+                <span className="text-gray-400">{dayjs(resume.createdAt).format("DD/MM/YYYY")}</span>
+              </>
+            )}
+            {hasEvaluationHistory && evaluationHistoryScore != null && (
+              <span className="inline-flex items-center gap-1 rounded-md border-2 border-emerald-400 bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-700">
+                <span className="h-1.5 w-1.5 rounded-md bg-emerald-400" />
+                {evaluationHistoryScore}%
               </span>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         <div className="flex shrink-0 items-center justify-end gap-2">
           {hasEvaluationHistory ? (
-            <button
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
-                onViewHistory?.(resume);
-              }}
-              className="inline-flex h-9 items-center justify-center rounded-md border border-amber-200 bg-white px-3 text-xs font-semibold text-amber-700 transition-colors hover:bg-amber-50"
-            >
-              View score
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onViewHistory?.(resume);
+                }}
+                className="inline-flex h-9 items-center justify-center rounded-md border border-amber-200 bg-white px-3 text-xs font-semibold text-amber-700 transition-colors hover:bg-amber-50"
+              >
+                View score
+              </button>
+              {onDelete && (
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onDelete(resume.id);
+                  }}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"
+                  aria-label="Delete resume"
+                >
+                  <FontAwesomeIcon icon={faTrashCan} className="text-[18px]" />
+                </button>
+              )}
+            </>
           ) : isSelectable ? (
             <>
               {onDelete && (

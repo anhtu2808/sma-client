@@ -20,7 +20,8 @@ import MenuBar from './MenuBar';
 import HighlightDetailModal from './HighlightDetailModal';
 import useEditorHighlights from './hooks/useEditorHighlights';
 import useTypewriterFix from './hooks/useTypewriterFix';
-import { findTextInDoc } from './utils/prosemirrorSearch';
+import useFixUndoStack from './hooks/useFixUndoStack';
+import { findTextInDocFuzzy } from './utils/prosemirrorSearch';
 import './resumeEditor.css';
 
 const AUTOSAVE_DEBOUNCE = 3000;
@@ -37,7 +38,7 @@ const EXTENSIONS = [
   Image,
 ];
 
-const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, onInitialContentSaved }) => {
+const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, onRegenerateSuggestions, isRegenerating }) => {
   const dispatch = useDispatch();
   const { data: resumeData, isLoading } = useGetResumeQuery(
     { resumeId },
@@ -84,21 +85,12 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
     }
   }, [enhancementId, updateContent]);
 
-  // First visit (content null): save generated HTML immediately, then notify parent
+  // Track initial content as already-saved baseline (no initial save needed — content set at creation)
   useEffect(() => {
-    if (!resumeData || !editor || initialSaveDoneRef.current) return;
-    if (!initialContent && initialHtml) {
-      initialSaveDoneRef.current = true;
-      saveContent(initialHtml).then(() => {
-        onInitialContentSaved?.();
-      });
-    } else {
-      initialSaveDoneRef.current = true;
-      lastSavedHtmlRef.current = initialContent;
-      // Content already exists, notify immediately
-      onInitialContentSaved?.();
-    }
-  }, [resumeData, editor, initialHtml, initialContent, saveContent, onInitialContentSaved]);
+    if (!editor || initialSaveDoneRef.current) return;
+    initialSaveDoneRef.current = true;
+    lastSavedHtmlRef.current = initialContent || initialHtml;
+  }, [editor, initialContent, initialHtml]);
 
   // Auto-save: debounce after edit + periodic interval
   useEffect(() => {
@@ -196,6 +188,9 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
   // Typewriter fix animation
   const { applyFix, fixingDetailId, cancelAnimation } = useTypewriterFix();
 
+  // Fix undo stack — rolls back isFixed state when Ctrl+Z is pressed
+  const { pushFixUndo } = useFixUndoStack(editor);
+
   const fixInEditor = useCallback(
     async (context, suggestionText, detailId) => {
       if (!editor) return false;
@@ -242,7 +237,7 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
       if (!suggestionText) continue;
 
       // Check if text exists in current doc state
-      const ranges = findTextInDoc(editor.state.doc, detail.context);
+      const ranges = findTextInDocFuzzy(editor.state.doc, detail.context);
       if (ranges.length === 0) continue;
 
       // Scroll to the text before replacing
@@ -294,10 +289,10 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
     }
   }, [editor, criteriaScores, isOptimizing, markDetailAsFixed, dispatch, saveContent, applyFix]);
 
-  // Expose fixInEditor + fixingDetailId + editor to parent via callback
+  // Expose fixInEditor + fixingDetailId + editor + pushFixUndo to parent via callback
   useEffect(() => {
-    onEditorReady?.({ fixInEditor, fixingDetailId, editor });
-  }, [fixInEditor, fixingDetailId, editor, onEditorReady]);
+    onEditorReady?.({ fixInEditor, fixingDetailId, editor, pushFixUndo });
+  }, [fixInEditor, fixingDetailId, editor, pushFixUndo, onEditorReady]);
 
   if (isLoading || !resumeData) {
     return <Loading className="py-20" />;
@@ -305,7 +300,7 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
 
   return (
     <div className="resume-editor flex flex-col h-full">
-      <MenuBar editor={editor} onSave={handleManualSave} isSaving={isSaving} saveStatus={saveStatus} onOptimizeAll={handleOptimizeAll} isOptimizing={isOptimizing} />
+      <MenuBar editor={editor} onSave={handleManualSave} isSaving={isSaving} saveStatus={saveStatus} onRegenerateSuggestions={onRegenerateSuggestions} isRegenerating={isRegenerating} />
       <div className="relative flex-1 overflow-y-auto bg-gray-200 py-10 flex justify-center">
         <div
           className="w-[210mm] min-h-[297mm] h-fit bg-white shadow-2xl px-[50px] py-[40px] cursor-text"

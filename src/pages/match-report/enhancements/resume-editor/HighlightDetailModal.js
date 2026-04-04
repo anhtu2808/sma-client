@@ -1,8 +1,8 @@
 import { useContext, useEffect, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Suggestions from '@/pages/match-report/sidebar/content/suggestions';
 import { useMarkDetailAsFixedMutation, useRegenerateSuggestionMutation } from '@/apis/matchingApi';
-import { setDetailFixed, updateScoresAfterFixed, updateSuggestion } from '@/store/slices/matchingReportSlice';
+import { setDetailContext, setDetailFixed, setFocusedItemId, updateScoresAfterFixed, updateSuggestion } from '@/store/slices/matchingReportSlice';
 import { getErrorMessage } from '@/constant/attachment';
 import toastMessage from '@/utils/toastMessage';
 import EditorContext from '@/pages/match-report/enhancements/EditorContext';
@@ -17,7 +17,8 @@ const HighlightDetailModal = ({ detail, open, onClose, onFixApplied }) => {
   const [markDetailAsFixed] = useMarkDetailAsFixedMutation();
   const [regeneratingSuggestionId, setRegeneratingSuggestionId] = useState(null);
   const [isApplying, setIsApplying] = useState(false);
-  const { fixInEditor } = useContext(EditorContext);
+  const { fixInEditor, editor, pushFixUndo } = useContext(EditorContext);
+  const matchData = useSelector((state) => state.matchingReport.data);
 
   // Position popover near the highlight element in the editor
   useEffect(() => {
@@ -102,7 +103,7 @@ const HighlightDetailModal = ({ detail, open, onClose, onFixApplied }) => {
   return (
     <div
       ref={popoverRef}
-      className="absolute z-50 w-[400px] rounded-lg border border-neutral-200 bg-white shadow-xl"
+      className="absolute z-50 w-[520px] rounded-lg border border-neutral-200 bg-white shadow-xl"
       style={{ maxHeight: 400 }}
     >
       {/* Header */}
@@ -120,9 +121,9 @@ const HighlightDetailModal = ({ detail, open, onClose, onFixApplied }) => {
       {/* Content */}
       <div className="max-h-[300px] overflow-y-auto">
         {detail.description && (
-          <div className="mx-4 mt-3 mb-1 rounded-md bg-amber-50 border border-amber-100 px-3 py-2">
-            <p className="text-sm font-medium text-amber-800 mb-0.5">{detail.label}</p>
-            <p className="text-[13px] leading-relaxed text-amber-700">{detail.description}</p>
+          <div className="mx-4 mt-3 mb-1 rounded-lg border-2 border-amber-300 bg-amber-100 px-3.5 py-3 shadow-sm">
+            <p className="mb-1.5 text-sm font-semibold leading-snug text-neutral-900">{detail.label}</p>
+            <p className="text-sm leading-relaxed text-neutral-800">{detail.description}</p>
           </div>
         )}
 
@@ -169,9 +170,23 @@ const HighlightDetailModal = ({ detail, open, onClose, onFixApplied }) => {
               const firstSuggestion = detail.suggestions?.[0]?.suggestion;
               if (!firstSuggestion || !fixInEditor || !detail.context) return;
 
+              // Capture pre-fix state for undo
+              const beforeDoc = editor?.state?.doc;
+              const beforeOverallScore = matchData?.aiOverallScore;
+              const beforeCriteriaScore = matchData?.criteriaScores
+                ? (() => {
+                    for (const cs of matchData.criteriaScores) {
+                      if (cs.details?.some((d) => d.id === detail.id)) return cs.aiScore;
+                    }
+                    return undefined;
+                  })()
+                : undefined;
+
               setIsApplying(true);
               const success = await fixInEditor(detail.context, firstSuggestion, detail.id);
               if (success) {
+                // Update context to new text so the decoration can find it in the doc
+                dispatch(setDetailContext({ detailId: detail.id, context: firstSuggestion }));
                 try {
                   const response = await markDetailAsFixed({ detailId: detail.id }).unwrap();
                   dispatch(setDetailFixed({ detailId: detail.id }));
@@ -181,8 +196,22 @@ const HighlightDetailModal = ({ detail, open, onClose, onFixApplied }) => {
                       criteriaScoreId: response.criteriaScoreId,
                       afterCriteriaScore: response.afterCriteriaScore,
                     }));
+
+                    // Register fix in undo stack
+                    if (beforeDoc && pushFixUndo) {
+                      pushFixUndo({
+                        beforeDoc,
+                        detailIds: [detail.id],
+                        criteriaScoreId: response.criteriaScoreId,
+                        beforeOverallScore,
+                        beforeCriteriaScore,
+                        originalContext: detail.context,
+                      });
+                    }
                   }
                   toastMessage.success('Fix applied successfully.');
+                  dispatch(setFocusedItemId(detail.id));
+                  setTimeout(() => dispatch(setFocusedItemId(null)), 2500);
                 } catch (error) {
                   toastMessage.error(getErrorMessage(error, 'Fix applied but failed to update status.'));
                 }

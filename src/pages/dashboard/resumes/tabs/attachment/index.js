@@ -164,9 +164,6 @@ const AttachmentsTab = () => {
 
           if (TERMINAL_PARSE_STATUSES.has(status)) {
             stopPolling(resumeId);
-            if (status === "FINISH") {
-              setPreviewResumeId(resumeId);
-            }
           }
         } catch (error) {
           stopPolling(resumeId);

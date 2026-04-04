@@ -1,7 +1,7 @@
 import { Extension } from '@tiptap/react';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
-import { findTextInDoc } from '../utils/prosemirrorSearch';
+import { findTextInDocFuzzy } from '../utils/prosemirrorSearch';
 
 export const suggestionHighlightKey = new PluginKey('suggestionHighlight');
 
@@ -104,14 +104,25 @@ const buildDecorationSet = (doc, highlights) => {
     return DecorationSet.empty;
   }
 
+  // Debug: log flat text length to verify editor content is loaded
+  let flatTextLen = 0;
+  doc.descendants((node) => {
+    if (node.isText) flatTextLen += node.text.length;
+    return true;
+  });
+  console.log(`[SuggestionHighlight] Building decorations: ${highlights.length} highlights, doc text length: ${flatTextLen}`);
+
   const decorations = [];
   let tagNumber = 0;
 
   for (const item of highlights) {
     if (!item.context || typeof item.context !== 'string') continue;
 
-    const ranges = findTextInDoc(doc, item.context);
-    if (ranges.length === 0) continue;
+    const ranges = findTextInDocFuzzy(doc, item.context);
+    if (ranges.length === 0) {
+      console.warn('[SuggestionHighlight] No match for:', item.label, '| context:', item.context.substring(0, 60));
+      continue;
+    }
     tagNumber++;
 
     for (const { from, to } of ranges) {

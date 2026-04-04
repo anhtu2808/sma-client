@@ -42,7 +42,7 @@ const formatOptions = [
   { value: 'h3', label: 'Heading 3' },
 ];
 
-const MenuBar = ({ editor, onSave, isSaving, saveStatus, onOptimizeAll, isOptimizing }) => {
+const MenuBar = ({ editor, onSave, isSaving, saveStatus, onRegenerateSuggestions, isRegenerating }) => {
   if (!editor) return null;
 
   const currentFormat = editor.isActive('heading', { level: 1 })
@@ -112,24 +112,18 @@ const MenuBar = ({ editor, onSave, isSaving, saveStatus, onOptimizeAll, isOptimi
       <ToolbarButton onClick={() => editor.chain().focus().toggleCodeBlock().run()} isActive={editor.isActive('codeBlock')} icon={Code} />
 
       <div className="ml-auto flex items-center gap-2">
-        {saveStatus && (
-          <span className="text-xs text-gray-400 flex items-center gap-1">
-            <Check size={14} /> {saveStatus}
-          </span>
-        )}
-        {onOptimizeAll && (
+        {onRegenerateSuggestions && (
           <button
             type="button"
-            onClick={onOptimizeAll}
-            disabled={isOptimizing}
-            className="optimize-all-btn relative overflow-hidden flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold text-white transition-all disabled:opacity-60 disabled:cursor-not-allowed bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 hover:from-violet-600 hover:via-purple-600 hover:to-fuchsia-600 shadow-sm hover:shadow-md"
+            onClick={onRegenerateSuggestions}
+            disabled={isRegenerating}
+            className="flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold text-white transition-all disabled:opacity-60 disabled:cursor-not-allowed bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 shadow-sm"
           >
-            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2.5s_infinite]" />
             <FontAwesomeIcon
               icon={faWandMagicSparkles}
-              className={`text-[13px] relative z-10 ${isOptimizing ? 'animate-spin' : ''}`}
+              className={`text-[13px] ${isRegenerating ? 'animate-spin' : ''}`}
             />
-            <span className="relative z-10">{isOptimizing ? 'Optimizing...' : 'Optimize All'}</span>
+            {isRegenerating ? 'Generating...' : 'Re-generate'}
           </button>
         )}
         <button
@@ -143,11 +137,6 @@ const MenuBar = ({ editor, onSave, isSaving, saveStatus, onOptimizeAll, isOptimi
         </button>
       </div>
 
-      <style>{`
-        @keyframes shimmer {
-          100% { transform: translateX(200%); }
-        }
-      `}</style>
     </div>
   );
 };
