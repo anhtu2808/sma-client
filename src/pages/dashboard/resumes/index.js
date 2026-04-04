@@ -9,6 +9,16 @@ const Resumes = () => {
   const tabItems = useMemo(
     () => [
       {
+        key: "attachments",
+        label: (
+          <span className="inline-flex items-center gap-2">
+            <FontAwesomeIcon icon={faPaperclip} className="text-[20px]" />
+            Attachments
+          </span>
+        ),
+        children: <AttachmentsTab />,
+      },
+      {
         key: "builder",
         label: (
           <span className="inline-flex items-center gap-2">
@@ -19,16 +29,6 @@ const Resumes = () => {
         children: (
           <ResumeBuilderTab />
         ),
-      },
-      {
-        key: "attachments",
-        label: (
-          <span className="inline-flex items-center gap-2">
-            <FontAwesomeIcon icon={faPaperclip} className="text-[20px]" />
-            Attachments
-          </span>
-        ),
-        children: <AttachmentsTab />,
       },
     ],
     []
@@ -47,7 +47,7 @@ const Resumes = () => {
         </Col>
 
         <Col span={24}>
-          <Tabs defaultActiveKey="builder" items={tabItems} />
+          <Tabs defaultActiveKey="attachments" items={tabItems} />
         </Col>
       </Row>
     </div>

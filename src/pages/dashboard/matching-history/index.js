@@ -21,7 +21,7 @@ const getMatchLevelLabel = (level) => {
   const levelMap = {
     EXCELLENT: "Excellent",
     GOOD: "Good",
-    FAIR: "Fair",
+    FAIR: "Moderate",
     POOR: "Poor",
     NOT_MATCHED: "Not Matched",
   };

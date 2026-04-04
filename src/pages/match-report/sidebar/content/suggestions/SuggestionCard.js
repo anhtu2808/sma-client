@@ -1,7 +1,9 @@
 import { useContext, useMemo, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
+  setDetailContext,
   setDetailFixed,
+  setFocusedItemId,
   updateScoresAfterFixed,
 } from "@/store/slices/matchingReportSlice";
 import { useMarkDetailAsFixedMutation } from "@/apis/matchingApi";
@@ -24,9 +26,12 @@ const SuggestionCard = ({
   const dispatch = useDispatch();
   const [copied, setCopied] = useState(false);
   const [fixApplied, setFixApplied] = useState(false);
-  const { fixInEditor, fixingDetailId, editor } = useContext(EditorContext);
+  const { fixInEditor, fixingDetailId, editor, pushFixUndo } = useContext(EditorContext);
   const [markDetailAsFixed] = useMarkDetailAsFixedMutation();
   const text = suggestion?.suggestion || "";
+
+  // Capture current scores for undo purposes (before applying fix)
+  const matchData = useSelector((state) => state.matchingReport.data);
 
   // Check if context text is findable in the editor document
   const isTextFoundInEditor = useMemo(() => {
@@ -57,19 +62,35 @@ const SuggestionCard = ({
     event.stopPropagation();
     if (!canFixInEditor || isFixingThis || fixApplied) return;
 
+    // Capture pre-fix state for undo
+    const beforeDoc = editor?.state?.doc;
+    const beforeOverallScore = matchData?.aiOverallScore;
+
     const success = await fixInEditor(context, text, detailId);
     if (!success) return;
 
     setFixApplied(true);
 
+    // Update context to the new text so the decoration can find it in the doc
+    dispatch(setDetailContext({ detailId, context: text }));
+
     // Mark as fixed via API — handle both single detail and context group
     const idsToMark = allDetailIds ?? [detailId];
+    let criteriaScoreId;
+    let beforeCriteriaScore;
+
     try {
       for (const id of idsToMark) {
         const response = await markDetailAsFixed({ detailId: id }).unwrap();
         dispatch(setDetailFixed({ detailId: id }));
 
         if (response) {
+          criteriaScoreId = response.criteriaScoreId;
+          // Before score = after minus impact (reverse the markAsFixed calculation)
+          if (beforeCriteriaScore === undefined && matchData?.criteriaScores) {
+            const cs = matchData.criteriaScores.find((c) => c.id === response.criteriaScoreId);
+            beforeCriteriaScore = cs?.aiScore;
+          }
           dispatch(
             updateScoresAfterFixed({
               afterOverallScore: response.afterOverallScore,
@@ -80,7 +101,21 @@ const SuggestionCard = ({
         }
       }
 
+      // Register this fix in the undo stack so Ctrl+Z can roll it back
+      if (beforeDoc && pushFixUndo) {
+        pushFixUndo({
+          beforeDoc,
+          detailIds: idsToMark,
+          criteriaScoreId,
+          beforeOverallScore,
+          beforeCriteriaScore,
+          originalContext: context,
+        });
+      }
+
       toastMessage.success("Fix applied successfully.");
+      dispatch(setFocusedItemId(detailId));
+      setTimeout(() => dispatch(setFocusedItemId(null)), 2500);
     } catch (error) {
       toastMessage.error(
         getErrorMessage(error, "Fix applied but failed to update status.")
@@ -94,7 +129,7 @@ const SuggestionCard = ({
       className={`relative cursor-pointer overflow-hidden rounded border bg-white p-3 text-sm leading-relaxed shadow-sm transition-all hover:shadow ${
         copied
           ? "border-emerald-500 text-emerald-700"
-          : "border-neutral-200 text-neutral-700"
+          : "border-neutral-200 text-neutral-900"
       }`}
     >
       <div className="flex items-start gap-3">

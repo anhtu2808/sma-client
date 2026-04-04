@@ -1,4 +1,4 @@
-import { faCircleInfo, faCircleQuestion, faMedal, faThumbsUp, faTriangleExclamation } from '../../../utils/icons';
+import { faCircleInfo, faCircleQuestion, faCircleXmark, faMedal, faThumbsUp, faTriangleExclamation } from '../../../utils/icons';
 
 /**
  * Parse AI-generated text into individual bullet items.
@@ -6,6 +6,13 @@ import { faCircleInfo, faCircleQuestion, faMedal, faThumbsUp, faTriangleExclamat
  */
 export const parseTextToItems = (text) => {
   if (!text || typeof text !== "string") return [];
+
+  // Handle <li> tag format from AI
+  if (text.includes("<li>")) {
+    return [...text.matchAll(/<li>([\s\S]*?)<\/li>/g)]
+      .map((m) => m[1].trim())
+      .filter((s) => s.length > 2);
+  }
 
   return text
     .split(/[\n;]/)
@@ -40,7 +47,7 @@ export const getMatchLevelConfig = (matchLevel) => {
       };
     case "FAIR":
       return {
-        label: "Fair Match",
+        label: "Moderate Match",
         icon: faCircleInfo,
         ringColor: "#F59E0B",
         badgeBg: "bg-amber-50",
@@ -50,6 +57,14 @@ export const getMatchLevelConfig = (matchLevel) => {
       return {
         label: "Poor Match",
         icon: faTriangleExclamation,
+        ringColor: "#EF4444",
+        badgeBg: "bg-red-50",
+        badgeText: "text-red-700",
+      };
+    case "NOT_MATCHED":
+      return {
+        label: "Not Matched",
+        icon: faCircleXmark,
         ringColor: "#EF4444",
         badgeBg: "bg-red-50",
         badgeText: "text-red-700",
