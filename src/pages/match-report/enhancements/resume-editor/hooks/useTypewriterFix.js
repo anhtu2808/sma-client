@@ -51,6 +51,15 @@ const useTypewriterFix = () => {
         }
 
         const { from, to } = ranges[0]; // Replace first occurrence
+        const isHtml = /<[^>]+>/.test(suggestionText);
+
+        // For HTML suggestions, extract plain text for typewriter animation
+        let plainText = suggestionText;
+        if (isHtml) {
+          const div = document.createElement('div');
+          div.innerHTML = suggestionText;
+          plainText = div.textContent || div.innerText || '';
+        }
 
         setFixingDetailId(detailId);
         editor.setEditable(false);
@@ -62,8 +71,14 @@ const useTypewriterFix = () => {
         let charIndex = 0;
 
         const typeNextChar = () => {
-          if (charIndex >= suggestionText.length || !animationRef.current) {
-            // Done
+          if (charIndex >= plainText.length || !animationRef.current) {
+            // Done — if HTML, replace plain text with full HTML content
+            if (isHtml) {
+              try {
+                const endPos = from + plainText.length;
+                editor.chain().deleteRange({ from, to: endPos }).insertContentAt(from, suggestionText, { updateSelection: false }).run();
+              } catch { /* best effort */ }
+            }
             editor.setEditable(true);
             animationRef.current = null;
             setFixingDetailId(null);
@@ -71,8 +86,8 @@ const useTypewriterFix = () => {
             return;
           }
 
-          charIndex = Math.min(charIndex + CHARS_PER_TICK, suggestionText.length);
-          const textSoFar = suggestionText.slice(0, charIndex);
+          charIndex = Math.min(charIndex + CHARS_PER_TICK, plainText.length);
+          const textSoFar = plainText.slice(0, charIndex);
 
           try {
             // Replace the entire growing range each tick to avoid position drift
@@ -86,7 +101,7 @@ const useTypewriterFix = () => {
             try {
               editor
                 .chain()
-                .insertContentAt(from + charIndex - 1, suggestionText.slice(charIndex - 1), { updateSelection: false })
+                .insertContentAt(from + charIndex - 1, plainText.slice(charIndex - 1), { updateSelection: false })
                 .run();
             } catch { /* best effort */ }
             editor.setEditable(true);
@@ -100,7 +115,7 @@ const useTypewriterFix = () => {
           animationRef.current = {
             timer: null,
             editor,
-            remainingText: suggestionText.slice(charIndex),
+            remainingText: plainText.slice(charIndex),
             insertPos: from + charIndex,
           };
 
@@ -111,7 +126,7 @@ const useTypewriterFix = () => {
         animationRef.current = {
           timer: null,
           editor,
-          remainingText: suggestionText,
+          remainingText: plainText,
           insertPos: from,
         };
 

@@ -46,11 +46,18 @@ const SuggestionCard = ({
   const canFixInEditor = !!fixInEditor && !!context && !!text && isTextFoundInEditor;
   const isFixingThis = fixingDetailId === detailId;
 
+  // Strip HTML tags to get plain text for clipboard
+  const getPlainText = (html) => {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    return div.textContent || div.innerText || '';
+  };
+
   const handleCopy = async () => {
     if (!text) return;
 
     try {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(getPlainText(text));
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -133,7 +140,7 @@ const SuggestionCard = ({
       }`}
     >
       <div className="flex items-start gap-3">
-        <div className="min-w-0 flex-1">{text}</div>
+        <div className="min-w-0 flex-1 prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: text }} />
 
         <div className="flex shrink-0 items-center gap-1">
           {canFixInEditor ? (

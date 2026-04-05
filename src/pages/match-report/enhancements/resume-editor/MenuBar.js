@@ -15,6 +15,7 @@ import {
   Save,
   Check,
   Loader2,
+  RefreshCw,
 } from 'lucide-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRotateLeft, faRotateRight, faWandMagicSparkles } from '../../../../utils/icons';
@@ -42,7 +43,7 @@ const formatOptions = [
   { value: 'h3', label: 'Heading 3' },
 ];
 
-const MenuBar = ({ editor, onSave, isSaving, saveStatus, onRegenerateSuggestions, isRegenerating }) => {
+const MenuBar = ({ editor, onSave, isSaving, saveStatus, onRegenerateSuggestions, isRegenerating, onReScore, isReScoring, reScoreStatus }) => {
   if (!editor) return null;
 
   const currentFormat = editor.isActive('heading', { level: 1 })
@@ -112,6 +113,20 @@ const MenuBar = ({ editor, onSave, isSaving, saveStatus, onRegenerateSuggestions
       <ToolbarButton onClick={() => editor.chain().focus().toggleCodeBlock().run()} isActive={editor.isActive('codeBlock')} icon={Code} />
 
       <div className="ml-auto flex items-center gap-2">
+        {onReScore && (
+          <button
+            type="button"
+            onClick={onReScore}
+            disabled={isReScoring || reScoreStatus === 'polling'}
+            className="flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold text-white transition-all disabled:opacity-60 disabled:cursor-not-allowed bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 shadow-sm"
+          >
+            <RefreshCw
+              size={13}
+              className={(isReScoring || reScoreStatus === 'polling') ? 'animate-spin' : ''}
+            />
+            {reScoreStatus === 'polling' ? 'Đang chấm điểm...' : 'Chấm điểm lại'}
+          </button>
+        )}
         {onRegenerateSuggestions && (
           <button
             type="button"

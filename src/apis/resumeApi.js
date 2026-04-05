@@ -632,6 +632,15 @@ export const resumeApi = api.injectEndpoints({
                 }
             },
         }),
+
+        reScoreEnhancement: builder.mutation({
+            query: ({ enhancementId }) => ({
+                url: `${API_VERSION}/resume-enhancements/${enhancementId}/re-score`,
+                method: "POST",
+            }),
+            transformResponse: (response) => response?.data ?? null,
+            invalidatesTags: ["FeatureUsage"],
+        }),
     }),
 });
 
@@ -672,4 +681,5 @@ export const {
     useUpdateEnhancementContentMutation,
     useGenerateEnhancementSuggestionMutation,
     useLazyGetEnhancementSuggestionQuery,
+    useReScoreEnhancementMutation,
 } = resumeApi;

@@ -8,9 +8,6 @@ import {
     faUser, faFileLines, faClipboardCheck, faClockRotateLeft, faEnvelope,
     faBell, faCreditCard, faGear,
 } from '../../../utils/icons';
-import { faFileInvoice } from '@fortawesome/free-solid-svg-icons';
-
-
 const Sidebar = () => {
 
 
@@ -28,7 +25,6 @@ const Sidebar = () => {
 
         { to: "/dashboard", icon: faUser, label: "Profile", end: true },
         { to: "/dashboard/resumes", icon: faFileLines, label: "Resumes" },
-        { to: "/dashboard/cv-template", icon: faFileInvoice, label: "CV Template", badge: "New" },
         { to: "/dashboard/matching-history", icon: faClipboardCheck, label: "Resume Checker", badge: "New" },
         { to: "/dashboard/jobs", icon: faClockRotateLeft, label: "My Jobs" },
         {

@@ -5,7 +5,7 @@ import Button from "@/components/Button";
 import Loading from "@/components/Loading";
 import { getParseStatusView, normalizeParseStatus } from "@/constant/attachment";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowsRotate, faCircleInfo, faCircleUser, faDownload, faEye, faFileLines, faFilePdf, faPen, faPenToSquare, faTrash, faWandMagicSparkles } from '../../../../../../utils/icons';
+import { faArrowsRotate, faCircleInfo, faCircleUser, faDownload, faEye, faFileLines, faFilePdf, faPenToSquare, faTrash, faWandMagicSparkles } from '../../../../../../utils/icons';
 
 const FilesList = ({
   files,
@@ -20,7 +20,6 @@ const FilesList = ({
   onDeleteResume,
   onRename,
   onViewParsedResult,
-  onEditResume,
   uploadQuota,
 }) => {
   const navigate = useNavigate();
@@ -130,19 +129,6 @@ const FilesList = ({
                     onClick={() => onViewParsedResult(file.id)}
                   >
                     <FontAwesomeIcon icon={faEye} className="text-[18px]" />
-                  </Button>
-                )}
-
-                {canSetAsProfile && (
-                  <Button
-                    mode="ghost"
-                    size="sm"
-                    shape="rounded"
-                    btnIcon
-                    tooltip="Edit CV"
-                    onClick={() => onEditResume(file.id)}
-                  >
-                    <FontAwesomeIcon icon={faPen} className="text-[18px]" />
                   </Button>
                 )}
 
