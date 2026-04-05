@@ -1,15 +1,21 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { message } from 'antd';
 import {
   useGetResumeQuery,
   useGetOrCreateEnhancementQuery,
   useGenerateEnhancementSuggestionMutation,
   useLazyGetEnhancementSuggestionQuery,
   useUpdateEnhancementContentMutation,
+  useReScoreEnhancementMutation,
 } from '@/apis/resumeApi';
+import {
+  useLazyGetMatchingStatusQuery,
+  useLazyGetMatchingDetailQuery,
+} from '@/apis/matchingApi';
 import { setMatchingReportData } from '@/store/slices/matchingReportSlice';
-import { mapSuggestionsToStore } from '@/utils/matchingReportUtils';
+import { mapSuggestionsToStore, mapEvaluationToStore } from '@/utils/matchingReportUtils';
 import MatchReportSidebar from '@/pages/match-report/sidebar';
 import Loading from '@/components/Loading';
 import { Result } from 'antd';
@@ -59,6 +65,13 @@ const Enhancements = () => {
   const [updateContent] = useUpdateEnhancementContentMutation();
   const [generateSuggestion, { isLoading: isRegenerating }] = useGenerateEnhancementSuggestionMutation();
   const [triggerGetSuggestions] = useLazyGetEnhancementSuggestionQuery();
+
+  // Re-score hooks and state
+  const [reScoreEnhancement, { isLoading: isReScoring }] = useReScoreEnhancementMutation();
+  const [triggerGetStatus] = useLazyGetMatchingStatusQuery();
+  const [triggerGetDetail] = useLazyGetMatchingDetailQuery();
+  const [reScoreStatus, setReScoreStatus] = useState(null); // null | 'polling' | 'success' | 'error'
+  const [reScoreEvalId, setReScoreEvalId] = useState(null);
 
   // Determine initial phase based on enhancement data
   useEffect(() => {
@@ -155,6 +168,56 @@ const Enhancements = () => {
       });
   }, [phase, enhancement, triggerGetSuggestions, dispatch]);
 
+  // Re-score handler: trigger POST /re-score then poll for status
+  const handleReScore = useCallback(async () => {
+    if (!enhancement?.id || isReScoring || reScoreStatus === 'polling') return;
+    try {
+      const evalId = await reScoreEnhancement({ enhancementId: enhancement.id }).unwrap();
+      setReScoreEvalId(evalId);
+      setReScoreStatus('polling');
+    } catch (err) {
+      message.error('Không thể bắt đầu chấm điểm lại');
+    }
+  }, [enhancement?.id, isReScoring, reScoreStatus, reScoreEnhancement]);
+
+  // Polling effect: check re-score status every 2s until FINISH/FAIL or 3min timeout
+  useEffect(() => {
+    if (reScoreStatus !== 'polling' || !reScoreEvalId) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const status = await triggerGetStatus({ evaluationId: reScoreEvalId }).unwrap();
+        if (status === 'FINISH') {
+          clearInterval(interval);
+          setReScoreStatus('success');
+          const data = await triggerGetDetail({ evaluationId: reScoreEvalId }).unwrap();
+          if (data) {
+            dispatch(setMatchingReportData(mapEvaluationToStore(data)));
+          }
+          message.success('Chấm điểm lại thành công!');
+        } else if (status === 'FAIL') {
+          clearInterval(interval);
+          setReScoreStatus('error');
+          message.error('Chấm điểm lại thất bại');
+        }
+      } catch {
+        clearInterval(interval);
+        setReScoreStatus('error');
+      }
+    }, 2000);
+
+    const timeout = setTimeout(() => {
+      clearInterval(interval);
+      setReScoreStatus('error');
+      message.error('Chấm điểm lại quá thời gian');
+    }, 180000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, [reScoreStatus, reScoreEvalId, triggerGetStatus, triggerGetDetail, dispatch]);
+
   // Manual re-generate: save current editor content then call POST suggestion
   const handleRegenerateSuggestions = useCallback(async () => {
     if (!enhancement?.id || isRegenerating) return;
@@ -247,6 +310,9 @@ const Enhancements = () => {
               onEditorReady={handleEditorReady}
               onRegenerateSuggestions={handleRegenerateSuggestions}
               isRegenerating={isRegenerating}
+              onReScore={handleReScore}
+              isReScoring={isReScoring}
+              reScoreStatus={reScoreStatus}
             />
           </main>
         </div>

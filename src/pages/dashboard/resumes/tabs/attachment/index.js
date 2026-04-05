@@ -1,9 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Modal } from "antd";
 import toastMessage from "@/utils/toastMessage";
 import {
-  useCloneResumeBuilderMutation,
   useDeleteCandidateResumeMutation,
   useGetCandidateResumesQuery,
   useLazyGetResumeParseStatusQuery,
@@ -32,7 +30,6 @@ import {
 } from "@/constant/attachment";
 
 const AttachmentsTab = () => {
-  const navigate = useNavigate();
   const inputRef = useRef(null);
   const pollingTimersRef = useRef({});
   const pollingStartTimesRef = useRef({});
@@ -68,8 +65,6 @@ const AttachmentsTab = () => {
   const [triggerResumeParseStatus] = useLazyGetResumeParseStatusQuery();
   const [deleteCandidateResume] = useDeleteCandidateResumeMutation();
   const [setResumeAsDefault, { isLoading: isSettingProfile }] = useSetResumeAsDefaultMutation();
-  const [cloneResumeBuilder] = useCloneResumeBuilderMutation();
-  const { data: templateResumes = [] } = useGetCandidateResumesQuery({ type: RESUME_TYPES.TEMPLATE });
 
   const [settingProfileId, setSettingProfileId] = useState(null);
   const [parseStatusOverrides, setParseStatusOverrides] = useState({});
@@ -284,21 +279,6 @@ const AttachmentsTab = () => {
     }
   };
 
-  const handleEditResume = async (resumeId) => {
-    // Check if a TEMPLATE clone already exists for this resume
-    const existingTemplate = templateResumes.find((r) => r.rootResumeId === resumeId);
-    if (existingTemplate) {
-      navigate(`/dashboard/resumes/editor/${existingTemplate.id}`);
-      return;
-    }
-    try {
-      const cloned = await cloneResumeBuilder({ resumeId }).unwrap();
-      navigate(`/dashboard/resumes/editor/${cloned.id}`);
-    } catch (error) {
-      toastMessage.error(getErrorMessage(error, "Failed to create editable copy."));
-    }
-  };
-
   // [FREE PARSING] Consent modal no longer needed - parse directly
 //  const openParseConsent = (resumeId) => {
 //    setConsentModal({
@@ -472,7 +452,6 @@ const AttachmentsTab = () => {
           const resume = resumes.find((r) => r.id === fileId);
           if (resume) setRenameResume(resume);
         }}
-        onEditResume={handleEditResume}
         uploadQuota={uploadFeature?.maxQuota != null ? {
           used: uploadFeature.maxQuota - (uploadFeature.remaining ?? 0),
           max: uploadFeature.maxQuota,

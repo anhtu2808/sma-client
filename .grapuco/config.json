@@ -1,0 +1,22 @@
+{
+  "repoId": "6586478c-b896-4938-8ff9-c4b2965d0597",
+  "repoName": "sma-client",
+  "server": "https://api.grapuco.com",
+  "language": "javascript",
+  "features": {
+    "embeddings": true,
+    "dataFlowAnalysis": true
+  },
+  "ignore": [
+    "node_modules",
+    "dist",
+    ".next",
+    ".git",
+    ".grapuco",
+    "__pycache__",
+    "vendor",
+    "target",
+    "build"
+  ],
+  "lastPush": "2026-04-05T03:27:18.361Z"
+}

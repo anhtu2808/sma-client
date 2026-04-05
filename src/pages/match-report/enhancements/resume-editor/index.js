@@ -15,6 +15,7 @@ import { setDetailFixed, updateScoresAfterFixed } from '@/store/slices/matchingR
 import Loading from '@/components/Loading';
 import EntryHeader from './EntryHeaderNode';
 import SuggestionHighlight from './extensions/SuggestionHighlight';
+import PreserveStyles from './extensions/PreserveStyles';
 import { buildResumeHtml } from './buildResumeHtml';
 import MenuBar from './MenuBar';
 import HighlightDetailModal from './HighlightDetailModal';
@@ -33,12 +34,13 @@ const EXTENSIONS = [
   TextStyleKit,
   EntryHeader,
   SuggestionHighlight,
+  PreserveStyles,
   TextAlign.configure({ types: ['heading', 'paragraph'] }),
   Link.configure({ openOnClick: false, autolink: true }),
   Image,
 ];
 
-const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, onRegenerateSuggestions, isRegenerating }) => {
+const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, onRegenerateSuggestions, isRegenerating, onReScore, isReScoring, reScoreStatus }) => {
   const dispatch = useDispatch();
   const { data: resumeData, isLoading } = useGetResumeQuery(
     { resumeId },
@@ -121,11 +123,23 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
     };
   }, [editor, enhancementId, saveContent]);
 
-  const handleManualSave = () => {
+  const handleManualSave = useCallback(() => {
     if (!editor) return;
     if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
     saveContent(editor.getHTML());
-  };
+  }, [editor, saveContent]);
+
+  // Cmd+S / Ctrl+S to save
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+        e.preventDefault();
+        handleManualSave();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleManualSave]);
 
   // Tag click handler — check if user clicked on the ::before tag area
   const handleEditorClick = useCallback((event) => {
@@ -300,7 +314,7 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
 
   return (
     <div className="resume-editor flex flex-col h-full">
-      <MenuBar editor={editor} onSave={handleManualSave} isSaving={isSaving} saveStatus={saveStatus} onRegenerateSuggestions={onRegenerateSuggestions} isRegenerating={isRegenerating} />
+      <MenuBar editor={editor} onSave={handleManualSave} isSaving={isSaving} saveStatus={saveStatus} onRegenerateSuggestions={onRegenerateSuggestions} isRegenerating={isRegenerating} onReScore={onReScore} isReScoring={isReScoring} reScoreStatus={reScoreStatus} />
       <div className="relative flex-1 overflow-y-auto bg-gray-200 py-10 flex justify-center">
         <div
           className="w-[210mm] min-h-[297mm] h-fit bg-white shadow-2xl px-[50px] py-[40px] cursor-text"

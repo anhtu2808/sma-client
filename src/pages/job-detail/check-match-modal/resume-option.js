@@ -3,7 +3,8 @@ import dayjs from "dayjs";
 import { getParseStatusView, normalizeParseStatus } from "@/constant/attachment";
 import { getEvaluationHistoryId, getEvaluationHistoryScore } from "./matchHistory";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBrain, faTrashCan } from '../../../utils/icons';
+import { faTrashCan } from '../../../utils/icons';
+import { Sparkles } from 'lucide-react';
 
 const ResumeOption = ({
   resume,
@@ -148,7 +149,7 @@ const ResumeOption = ({
                 onParse(resume.id);
               }}
             >
-              <FontAwesomeIcon icon={faBrain} className="text-[14px]" />
+              <Sparkles size={14} />
               Parse CV
             </button>
           ) : (

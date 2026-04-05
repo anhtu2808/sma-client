@@ -42,6 +42,7 @@ const MatchReport = () => {
   const [latestStatus, setLatestStatus] = useState("WAITING");
   const [hasInitialStatus, setHasInitialStatus] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [pollingSessionId, setPollingSessionId] = useState(0);
 
   const [triggerGetMatchingStatus] = useLazyGetMatchingStatusQuery();
   const [triggerGetMatchingDetail, { isLoading: isDetailLoading }] = useLazyGetMatchingDetailQuery();
@@ -50,7 +51,17 @@ const MatchReport = () => {
   const activeDocumentTab = useSelector((state) => state.matchingReport.ui.activeDocumentTab);
   const { jobId, resumeId, matchSource } = location.state || {};
 
+  const stopPolling = useCallback(() => {
+    if (pollingTimerRef.current) {
+      clearInterval(pollingTimerRef.current);
+      pollingTimerRef.current = null;
+    }
+    pollingStartedAtRef.current = null;
+  }, []);
+
   const handleRetry = async () => {
+    stopPolling();
+
     if (matchSource !== "new") {
       if (!hasValidEvaluationId) {
         if (jobId) {
@@ -63,7 +74,8 @@ const MatchReport = () => {
 
       setErrorMessage("");
       setLatestStatus("WAITING");
-      setHasInitialStatus(false);
+      setHasInitialStatus(true);
+      setPollingSessionId((n) => n + 1);
       setPhase("polling");
       return;
     }
@@ -95,14 +107,6 @@ const MatchReport = () => {
       setErrorMessage("Retry failed. Please go back to job details and try again.");
     }
   };
-
-  const stopPolling = useCallback(() => {
-    if (pollingTimerRef.current) {
-      clearInterval(pollingTimerRef.current);
-      pollingTimerRef.current = null;
-    }
-    pollingStartedAtRef.current = null;
-  }, []);
 
   useEffect(() => {
     setIsAuthorized(
@@ -229,7 +233,7 @@ const MatchReport = () => {
     if (!hasInitialStatus) {
       return <Loading fullScreen={true} />;
     }
-    return <MatchingLoading status={latestStatus} />;
+    return <MatchingLoading key={pollingSessionId} status={latestStatus} />;
   }
 
   if (isDetailLoading) {

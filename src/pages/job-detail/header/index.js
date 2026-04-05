@@ -4,6 +4,7 @@ import toastMessage from "@/utils/toastMessage";
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGetJobByIdQuery, useGetMarkedJobsQuery, useToggleMarkJobMutation } from '@/apis/jobApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBookmarkSolid, faBookmarkRegular } from '@/utils/icons';
 
 const Header = () => {
     const { id } = useParams();
@@ -83,7 +84,7 @@ const Header = () => {
                 disabled={bookmarkLoading}
                 type="button"
             >
-                <FontAwesomeIcon icon={isMarked ? 'bookmark' : 'bookmark_border'} />
+                <FontAwesomeIcon icon={isMarked ? faBookmarkSolid : faBookmarkRegular} />
             </button>
         </div>
     );

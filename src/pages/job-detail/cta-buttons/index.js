@@ -7,7 +7,8 @@ import Loading from '@/components/Loading';
 import useRequireLoginRedirect from '@/hooks/useRequireLoginRedirect';
 import CheckMatchModal from '@/pages/job-detail/check-match-modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowUpRightFromSquare, faWandMagicSparkles } from '../../../utils/icons';
+import { faArrowUpRightFromSquare } from '../../../utils/icons';
+import { Sparkles } from 'lucide-react';
 
 const CTAButtons = () => {
     const navigate = useNavigate();
@@ -123,7 +124,7 @@ const CTAButtons = () => {
                             className="h-12"
                             shape='rounded'
                             onClick={handleOpenCheckMatch}
-                            iconRight={<FontAwesomeIcon icon={faWandMagicSparkles} className="text-[20px]" />}
+                            iconRight={<Sparkles size={20} className="text-current" />}
                         >
                             Check Match
                         </Button>

@@ -7,36 +7,14 @@ import { Pagination, Dropdown } from "antd";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBolt, faChartSimple, faCircleExclamation, faClipboardCheck, faClock, faDownload, faEllipsisVertical, faFileLines, faLightbulb, faMagnifyingGlass, faPenToSquare, faTriangleExclamation } from '../../../utils/icons';
+import { faCircleExclamation, faClipboardCheck, faClock, faDownload, faEllipsisVertical, faFileLines, faMagnifyingGlass, faPenToSquare } from '../../../utils/icons';
 dayjs.extend(relativeTime);
 
 const getScoreColor = (score) => {
-  if (score === null || score === undefined) return { bg: "bg-gray-100", text: "text-gray-600", border: "border-gray-300" };
-  if (score > 70) return { bg: "bg-green-50", text: "text-green-600", border: "border-green-200" };
-  if (score >= 40) return { bg: "bg-orange-50", text: "text-orange-600", border: "border-orange-200" };
-  return { bg: "bg-red-50", text: "text-red-600", border: "border-red-200" };
-};
-
-const getMatchLevelLabel = (level) => {
-  const levelMap = {
-    EXCELLENT: "Excellent",
-    GOOD: "Good",
-    FAIR: "Moderate",
-    POOR: "Poor",
-    NOT_MATCHED: "Not Matched",
-  };
-  return levelMap[level] || level || "Unknown";
-};
-
-const getMatchLevelColor = (level) => {
-  const colorMap = {
-    EXCELLENT: { bg: "bg-green-100", text: "text-green-700" },
-    GOOD: { bg: "bg-blue-100", text: "text-blue-700" },
-    FAIR: { bg: "bg-yellow-100", text: "text-yellow-700" },
-    POOR: { bg: "bg-orange-100", text: "text-orange-700" },
-    NOT_MATCHED: { bg: "bg-red-100", text: "text-red-700" },
-  };
-  return colorMap[level] || { bg: "bg-gray-100", text: "text-gray-600" };
+  if (score === null || score === undefined) return { text: "text-gray-500", accent: "bg-gray-300" };
+  if (score > 70) return { text: "text-green-600", accent: "bg-green-400" };
+  if (score >= 40) return { text: "text-orange-500", accent: "bg-orange-400" };
+  return { text: "text-red-500", accent: "bg-red-400" };
 };
 
 const formatRelativeDate = (dateString) => {
@@ -49,29 +27,15 @@ const formatRelativeDate = (dateString) => {
   return date.format("MMM D, YYYY");
 };
 
-const getEvaluationTypeLabel = (type) => {
-  if (type === "OVERVIEW") {
-    return { label: "Quick Scan", icon: faBolt, bg: "bg-purple-100", text: "text-purple-700" };
-  }
-  if (type === "DETAIL") {
-    return { label: "Detailed", icon: faChartSimple, bg: "bg-indigo-100", text: "text-indigo-700" };
-  }
-  return null;
-};
-
 const MatchingHistoryItem = ({ item, onViewReport }) => {
   const score = item.aiOverallScore;
 
   const scoreColors = getScoreColor(score);
-  const matchLevelColors = getMatchLevelColor(item.matchLevel);
-  const evalType = getEvaluationTypeLabel(item.evaluationType);
 
   // Use direct API fields
   const jobTitle = item.jobName || "N/A";
   const companyName = item.companyName || "N/A";
   const resumeName = item.resumeFullName || item.candidateName;
-  const strengthCount = item.strengths?.split("\n").filter(Boolean).length || 0;
-  const weaknessCount = item.weaknesses?.split("\n").filter(Boolean).length || 0;
 
   // Dropdown menu items
   const menuItems = [
@@ -94,88 +58,60 @@ const MatchingHistoryItem = ({ item, onViewReport }) => {
   ];
 
   return (
-    <div className="bg-white dark:bg-surface-dark rounded-2xl border border-gray-200 dark:border-gray-700 p-5 hover:shadow-lg transition-all duration-300 hover:border-primary/30">
-      <div className="flex items-center gap-5">
-        {/* Circular Score Badge */}
-        <div
-          className={`shrink-0 w-16 h-16 rounded-full border-2 flex flex-col items-center justify-center ${scoreColors.bg} ${scoreColors.border}`}
-        >
-          <span className={`text-lg font-bold ${scoreColors.text}`}>
-            {score !== null && score !== undefined ? Math.round(score) : "N/A"}
-          </span>
-          <span className={`text-[10px] font-medium ${scoreColors.text}/70`}>Score</span>
-        </div>
+    <div className="bg-white dark:bg-surface-dark rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-all duration-300 hover:border-primary/30">
+      <div className="flex items-stretch gap-0">
+        {/* Left accent bar */}
+        <div className={`w-1 shrink-0 ${scoreColors.accent}`} />
 
-        {/* Main Content */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+        {/* Card content */}
+        <div className="flex flex-1 items-center gap-4 px-5 py-4">
+          {/* Main Content */}
+          <div className="flex-1 min-w-0">
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white truncate mb-0.5">
               {jobTitle}
             </h3>
-            <span
-              className={`shrink-0 px-2 py-0.5 rounded-full text-xs font-medium ${matchLevelColors.bg} ${matchLevelColors.text}`}
-            >
-              {getMatchLevelLabel(item.matchLevel)}
-            </span>
-            {evalType && (
-              <span
-                className={`shrink-0 px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1 ${evalType.bg} ${evalType.text}`}
-              >
-                <FontAwesomeIcon icon={evalType.icon} className="text-[12px]" />
-                {evalType.label}
-              </span>
-            )}
-          </div>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-            {companyName}
-          </p>
-          {resumeName && (
-            <p className="text-xs text-gray-400 dark:text-gray-500 mb-1 flex items-center gap-1 truncate">
-              <FontAwesomeIcon icon={faFileLines} className="text-[14px]" />
-              Resume: {resumeName}
+            <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+              {companyName}
+              <span className="text-gray-300 dark:text-gray-600">&middot;</span>
+              <FontAwesomeIcon icon={faClock} className="text-[12px]" />
+              <span>{formatRelativeDate(item.scoreAt)}</span>
             </p>
-          )}
-          <div className="flex items-center gap-3 text-xs text-gray-400 dark:text-gray-500">
-            <span className="flex items-center gap-1">
-              <FontAwesomeIcon icon={faClock} className="text-[14px]" />
-              {formatRelativeDate(item.scoreAt)}
-            </span>
-            <span className="text-gray-300 dark:text-gray-600">&middot;</span>
-            <span className="flex items-center gap-1">
-              <FontAwesomeIcon icon={faLightbulb} className="text-[14px]" />
-              {strengthCount}
-            </span>
-            {weaknessCount > 0 && (
-              <>
-                <span className="text-gray-300 dark:text-gray-600">&middot;</span>
-                <span className="flex items-center gap-1">
-                  <FontAwesomeIcon icon={faTriangleExclamation} className="text-[14px]" />
-                  {weaknessCount}
-                </span>
-              </>
+            {resumeName && (
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 flex items-center gap-1 truncate">
+                <FontAwesomeIcon icon={faFileLines} className="text-[13px]" />
+                {resumeName}
+              </p>
             )}
           </div>
-        </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-2 shrink-0">
-          <Button
-            mode="primary"
-            size="sm"
-            shape="rounded"
-            onClick={() => onViewReport(item.id)}
-          >
-            View Report
-          </Button>
-          <Dropdown
-            menu={{ items: menuItems }}
-            trigger={["click"]}
-            placement="bottomRight"
-          >
-            <Button mode="ghost" size="sm">
-              <FontAwesomeIcon icon={faEllipsisVertical} className="text-[16px]" />
+          {/* Score display */}
+          <div className="flex flex-col items-center justify-center w-14 shrink-0">
+            <span className={`text-2xl font-bold leading-none ${scoreColors.text}`}>
+              {score !== null && score !== undefined ? Math.round(score) : "—"}
+            </span>
+            <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 tracking-wide uppercase">Score</span>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              mode="primary"
+              size="sm"
+              shape="rounded"
+              onClick={() => onViewReport(item.id)}
+            >
+              View Report
             </Button>
-          </Dropdown>
+            <Dropdown
+              menu={{ items: menuItems }}
+              trigger={["click"]}
+              placement="bottomRight"
+            >
+              <Button mode="ghost" size="sm">
+                <FontAwesomeIcon icon={faEllipsisVertical} className="text-[16px]" />
+              </Button>
+            </Dropdown>
+          </div>
         </div>
       </div>
     </div>

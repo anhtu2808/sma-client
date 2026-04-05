@@ -7,6 +7,13 @@
 export const findTextInDoc = (doc, searchText) => {
   if (!doc || !searchText || typeof searchText !== 'string') return [];
 
+  // Strip HTML tags if context contains them
+  if (/<[^>]+>/.test(searchText)) {
+    const div = document.createElement('div');
+    div.innerHTML = searchText;
+    searchText = div.textContent || div.innerText || '';
+  }
+
   const normalizedSearch = searchText.trim().toLowerCase().replace(/\s+/g, ' ');
   if (normalizedSearch.length === 0) return [];
 
