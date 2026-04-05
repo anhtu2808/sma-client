@@ -72,11 +72,16 @@ const useTypewriterFix = () => {
 
         const typeNextChar = () => {
           if (charIndex >= plainText.length || !animationRef.current) {
-            // Done — if HTML, replace plain text with full HTML content
+            // Done — if HTML, replace the parent block node with full HTML content
             if (isHtml) {
               try {
-                const endPos = from + plainText.length;
-                editor.chain().deleteRange({ from, to: endPos }).insertContentAt(from, suggestionText, { updateSelection: false }).run();
+                const resolved = editor.state.doc.resolve(from);
+                const parentStart = resolved.before(resolved.depth);
+                const parentEnd = resolved.after(resolved.depth);
+                editor.chain()
+                  .deleteRange({ from: parentStart, to: parentEnd })
+                  .insertContentAt(parentStart, suggestionText, { updateSelection: false })
+                  .run();
               } catch { /* best effort */ }
             }
             editor.setEditable(true);
