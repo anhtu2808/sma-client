@@ -76,6 +76,14 @@ const ReportSidebar = () => {
         </div>
       </div>
 
+      <div className="mx-5 mb-2 mt-5 flex items-start gap-3 rounded-xl bg-amber-50/70 p-4 border border-amber-100">
+        <div className="text-amber-500 mt-0.5 shrink-0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
+        </div>
+        <p className="text-[12px] leading-relaxed text-amber-900 italic font-medium">
+          <b>Note:</b> AI-generated matching results and scores are approximations based on the provided data. Please verify technical details manually to ensure accuracy.
+        </p>
+      </div>
       {/* Criteria List with Progress Bars */}
       <div className="flex-1 overflow-y-auto">
         <div className="divide-y divide-neutral-100">
