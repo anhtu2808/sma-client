@@ -7,6 +7,7 @@ import InteractiveFeaturesSection from './sections/InteractiveFeaturesSection';
 import DashboardPreviewSection from './sections/DashboardPreviewSection';
 import CTASection from './sections/CTASection';
 import Reveal from '@/components/Reveal/Reveal';
+import CandidateFAQ from './sections/CandidateFAQ';
 
 const Home = () => {
     return (
@@ -27,6 +28,10 @@ const Home = () => {
 
             <Reveal delay={0.2}>
                 <FeaturesSection />
+            </Reveal>
+
+            <Reveal delay={0.2}>
+                <CandidateFAQ />
             </Reveal>
 
             <Reveal delay={0.2}>

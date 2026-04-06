@@ -31,6 +31,7 @@ import ResetPassword from "@/pages/reset-password";
 import Enhancements from "@/pages/match-report/enhancements";
 import CvPreview from "@/pages/cv-preview";
 import ToastTest from "@/pages/ui-kit/toast";
+import LegalPage from '@/pages/legal';
 
 
 export const routes = createBrowserRouter(
@@ -79,6 +80,7 @@ export const routes = createBrowserRouter(
             <Route path="dashboard/resumes/builder/:id" element={<CvBuilder />} />
             <Route path="dashboard/resumes/editor/:resumeId" element={<ResumeEditor />} />
             <Route path="checkout" element={<Checkout />} />
+            <Route path="legal/:type" element={<LegalPage />} />
         </>
     )
 );
