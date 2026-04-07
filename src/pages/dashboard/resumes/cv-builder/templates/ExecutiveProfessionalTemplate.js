@@ -196,7 +196,7 @@ const ExecutiveProfessionalTemplate = ({
                                                         <div className="min-w-0 flex-1">
                                                             <div className="flex flex-col">
                                                                 <InlineSelect className="font-bold text-gray-900 text-lg" value={edu.degree} options={degreeOptions} onChange={v => updateField(`education.${itemIndex}.degree`, v)} />
-                                                                <EditableText as="h4" className="font-medium mt-0.5 text-sm" value={edu.majorField || 'Major'} onChange={v => updateField(`education.${itemIndex}.majorField`, v)} />
+                                                                <EditableText as="h4" className="font-medium mt-0.5 text-sm" value={edu.majorField} onChange={v => updateField(`education.${itemIndex}.majorField`, v)} />
                                                             </div>
                                                             <EditableText as="p" className="font-medium mt-0.5 text-sm" value={edu.institution} onChange={v => updateField(`education.${itemIndex}.institution`, v)} />
                                                         </div>

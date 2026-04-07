@@ -10,6 +10,7 @@ import ModernMinimalistImg from "@/assets/template/ModernMinimalist.png";
 import ExecutiveProfessionalImg from "@/assets/template/ExecutiveProfessional.png";
 import CreativeStudioImg from "@/assets/template/CreativeStudio.png";
 import TechInnovatorImg from "@/assets/template/TechInnovator.png";
+import ProfessionalATSImg from "@/assets/template/ProfessionalATS.png";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '../../../../utils/icons';
 
@@ -53,6 +54,16 @@ export const CV_TEMPLATES = [
         themeColor: "bg-teal-600",
         isPremium: true,
         preview: TechInnovatorImg,
+    },
+    {
+        id: "tpl_prof_2",
+        name: "Professional Template",
+        description: "Standard single column ATS-friendly minimalist design.",
+        layout: "professional",
+        bgColor: "bg-blue-50 dark:bg-blue-900/20",
+        themeColor: "bg-blue-600",
+        isPremium: true,
+        preview: ProfessionalATSImg,
     }
 ];
 

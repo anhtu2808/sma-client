@@ -1,18 +1,26 @@
-import React from 'react';
+import React, { useMemo, useRef, useEffect } from 'react';
 import { DatePicker } from "antd";
 import Checkbox from "@/components/Checkbox";
 import dayjs from "dayjs";
 
 export const EditableDateRange = React.memo(({ startDate, endDate, isCurrent, onStartDateChange, onEndDateChange, onIsCurrentChange, className }) => {
-    const onStartDateChangeRef = React.useRef(onStartDateChange);
-    const onEndDateChangeRef = React.useRef(onEndDateChange);
-    const onIsCurrentChangeRef = React.useRef(onIsCurrentChange);
+    const onStartDateChangeRef = useRef(onStartDateChange);
+    const onEndDateChangeRef = useRef(onEndDateChange);
+    const onIsCurrentChangeRef = useRef(onIsCurrentChange);
 
-    React.useEffect(() => {
+    useEffect(() => {
         onStartDateChangeRef.current = onStartDateChange;
         onEndDateChangeRef.current = onEndDateChange;
         onIsCurrentChangeRef.current = onIsCurrentChange;
     });
+
+    const parsedStart = useMemo(() => {
+        return startDate && !isNaN(new Date(startDate).getTime()) ? dayjs(startDate) : null;
+    }, [startDate]);
+
+    const parsedEnd = useMemo(() => {
+        return endDate && !isNaN(new Date(endDate).getTime()) ? dayjs(endDate) : null;
+    }, [endDate]);
 
     return (
         <div className={`flex items-center gap-2 flex-nowrap whitespace-nowrap ${className}`}>
@@ -20,7 +28,7 @@ export const EditableDateRange = React.memo(({ startDate, endDate, isCurrent, on
                 picker="month"
                 format="MM/YYYY"
                 suffixIcon={null}
-                value={startDate && !isNaN(new Date(startDate).getTime()) ? dayjs(startDate) : null}
+                value={parsedStart}
                 onChange={(date) => {
                     if (date) {
                         onStartDateChangeRef.current(date.startOf('month').format('YYYY-MM-DD'));
@@ -42,7 +50,7 @@ export const EditableDateRange = React.memo(({ startDate, endDate, isCurrent, on
                     picker="month"
                     format="MM/YYYY"
                     suffixIcon={null}
-                    value={endDate && !isNaN(new Date(endDate).getTime()) ? dayjs(endDate) : null}
+                    value={parsedEnd}
                     onChange={(date) => {
                         if (date) {
                             onEndDateChangeRef.current(date.startOf('month').format('YYYY-MM-DD'));
