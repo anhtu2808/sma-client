@@ -6,6 +6,7 @@ import TextAlign from '@tiptap/extension-text-align';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
 import { TextStyleKit } from '@tiptap/extension-text-style';
+import { PaginationPlus } from 'tiptap-pagination-plus';
 import { message } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -38,6 +39,25 @@ const EXTENSIONS = [
   TextAlign.configure({ types: ['heading', 'paragraph'] }),
   Link.configure({ openOnClick: false, autolink: true }),
   Image,
+  PaginationPlus.configure({
+    // A4 @ 96 DPI: 794 x 1123 px
+    pageWidth: 794,
+    pageHeight: 1123,
+    pageGap: 32,
+    pageGapBorderSize: 0,
+    pageGapBorderColor: 'transparent',
+    pageBreakBackground: '#e5e7eb', // tailwind neutral-200 (matches outer bg)
+    marginTop: 40,
+    marginBottom: 40,
+    marginLeft: 50,
+    marginRight: 50,
+    contentMarginTop: 0,
+    contentMarginBottom: 0,
+    headerLeft: '',
+    headerRight: '',
+    footerLeft: '',
+    footerRight: '',
+  }),
 ];
 
 const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, onRegenerateSuggestions, isRegenerating, onReScore, isReScoring, reScoreStatus, onExport, isExporting }) => {
@@ -315,9 +335,9 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
   return (
     <div className="resume-editor flex flex-col h-full">
       <MenuBar editor={editor} onSave={handleManualSave} isSaving={isSaving} saveStatus={saveStatus} onRegenerateSuggestions={onRegenerateSuggestions} isRegenerating={isRegenerating} onReScore={onReScore} isReScoring={isReScoring} reScoreStatus={reScoreStatus} onExport={onExport} isExporting={isExporting} />
-      <div className="relative flex-1 overflow-y-auto bg-gray-200 py-10 flex justify-center">
+      <div className="relative flex-1 overflow-y-auto bg-gray-200 py-10 flex justify-center items-start">
         <div
-          className="w-[210mm] min-h-[297mm] h-fit bg-white shadow-2xl px-[50px] py-[40px] cursor-text"
+          className="w-fit h-fit bg-white cursor-text"
           onClick={(e) => {
             handleEditorClick(e);
             if (!e.defaultPrevented) {

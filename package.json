@@ -50,6 +50,7 @@
     "redux-persist": "^6.0.0",
     "sass": "^1.97.3",
     "sockjs-client": "^1.6.1",
+    "tiptap-pagination-plus": "^3.0.6",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
