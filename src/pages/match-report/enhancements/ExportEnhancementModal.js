@@ -1,15 +1,14 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Modal, Input, Tooltip } from 'antd';
 import { FileCheck, Send, Info, Loader2, X, Download } from 'lucide-react';
-import html2canvas from 'html2canvas-pro';
-import { jsPDF } from 'jspdf';
 import {
   useUploadFilesMutation,
   useExportEnhancementToOriginalMutation,
   useUpdateEnhancementContentMutation,
 } from '@/apis/resumeApi';
 import toastMessage from '@/utils/toastMessage';
+import { buildEnhancementPdfBlob } from './buildEnhancementPdf';
 import './resume-editor/resumeEditor.css';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -107,7 +106,6 @@ const ExportEnhancementModal = ({
   companyName,
 }) => {
   const navigate = useNavigate();
-  const printRef = useRef(null); // A4-sized container used for both preview & PDF
 
   const [cvName, setCvName] = useState('');
   const [htmlContent, setHtmlContent] = useState('');
@@ -150,78 +148,14 @@ const ExportEnhancementModal = ({
       .finally(() => setIsInitializing(false));
   }, [open, editor, enhancementId, defaultCvName, updateContent]);
 
-  const buildPdfBlob = useCallback(async () => {
-    const container = printRef.current;
-    if (!container) throw new Error('Preview container not ready');
-
-    // Inline cross-origin images (avatar) so html2canvas can render them
-    const imgs = container.querySelectorAll('img');
-    const originalSrcs = [];
-    for (const img of imgs) {
-      if (img.src && !img.src.startsWith('data:')) {
-        originalSrcs.push({ img, src: img.src });
-        try {
-          const response = await fetch(img.src);
-          const blob = await response.blob();
-          const dataUrl = await new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result);
-            reader.readAsDataURL(blob);
-          });
-          img.src = dataUrl;
-        } catch (e) {
-          console.warn('Could not inline image:', e);
-        }
-      }
-    }
-
-    await new Promise((r) => setTimeout(r, 60));
-
-    // Let html2canvas auto-detect dimensions from the element itself.
-    // Passing explicit width/windowWidth causes content misalignment when combined
-    // with position: fixed offscreen positioning.
-    // Scale 3 gives crisp text while keeping output under ~2MB for a typical CV.
-    const canvas = await html2canvas(container, {
-      scale: 3,
-      useCORS: true,
-      logging: false,
-      backgroundColor: '#ffffff',
-      foreignObjectRendering: false,
-      imageTimeout: 0,
-      onclone: (_clonedDoc, clonedEl) => {
-        // Force the clone to be fully visible at (0,0) so html2canvas captures
-        // it correctly (the live element is hidden via visibility/z-index).
-        clonedEl.style.visibility = 'visible';
-        clonedEl.style.zIndex = '0';
-        clonedEl.style.position = 'static';
-      },
-    });
-
-    // Restore original src
-    for (const { img, src } of originalSrcs) {
-      img.src = src;
-    }
-
-    // Quality 0.95 for crisp text; with scale 3 a typical CV is ~1-2MB.
-    const imgData = canvas.toDataURL('image/jpeg', 0.95);
-    const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4', compress: true });
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-    const imgHeightMm = (canvas.height * pdfWidth) / canvas.width;
-
-    let heightLeft = imgHeightMm;
-    let position = 0;
-    pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightMm, undefined, 'FAST');
-    heightLeft -= pdfHeight;
-    while (heightLeft > 0) {
-      position -= pdfHeight;
-      pdf.addPage();
-      pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightMm, undefined, 'FAST');
-      heightLeft -= pdfHeight;
-    }
-
-    return pdf.output('blob');
-  }, []);
+  const buildPdfBlob = useCallback(
+    async () =>
+      buildEnhancementPdfBlob({
+        htmlContent,
+        title: cvName.trim() || defaultCvName,
+      }),
+    [htmlContent, cvName, defaultCvName]
+  );
 
   const doExport = useCallback(async () => {
     if (!htmlContent || !cvName.trim()) {
@@ -335,49 +269,6 @@ const ExportEnhancementModal = ({
       closable={false}
       styles={{ body: { padding: 0, maxHeight: '90vh', overflow: 'hidden' } }}
     >
-      {/* Hidden print container — native A4 (no transform) used ONLY by html2canvas.
-          Renders a vertical stack of exact A4 page divs. Total height equals
-          `pagesHtml.length × A4_HEIGHT_PX`, so the existing slicing loop in
-          `buildPdfBlob` lands each slice on a page that already has its top +
-          bottom padding baked in. */}
-      {pagesHtml.length > 0 && (
-        <div
-          ref={printRef}
-          aria-hidden="true"
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: `${A4_WIDTH_PX}px`,
-            background: '#ffffff',
-            pointerEvents: 'none',
-            zIndex: -9999,
-            visibility: 'hidden',
-          }}
-        >
-          {pagesHtml.map((pageHtml, i) => (
-            <div
-              key={i}
-              className="resume-editor"
-              style={{
-                width: `${A4_WIDTH_PX}px`,
-                height: `${A4_HEIGHT_PX}px`,
-                background: '#ffffff',
-                padding: `${PAGE_PAD_Y}px ${PAGE_PAD_X}px`,
-                boxSizing: 'border-box',
-                overflow: 'hidden',
-              }}
-            >
-              <div
-                className="tiptap-content"
-                // eslint-disable-next-line react/no-danger
-                dangerouslySetInnerHTML={{ __html: pageHtml }}
-              />
-            </div>
-          ))}
-        </div>
-      )}
-
       <div
         className="relative flex flex-col md:flex-row"
         style={{ height: 'min(90vh, 820px)' }}
