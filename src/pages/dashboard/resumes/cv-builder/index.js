@@ -16,6 +16,7 @@ import ModernMinimalistTemplate from "./templates/ModernMinimalistTemplate";
 import ExecutiveProfessionalTemplate from "./templates/ExecutiveProfessionalTemplate";
 import CreativeStudioTemplate from "./templates/CreativeStudioTemplate";
 import TechInnovatorTemplate from "./templates/TechInnovatorTemplate";
+import ProfessionalTemplate from "./templates/ProfessionalTemplate";
 import PropertiesSidebar from "./PropertiesSidebar";
 import Button from "@/components/Button";
 import {
@@ -776,6 +777,7 @@ export default function CvBuilder({ onBack }) {
     if (templateId === 'tpl_prof_1') TemplateComponent = ExecutiveProfessionalTemplate;
     if (templateId === 'tpl_creative_1') TemplateComponent = CreativeStudioTemplate;
     if (templateId === 'tpl_modern_2') TemplateComponent = TechInnovatorTemplate;
+    if (templateId === 'tpl_prof_2') TemplateComponent = ProfessionalTemplate;
 
     const handleAvatarUpload = async (event) => {
         const file = event.target.files?.[0];
