@@ -105,12 +105,14 @@ const ExportEnhancementModal = ({
     // Let html2canvas auto-detect dimensions from the element itself.
     // Passing explicit width/windowWidth causes content misalignment when combined
     // with position: fixed offscreen positioning.
+    // Scale 3 gives crisp text while keeping output under ~2MB for a typical CV.
     const canvas = await html2canvas(container, {
-      scale: 2,
+      scale: 3,
       useCORS: true,
       logging: false,
       backgroundColor: '#ffffff',
       foreignObjectRendering: false,
+      imageTimeout: 0,
       onclone: (_clonedDoc, clonedEl) => {
         // Force the clone to be fully visible at (0,0) so html2canvas captures
         // it correctly (the live element is hidden via visibility/z-index).
@@ -125,7 +127,8 @@ const ExportEnhancementModal = ({
       img.src = src;
     }
 
-    const imgData = canvas.toDataURL('image/jpeg', 0.85);
+    // Quality 0.95 for crisp text; with scale 3 a typical CV is ~1-2MB.
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
     const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4', compress: true });
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
