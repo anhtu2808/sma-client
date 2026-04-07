@@ -39,6 +39,32 @@ if (!hyphenationConfigured) {
   hyphenationConfigured = true;
 }
 
+Font.register({
+  family: 'Inter',
+  fonts: [
+    {
+      src: 'https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfMZg.ttf',
+      fontStyle: 'normal',
+      fontWeight: 400,
+    },
+    {
+      src: 'https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuFuYMZg.ttf',
+      fontStyle: 'normal',
+      fontWeight: 700,
+    },
+    {
+      src: 'https://fonts.gstatic.com/s/inter/v20/UcCM3FwrK3iLTcvneQg7Ca725JhhKnNqk4j1ebLhAm8SrXTc2dthjQ.ttf',
+      fontStyle: 'italic',
+      fontWeight: 400,
+    },
+    {
+      src: 'https://fonts.gstatic.com/s/inter/v20/UcCM3FwrK3iLTcvneQg7Ca725JhhKnNqk4j1ebLhAm8SrXTcPtxhjQ.ttf',
+      fontStyle: 'italic',
+      fontWeight: 700,
+    },
+  ],
+});
+
 const styles = StyleSheet.create({
   page: {
     paddingTop: PAGE_PADDING_Y,
@@ -46,7 +72,7 @@ const styles = StyleSheet.create({
     paddingBottom: PAGE_PADDING_Y,
     paddingLeft: PAGE_PADDING_X,
     backgroundColor: '#ffffff',
-    fontFamily: 'Helvetica',
+    fontFamily: 'Inter',
     color: '#1f2937',
     fontSize: pxToPt(13),
     lineHeight: 1.5,

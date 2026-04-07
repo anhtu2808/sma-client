@@ -92,8 +92,8 @@ const distributeHtmlIntoPages = (html) => {
  * Modal that packages the edited enhancement content into a new ORIGINAL resume (PDF).
  *
  * Preview strategy: render the editor HTML live inside an A4-sized, scaled-down container
- * (CSS zoom) — this gives a crisp, readable preview without any html2canvas rasterization.
- * The actual html2canvas → jsPDF pipeline runs only when user clicks Save.
+ * (CSS zoom) — this gives a crisp, readable preview while export is generated separately
+ * as a text-based PDF via `@react-pdf/renderer`.
  */
 const ExportEnhancementModal = ({
   open,
