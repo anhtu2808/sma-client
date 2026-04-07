@@ -40,7 +40,7 @@ const EXTENSIONS = [
   Image,
 ];
 
-const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, onRegenerateSuggestions, isRegenerating, onReScore, isReScoring, reScoreStatus }) => {
+const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, onRegenerateSuggestions, isRegenerating, onReScore, isReScoring, reScoreStatus, onExport, isExporting }) => {
   const dispatch = useDispatch();
   const { data: resumeData, isLoading } = useGetResumeQuery(
     { resumeId },
@@ -314,7 +314,7 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
 
   return (
     <div className="resume-editor flex flex-col h-full">
-      <MenuBar editor={editor} onSave={handleManualSave} isSaving={isSaving} saveStatus={saveStatus} onRegenerateSuggestions={onRegenerateSuggestions} isRegenerating={isRegenerating} onReScore={onReScore} isReScoring={isReScoring} reScoreStatus={reScoreStatus} />
+      <MenuBar editor={editor} onSave={handleManualSave} isSaving={isSaving} saveStatus={saveStatus} onRegenerateSuggestions={onRegenerateSuggestions} isRegenerating={isRegenerating} onReScore={onReScore} isReScoring={isReScoring} reScoreStatus={reScoreStatus} onExport={onExport} isExporting={isExporting} />
       <div className="relative flex-1 overflow-y-auto bg-gray-200 py-10 flex justify-center">
         <div
           className="w-[210mm] min-h-[297mm] h-fit bg-white shadow-2xl px-[50px] py-[40px] cursor-text"
