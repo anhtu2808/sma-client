@@ -641,6 +641,19 @@ export const resumeApi = api.injectEndpoints({
             transformResponse: (response) => response?.data ?? null,
             invalidatesTags: ["FeatureUsage"],
         }),
+
+        exportEnhancementToOriginal: builder.mutation({
+            query: ({ enhancementId, payload }) => ({
+                url: `${API_VERSION}/resume-enhancements/${enhancementId}/export`,
+                method: "POST",
+                body: payload,
+            }),
+            transformResponse: (response) => response?.data ?? response,
+            invalidatesTags: [
+                { type: "Resumes", id: RESUME_TYPES.ORIGINAL },
+                { type: "Resumes", id: "ALL" },
+            ],
+        }),
     }),
 });
 
@@ -682,4 +695,5 @@ export const {
     useGenerateEnhancementSuggestionMutation,
     useLazyGetEnhancementSuggestionQuery,
     useReScoreEnhancementMutation,
+    useExportEnhancementToOriginalMutation,
 } = resumeApi;

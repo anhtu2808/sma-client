@@ -1,146 +1,115 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { findTextInDocFuzzy } from '../utils/prosemirrorSearch';
 
-const TYPING_DELAY = 8; // ms per character
-const CHARS_PER_TICK = 3; // characters inserted per animation frame
+// Block-level HTML tags. If a suggestion contains any of these, we treat it
+// as a "block suggestion" and replace the entire containing block — this is
+// the only reliable way to preserve structures like <ul><li>..</li></ul> or
+// a styled <h2>..</h2> without corrupting neighbouring blocks.
+const BLOCK_TAGS_RE = /<(ul|ol|li|h[1-6]|p|div|blockquote|pre|table|section|article)[\s>]/i;
 
 /**
- * Hook that provides a typewriter-style text replacement in a TipTap editor.
+ * Hook that provides apply-suggestion logic for a TipTap editor.
+ *
+ * Behaviour (no typewriter animation — instant, correct replacement):
+ * - Block HTML suggestion (h2/ul/li/...): replace the entire containing block.
+ *   Preserves heading style, inserts lists as proper list nodes.
+ * - Inline/plain suggestion: replace just the matched text range.
  *
  * Returns:
- * - applyFix(editor, context, suggestionText) → Promise<boolean>
- * - fixingDetailId — currently animating detail ID (or null)
- * - cancelAnimation() — stops any running animation
+ * - applyFix(editor, context, suggestionText, detailId) →
+ *     Promise<{ success: boolean, range?: { from: number, to: number } }>
+ *   The `range` is the absolute doc position of the inserted content; callers
+ *   pin this so the highlight decoration is anchored at the actual location
+ *   instead of relying on a fragile text re-search.
+ * - fixingDetailId — currently fixing detail ID (or null)
+ * - cancelAnimation() — no-op stub kept for API compatibility
  */
 const useTypewriterFix = () => {
   const [fixingDetailId, setFixingDetailId] = useState(null);
-  const animationRef = useRef(null);
 
   const cancelAnimation = useCallback(() => {
-    if (animationRef.current) {
-      clearTimeout(animationRef.current.timer);
-      const { editor, remainingText, insertPos } = animationRef.current;
-
-      // Insert any remaining text immediately
-      if (remainingText && editor && !editor.isDestroyed) {
-        editor.chain().insertContentAt(insertPos, remainingText, { updateSelection: false }).run();
-        editor.setEditable(true);
-      }
-
-      animationRef.current = null;
-      setFixingDetailId(null);
-    }
+    setFixingDetailId(null);
   }, []);
 
-  const applyFix = useCallback(
-    (editor, context, suggestionText, detailId) => {
-      return new Promise((resolve) => {
-        if (!editor || editor.isDestroyed) {
-          resolve(false);
-          return;
-        }
+  const applyFix = useCallback((editor, context, suggestionText, detailId) => {
+    return new Promise((resolve) => {
+      if (!editor || editor.isDestroyed) {
+        resolve({ success: false });
+        return;
+      }
 
-        // Cancel any in-progress animation
-        cancelAnimation();
+      // Find context text in the document
+      const ranges = findTextInDocFuzzy(editor.state.doc, context);
+      if (ranges.length === 0) {
+        resolve({ success: false });
+        return;
+      }
 
-        // Find context text in the document
-        const ranges = findTextInDocFuzzy(editor.state.doc, context);
-        if (ranges.length === 0) {
-          resolve(false);
-          return;
-        }
+      const { from, to } = ranges[0]; // Replace first occurrence
+      const isBlockHtml = typeof suggestionText === 'string' && BLOCK_TAGS_RE.test(suggestionText);
 
-        const { from, to } = ranges[0]; // Replace first occurrence
-        const isHtml = /<[^>]+>/.test(suggestionText);
+      setFixingDetailId(detailId);
+      editor.setEditable(false);
 
-        // For HTML suggestions, extract plain text for typewriter animation
-        let plainText = suggestionText;
-        if (isHtml) {
-          const div = document.createElement('div');
-          div.innerHTML = suggestionText;
-          plainText = div.textContent || div.innerText || '';
-        }
+      try {
+        let insertedFrom;
+        let insertedTo;
 
-        setFixingDetailId(detailId);
-        editor.setEditable(false);
+        if (isBlockHtml) {
+          // Block-level HTML → replace the entire innermost containing block.
+          const resolved = editor.state.doc.resolve(from);
+          const depth = resolved.depth; // innermost block depth
+          const parentStart = resolved.before(depth);
+          const parentEnd = resolved.after(depth);
 
-        // Delete the original text
-        editor.chain().deleteRange({ from, to }).run();
+          const sizeBefore = editor.state.doc.content.size;
+          editor
+            .chain()
+            .deleteRange({ from: parentStart, to: parentEnd })
+            .insertContentAt(parentStart, suggestionText, { updateSelection: false })
+            .run();
+          const sizeAfter = editor.state.doc.content.size;
 
-        // Typewriter: insert accumulated substring to avoid position math issues
-        let charIndex = 0;
-
-        const typeNextChar = () => {
-          if (charIndex >= plainText.length || !animationRef.current) {
-            // Done — if HTML, replace the parent block node with full HTML content
-            if (isHtml) {
-              try {
-                const resolved = editor.state.doc.resolve(from);
-                const parentStart = resolved.before(resolved.depth);
-                const parentEnd = resolved.after(resolved.depth);
-                editor.chain()
-                  .deleteRange({ from: parentStart, to: parentEnd })
-                  .insertContentAt(parentStart, suggestionText, { updateSelection: false })
-                  .run();
-              } catch { /* best effort */ }
-            }
-            editor.setEditable(true);
-            animationRef.current = null;
-            setFixingDetailId(null);
-            resolve(true);
-            return;
+          // New content occupies parentStart .. parentStart + (newContentSize)
+          // where newContentSize = (deletedSize) + (delta)
+          const deletedLen = parentEnd - parentStart;
+          const newLen = deletedLen + (sizeAfter - sizeBefore);
+          insertedFrom = parentStart;
+          insertedTo = parentStart + newLen;
+        } else {
+          // Inline / plain text suggestion → replace just the matched range.
+          let plainText = suggestionText;
+          if (typeof suggestionText === 'string' && /<[^>]+>/.test(suggestionText)) {
+            const div = document.createElement('div');
+            div.innerHTML = suggestionText;
+            plainText = (div.textContent || div.innerText || '').trim();
           }
 
-          charIndex = Math.min(charIndex + CHARS_PER_TICK, plainText.length);
-          const textSoFar = plainText.slice(0, charIndex);
+          const sizeBefore = editor.state.doc.content.size;
+          editor
+            .chain()
+            .deleteRange({ from, to })
+            .insertContentAt(from, plainText, { updateSelection: false })
+            .run();
+          const sizeAfter = editor.state.doc.content.size;
 
-          try {
-            // Replace the entire growing range each tick to avoid position drift
-            editor
-              .chain()
-              .deleteRange({ from, to: from + charIndex - 1 })
-              .insertContentAt(from, textSoFar, { updateSelection: false })
-              .run();
-          } catch {
-            // On any error, insert remaining text and unlock
-            try {
-              editor
-                .chain()
-                .insertContentAt(from + charIndex - 1, plainText.slice(charIndex - 1), { updateSelection: false })
-                .run();
-            } catch { /* best effort */ }
-            editor.setEditable(true);
-            animationRef.current = null;
-            setFixingDetailId(null);
-            resolve(true);
-            return;
-          }
+          const deletedLen = to - from;
+          const newLen = deletedLen + (sizeAfter - sizeBefore);
+          insertedFrom = from;
+          insertedTo = from + newLen;
+        }
 
-          // Track state for cancellation
-          animationRef.current = {
-            timer: null,
-            editor,
-            remainingText: plainText.slice(charIndex),
-            insertPos: from + charIndex,
-          };
-
-          animationRef.current.timer = setTimeout(typeNextChar, TYPING_DELAY);
-        };
-
-        // Initialize animation ref
-        animationRef.current = {
-          timer: null,
-          editor,
-          remainingText: plainText,
-          insertPos: from,
-        };
-
-        // Start the animation
-        animationRef.current.timer = setTimeout(typeNextChar, TYPING_DELAY);
-      });
-    },
-    [cancelAnimation]
-  );
+        editor.setEditable(true);
+        setFixingDetailId(null);
+        resolve({ success: true, range: { from: insertedFrom, to: insertedTo } });
+      } catch (err) {
+        console.error('applyFix error:', err);
+        editor.setEditable(true);
+        setFixingDetailId(null);
+        resolve({ success: false });
+      }
+    });
+  }, []);
 
   return { applyFix, fixingDetailId, cancelAnimation };
 };

@@ -14,6 +14,7 @@ import {
   useLazyGetMatchingStatusQuery,
   useLazyGetMatchingDetailQuery,
 } from '@/apis/matchingApi';
+import { useGetJobByIdQuery } from '@/apis/jobApi';
 import { setMatchingReportData } from '@/store/slices/matchingReportSlice';
 import { mapSuggestionsToStore, mapEvaluationToStore } from '@/utils/matchingReportUtils';
 import MatchReportSidebar from '@/pages/match-report/sidebar';
@@ -23,6 +24,7 @@ import Button from '@/components/Button';
 import EditorContext from './EditorContext';
 import ResumeEditor from './resume-editor';
 import EnhancementLoading from './EnhancementLoading';
+import ExportEnhancementModal from './ExportEnhancementModal';
 import { buildResumeHtml } from './resume-editor/buildResumeHtml';
 
 const PARSED_STATUSES = ['FINISH', 'DONE', 'SUCCESS'];
@@ -72,6 +74,13 @@ const Enhancements = () => {
   const [triggerGetDetail] = useLazyGetMatchingDetailQuery();
   const [reScoreStatus, setReScoreStatus] = useState(null); // null | 'polling' | 'success' | 'error'
   const [reScoreEvalId, setReScoreEvalId] = useState(null);
+
+  // Export modal state
+  const [exportModalOpen, setExportModalOpen] = useState(false);
+
+  // Fetch job info for export modal context
+  const { data: jobResponse } = useGetJobByIdQuery(jobId, { skip: !jobId });
+  const jobData = jobResponse?.data;
 
   // Determine initial phase based on enhancement data
   useEffect(() => {
@@ -218,6 +227,11 @@ const Enhancements = () => {
     };
   }, [reScoreStatus, reScoreEvalId, triggerGetStatus, triggerGetDetail, dispatch]);
 
+  const handleOpenExportModal = useCallback(() => {
+    if (!enhancement?.id || !editorApi?.editor) return;
+    setExportModalOpen(true);
+  }, [enhancement?.id, editorApi?.editor]);
+
   // Manual re-generate: save current editor content then call POST suggestion
   const handleRegenerateSuggestions = useCallback(async () => {
     if (!enhancement?.id || isRegenerating) return;
@@ -313,10 +327,22 @@ const Enhancements = () => {
               onReScore={handleReScore}
               isReScoring={isReScoring}
               reScoreStatus={reScoreStatus}
+              onExport={handleOpenExportModal}
+              isExporting={exportModalOpen}
             />
           </main>
         </div>
       </div>
+      <ExportEnhancementModal
+        open={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        editor={editorApi?.editor}
+        enhancementId={enhancement?.id}
+        originalResumeName={resumeData?.resumeName}
+        jobId={jobId}
+        jobTitle={jobData?.name}
+        companyName={jobData?.company?.name}
+      />
     </EditorContext.Provider>
   );
 };

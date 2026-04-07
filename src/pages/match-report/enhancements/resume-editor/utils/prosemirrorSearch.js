@@ -1,3 +1,48 @@
+// Block-level HTML elements that should produce a whitespace separator in the
+// flattened plain text — must mirror the block boundaries handled by
+// findTextInDoc, otherwise multi-block search strings won't match the doc.
+const STRIP_HTML_BLOCK_TAGS = new Set([
+  'LI', 'P', 'DIV', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6',
+  'UL', 'OL', 'BLOCKQUOTE', 'PRE', 'TR', 'TD', 'TH', 'BR',
+  'SECTION', 'ARTICLE', 'HEADER', 'FOOTER', 'NAV',
+]);
+
+/**
+ * Strip HTML tags from a string, returning plain text.
+ *
+ * IMPORTANT: inserts a space at every block-element boundary so the output
+ * mirrors what `findTextInDoc` builds when flattening a ProseMirror doc
+ * (which inserts ' ' at block boundaries). Without this, structures like
+ * <ul><li>A</li><li>B</li></ul> become "AB" via `textContent`, which won't
+ * match the doc's "A B" → search returns only a partial fallback range.
+ *
+ * Returns the original string if it contains no HTML tags.
+ */
+export const stripHtml = (html) => {
+  if (!html || typeof html !== 'string') return '';
+  if (!/<[^>]+>/.test(html)) return html;
+
+  const div = document.createElement('div');
+  div.innerHTML = html;
+
+  const parts = [];
+  const walk = (node) => {
+    for (const child of node.childNodes) {
+      if (child.nodeType === Node.TEXT_NODE) {
+        parts.push(child.textContent || '');
+      } else if (child.nodeType === Node.ELEMENT_NODE) {
+        const isBlock = STRIP_HTML_BLOCK_TAGS.has(child.tagName);
+        if (isBlock) parts.push(' ');
+        walk(child);
+        if (isBlock) parts.push(' ');
+      }
+    }
+  };
+  walk(div);
+
+  return parts.join('').replace(/\s+/g, ' ').trim();
+};
+
 /**
  * Search for text in a ProseMirror document, handling text that spans
  * across multiple inline nodes (bold, italic, links, etc.).
@@ -119,8 +164,8 @@ export const findTextInDocFuzzy = (doc, searchText) => {
   // 3. Try progressively shorter SUBSTRINGS from the start of the text.
   //    This preserves punctuation (colons, commas, periods) unlike word-based matching.
   if (normalizedSearch.length >= 25) {
-    const maxLen = Math.min(normalizedSearch.length, 100);
-    for (let len = maxLen; len >= 25; len -= 10) {
+    const maxLen = Math.min(normalizedSearch.length, 600);
+    for (let len = maxLen; len >= 25; len -= 25) {
       const partial = normalizedSearch.substring(0, len);
       const partialResults = findTextInDoc(doc, partial);
       if (partialResults.length > 0) return partialResults;

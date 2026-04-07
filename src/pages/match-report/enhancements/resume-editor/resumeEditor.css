@@ -154,35 +154,26 @@
 .suggestion-has-tag::before {
   content: var(--tag-number, "");
   position: absolute;
-  top: -20px;
-  left: 0;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 4px;
-  font-size: 10px;
+  top: 0;
+  left: -20px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  font-size: 9px;
   font-weight: 700;
-  line-height: 18px;
+  line-height: 16px;
   text-align: center;
   color: #fff;
   cursor: pointer;
   user-select: none;
-  border-radius: 3px 3px 3px 0;
+  border-radius: 3px 0 0 3px;
   z-index: 2;
   pointer-events: auto;
 }
 
-/* Pennant tail */
+/* Pennant tail removed — badge now sits in the left gutter, no overhang above the line */
 .suggestion-has-tag::after {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: 0;
-  width: 0;
-  height: 0;
-  border-left: 4px solid transparent;
-  border-right: 0 solid transparent;
-  z-index: 2;
-  pointer-events: none;
+  display: none;
 }
 
 .suggestion-tag--missing::before {

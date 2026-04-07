@@ -8,8 +8,15 @@ export const suggestionHighlightKey = new PluginKey('suggestionHighlight');
 /**
  * TipTap extension that renders ProseMirror Decorations for AI detail items.
  *
+ * Two source-of-truth strategies for the highlight range:
+ * 1. **Pinned range** (preferred when available, e.g. right after Apply):
+ *    absolute doc positions captured at insertion time. Mapped through every
+ *    docChanged transaction so manual edits keep the highlight anchored.
+ * 2. **Text search** (fallback for highlights from initial API load):
+ *    `findTextInDocFuzzy(item.context)`.
+ *
  * Commands:
- * - setHighlights(highlights) — array of { detailId, context, status, isFocused, label }
+ * - setHighlights(highlights) — array of { detailId, context, pinnedRange?, status, isFocused, label }
  * - clearHighlights()
  *
  * Decorations are view-only and never serialized to HTML.
@@ -45,23 +52,46 @@ const SuggestionHighlight = Extension.create({
 
         state: {
           init() {
-            return { decorationSet: DecorationSet.empty, highlights: [] };
+            return {
+              decorationSet: DecorationSet.empty,
+              highlights: [],
+              pinnedRanges: new Map(), // detailId → {from, to}
+            };
           },
 
           apply(tr, prevState) {
             const meta = tr.getMeta(suggestionHighlightKey);
 
             if (meta) {
-              // Rebuild decorations from new highlight data
-              const decorationSet = buildDecorationSet(tr.doc, meta.highlights);
-              return { decorationSet, highlights: meta.highlights };
+              // Rebuild decorations from new highlight data.
+              // Seed pinnedRanges from incoming highlights AND preserve any existing
+              // mapped ranges (so a re-render after a manual edit doesn't drop them).
+              const newPinned = new Map(prevState.pinnedRanges);
+              for (const h of meta.highlights || []) {
+                if (h.pinnedRange &&
+                    Number.isFinite(h.pinnedRange.from) &&
+                    Number.isFinite(h.pinnedRange.to)) {
+                  newPinned.set(h.detailId, h.pinnedRange);
+                }
+              }
+              const decorationSet = buildDecorationSet(tr.doc, meta.highlights, newPinned);
+              return { decorationSet, highlights: meta.highlights, pinnedRanges: newPinned };
             }
 
-            // If the doc changed, map existing decorations
+            // If the doc changed, map both decorations and pinned ranges
             if (tr.docChanged) {
+              const mappedPinned = new Map();
+              for (const [id, r] of prevState.pinnedRanges) {
+                const from = tr.mapping.map(r.from, 1);
+                const to = tr.mapping.map(r.to, -1);
+                if (from < to && to <= tr.doc.content.size) {
+                  mappedPinned.set(id, { from, to });
+                }
+              }
               return {
                 decorationSet: prevState.decorationSet.map(tr.mapping, tr.doc),
                 highlights: prevState.highlights,
+                pinnedRanges: mappedPinned,
               };
             }
 
@@ -99,34 +129,36 @@ const getTagStatusClass = (status) => {
   return normalized === 'missing' ? 'suggestion-tag--missing' : 'suggestion-tag--matched';
 };
 
-const buildDecorationSet = (doc, highlights) => {
+const buildDecorationSet = (doc, highlights, pinnedRanges) => {
   if (!highlights || highlights.length === 0) {
     return DecorationSet.empty;
   }
-
-  // Debug: log flat text length to verify editor content is loaded
-  let flatTextLen = 0;
-  doc.descendants((node) => {
-    if (node.isText) flatTextLen += node.text.length;
-    return true;
-  });
-  console.log(`[SuggestionHighlight] Building decorations: ${highlights.length} highlights, doc text length: ${flatTextLen}`);
 
   const decorations = [];
   let tagNumber = 0;
 
   for (const item of highlights) {
-    if (!item.context || typeof item.context !== 'string') continue;
+    let ranges = [];
 
-    const ranges = findTextInDocFuzzy(doc, item.context);
+    // Strategy 1: pinned range from prior apply
+    const pinned = pinnedRanges?.get?.(item.detailId);
+    if (pinned &&
+        Number.isFinite(pinned.from) &&
+        Number.isFinite(pinned.to) &&
+        pinned.from < pinned.to &&
+        pinned.to <= doc.content.size) {
+      ranges = [{ from: pinned.from, to: pinned.to }];
+    } else if (item.context && typeof item.context === 'string') {
+      // Strategy 2: text search fallback
+      ranges = findTextInDocFuzzy(doc, item.context);
+    }
+
     if (ranges.length === 0) {
-      console.warn('[SuggestionHighlight] No match for:', item.label, '| context:', item.context.substring(0, 60));
       continue;
     }
     tagNumber++;
 
     for (const { from, to } of ranges) {
-      // Inline decoration for the highlighted text + tag overlay via CSS ::before
       decorations.push(
         Decoration.inline(from, to, {
           class: `${getHighlightClass(item.status, item.isFocused)} suggestion-has-tag ${getTagStatusClass(item.status)}`,

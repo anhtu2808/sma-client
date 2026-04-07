@@ -48,6 +48,19 @@ const Application = () => {
 
     const [selectedResumeId, setSelectedResumeId] = useState(null);
     const [newlyUploadedResume, setNewlyUploadedResume] = useState(null);
+
+    // Auto-preselect resume when navigated from enhancement export flow
+    const preselectedResumeId = location.state?.preselectedResumeId;
+    useEffect(() => {
+        if (!preselectedResumeId || selectedResumeId) return;
+        const list = resumes?.content || resumes || [];
+        const found = Array.isArray(list)
+            ? list.find((r) => r?.id === preselectedResumeId)
+            : null;
+        if (found) {
+            setSelectedResumeId(found.id);
+        }
+    }, [preselectedResumeId, selectedResumeId, resumes]);
     const [answers, setAnswers] = useState({});
     const [contactInfo, setContactInfo] = useState({
         fullName: '',

@@ -159,16 +159,11 @@ const ContentDetail = ({ items, isLast }) => {
               </span>
             ))}
           </div>
-          {primaryItem.context && (
-            <p className={`text-sm line-clamp-2 italic ${allFixed ? "text-emerald-500/60" : "text-neutral-600"}`}>
-              &ldquo;{primaryItem.context}&rdquo;
-            </p>
-          )}
         </div>
       );
     }
 
-    // Single item — show label + optional context quote for context-based items
+    // Single item — show label only (raw context HTML is hidden from the UI).
     return (
       <div className="flex min-w-0 flex-col gap-1">
         <span className={`text-sm font-medium ${
@@ -178,11 +173,6 @@ const ContentDetail = ({ items, isLast }) => {
         }`}>
           {primaryItem.label}
         </span>
-        {isContextGroup && primaryItem.context && (
-          <p className={`text-xs line-clamp-2 italic ${allFixed ? "text-emerald-500/60" : "text-neutral-500"}`}>
-            &ldquo;{primaryItem.context}&rdquo;
-          </p>
-        )}
       </div>
     );
   };

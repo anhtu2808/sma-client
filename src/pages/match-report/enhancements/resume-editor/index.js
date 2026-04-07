@@ -16,6 +16,7 @@ import Loading from '@/components/Loading';
 import EntryHeader from './EntryHeaderNode';
 import SuggestionHighlight from './extensions/SuggestionHighlight';
 import PreserveStyles from './extensions/PreserveStyles';
+import SmartBreakSpacer from './extensions/SmartBreakSpacer';
 import { buildResumeHtml } from './buildResumeHtml';
 import MenuBar from './MenuBar';
 import HighlightDetailModal from './HighlightDetailModal';
@@ -38,9 +39,12 @@ const EXTENSIONS = [
   TextAlign.configure({ types: ['heading', 'paragraph'] }),
   Link.configure({ openOnClick: false, autolink: true }),
   Image,
+  // A4 page-break visualization: inserts spacer decoration widgets before any
+  // top-level block that would otherwise straddle a page boundary.
+  SmartBreakSpacer,
 ];
 
-const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, onRegenerateSuggestions, isRegenerating, onReScore, isReScoring, reScoreStatus }) => {
+const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, onRegenerateSuggestions, isRegenerating, onReScore, isReScoring, reScoreStatus, onExport, isExporting }) => {
   const dispatch = useDispatch();
   const { data: resumeData, isLoading } = useGetResumeQuery(
     { resumeId },
@@ -146,11 +150,11 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
     const highlightEl = event.target.closest('[data-tag="true"]');
     if (!highlightEl) return;
 
-    // Check if click was in the tag area (above the highlight text, within the ::before zone)
+    // Check if click was in the tag area — badge sits in the left gutter
+    // at `left: -20px` with ~16px width (see resumeEditor.css .suggestion-has-tag::before).
     const rect = highlightEl.getBoundingClientRect();
-    const clickY = event.clientY;
-    // The tag ::before is positioned at top: -20px, height 18px — so above the element
-    const isTagArea = clickY < rect.top + 2;
+    const clickX = event.clientX;
+    const isTagArea = clickX < rect.left && clickX >= rect.left - 22;
 
     if (!isTagArea) return;
 
@@ -314,10 +318,17 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
 
   return (
     <div className="resume-editor flex flex-col h-full">
-      <MenuBar editor={editor} onSave={handleManualSave} isSaving={isSaving} saveStatus={saveStatus} onRegenerateSuggestions={onRegenerateSuggestions} isRegenerating={isRegenerating} onReScore={onReScore} isReScoring={isReScoring} reScoreStatus={reScoreStatus} />
-      <div className="relative flex-1 overflow-y-auto bg-gray-200 py-10 flex justify-center">
+      <MenuBar editor={editor} onSave={handleManualSave} isSaving={isSaving} saveStatus={saveStatus} onRegenerateSuggestions={onRegenerateSuggestions} isRegenerating={isRegenerating} onReScore={onReScore} isReScoring={isReScoring} reScoreStatus={reScoreStatus} onExport={onExport} isExporting={isExporting} />
+      <div className="relative flex-1 overflow-y-auto bg-gray-200 py-10 flex justify-center items-start">
         <div
-          className="w-[210mm] min-h-[297mm] h-fit bg-white shadow-2xl px-[50px] py-[40px] cursor-text"
+          className="bg-white cursor-text"
+          style={{
+            width: 794, // A4 width @ 96 DPI
+            paddingLeft: 50,
+            paddingRight: 50,
+            paddingTop: 40,
+            paddingBottom: 40,
+          }}
           onClick={(e) => {
             handleEditorClick(e);
             if (!e.defaultPrevented) {
