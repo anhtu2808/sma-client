@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 /**
@@ -13,13 +13,27 @@ const useEditorHighlights = (editor) => {
     (state) => state.matchingReport.ui?.focusedItemId
   );
   const prevFocusedRef = useRef(null);
+  // Counter bumped on every doc update — lets the effect below re-run and
+  // rebuild decorations against the latest document (important after Apply).
+  const [docVersion, setDocVersion] = useState(0);
 
-  // Build and apply highlight decorations whenever data or focusedItemId changes
+  useEffect(() => {
+    if (!editor) return undefined;
+    const handler = ({ transaction }) => {
+      if (transaction?.docChanged) setDocVersion((v) => v + 1);
+    };
+    editor.on('update', handler);
+    return () => {
+      editor.off('update', handler);
+    };
+  }, [editor]);
+
+  // Build and apply highlight decorations whenever data, focus, or doc changes
   useEffect(() => {
     if (!editor || !criteriaScores) return;
 
     const highlights = [];
-    const seenContexts = new Set();
+    const seenContextKeys = new Set();
 
     for (const criteria of criteriaScores) {
       if (!Array.isArray(criteria.details)) continue;
@@ -27,9 +41,12 @@ const useEditorHighlights = (editor) => {
       for (const detail of criteria.details) {
         if (!detail.context) continue;
 
-        // Deduplicate: a context shared across criteria should only highlight once
-        if (seenContexts.has(detail.context)) continue;
-        seenContexts.add(detail.context);
+        // Deduplicate by contextId — multiple details that share the same
+        // context (e.g. one suggestion covers multiple labels) should produce
+        // a SINGLE highlight, not stacked badges at the same position.
+        const ctxKey = detail.contextId != null ? `cid:${detail.contextId}` : `ctx:${detail.context}`;
+        if (seenContextKeys.has(ctxKey)) continue;
+        seenContextKeys.add(ctxKey);
 
         const isPositive =
           detail.isFixed ||
@@ -41,6 +58,7 @@ const useEditorHighlights = (editor) => {
         highlights.push({
           detailId: detail.id,
           context: detail.context,
+          pinnedRange: detail.pinnedRange || null,
           status: isPositive ? 'MATCHED' : detail.status,
           isFocused: detail.id === focusedItemId,
           label: detail.label,
@@ -49,7 +67,7 @@ const useEditorHighlights = (editor) => {
     }
 
     editor.commands.setHighlights(highlights);
-  }, [editor, criteriaScores, focusedItemId]);
+  }, [editor, criteriaScores, focusedItemId, docVersion]);
 
   // Scroll-to-focus when focusedItemId changes
   useEffect(() => {

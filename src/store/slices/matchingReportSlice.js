@@ -127,6 +127,18 @@ const matchingReportSlice = createSlice({
       });
     },
 
+    setDetailPinnedRange: (state, action) => {
+      const { detailId, range } = action.payload;
+      if (!state.data) return;
+
+      state.data.criteriaScores.forEach((criteria) => {
+        const detail = criteria.details.find((d) => d.id === detailId);
+        if (detail) {
+          detail.pinnedRange = range || null;
+        }
+      });
+    },
+
     updateScoresAfterFixed: (state, action) => {
       const { afterOverallScore, criteriaScoreId, afterCriteriaScore } = action.payload;
       if (!state.data) return;
@@ -174,6 +186,7 @@ export const {
   setDetailFixed,
   setDetailUnfixed,
   setDetailContext,
+  setDetailPinnedRange,
   updateSuggestion,
   updateScoresAfterFixed,
   revertScoresAfterUnfixed,

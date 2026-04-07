@@ -2,12 +2,13 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Suggestions from '@/pages/match-report/sidebar/content/suggestions';
 import { useMarkDetailAsFixedMutation, useRegenerateSuggestionMutation } from '@/apis/matchingApi';
-import { setDetailContext, setDetailFixed, setFocusedItemId, updateScoresAfterFixed, updateSuggestion } from '@/store/slices/matchingReportSlice';
+import { setDetailContext, setDetailFixed, setDetailPinnedRange, setFocusedItemId, updateScoresAfterFixed, updateSuggestion } from '@/store/slices/matchingReportSlice';
 import { getErrorMessage } from '@/constant/attachment';
 import toastMessage from '@/utils/toastMessage';
 import EditorContext from '@/pages/match-report/enhancements/EditorContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowsRotate, faThumbsDown, faThumbsUp, faXmark } from '../../../../utils/icons';
+import { stripHtml } from './utils/prosemirrorSearch';
 
 const HighlightDetailModal = ({ detail, open, onClose, onFixApplied }) => {
   const dispatch = useDispatch();
@@ -170,6 +171,23 @@ const HighlightDetailModal = ({ detail, open, onClose, onFixApplied }) => {
               const firstSuggestion = detail.suggestions?.[0]?.suggestion;
               if (!firstSuggestion || !fixInEditor || !detail.context) return;
 
+              // Find ALL sibling details sharing the same contextId — a single
+              // suggestion covers multiple labels (see API `coveredLabels`), so
+              // applying it must mark every sibling as fixed and update their
+              // context, otherwise unfixed siblings leave a stale red badge.
+              const siblingDetailIds = (() => {
+                if (!matchData?.criteriaScores || detail.contextId == null) {
+                  return [detail.id];
+                }
+                const ids = [];
+                for (const cs of matchData.criteriaScores) {
+                  for (const d of cs.details ?? []) {
+                    if (d.contextId === detail.contextId) ids.push(d.id);
+                  }
+                }
+                return ids.length > 0 ? ids : [detail.id];
+              })();
+
               // Capture pre-fix state for undo
               const beforeDoc = editor?.state?.doc;
               const beforeOverallScore = matchData?.aiOverallScore;
@@ -183,26 +201,47 @@ const HighlightDetailModal = ({ detail, open, onClose, onFixApplied }) => {
                 : undefined;
 
               setIsApplying(true);
-              const success = await fixInEditor(detail.context, firstSuggestion, detail.id);
+              const result = await fixInEditor(detail.context, firstSuggestion, detail.id);
+              const success = result?.success;
+              const pinnedRange = result?.range || null;
               if (success) {
-                // Update context to new text so the decoration can find it in the doc
-                dispatch(setDetailContext({ detailId: detail.id, context: firstSuggestion }));
+                // Store plain-text version in Redux as a fallback for re-renders
+                // (findTextInDocFuzzy) AND pin the exact inserted range so the
+                // highlight decoration is anchored even when text-search is fragile.
+                const plainSuggestion = stripHtml(firstSuggestion);
+                for (const sid of siblingDetailIds) {
+                  dispatch(setDetailContext({ detailId: sid, context: plainSuggestion }));
+                  if (pinnedRange) {
+                    dispatch(setDetailPinnedRange({ detailId: sid, range: pinnedRange }));
+                  }
+                }
                 try {
-                  const response = await markDetailAsFixed({ detailId: detail.id }).unwrap();
-                  dispatch(setDetailFixed({ detailId: detail.id }));
-                  if (response) {
+                  // Mark every sibling as fixed on the BE; keep the latest response
+                  // for score updates. Failures fall through so the UI is at least
+                  // consistent with the doc state.
+                  let lastResponse = null;
+                  for (const sid of siblingDetailIds) {
+                    try {
+                      const r = await markDetailAsFixed({ detailId: sid }).unwrap();
+                      if (r) lastResponse = r;
+                    } catch (e) {
+                      console.warn('markDetailAsFixed failed for sibling', sid, e);
+                    }
+                    dispatch(setDetailFixed({ detailId: sid }));
+                  }
+                  if (lastResponse) {
                     dispatch(updateScoresAfterFixed({
-                      afterOverallScore: response.afterOverallScore,
-                      criteriaScoreId: response.criteriaScoreId,
-                      afterCriteriaScore: response.afterCriteriaScore,
+                      afterOverallScore: lastResponse.afterOverallScore,
+                      criteriaScoreId: lastResponse.criteriaScoreId,
+                      afterCriteriaScore: lastResponse.afterCriteriaScore,
                     }));
 
-                    // Register fix in undo stack
+                    // Register fix in undo stack — undo must rollback all siblings
                     if (beforeDoc && pushFixUndo) {
                       pushFixUndo({
                         beforeDoc,
-                        detailIds: [detail.id],
-                        criteriaScoreId: response.criteriaScoreId,
+                        detailIds: siblingDetailIds,
+                        criteriaScoreId: lastResponse.criteriaScoreId,
                         beforeOverallScore,
                         beforeCriteriaScore,
                         originalContext: detail.context,
