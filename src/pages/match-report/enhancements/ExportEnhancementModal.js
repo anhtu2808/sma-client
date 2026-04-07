@@ -20,6 +20,75 @@ const A4_WIDTH_PX = 794;
 const A4_HEIGHT_PX = 1123;
 const PREVIEW_SCALE = 0.82;
 
+// Page padding (matches the `.resume-editor` container below): 40px top/bottom, 50px sides.
+const PAGE_PAD_Y = 40;
+const PAGE_PAD_X = 50;
+// Usable content height per page after subtracting top AND bottom padding.
+const PAGE_USABLE_HEIGHT = A4_HEIGHT_PX - PAGE_PAD_Y * 2;
+
+/**
+ * Distribute an HTML string into an array of per-page HTML chunks so that each
+ * page fits within `PAGE_USABLE_HEIGHT` and no top-level element is sliced in half
+ * at a page boundary. Runs a single off-screen measurement pass.
+ *
+ * Limitation: if a single top-level child is taller than one page (e.g. a giant
+ * table), it is placed alone on its own page and will overflow-clip at the bottom.
+ * That is a rare authoring edge case and matches the pre-existing behavior for
+ * oversized blocks.
+ */
+const distributeHtmlIntoPages = (html) => {
+  if (!html || typeof document === 'undefined') return [html || ''];
+
+  const measure = document.createElement('div');
+  measure.className = 'resume-editor';
+  measure.style.cssText = [
+    'position: fixed',
+    'left: -99999px',
+    'top: 0',
+    `width: ${A4_WIDTH_PX}px`,
+    `padding: ${PAGE_PAD_Y}px ${PAGE_PAD_X}px`,
+    'box-sizing: border-box',
+    'background: #fff',
+    'visibility: hidden',
+    'pointer-events: none',
+  ].join(';');
+
+  const inner = document.createElement('div');
+  inner.className = 'tiptap-content';
+  inner.innerHTML = html;
+  measure.appendChild(inner);
+  document.body.appendChild(measure);
+
+  try {
+    const children = Array.from(inner.children);
+    if (children.length === 0) return [html];
+
+    const pages = [[]];
+    let currentHeight = 0;
+    for (const child of children) {
+      const cs = window.getComputedStyle(child);
+      const mt = parseFloat(cs.marginTop) || 0;
+      const mb = parseFloat(cs.marginBottom) || 0;
+      const blockHeight = child.offsetHeight + mt + mb;
+
+      const currentPage = pages[pages.length - 1];
+      if (
+        currentPage.length > 0 &&
+        currentHeight + blockHeight > PAGE_USABLE_HEIGHT
+      ) {
+        pages.push([]);
+        currentHeight = 0;
+      }
+      pages[pages.length - 1].push(child.outerHTML);
+      currentHeight += blockHeight;
+    }
+
+    return pages.map((group) => group.join(''));
+  } finally {
+    document.body.removeChild(measure);
+  }
+};
+
 /**
  * Modal that packages the edited enhancement content into a new ORIGINAL resume (PDF).
  *
@@ -42,6 +111,7 @@ const ExportEnhancementModal = ({
 
   const [cvName, setCvName] = useState('');
   const [htmlContent, setHtmlContent] = useState('');
+  const [pagesHtml, setPagesHtml] = useState([]);
   const [isInitializing, setIsInitializing] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [exportStep, setExportStep] = useState(null);
@@ -57,7 +127,8 @@ const ExportEnhancementModal = ({
     return combined.length > NAME_MAX_LENGTH ? combined.slice(0, NAME_MAX_LENGTH) : combined;
   }, [originalResumeName, jobTitle]);
 
-  // Init on open: save latest editor content and load it into preview
+  // Init on open: save latest editor content and load it into preview, then
+  // distribute the content into A4 pages so each page has proper top + bottom padding.
   useEffect(() => {
     if (!open) return;
     setCvName(defaultCvName);
@@ -65,12 +136,16 @@ const ExportEnhancementModal = ({
 
     setIsInitializing(true);
     const html = editor.getHTML();
+    const applyHtml = () => {
+      setHtmlContent(html);
+      setPagesHtml(distributeHtmlIntoPages(html));
+    };
     updateContent({ id: enhancementId, content: html })
       .unwrap()
-      .then(() => setHtmlContent(html))
+      .then(applyHtml)
       .catch(() => {
         // Even if save fails, still show preview from current editor content
-        setHtmlContent(html);
+        applyHtml();
       })
       .finally(() => setIsInitializing(false));
   }, [open, editor, enhancementId, defaultCvName, updateContent]);
@@ -261,33 +336,45 @@ const ExportEnhancementModal = ({
       styles={{ body: { padding: 0, maxHeight: '90vh', overflow: 'hidden' } }}
     >
       {/* Hidden print container — native A4 (no transform) used ONLY by html2canvas.
-          `printRef` points at this outer wrapper (NOT its child) so that padding is
-          included in the captured bitmap. */}
-      {htmlContent && (
+          Renders a vertical stack of exact A4 page divs. Total height equals
+          `pagesHtml.length × A4_HEIGHT_PX`, so the existing slicing loop in
+          `buildPdfBlob` lands each slice on a page that already has its top +
+          bottom padding baked in. */}
+      {pagesHtml.length > 0 && (
         <div
           ref={printRef}
           aria-hidden="true"
-          className="resume-editor"
           style={{
             position: 'fixed',
             top: 0,
             left: 0,
             width: `${A4_WIDTH_PX}px`,
-            minHeight: `${A4_HEIGHT_PX}px`,
             background: '#ffffff',
-            padding: '40px 50px',
-            boxSizing: 'border-box',
             pointerEvents: 'none',
-            // Sit behind the document; modal backdrop covers it from the user's view.
             zIndex: -9999,
             visibility: 'hidden',
           }}
         >
-          <div
-            className="tiptap-content"
-            // eslint-disable-next-line react/no-danger
-            dangerouslySetInnerHTML={{ __html: htmlContent }}
-          />
+          {pagesHtml.map((pageHtml, i) => (
+            <div
+              key={i}
+              className="resume-editor"
+              style={{
+                width: `${A4_WIDTH_PX}px`,
+                height: `${A4_HEIGHT_PX}px`,
+                background: '#ffffff',
+                padding: `${PAGE_PAD_Y}px ${PAGE_PAD_X}px`,
+                boxSizing: 'border-box',
+                overflow: 'hidden',
+              }}
+            >
+              <div
+                className="tiptap-content"
+                // eslint-disable-next-line react/no-danger
+                dangerouslySetInnerHTML={{ __html: pageHtml }}
+              />
+            </div>
+          ))}
         </div>
       )}
 
@@ -320,32 +407,43 @@ const ExportEnhancementModal = ({
                 <span className="text-sm">Loading preview...</span>
               </div>
             )}
-            {!isInitializing && htmlContent && (
-              /* Fixed-size wrapper at scaled dimensions → parent layout is correct. */
-              <div
-                style={{
-                  width: `${A4_WIDTH_PX * PREVIEW_SCALE}px`,
-                  minHeight: `${A4_HEIGHT_PX * PREVIEW_SCALE}px`,
-                  flexShrink: 0,
-                }}
-              >
-                <div
-                  className="resume-editor shadow-xl border border-slate-200 rounded"
-                  style={{
-                    width: `${A4_WIDTH_PX}px`,
-                    minHeight: `${A4_HEIGHT_PX}px`,
-                    background: '#ffffff',
-                    padding: '40px 50px',
-                    boxSizing: 'border-box',
-                    transform: `scale(${PREVIEW_SCALE})`,
-                    transformOrigin: 'top left',
-                  }}
-                >
+            {!isInitializing && pagesHtml.length > 0 && (
+              /* Vertical stack of real A4 page divs — each has its own top +
+                 bottom padding, so the preview is pixel-accurate to the exported
+                 PDF (which rasterizes this exact same layout via the hidden
+                 container above). */
+              <div className="flex flex-col items-center gap-6">
+                {pagesHtml.map((pageHtml, i) => (
                   <div
-                    className="tiptap-content"
-                    // eslint-disable-next-line react/no-danger
-                    dangerouslySetInnerHTML={{ __html: htmlContent }}
-                  />
+                    key={i}
+                    style={{
+                      width: `${A4_WIDTH_PX * PREVIEW_SCALE}px`,
+                      height: `${A4_HEIGHT_PX * PREVIEW_SCALE}px`,
+                      flexShrink: 0,
+                    }}
+                  >
+                    <div
+                      className="resume-editor shadow-xl border border-slate-200 rounded bg-white"
+                      style={{
+                        width: `${A4_WIDTH_PX}px`,
+                        height: `${A4_HEIGHT_PX}px`,
+                        padding: `${PAGE_PAD_Y}px ${PAGE_PAD_X}px`,
+                        boxSizing: 'border-box',
+                        overflow: 'hidden',
+                        transform: `scale(${PREVIEW_SCALE})`,
+                        transformOrigin: 'top left',
+                      }}
+                    >
+                      <div
+                        className="tiptap-content"
+                        // eslint-disable-next-line react/no-danger
+                        dangerouslySetInnerHTML={{ __html: pageHtml }}
+                      />
+                    </div>
+                  </div>
+                ))}
+                <div className="text-[11px] text-slate-400 pb-2">
+                  {pagesHtml.length === 1 ? 'Page 1' : `Pages 1–${pagesHtml.length}`} · A4
                 </div>
               </div>
             )}
