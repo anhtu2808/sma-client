@@ -49,7 +49,11 @@ const MatchReport = () => {
   const [startMatchingDetail, { isLoading: isRetrying }] = useStartMatchingDetailMutation();
 
   const activeDocumentTab = useSelector((state) => state.matchingReport.ui.activeDocumentTab);
-  const { jobId, resumeId, matchSource } = location.state || {};
+  const { jobId: jobIdFromState, resumeId: resumeIdFromState } = location.state || {};
+  const [failedMeta, setFailedMeta] = useState({ jobId: null, resumeId: null });
+
+  const jobId = jobIdFromState ?? failedMeta.jobId;
+  const resumeId = resumeIdFromState ?? failedMeta.resumeId;
 
   const stopPolling = useCallback(() => {
     if (pollingTimerRef.current) {
@@ -62,30 +66,8 @@ const MatchReport = () => {
   const handleRetry = async () => {
     stopPolling();
 
-    if (matchSource !== "new") {
-      if (!hasValidEvaluationId) {
-        if (jobId) {
-          navigate(`/jobs/${jobId}`);
-        } else {
-          navigate("/jobs");
-        }
-        return;
-      }
-
-      setErrorMessage("");
-      setLatestStatus("WAITING");
-      setHasInitialStatus(true);
-      setPollingSessionId((n) => n + 1);
-      setPhase("polling");
-      return;
-    }
-
     if (!jobId || !resumeId) {
-      if (jobId) {
-        navigate(`/jobs/${jobId}`);
-      } else {
-        navigate("/jobs");
-      }
+      setErrorMessage("Missing job or resume reference. Please go back to job details and try again.");
       return;
     }
 
@@ -104,7 +86,9 @@ const MatchReport = () => {
         replace: true,
       });
     } catch (error) {
-      setErrorMessage("Retry failed. Please go back to job details and try again.");
+      setErrorMessage(
+        error?.data?.message || "Retry failed. Please go back to job details and try again."
+      );
     }
   };
 
@@ -175,6 +159,20 @@ const MatchReport = () => {
           stopPolling();
           setPhase("failed");
           setErrorMessage("AI matching failed. Please go back and try matching again.");
+
+          // Ensure we have jobId/resumeId for retry even when landing directly via URL
+          if (!jobIdFromState || !resumeIdFromState) {
+            try {
+              const detail = await triggerGetMatchingDetail({
+                evaluationId: activeEvaluationId,
+              }).unwrap();
+              if (detail?.jobId && detail?.resumeId) {
+                setFailedMeta({ jobId: detail.jobId, resumeId: detail.resumeId });
+              }
+            } catch (_) {
+              // swallow — user can still navigate back
+            }
+          }
         }
       } catch (error) {
         if (cancelled) return;
@@ -236,7 +234,7 @@ const MatchReport = () => {
     return <MatchingLoading key={pollingSessionId} status={latestStatus} />;
   }
 
-  if (isDetailLoading) {
+  if (isDetailLoading && phase !== "failed") {
     return <Loading fullScreen={true} />;
   }
 
