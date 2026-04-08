@@ -25,6 +25,22 @@ const PAGE_PAD_X = 50;
 // Usable content height per page after subtracting top AND bottom padding.
 const PAGE_USABLE_HEIGHT = A4_HEIGHT_PX - PAGE_PAD_Y * 2;
 
+const stripPdfExtension = (value = '') => value.replace(/\.pdf$/i, '').trim();
+
+const buildShortCvName = (originalResumeName) => {
+  const baseName = stripPdfExtension(originalResumeName) || 'Resume';
+  const optimizedName = `${baseName} (Optimized)`;
+  return optimizedName.length > NAME_MAX_LENGTH
+    ? optimizedName.slice(0, NAME_MAX_LENGTH).trim()
+    : optimizedName;
+};
+
+const buildPdfFileName = (value, fallbackName) => {
+  const baseName = stripPdfExtension(value) || stripPdfExtension(fallbackName) || 'Resume';
+  const safeName = baseName.replace(/[^\w\s.-]/g, '_').trim() || 'Resume';
+  return `${safeName}.pdf`;
+};
+
 /**
  * Distribute an HTML string into an array of per-page HTML chunks so that each
  * page fits within `PAGE_USABLE_HEIGHT` and no top-level element is sliced in half
@@ -119,11 +135,8 @@ const ExportEnhancementModal = ({
   const [exportEnhancement] = useExportEnhancementToOriginalMutation();
 
   const defaultCvName = useMemo(() => {
-    const base = originalResumeName || 'Resume';
-    const suffix = jobTitle ? ` – Optimized for ${jobTitle}` : ' – Optimized';
-    const combined = `${base}${suffix}`;
-    return combined.length > NAME_MAX_LENGTH ? combined.slice(0, NAME_MAX_LENGTH) : combined;
-  }, [originalResumeName, jobTitle]);
+    return buildShortCvName(originalResumeName);
+  }, [originalResumeName]);
 
   // Init on open: save latest editor content and load it into preview, then
   // distribute the content into A4 pages so each page has proper top + bottom padding.
@@ -176,8 +189,7 @@ const ExportEnhancementModal = ({
       }
 
       setExportStep('Uploading...');
-      const safeName = cvName.trim().replace(/[^\w\s.-]/g, '_');
-      const fileName = `${safeName}.pdf`;
+      const fileName = buildPdfFileName(cvName.trim(), defaultCvName);
       const formData = new FormData();
       formData.append('files', new File([blob], fileName, { type: 'application/pdf' }));
 
@@ -188,7 +200,11 @@ const ExportEnhancementModal = ({
       setExportStep('Finalizing...');
       const newResume = await exportEnhancement({
         enhancementId,
-        payload: { resumeUrl: uploadedUrl, fileName },
+        payload: {
+          resumeUrl: uploadedUrl,
+          fileName,
+          resumeName: cvName.trim() || defaultCvName,
+        },
       }).unwrap();
 
       return newResume;
@@ -231,8 +247,7 @@ const ExportEnhancementModal = ({
       setExportStep('Generating PDF...');
       const blob = await buildPdfBlob();
 
-      const safeName = cvName.trim().replace(/[^\w\s.-]/g, '_');
-      const fileName = `${safeName}.pdf`;
+      const fileName = buildPdfFileName(cvName.trim(), defaultCvName);
 
       // Trigger browser download
       const url = URL.createObjectURL(blob);
@@ -252,7 +267,7 @@ const ExportEnhancementModal = ({
       setIsExporting(false);
       setExportStep(null);
     }
-  }, [htmlContent, cvName, buildPdfBlob]);
+  }, [htmlContent, cvName, buildPdfBlob, defaultCvName]);
 
   const isBusy = isInitializing || isExporting;
   const canSubmit = !!htmlContent && !!cvName.trim() && !isBusy;
