@@ -6,6 +6,7 @@ import {
   useUploadFilesMutation,
   useExportEnhancementToOriginalMutation,
   useUpdateEnhancementContentMutation,
+  useParseCandidateResumeMutation,
 } from '@/apis/resumeApi';
 import toastMessage from '@/utils/toastMessage';
 import { buildEnhancementPdfBlob } from './buildEnhancementPdf';
@@ -133,6 +134,7 @@ const ExportEnhancementModal = ({
   const [updateContent] = useUpdateEnhancementContentMutation();
   const [uploadFiles] = useUploadFilesMutation();
   const [exportEnhancement] = useExportEnhancementToOriginalMutation();
+  const [parseCandidateResume] = useParseCandidateResumeMutation();
 
   const defaultCvName = useMemo(() => {
     return buildShortCvName(originalResumeName);
@@ -207,6 +209,18 @@ const ExportEnhancementModal = ({
         },
       }).unwrap();
 
+      const parseStatus = typeof newResume?.parseStatus === 'string'
+        ? newResume.parseStatus.toUpperCase()
+        : null;
+
+      if (newResume?.id && (parseStatus === 'WAITING' || parseStatus === null)) {
+        try {
+          await parseCandidateResume({ resumeId: newResume.id }).unwrap();
+        } catch (parseError) {
+          console.error('Fallback parse trigger failed:', parseError);
+        }
+      }
+
       return newResume;
     } catch (err) {
       console.error('Export enhancement error:', err);
@@ -216,7 +230,7 @@ const ExportEnhancementModal = ({
       setIsExporting(false);
       setExportStep(null);
     }
-  }, [htmlContent, cvName, buildPdfBlob, uploadFiles, exportEnhancement, enhancementId]);
+  }, [htmlContent, cvName, buildPdfBlob, uploadFiles, exportEnhancement, enhancementId, defaultCvName, parseCandidateResume]);
 
   const handleSaveOnly = useCallback(async () => {
     const newResume = await doExport();

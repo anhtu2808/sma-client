@@ -54,7 +54,10 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
       return;
     }
 
-    const selectableResumes = resumes.filter((resume) => getResumeMatchMode(resume) === "new");
+    const selectableResumes = resumes.filter((resume) => {
+      const mode = getResumeMatchMode(resume);
+      return mode === "new" || mode === "retry";
+    });
 
     if (selectableResumes.length > 0 && (!selectedResumeId || !selectableResumes.some((r) => r.id === selectedResumeId))) {
       setSelectedResumeId(selectableResumes[0].id);
@@ -112,7 +115,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
 
   const selectedResume = resumes.find((resume) => resume.id === selectedResumeId) || null;
   const selectedResumeMatchMode = getResumeMatchMode(selectedResume);
-  const canSubmit = !!selectedResume && selectedResumeMatchMode === "new";
+  const canSubmit = !!selectedResume && (selectedResumeMatchMode === "new" || selectedResumeMatchMode === "retry");
   const selectedEvaluationId = getEvaluationHistoryId(selectedResume);
   const isUploading = isUploadingFile || isSavingResume;
 

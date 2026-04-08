@@ -1,7 +1,11 @@
 import React from "react";
 import dayjs from "dayjs";
 import { getParseStatusView, normalizeParseStatus } from "@/constant/attachment";
-import { getEvaluationHistoryId, getEvaluationHistoryScore } from "./matchHistory";
+import {
+  getEvaluationHistoryScore,
+  getEvaluationHistoryStatus,
+  getResumeMatchMode,
+} from "./matchHistory";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashCan } from '../../../utils/icons';
 import { Sparkles } from 'lucide-react';
@@ -21,14 +25,36 @@ const ResumeOption = ({
   const statusView = getParseStatusView(status, false);
   const isWaiting = status === "WAITING";
   const isParseBusy = isParsing || isPartial;
-  const evaluationHistoryId = getEvaluationHistoryId(resume);
   const evaluationHistoryScore = getEvaluationHistoryScore(resume);
-  const hasEvaluationHistory = evaluationHistoryId != null;
+  const evaluationStatus = getEvaluationHistoryStatus(resume);
+  const matchMode = getResumeMatchMode(resume);
+  const hasFinishedScore = matchMode === "existing";
+  const canRetryScore = matchMode === "retry";
+  const isScoreProcessing = matchMode === "processing";
+  const canSelect = isSelectable || canRetryScore;
+
+  const scoreStatusView = (() => {
+    switch (evaluationStatus) {
+      case "FINISH":
+        return { label: "Scored", className: "bg-amber-100 text-amber-700" };
+      case "FAIL":
+        return { label: "Score failed", className: "bg-red-100 text-red-700" };
+      case "WAITING":
+      case "PARTIAL":
+        return { label: "Scoring", className: "bg-sky-100 text-sky-700" };
+      default:
+        return null;
+    }
+  })();
 
   const cardClassName = isSelected
     ? "border-2 border-primary bg-orange-50/40"
-    : hasEvaluationHistory
+    : hasFinishedScore
     ? "border-2 border-amber-200 bg-amber-50/40"
+    : canRetryScore
+    ? "border-2 border-red-200 bg-red-50/40 hover:border-primary"
+    : isScoreProcessing
+    ? "border-2 border-sky-200 bg-sky-50/40"
     : isSelectable
     ? "border-2 border-gray-200 bg-white hover:border-primary"
     : "border-2 border-gray-200 bg-gray-50/80 opacity-80";
@@ -36,11 +62,11 @@ const ResumeOption = ({
   return (
     <div
       className={`rounded-xl p-5 transition-all ${cardClassName}`}
-      role={isSelectable ? "button" : undefined}
-      tabIndex={isSelectable ? 0 : -1}
-      onClick={() => isSelectable && onSelect(resume.id)}
+      role={canSelect ? "button" : undefined}
+      tabIndex={canSelect ? 0 : -1}
+      onClick={() => canSelect && onSelect(resume.id)}
       onKeyDown={(event) => {
-        if (!isSelectable) return;
+        if (!canSelect) return;
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
           onSelect(resume.id);
@@ -53,9 +79,9 @@ const ResumeOption = ({
             <h4 className="text-base font-semibold text-gray-900 truncate">
               {resume.resumeName || resume.fileName || `Resume #${resume.id}`}
             </h4>
-            {hasEvaluationHistory && (
-              <span className="inline-flex items-center rounded-md bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
-                Matched before
+            {scoreStatusView && (
+              <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-semibold ${scoreStatusView.className}`}>
+                {scoreStatusView.label}
               </span>
             )}
           </div>
@@ -66,7 +92,7 @@ const ResumeOption = ({
             >
               {statusView.label}
             </span>
-            {!hasEvaluationHistory && (
+            {!hasFinishedScore && !isScoreProcessing && !canRetryScore && (
               <>
                 <span className="text-gray-400">•</span>
                 <span>{resume.fileName || "No file name"}</span>
@@ -78,7 +104,7 @@ const ResumeOption = ({
                 <span className="text-gray-400">{dayjs(resume.createdAt).format("DD/MM/YYYY")}</span>
               </>
             )}
-            {hasEvaluationHistory && evaluationHistoryScore != null && (
+            {hasFinishedScore && evaluationHistoryScore != null && (
               <span className="inline-flex items-center gap-1 rounded-md border-2 border-emerald-400 bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-700">
                 <span className="h-1.5 w-1.5 rounded-md bg-emerald-400" />
                 {evaluationHistoryScore}%
@@ -88,7 +114,7 @@ const ResumeOption = ({
         </div>
 
         <div className="flex shrink-0 items-center justify-end gap-2">
-          {hasEvaluationHistory ? (
+          {hasFinishedScore ? (
             <>
               <button
                 type="button"
@@ -114,7 +140,7 @@ const ResumeOption = ({
                 </button>
               )}
             </>
-          ) : isSelectable ? (
+          ) : canSelect ? (
             <>
               {onDelete && (
                 <button
@@ -132,8 +158,8 @@ const ResumeOption = ({
               <input
                 type="radio"
                 checked={isSelected}
-                disabled={!isSelectable}
-                onChange={() => isSelectable && onSelect(resume.id)}
+                disabled={!canSelect}
+                onChange={() => canSelect && onSelect(resume.id)}
                 className="h-5 w-5 cursor-pointer border-gray-300 focus:ring-primary disabled:cursor-not-allowed"
                 style={{ accentColor: "#ff5722" }}
                 aria-label={`Select resume ${resume.resumeName || resume.fileName || resume.id}`}
@@ -152,6 +178,8 @@ const ResumeOption = ({
               <Sparkles size={14} />
               Parse CV
             </button>
+          ) : isScoreProcessing ? (
+            <span className="text-xs font-medium text-sky-600">Scoring...</span>
           ) : (
             <span className="text-xs text-gray-400">Processing...</span>
           )}
