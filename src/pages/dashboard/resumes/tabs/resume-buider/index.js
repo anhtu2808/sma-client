@@ -95,7 +95,13 @@ const ResumeBuilderTab = () => {
             {builderResumes.map((resume) => {
               const nameRaw = resume.resumeName || resume.fileName || resume.fullName || `Resume #${resume.id}`;
               const match = nameRaw.match(/^\[(tpl_[a-z0-9_]+)\]\s*(.*)$/);
-              const templateId = match ? match[1] : (resume.template || 'tpl_modern_1');
+              
+              let templateId = match ? match[1] : null;
+              if (!templateId) {
+                  const stored = localStorage.getItem(`cv_template_${resume.id}`);
+                  templateId = stored || resume.template || 'tpl_modern_1';
+              }
+
               const displayTitle = match ? (match[2] || `Resume #${resume.id}`) : nameRaw;
               const templateObj = CV_TEMPLATES.find(t => t.id === templateId) || CV_TEMPLATES[0];
 
