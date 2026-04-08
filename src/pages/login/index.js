@@ -52,7 +52,7 @@ const Login = () => {
       }
     } catch (error) {
       toastMessage.error(
-        error.response.data.message || "An error occurred during login",
+        error.response?.data?.message || "An error occurred during login",
       );
     } finally {
       setLoading(false);

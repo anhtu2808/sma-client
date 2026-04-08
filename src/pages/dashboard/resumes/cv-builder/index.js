@@ -773,6 +773,12 @@ export default function CvBuilder({ onBack }) {
 
     const templateId = searchParams.get('template') || 'tpl_modern_1';
 
+    useEffect(() => {
+        if (resumeId && templateId) {
+            localStorage.setItem(`cv_template_${resumeId}`, templateId);
+        }
+    }, [resumeId, templateId]);
+
     let TemplateComponent = ModernMinimalistTemplate;
     if (templateId === 'tpl_prof_1') TemplateComponent = ExecutiveProfessionalTemplate;
     if (templateId === 'tpl_creative_1') TemplateComponent = CreativeStudioTemplate;
