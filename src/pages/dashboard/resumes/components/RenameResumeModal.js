@@ -58,6 +58,7 @@ const RenameResumeModal = ({ open, onClose, resume }) => {
       confirmLoading={isLoading}
       okText="Save"
       cancelText="Cancel"
+      okButtonProps={{ style: { backgroundColor: '#f97316', borderColor: '#f97316' } }}
       centered
       destroyOnClose
     >

@@ -59,14 +59,6 @@ const CompanyHeader = ({ company }) => {
                                 )}
                             </div>
                         </div>
-
-                        <Button
-                            variant="outline"
-                            className="!rounded-full !px-6 border-orange-500 text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-500/10"
-                        >
-                            <FontAwesomeIcon icon={faPlus} className="mr-2" />
-                            Follow
-                        </Button>
                     </div>
 
                     <div className="h-px bg-slate-100 dark:bg-[#3d241b] my-6"></div>
@@ -76,12 +68,6 @@ const CompanyHeader = ({ company }) => {
                         <div>
                             <p className="text-sm text-slate-500 dark:text-[#8c6b5d] mb-1">Open Jobs</p>
                             <p className="text-2xl font-bold text-slate-900 dark:text-white">{company.totalJobs || 0}</p>
-                        </div>
-                        <div>
-                            <p className="text-sm text-slate-500 dark:text-[#8c6b5d] mb-1">Followers</p>
-                            <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                                {company.followerNumber ? (company.followerNumber > 1000 ? `${(company.followerNumber / 1000).toFixed(1)}k` : company.followerNumber) : 0}
-                            </p>
                         </div>
                     </div>
                 </div>

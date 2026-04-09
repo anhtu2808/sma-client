@@ -6,7 +6,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleInfo, faImages, faLocationDot, faMap } from '../../../utils/icons';
 
 export const AboutSection = ({ company }) => {
-    const photos = company.images || [];
 
     return (
         <div className="bg-white dark:bg-[#2c1a14] rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100 dark:border-[#3d241b] mb-6">
@@ -19,22 +18,7 @@ export const AboutSection = ({ company }) => {
                 dangerouslySetInnerHTML={{ __html: company.description || "<p>No description available.</p>" }}
             />
 
-            {/* Company Images */}
-            {photos.length > 0 && (
-                <div className="mt-6 pt-6 border-t border-slate-100 dark:border-[#3d241b]">
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        {photos.map((photo, index) => (
-                            <div key={photo.id || index} className="rounded-xl overflow-hidden h-40 md:h-48 relative group">
-                                <img
-                                    src={photo.url || photo}
-                                    alt={photo.description || `${company.name} photo ${index + 1}`}
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                />
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
+
         </div>
     );
 };

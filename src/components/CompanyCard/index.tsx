@@ -2,7 +2,7 @@ import { Building2 } from 'lucide-react';
 import PropTypes from 'prop-types';
 import { getIndustryLabel } from '@/constant/job';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBuilding, faUsers } from '../../utils/icons';
+import { faBuilding } from '../../utils/icons';
 
 const CompanyCard = ({
     logo,
@@ -11,7 +11,7 @@ const CompanyCard = ({
     description,
     industry,
     location,
-    followers = 0,
+
     onViewDetails,
     className = ""
 }) => {
@@ -64,10 +64,6 @@ const CompanyCard = ({
                             <span className="truncate uppercase font-medium">{getIndustryLabel(industry)}</span>
                         </div>
                     )}
-                    <div className="flex items-center gap-2 text-slate-500 text-xs">
-                        <FontAwesomeIcon icon={faUsers} className="text-[16px]" />
-                        <span>{followers.toLocaleString('vi-VN')} Subscribed</span>
-                    </div>
                 </div>
             </div>
         </article>

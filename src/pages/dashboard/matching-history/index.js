@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useGetAllMatchingQuery } from "@/apis/matchingApi";
 import Button from "@/components/Button";
 import Loading from "@/components/Loading";
-import { Pagination, Dropdown } from "antd";
+import { Dropdown } from "antd";
+import Pagination from "@/components/Pagination";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -214,17 +215,9 @@ const MatchingHistory = () => {
         {!isLoading && !isError && totalElements > 0 && (
           <div className="flex justify-center pb-8 pt-2">
             <Pagination
-              current={page + 1}
-              pageSize={size}
-              total={totalElements}
-              onChange={(newPage, newSize) => {
-                setPage(newPage - 1);
-                setSize(newSize);
-              }}
-              showSizeChanger
-              showTotal={(total, range) =>
-                `${range[0]}-${range[1]} of ${total} results`
-              }
+              currentPage={page + 1}
+              totalPages={Math.ceil(totalElements / size)}
+              onPageChange={(newPage) => setPage(newPage - 1)}
             />
           </div>
         )}
