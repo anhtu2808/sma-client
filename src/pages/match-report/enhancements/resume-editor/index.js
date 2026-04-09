@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { useGetResumeQuery, useUpdateEnhancementContentMutation } from '@/apis/resumeApi';
 import { useMarkDetailAsFixedMutation } from '@/apis/matchingApi';
-import { setDetailFixed, updateScoresAfterFixed } from '@/store/slices/matchingReportSlice';
+import { setDetailFixed, setHighlightModalDetailId, updateScoresAfterFixed } from '@/store/slices/matchingReportSlice';
 import Loading from '@/components/Loading';
 import EntryHeader from './EntryHeaderNode';
 import SuggestionHighlight from './extensions/SuggestionHighlight';
@@ -54,9 +54,11 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
 
   const [saveStatus, setSaveStatus] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [tagModalDetail, setTagModalDetail] = useState(null);
   const criteriaScores = useSelector(
     (state) => state.matchingReport.data?.criteriaScores
+  );
+  const highlightModalDetailId = useSelector(
+    (state) => state.matchingReport.ui.highlightModalDetailId
   );
   const autoSaveTimerRef = useRef(null);
   const initialSaveDoneRef = useRef(false);
@@ -145,13 +147,11 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleManualSave]);
 
-  // Tag click handler — check if user clicked on the ::before tag area
+  // Editor tag-badge click opens the modal at the FIRST detail of the clicked context.
   const handleEditorClick = useCallback((event) => {
     const highlightEl = event.target.closest('[data-tag="true"]');
     if (!highlightEl) return;
 
-    // Check if click was in the tag area — badge sits in the left gutter
-    // at `left: -20px` with ~16px width (see resumeEditor.css .suggestion-has-tag::before).
     const rect = highlightEl.getBoundingClientRect();
     const clickX = event.clientX;
     const isTagArea = clickX < rect.left && clickX >= rect.left - 22;
@@ -161,44 +161,43 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
     event.preventDefault();
     event.stopPropagation();
 
-    const detailId = Number(highlightEl.dataset.detailId);
-    if (!Number.isFinite(detailId) || !criteriaScores) return;
+    const clickedId = Number(highlightEl.dataset.detailId);
+    if (!Number.isFinite(clickedId) || !criteriaScores) return;
 
-    const detail = criteriaScores
-      .flatMap((cs) => cs.details || [])
-      .find((d) => d.id === detailId);
+    const allDetails = criteriaScores.flatMap((cs) => cs.details || []);
+    const clicked = allDetails.find((d) => d.id === clickedId);
+    if (!clicked) return;
 
-    if (detail) {
-      setTagModalDetail(detail);
-    }
-  }, [criteriaScores]);
+    const firstSibling = clicked.contextId != null
+      ? allDetails.find((d) => d.contextId === clicked.contextId) || clicked
+      : clicked;
+
+    dispatch(setHighlightModalDetailId(firstSibling.id));
+  }, [criteriaScores, dispatch]);
 
   const handleModalClose = useCallback(() => {
-    setTagModalDetail(null);
-  }, []);
+    dispatch(setHighlightModalDetailId(null));
+  }, [dispatch]);
 
-  // Derive modal detail from Redux (avoids stale state + infinite re-render)
-  const tagModalDetailId = tagModalDetail?.id ?? null;
   const resolvedModalDetail = useMemo(() => {
-    if (!tagModalDetailId || !criteriaScores) return null;
+    if (!highlightModalDetailId || !criteriaScores) return null;
     return criteriaScores
       .flatMap((cs) => cs.details || [])
-      .find((d) => d.id === tagModalDetailId) ?? null;
-  }, [tagModalDetailId, criteriaScores]);
+      .find((d) => d.id === highlightModalDetailId) ?? null;
+  }, [highlightModalDetailId, criteriaScores]);
 
-  // Auto-close modal when detail transitions to fixed (not if already fixed on open)
+  // Auto-close modal when detail transitions to fixed (not if already fixed on open).
   const wasFixedOnOpenRef = useRef(false);
   useEffect(() => {
-    // Track whether detail was already fixed when modal opened
     wasFixedOnOpenRef.current = !!resolvedModalDetail?.isFixed;
-  }, [tagModalDetailId]); // reset on modal open/change
+  }, [highlightModalDetailId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (resolvedModalDetail?.isFixed && !wasFixedOnOpenRef.current) {
-      const timer = setTimeout(() => setTagModalDetail(null), 500);
+      const timer = setTimeout(() => dispatch(setHighlightModalDetailId(null)), 500);
       return () => clearTimeout(timer);
     }
-  }, [resolvedModalDetail?.isFixed]);
+  }, [resolvedModalDetail?.isFixed, dispatch]);
 
   // AI highlight decorations synced from Redux
   useEditorHighlights(editor);

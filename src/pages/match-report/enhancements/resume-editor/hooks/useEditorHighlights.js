@@ -35,15 +35,28 @@ const useEditorHighlights = (editor) => {
     const highlights = [];
     const seenContextKeys = new Set();
 
+    let focusedContextKey = null;
+    if (focusedItemId != null) {
+      outer: for (const criteria of criteriaScores) {
+        if (!Array.isArray(criteria.details)) continue;
+        for (const detail of criteria.details) {
+          if (detail.id === focusedItemId) {
+            focusedContextKey = detail.contextId != null
+              ? `cid:${detail.contextId}`
+              : `ctx:${detail.context}`;
+            break outer;
+          }
+        }
+      }
+    }
+
     for (const criteria of criteriaScores) {
       if (!Array.isArray(criteria.details)) continue;
 
       for (const detail of criteria.details) {
         if (!detail.context) continue;
 
-        // Deduplicate by contextId — multiple details that share the same
-        // context (e.g. one suggestion covers multiple labels) should produce
-        // a SINGLE highlight, not stacked badges at the same position.
+        // Dedupe per context: siblings share one highlight.
         const ctxKey = detail.contextId != null ? `cid:${detail.contextId}` : `ctx:${detail.context}`;
         if (seenContextKeys.has(ctxKey)) continue;
         seenContextKeys.add(ctxKey);
@@ -60,7 +73,7 @@ const useEditorHighlights = (editor) => {
           context: detail.context,
           pinnedRange: detail.pinnedRange || null,
           status: isPositive ? 'MATCHED' : detail.status,
-          isFocused: detail.id === focusedItemId,
+          isFocused: ctxKey === focusedContextKey,
           label: detail.label,
         });
       }

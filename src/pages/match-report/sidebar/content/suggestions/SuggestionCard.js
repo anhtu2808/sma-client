@@ -1,4 +1,5 @@
 import { useContext, useMemo, useState } from "react";
+import { Tooltip } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setDetailContext,
@@ -78,11 +79,12 @@ const SuggestionCard = ({
 
     setFixApplied(true);
 
-    // Update context to the new text so the decoration can find it in the doc
-    dispatch(setDetailContext({ detailId, context: text }));
-
-    // Mark as fixed via API — handle both single detail and context group
     const idsToMark = allDetailIds ?? [detailId];
+
+    for (const id of idsToMark) {
+      dispatch(setDetailContext({ detailId: id, context: text }));
+    }
+
     let criteriaScoreId;
     let beforeCriteriaScore;
 
@@ -144,44 +146,46 @@ const SuggestionCard = ({
 
         <div className="flex shrink-0 items-center gap-1">
           {canFixInEditor ? (
-            <button
-              type="button"
-              aria-label="Fix in editor"
-              title="Replace text in editor"
-              disabled={isFixingThis || fixApplied || !!fixingDetailId}
-              onClick={handleFixInEditor}
-              className="flex shrink-0 items-center justify-center rounded p-1 text-neutral-500 transition-colors hover:bg-amber-50 hover:text-amber-700 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <FontAwesomeIcon
-                icon={isFixingThis ? faArrowsRotate : fixApplied ? faCircleCheck : faWandMagicSparkles}
-                className={`text-[18px] ${
-                  isFixingThis ? "animate-spin" : ""
-                } ${fixApplied ? "text-emerald-500" : ""}`}
-              />
-            </button>
+            <Tooltip title="Apply suggestion to editor" placement="top">
+              <button
+                type="button"
+                aria-label="Apply suggestion to editor"
+                disabled={isFixingThis || fixApplied || !!fixingDetailId}
+                onClick={handleFixInEditor}
+                className="flex shrink-0 items-center justify-center rounded p-1 text-neutral-500 transition-colors hover:bg-amber-50 hover:text-amber-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <FontAwesomeIcon
+                  icon={isFixingThis ? faArrowsRotate : fixApplied ? faCircleCheck : faWandMagicSparkles}
+                  className={`text-[18px] ${
+                    isFixingThis ? "animate-spin" : ""
+                  } ${fixApplied ? "text-emerald-500" : ""}`}
+                />
+              </button>
+            </Tooltip>
           ) : null}
 
           {canRegenerate ? (
-            <button
-              type="button"
-              aria-label="Regenerate suggestion"
-              title="Uses 1 suggestion credit"
-              disabled={
-                isRegenerating || !Number.isFinite(Number(suggestion?.id))
-              }
-              onClick={(event) => {
-                event.stopPropagation();
-                onRegenerate?.(suggestion?.id);
-              }}
-              className="flex shrink-0 items-center justify-center rounded p-1 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <FontAwesomeIcon
-                icon={faArrowsRotate}
-                className={`text-[18px] ${
-                  isRegenerating ? "animate-spin" : ""
-                }`}
-              />
-            </button>
+            <Tooltip title="Regenerate suggestion (uses 1 credit)" placement="top">
+              <button
+                type="button"
+                aria-label="Regenerate suggestion"
+                disabled={
+                  isRegenerating || !Number.isFinite(Number(suggestion?.id))
+                }
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onRegenerate?.(suggestion?.id);
+                }}
+                className="flex shrink-0 items-center justify-center rounded p-1 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <FontAwesomeIcon
+                  icon={faArrowsRotate}
+                  className={`text-[18px] ${
+                    isRegenerating ? "animate-spin" : ""
+                  }`}
+                />
+              </button>
+            </Tooltip>
           ) : null}
         </div>
       </div>
