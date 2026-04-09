@@ -71,9 +71,19 @@ const Usage = () => {
   } = useGetFeatureUsageHistoryQuery(historyParams, { skip: !hasAccessToken });
 
   const quotas = useMemo(() => mapQuotas(featureUsage), [featureUsage]);
-  const historyContent = historyData?.content ?? [];
+  const historyContentRaw = historyData?.content ?? [];
   const pageNumber = historyData?.pageNumber ?? 0;
   const totalPages = Math.max(1, historyData?.totalPages ?? 1);
+
+  const historyContent = useMemo(() => {
+    if (!searchValue.trim()) return historyContentRaw;
+    const query = searchValue.trim().toLowerCase();
+    return historyContentRaw.filter((item) => {
+      const featureName = (item?.featureName || "").toLowerCase();
+      const planName = (item?.planName || "").toLowerCase();
+      return featureName.includes(query) || planName.includes(query);
+    });
+  }, [historyContentRaw, searchValue]);
 
   return (
     <Row gutter={[24, 24]}>
