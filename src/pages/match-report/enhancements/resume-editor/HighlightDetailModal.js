@@ -1,7 +1,7 @@
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Suggestions from '@/pages/match-report/sidebar/content/suggestions';
-import { useMarkDetailAsFixedMutation, useRegenerateSuggestionMutation } from '@/apis/matchingApi';
+import { useMarkDetailAsFixedBatchMutation, useRegenerateSuggestionMutation } from '@/apis/matchingApi';
 import {
   setDetailContext,
   setDetailFixed,
@@ -30,7 +30,7 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
   const popoverRef = useRef(null);
   const cleanupRef = useRef(null);
   const [regenerateSuggestion] = useRegenerateSuggestionMutation();
-  const [markDetailAsFixed] = useMarkDetailAsFixedMutation();
+  const [markDetailAsFixedBatch] = useMarkDetailAsFixedBatchMutation();
   const [regeneratingSuggestionId, setRegeneratingSuggestionId] = useState(null);
   const [isApplying, setIsApplying] = useState(false);
   const [activeIdx, setActiveIdx] = useState(0);
@@ -197,28 +197,22 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
         }
       }
       try {
-        let lastResponse = null;
+        const response = await markDetailAsFixedBatch({ detailIds: siblingDetailIds }).unwrap();
         for (const sid of siblingDetailIds) {
-          try {
-            const r = await markDetailAsFixed({ detailId: sid }).unwrap();
-            if (r) lastResponse = r;
-          } catch (e) {
-            console.warn('markDetailAsFixed failed for sibling', sid, e);
-          }
           dispatch(setDetailFixed({ detailId: sid }));
         }
-        if (lastResponse) {
+        if (response) {
           dispatch(updateScoresAfterFixed({
-            afterOverallScore: lastResponse.afterOverallScore,
-            criteriaScoreId: lastResponse.criteriaScoreId,
-            afterCriteriaScore: lastResponse.afterCriteriaScore,
+            afterOverallScore: response.afterOverallScore,
+            criteriaScoreId: response.criteriaScoreId,
+            afterCriteriaScore: response.afterCriteriaScore,
           }));
 
           if (beforeDoc && pushFixUndo) {
             pushFixUndo({
               beforeDoc,
               detailIds: siblingDetailIds,
-              criteriaScoreId: lastResponse.criteriaScoreId,
+              criteriaScoreId: response.criteriaScoreId,
               beforeOverallScore,
               beforeCriteriaScore,
               originalContext: detail.context,
@@ -262,18 +256,26 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
                   className="flex transition-transform duration-300 ease-out"
                   style={{ transform: `translateX(-${activeIdx * 100}%)` }}
                 >
-                  {siblings.map((s) => (
-                    <div key={s.id} className="flex w-full shrink-0 px-px">
-                      <div className="flex w-full flex-col rounded-lg border-2 border-amber-300 bg-amber-100 px-3.5 py-3 shadow-sm">
-                        <p className="mb-1.5 text-sm font-semibold leading-snug text-neutral-900">
-                          {s.label}
-                        </p>
-                        <p className="text-sm leading-relaxed text-neutral-800">
-                          {s.description || '—'}
-                        </p>
+                  {siblings.map((s) => {
+                    const sSibling = s;
+                    const sIsPositive = sSibling.isFixed || sSibling.status === 'MATCHED' || sSibling.status === 'FIXED';
+                    const descCardClass = sIsPositive
+                      ? 'flex w-full flex-col rounded-lg border-2 border-emerald-300 bg-emerald-50 px-3.5 py-3 shadow-sm'
+                      : 'flex w-full flex-col rounded-lg border-2 border-amber-300 bg-amber-100 px-3.5 py-3 shadow-sm';
+
+                    return (
+                      <div key={s.id} className="flex w-full shrink-0 px-px">
+                        <div className={descCardClass}>
+                          <p className="mb-1.5 text-sm font-semibold leading-snug text-neutral-900">
+                            {s.label}
+                          </p>
+                          <p className="text-sm leading-relaxed text-neutral-800">
+                            {s.description || '—'}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -319,7 +321,7 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
           </div>
         )}
 
-        {hasSuggestions && (
+        {hasSuggestions && !isPositiveStatus && (
           <Suggestions
             itemKey={detail.id}
             suggestions={detail.suggestions}
@@ -330,6 +332,7 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
             onRegenerateSuggestion={handleRegenerateSuggestion}
             context={detail.context}
             detailId={detail.id}
+            allDetailIds={siblings.map((s) => s.id)}
           />
         )}
       </div>
