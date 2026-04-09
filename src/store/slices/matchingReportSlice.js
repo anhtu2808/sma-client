@@ -7,6 +7,7 @@ const createInitialState = () => ({
     focusedItemId: null,
     expandedItemIds: [],
     activeDocumentTab: "resume",
+    highlightModalDetailId: null,
   },
 });
 
@@ -25,6 +26,11 @@ const matchingReportSlice = createSlice({
       state.ui.activeCriteriaId = action.payload;
       state.ui.expandedItemIds = [];
       state.ui.focusedItemId = null;
+      state.ui.highlightModalDetailId = null;
+    },
+
+    setHighlightModalDetailId: (state, action) => {
+      state.ui.highlightModalDetailId = action.payload;
     },
 
     toggleExpandedItemId: (state, action) => {
@@ -178,6 +184,7 @@ export const {
   resetMatchingReportState,
   setMatchingReportData,
   setActiveCriteriaId,
+  setHighlightModalDetailId,
   setFocusedItemId,
   focusItemWithTabSwitch,
   toggleExpandedItemId,
