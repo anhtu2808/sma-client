@@ -140,6 +140,7 @@ interface ContextDetail {
   label: string;
   description: string;
   impactScore: number;
+  isFixed?: boolean;
 }
 
 interface ContextItem {
@@ -171,6 +172,8 @@ export const mapSuggestionsToStore = (response: SuggestionsResponse): MatchingRe
     criteriaMap.set(cs.id, { ...cs, details: [] });
   }
 
+  const seenDetailIds = new Set<number>();
+
   // Distribute context details into their parent criteria
   for (const ctx of response.contexts ?? []) {
     const suggestions = normalizeSuggestions(ctx.suggestions);
@@ -179,6 +182,7 @@ export const mapSuggestionsToStore = (response: SuggestionsResponse): MatchingRe
       const criteria = criteriaMap.get(detail.evaluationCriteriaScoreId);
       if (!criteria) continue;
 
+      seenDetailIds.add(detail.id);
       criteria.details.push({
         id: detail.id,
         contextId: ctx.id,
@@ -188,10 +192,40 @@ export const mapSuggestionsToStore = (response: SuggestionsResponse): MatchingRe
         requiredLevel: null,
         candidateLevel: null,
         isRequired: null,
-        isFixed: false,
+        isFixed: detail.isFixed ?? false,
         context: ctx.context,
         impactScore: detail.impactScore ?? null,
         suggestions,
+      });
+    }
+  }
+
+  // Include MATCHED details from criteriaScores that have context
+  for (const cs of response.criteriaScores ?? []) {
+    const criteria = criteriaMap.get(cs.id);
+    if (!criteria) continue;
+
+    for (const detail of cs.details ?? []) {
+      if (seenDetailIds.has(detail.id)) continue;
+      if (!detail.context) continue;
+
+      const isMatched = detail.status === "MATCHED" || detail.status === "matched";
+      if (!isMatched) continue;
+
+      seenDetailIds.add(detail.id);
+      criteria.details.push({
+        id: detail.id,
+        contextId: detail.contextId ?? undefined,
+        label: detail.label,
+        status: detail.status as MatchStatus,
+        description: detail.description ?? null,
+        requiredLevel: detail.requiredLevel ?? null,
+        candidateLevel: detail.candidateLevel ?? null,
+        isRequired: detail.isRequired ?? null,
+        isFixed: detail.isFixed ?? false,
+        context: detail.context,
+        impactScore: detail.impactScore ?? null,
+        suggestions: [],
       });
     }
   }

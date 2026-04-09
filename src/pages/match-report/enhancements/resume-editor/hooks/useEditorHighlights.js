@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { stripHtml } from '../utils/prosemirrorSearch';
 
 /**
  * Syncs Redux matchingReport detail items → ProseMirror decorations
@@ -68,9 +69,16 @@ const useEditorHighlights = (editor) => {
           detail.status === 'FIXED' ||
           detail.status === 'fixed';
 
+        // For fixed items with suggestions, use the suggestion text as fallback context
+        // (since the original context no longer exists in the editor after Apply)
+        const effectiveContext =
+          isPositive && detail.isFixed && detail.suggestions?.[0]?.suggestion
+            ? stripHtml(detail.suggestions[0].suggestion)
+            : detail.context;
+
         highlights.push({
           detailId: detail.id,
-          context: detail.context,
+          context: effectiveContext,
           pinnedRange: detail.pinnedRange || null,
           status: isPositive ? 'MATCHED' : detail.status,
           isFocused: ctxKey === focusedContextKey,
