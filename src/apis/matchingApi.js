@@ -55,6 +55,15 @@ export const matchingApi = api.injectEndpoints({
       transformResponse: (response) => response?.data ?? null,
     }),
 
+    markDetailAsFixedBatch: builder.mutation({
+      query: ({ detailIds }) => ({
+        url: `${API_VERSION}/criteria-score/details/mark-as-fixed-batch`,
+        method: "PUT",
+        body: { detailIds },
+      }),
+      transformResponse: (response) => response?.data ?? null,
+    }),
+
     unmarkDetailAsFixed: builder.mutation({
       query: ({ detailId }) => ({
         url: `${API_VERSION}/criteria-score/detail/${detailId}/unmark-as-fixed`,
@@ -83,6 +92,7 @@ export const {
   useLazyGetMatchingDetailQuery,
   useRegenerateSuggestionMutation,
   useMarkDetailAsFixedMutation,
+  useMarkDetailAsFixedBatchMutation,
   useUnmarkDetailAsFixedMutation,
   useLazyGetMatchingSuggestionsQuery,
 } = matchingApi;

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Suggestions from '@/pages/match-report/sidebar/content/suggestions';
-import { useMarkDetailAsFixedMutation, useRegenerateSuggestionMutation } from '@/apis/matchingApi';
+import { useMarkDetailAsFixedBatchMutation, useRegenerateSuggestionMutation } from '@/apis/matchingApi';
 import {
   setDetailContext,
   setDetailFixed,
@@ -30,7 +30,7 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
   const popoverRef = useRef(null);
   const cleanupRef = useRef(null);
   const [regenerateSuggestion] = useRegenerateSuggestionMutation();
-  const [markDetailAsFixed] = useMarkDetailAsFixedMutation();
+  const [markDetailAsFixedBatch] = useMarkDetailAsFixedBatchMutation();
   const [regeneratingSuggestionId, setRegeneratingSuggestionId] = useState(null);
   const [isApplying, setIsApplying] = useState(false);
   const [activeIdx, setActiveIdx] = useState(0);
@@ -197,28 +197,22 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
         }
       }
       try {
-        let lastResponse = null;
+        const response = await markDetailAsFixedBatch({ detailIds: siblingDetailIds }).unwrap();
         for (const sid of siblingDetailIds) {
-          try {
-            const r = await markDetailAsFixed({ detailId: sid }).unwrap();
-            if (r) lastResponse = r;
-          } catch (e) {
-            console.warn('markDetailAsFixed failed for sibling', sid, e);
-          }
           dispatch(setDetailFixed({ detailId: sid }));
         }
-        if (lastResponse) {
+        if (response) {
           dispatch(updateScoresAfterFixed({
-            afterOverallScore: lastResponse.afterOverallScore,
-            criteriaScoreId: lastResponse.criteriaScoreId,
-            afterCriteriaScore: lastResponse.afterCriteriaScore,
+            afterOverallScore: response.afterOverallScore,
+            criteriaScoreId: response.criteriaScoreId,
+            afterCriteriaScore: response.afterCriteriaScore,
           }));
 
           if (beforeDoc && pushFixUndo) {
             pushFixUndo({
               beforeDoc,
               detailIds: siblingDetailIds,
-              criteriaScoreId: lastResponse.criteriaScoreId,
+              criteriaScoreId: response.criteriaScoreId,
               beforeOverallScore,
               beforeCriteriaScore,
               originalContext: detail.context,
@@ -338,6 +332,7 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
             onRegenerateSuggestion={handleRegenerateSuggestion}
             context={detail.context}
             detailId={detail.id}
+            allDetailIds={siblings.map((s) => s.id)}
           />
         )}
       </div>

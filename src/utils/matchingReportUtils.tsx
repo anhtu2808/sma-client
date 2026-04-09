@@ -114,10 +114,17 @@ const normalizeCriteriaScores = (criteriaScores?: CriteriaScore[] | null): Crite
   }));
 };
 
+const countMissing = (cs: CriteriaScore) =>
+  (cs.details ?? []).filter(
+    (d) => (d.status === "MISSING" || d.status === "missing") && !d.isFixed
+  ).length;
+
 export const mapEvaluationToStore = (evaluationData: EvaluationData): MatchingReportState => {
   const normalizedEvaluationData = {
     ...evaluationData,
-    criteriaScores: normalizeCriteriaScores(evaluationData?.criteriaScores).sort((a, b) => a.id - b.id),
+    criteriaScores: normalizeCriteriaScores(evaluationData?.criteriaScores).sort(
+      (a, b) => countMissing(b) - countMissing(a) || a.id - b.id
+    ),
   };
 
   return {
@@ -230,7 +237,9 @@ export const mapSuggestionsToStore = (response: SuggestionsResponse): MatchingRe
     }
   }
 
-  const criteriaScores = Array.from(criteriaMap.values()).sort((a, b) => a.id - b.id);
+  const criteriaScores = Array.from(criteriaMap.values()).sort(
+    (a, b) => countMissing(b) - countMissing(a) || a.id - b.id
+  );
 
   return {
     data: {

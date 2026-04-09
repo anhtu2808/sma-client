@@ -7,7 +7,7 @@ import {
   setFocusedItemId,
   updateScoresAfterFixed,
 } from "@/store/slices/matchingReportSlice";
-import { useMarkDetailAsFixedMutation } from "@/apis/matchingApi";
+import { useMarkDetailAsFixedBatchMutation } from "@/apis/matchingApi";
 import { getErrorMessage } from "@/constant/attachment";
 import toastMessage from "@/utils/toastMessage";
 import EditorContext from "@/pages/match-report/enhancements/EditorContext";
@@ -28,7 +28,7 @@ const SuggestionCard = ({
   const [copied, setCopied] = useState(false);
   const [fixApplied, setFixApplied] = useState(false);
   const { fixInEditor, fixingDetailId, editor, pushFixUndo } = useContext(EditorContext);
-  const [markDetailAsFixed] = useMarkDetailAsFixedMutation();
+  const [markDetailAsFixedBatch] = useMarkDetailAsFixedBatchMutation();
   const text = suggestion?.suggestion || "";
 
   // Capture current scores for undo purposes (before applying fix)
@@ -89,25 +89,25 @@ const SuggestionCard = ({
     let beforeCriteriaScore;
 
     try {
-      for (const id of idsToMark) {
-        const response = await markDetailAsFixed({ detailId: id }).unwrap();
-        dispatch(setDetailFixed({ detailId: id }));
+      const response = await markDetailAsFixedBatch({ detailIds: idsToMark }).unwrap();
 
-        if (response) {
-          criteriaScoreId = response.criteriaScoreId;
-          // Before score = after minus impact (reverse the markAsFixed calculation)
-          if (beforeCriteriaScore === undefined && matchData?.criteriaScores) {
-            const cs = matchData.criteriaScores.find((c) => c.id === response.criteriaScoreId);
-            beforeCriteriaScore = cs?.aiScore;
-          }
-          dispatch(
-            updateScoresAfterFixed({
-              afterOverallScore: response.afterOverallScore,
-              criteriaScoreId: response.criteriaScoreId,
-              afterCriteriaScore: response.afterCriteriaScore,
-            })
-          );
+      for (const id of idsToMark) {
+        dispatch(setDetailFixed({ detailId: id }));
+      }
+
+      if (response) {
+        criteriaScoreId = response.criteriaScoreId;
+        if (beforeCriteriaScore === undefined && matchData?.criteriaScores) {
+          const cs = matchData.criteriaScores.find((c) => c.id === response.criteriaScoreId);
+          beforeCriteriaScore = cs?.aiScore;
         }
+        dispatch(
+          updateScoresAfterFixed({
+            afterOverallScore: response.afterOverallScore,
+            criteriaScoreId: response.criteriaScoreId,
+            afterCriteriaScore: response.afterCriteriaScore,
+          })
+        );
       }
 
       // Register this fix in the undo stack so Ctrl+Z can roll it back
@@ -142,7 +142,7 @@ const SuggestionCard = ({
       }`}
     >
       <div className="flex items-start gap-3">
-        <div className="min-w-0 flex-1 prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: text }} />
+        <div className="min-w-0 flex-1 prose prose-sm max-w-none [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5" dangerouslySetInnerHTML={{ __html: text }} />
 
         <div className="flex shrink-0 items-center gap-1">
           {canFixInEditor ? (
