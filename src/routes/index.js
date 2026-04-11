@@ -28,6 +28,7 @@ import Checkout from "@/pages/checkout";
 import MatchReport from "@/pages/match-report";
 import MatchingHistory from "@/pages/dashboard/matching-history";
 import ResetPassword from "@/pages/reset-password";
+import VerifyEmail from "@/pages/verify-email";
 import Enhancements from "@/pages/match-report/enhancements";
 import CvPreview from "@/pages/cv-preview";
 import ToastTest from "@/pages/ui-kit/toast";
@@ -42,6 +43,7 @@ export const routes = createBrowserRouter(
                 <Route path="register" element={<Register />} />
                 <Route path="forgot-password" element={<ForgotPassword />} />
                 <Route path="reset-password" element={<ResetPassword />} />
+                <Route path="verify-email" element={<VerifyEmail />} />
             </Route>
             <Route element={<Layout />}>
                 <Route index element={<Home />} />

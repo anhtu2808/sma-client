@@ -6,7 +6,7 @@ import Button from "@/components/Button";
 import SideDecorator from "./side-decorator";
 import authService from "@/services/authService";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowRight, faEnvelope } from '../../utils/icons';
+import { faArrowRight } from '../../utils/icons';
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
@@ -52,19 +52,13 @@ const ForgotPassword = () => {
           </p>
 
           <form className="space-y-6" onSubmit={handleSubmit}>
-            <div className="space-y-2">
-              <label className="block text-[0.85rem] font-bold text-[#3a2b25] dark:text-gray-300">
-                Email address
-              </label>
-              <Input
-                type="email"
-                placeholder="name@company.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                prefix={<FontAwesomeIcon icon={faEnvelope} className="text-gray-400" />}
-              />
-            </div>
+            <Input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
 
             <Button
               type="submit"

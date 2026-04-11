@@ -120,6 +120,28 @@ const authService = {
         }
     },
 
+    verifyEmail: async ({ email, otp }) => {
+        try {
+            const response = await AuthAPI.post('/candidate/auth/verify-email', { email, otp });
+            if (response.data?.data?.accessToken) {
+                localStorage.setItem('accessToken', response.data.data.accessToken);
+                localStorage.setItem('refreshToken', response.data.data.refreshToken);
+            }
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    resendVerificationEmail: async (email) => {
+        try {
+            const response = await AuthAPI.post(`/candidate/auth/resend-verification?email=${encodeURIComponent(email)}`);
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    },
+
     isAuthenticated: () => {
         return !!localStorage.getItem('accessToken');
     },
