@@ -11,7 +11,8 @@ export const applicationApi = api.injectEndpoints({
             }),
             invalidatesTags: (result, error, payload) => [
                 { type: "Jobs", id: parseInt(payload.jobId) },
-                "Jobs"
+                "Jobs",
+                "Applications",
             ],
         }),
 
