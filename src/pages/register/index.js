@@ -33,8 +33,8 @@ const Register = () => {
       });
 
       if (response.data.code === 200) {
-        toastMessage.success(response.data.message || "Registration successful");
-        navigate("/");
+        toastMessage.success("Registration successful! Please check your email to verify your account.");
+        navigate("/verify-email", { state: { email } });
       } else {
         toastMessage.error(response.data.message || "Registration failed");
       }
@@ -80,10 +80,10 @@ const Register = () => {
       <div className="w-full lg:w-1/2 h-full flex flex-col justify-center px-8 sm:px-12 lg:px-24 xl:px-32 relative bg-white dark:bg-gray-900 z-10 overflow-y-auto">
         <div className="w-full max-w-md mx-auto py-12">
           <h1 className="text-4xl font-extrabold mb-3 tracking-tight text-gray-900 dark:text-white">
-            Create Account
+            Sign Up
           </h1>
           <p className="text-lg text-gray-500 dark:text-gray-400 mb-8">
-            Join us to find your dream job!
+            Join SmartRecruit and find your dream job!
           </p>
           <div className="flex justify-center mb-5">
             <div className="relative w-full">
@@ -165,7 +165,7 @@ const Register = () => {
                 disabled={loading}
                 loading={loading}
               >
-                {loading ? "Creating Account..." : "Create Account"}
+                {loading ? "Signing up..." : "Sign Up"}
               </Button>
             </div>
           </form>
