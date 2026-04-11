@@ -31,6 +31,16 @@ const getStatusConfig = (status) => {
     };
   }
 
+  if (status === "PARTIAL" || status === "partial") {
+    return {
+      icon: faCircleXmark,
+      iconClassName: "text-amber-500",
+      tagClassName: "text-sm font-medium text-neutral-900",
+      progressClassName:
+        "inline-flex items-center gap-1 rounded bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700",
+    };
+  }
+
   return {
     icon: faCircleCheck,
     iconClassName: "text-emerald-500",

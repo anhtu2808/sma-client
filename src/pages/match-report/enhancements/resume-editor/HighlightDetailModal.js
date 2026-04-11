@@ -40,11 +40,15 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
   // Siblings = all details sharing the same contextId, in document order.
   const siblings = useMemo(() => {
     if (!detail) return [];
-    if (detail.contextId == null || !matchData?.criteriaScores) return [detail];
+    if (!matchData?.criteriaScores) return [detail];
     const result = [];
     for (const cs of matchData.criteriaScores) {
       for (const d of cs.details ?? []) {
-        if (d.contextId === detail.contextId) result.push(d);
+        if (detail.contextId != null) {
+          if (d.contextId === detail.contextId) result.push(d);
+        } else if (detail.context && d.contextId == null && d.context === detail.context) {
+          result.push(d);
+        }
       }
     }
     return result.length > 0 ? result : [detail];
@@ -163,11 +167,15 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
     if (!firstSuggestion || !fixInEditor || !detail.context) return;
 
     const siblingDetailIds = (() => {
-      if (!matchData?.criteriaScores || detail.contextId == null) return [detail.id];
+      if (!matchData?.criteriaScores) return [detail.id];
       const ids = [];
       for (const cs of matchData.criteriaScores) {
         for (const d of cs.details ?? []) {
-          if (d.contextId === detail.contextId) ids.push(d.id);
+          if (detail.contextId != null) {
+            if (d.contextId === detail.contextId) ids.push(d.id);
+          } else if (detail.context && d.contextId == null && d.context === detail.context) {
+            ids.push(d.id);
+          }
         }
       }
       return ids.length > 0 ? ids : [detail.id];

@@ -114,7 +114,7 @@ const getHighlightClass = (status, isFocused) => {
   const normalized = (status || '').toLowerCase();
 
   let statusClass;
-  if (normalized === 'missing') {
+  if (normalized === 'missing' || normalized === 'partial') {
     statusClass = `${base}--missing`;
   } else {
     // MATCHED, FIXED, or any positive status
@@ -126,7 +126,9 @@ const getHighlightClass = (status, isFocused) => {
 
 const getTagStatusClass = (status) => {
   const normalized = (status || '').toLowerCase();
-  return normalized === 'missing' ? 'suggestion-tag--missing' : 'suggestion-tag--matched';
+  return normalized === 'missing' || normalized === 'partial'
+    ? 'suggestion-tag--missing'
+    : 'suggestion-tag--matched';
 };
 
 const buildDecorationSet = (doc, highlights, pinnedRanges) => {
