@@ -170,6 +170,8 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
 
     const firstSibling = clicked.contextId != null
       ? allDetails.find((d) => d.contextId === clicked.contextId) || clicked
+      : clicked.context
+        ? allDetails.find((d) => d.contextId == null && d.context === clicked.context) || clicked
       : clicked;
 
     dispatch(setHighlightModalDetailId(firstSibling.id));

@@ -1,4 +1,4 @@
-export type MatchStatus = "MATCHED" | "MISSING" | "FIXED";
+export type MatchStatus = "MATCHED" | "MISSING" | "FIXED" | "PARTIAL";
 
 export type MatchLevel = "EXCELLENT" | "GOOD" | "FAIR" | "POOR";
 
@@ -92,6 +92,14 @@ const normalizeSuggestions = (suggestions?: SuggestionItem[] | null): Suggestion
     .filter((suggestion) => Number.isFinite(suggestion.id));
 };
 
+const normalizeMatchStatus = (status?: string | null): MatchStatus => {
+  const normalized = typeof status === "string" ? status.trim().toUpperCase() : "";
+  if (normalized === "MATCHED" || normalized === "MISSING" || normalized === "FIXED" || normalized === "PARTIAL") {
+    return normalized as MatchStatus;
+  }
+  return "MISSING";
+};
+
 const normalizeDetails = (details?: DetailItem[] | null): DetailItem[] => {
   if (!Array.isArray(details)) {
     return [];
@@ -116,7 +124,7 @@ const normalizeCriteriaScores = (criteriaScores?: CriteriaScore[] | null): Crite
 
 const countMissing = (cs: CriteriaScore) =>
   (cs.details ?? []).filter(
-    (d) => (d.status === "MISSING" || d.status === "missing") && !d.isFixed
+    (d) => (d.status === "MISSING" || d.status === "missing" || d.status === "PARTIAL" || d.status === "partial") && !d.isFixed
   ).length;
 
 export const mapEvaluationToStore = (evaluationData: EvaluationData): MatchingReportState => {
@@ -145,7 +153,11 @@ interface ContextDetail {
   scoringCriteriaId: number;
   criteriaName: string;
   label: string;
+  status?: MatchStatus | string;
   description: string;
+  requiredLevel?: string | null;
+  candidateLevel?: CandidateLevel | "NONE" | string | null;
+  isRequired?: boolean | null;
   impactScore: number;
   isFixed?: boolean;
 }
@@ -194,11 +206,11 @@ export const mapSuggestionsToStore = (response: SuggestionsResponse): MatchingRe
         id: detail.id,
         contextId: ctx.id,
         label: detail.label,
-        status: "MISSING" as MatchStatus,
+        status: normalizeMatchStatus(detail.status),
         description: detail.description ?? null,
-        requiredLevel: null,
-        candidateLevel: null,
-        isRequired: null,
+        requiredLevel: detail.requiredLevel ?? null,
+        candidateLevel: detail.candidateLevel ?? null,
+        isRequired: detail.isRequired ?? null,
         isFixed: detail.isFixed ?? false,
         context: ctx.context,
         impactScore: detail.impactScore ?? null,
@@ -216,15 +228,12 @@ export const mapSuggestionsToStore = (response: SuggestionsResponse): MatchingRe
       if (seenDetailIds.has(detail.id)) continue;
       if (!detail.context) continue;
 
-      const isMatched = detail.status === "MATCHED" || detail.status === "matched";
-      if (!isMatched) continue;
-
       seenDetailIds.add(detail.id);
       criteria.details.push({
         id: detail.id,
         contextId: detail.contextId ?? undefined,
         label: detail.label,
-        status: detail.status as MatchStatus,
+        status: normalizeMatchStatus(detail.status),
         description: detail.description ?? null,
         requiredLevel: detail.requiredLevel ?? null,
         candidateLevel: detail.candidateLevel ?? null,
