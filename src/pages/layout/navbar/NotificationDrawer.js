@@ -33,7 +33,7 @@ const getRoute = (type) => {
     switch (type) {
         case 'CV_PARSE_FAILED': return '/dashboard/resumes';
         case 'PAYMENT_SUCCESS':
-        case 'PAYMENT_FAILURE': return '/dashboard/billing-plans';
+        case 'PAYMENT_FAILURE': return '/dashboard/payment-history';
         case 'APPLICATION_STATUS': return '/dashboard/jobs';
         case 'SYSTEM': return '/dashboard/usage';
         case 'INVITATION': return '/dashboard/invitations';
