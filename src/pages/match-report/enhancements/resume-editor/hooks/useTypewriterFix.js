@@ -59,23 +59,84 @@ const useTypewriterFix = () => {
           // Block-level HTML → replace the entire innermost containing block.
           const resolved = editor.state.doc.resolve(from);
           const depth = resolved.depth; // innermost block depth
-          const parentStart = resolved.before(depth);
-          const parentEnd = resolved.after(depth);
 
-          const sizeBefore = editor.state.doc.content.size;
-          editor
-            .chain()
-            .deleteRange({ from: parentStart, to: parentEnd })
-            .insertContentAt(parentStart, suggestionText, { updateSelection: false })
-            .run();
-          const sizeAfter = editor.state.doc.content.size;
+          // Strip empty list items that the AI occasionally appends.
+          // Use DOM parsing instead of regex to handle any internal structure
+          // (e.g. <li></li>, <li><p></p></li>, <li>&nbsp;</li>, etc.)
+          const _tmpDiv = document.createElement('div');
+          _tmpDiv.innerHTML = suggestionText.trim();
+          _tmpDiv.querySelectorAll('li').forEach((li) => {
+            if (!li.textContent.trim()) li.remove();
+          });
 
-          // New content occupies parentStart .. parentStart + (newContentSize)
-          // where newContentSize = (deletedSize) + (delta)
-          const deletedLen = parentEnd - parentStart;
-          const newLen = deletedLen + (sizeAfter - sizeBefore);
-          insertedFrom = parentStart;
-          insertedTo = parentStart + newLen;
+          // Special case: if the matched position is inside a listItem's paragraph,
+          // we must NOT delete the whole block. Deleting the paragraph but leaving
+          // the listItem shell causes ProseMirror to add empty paragraphs to satisfy
+          // the schema → extra empty bullets. Instead, replace only the paragraph's
+          // text content, which preserves the existing list structure cleanly.
+          const innerNode = resolved.node(depth);
+          const outerNode = depth > 0 ? resolved.node(depth - 1) : null;
+          const isInListItem =
+            innerNode?.type.name === 'paragraph' &&
+            (outerNode?.type.name === 'listItem' || outerNode?.type.name === 'taskItem');
+
+          if (isInListItem) {
+            // Extract the first <li>'s inner HTML as the replacement content.
+            const liEl = _tmpDiv.querySelector('li');
+            const innerHtml = liEl ? liEl.innerHTML.trim() : _tmpDiv.textContent.trim();
+
+            // Replace only the content inside the existing paragraph, keeping the
+            // listItem/bulletList structure intact.
+            const paraContentStart = resolved.start(depth);
+            const paraContentEnd = resolved.end(depth);
+
+            const sizeBefore = editor.state.doc.content.size;
+            editor
+              .chain()
+              .deleteRange({ from: paraContentStart, to: paraContentEnd })
+              .insertContentAt(paraContentStart, innerHtml, { updateSelection: false })
+              .run();
+            const sizeAfter = editor.state.doc.content.size;
+
+            const newLen = (paraContentEnd - paraContentStart) + (sizeAfter - sizeBefore);
+            let textFrom = paraContentStart;
+            editor.state.doc.nodesBetween(paraContentStart, paraContentStart + newLen, (node, pos) => {
+              if (node.isText) { textFrom = pos; return false; }
+              return true;
+            });
+            insertedFrom = textFrom;
+            insertedTo = paraContentStart + newLen;
+          } else {
+            // Standard block replacement: delete the entire containing block and
+            // insert the suggestion HTML in its place.
+            const parentStart = resolved.before(depth);
+            const parentEnd = resolved.after(depth);
+            const cleanedSuggestion = _tmpDiv.innerHTML;
+
+            const sizeBefore = editor.state.doc.content.size;
+            editor
+              .chain()
+              .deleteRange({ from: parentStart, to: parentEnd })
+              .insertContentAt(parentStart, cleanedSuggestion, {
+                updateSelection: false,
+                parseOptions: { preserveWhitespace: false },
+              })
+              .run();
+            const sizeAfter = editor.state.doc.content.size;
+
+            const deletedLen = parentEnd - parentStart;
+            const newLen = deletedLen + (sizeAfter - sizeBefore);
+
+            // Find the first text-node position inside the newly inserted content
+            // so the badge widget renders inline with text rather than between blocks.
+            let textFrom = parentStart + 1; // safe fallback
+            editor.state.doc.nodesBetween(parentStart, parentStart + newLen, (node, pos) => {
+              if (node.isText) { textFrom = pos; return false; }
+              return true;
+            });
+            insertedFrom = textFrom;
+            insertedTo = parentStart + newLen - 1;
+          }
         } else {
           // Inline / plain text suggestion → replace just the matched range.
           let plainText = suggestionText;
