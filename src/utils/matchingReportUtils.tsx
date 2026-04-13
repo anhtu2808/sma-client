@@ -14,6 +14,7 @@ export interface SuggestionItem {
 export interface DetailItem {
   id: number;
   contextId?: number;
+  tagIndex?: number | null;
   label: string;
   status: MatchStatus;
   description: string | null;
@@ -194,8 +195,9 @@ export const mapSuggestionsToStore = (response: SuggestionsResponse): MatchingRe
   const seenDetailIds = new Set<number>();
 
   // Distribute context details into their parent criteria
-  for (const ctx of response.contexts ?? []) {
+  for (const [contextIndex, ctx] of (response.contexts ?? []).entries()) {
     const suggestions = normalizeSuggestions(ctx.suggestions);
+    const tagIndex = contextIndex + 1;
 
     for (const detail of ctx.details ?? []) {
       const criteria = criteriaMap.get(detail.evaluationCriteriaScoreId);
@@ -205,6 +207,7 @@ export const mapSuggestionsToStore = (response: SuggestionsResponse): MatchingRe
       criteria.details.push({
         id: detail.id,
         contextId: ctx.id,
+        tagIndex,
         label: detail.label,
         status: normalizeMatchStatus(detail.status),
         description: detail.description ?? null,
@@ -232,6 +235,7 @@ export const mapSuggestionsToStore = (response: SuggestionsResponse): MatchingRe
       criteria.details.push({
         id: detail.id,
         contextId: detail.contextId ?? undefined,
+        tagIndex: null,
         label: detail.label,
         status: normalizeMatchStatus(detail.status),
         description: detail.description ?? null,

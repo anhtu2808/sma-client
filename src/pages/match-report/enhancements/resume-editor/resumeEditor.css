@@ -146,50 +146,43 @@
   background: rgba(16, 185, 129, 0.28) !important;
 }
 
-/* Tag overlay — flag/pennant badge floating above highlight (does not affect text flow) */
-.suggestion-has-tag {
+/* Highlight tag widget */
+.suggestion-tag {
+  display: inline-flex;
+  width: 0;
+  height: 0;
+  overflow: visible;
   position: relative;
+  vertical-align: baseline;
+  pointer-events: auto;
+  user-select: none;
 }
 
-.suggestion-has-tag::before {
-  content: var(--tag-number, "");
-  position: absolute;
-  top: 0;
+.suggestion-tag__badge {
+  position: relative;
+  top: -2px;
   left: -20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-width: 16px;
   height: 16px;
   padding: 0 3px;
   font-size: 9px;
   font-weight: 700;
-  line-height: 16px;
-  text-align: center;
+  line-height: 1;
   color: #fff;
   cursor: pointer;
-  user-select: none;
   border-radius: 3px 0 0 3px;
   z-index: 2;
-  pointer-events: auto;
 }
 
-/* Pennant tail removed — badge now sits in the left gutter, no overhang above the line */
-.suggestion-has-tag::after {
-  display: none;
-}
-
-.suggestion-tag--missing::before {
+.suggestion-tag--missing .suggestion-tag__badge {
   background: #F97316;
 }
 
-.suggestion-tag--missing::after {
-  border-top: 4px solid #c2610f;
-}
-
-.suggestion-tag--matched::before {
+.suggestion-tag--matched .suggestion-tag__badge {
   background: #10b981;
-}
-
-.suggestion-tag--matched::after {
-  border-top: 4px solid #0d9467;
 }
 
 .resume-editor .tiptap-content blockquote {

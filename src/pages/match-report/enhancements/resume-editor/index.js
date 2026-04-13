@@ -149,19 +149,13 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
 
   // Editor tag-badge click opens the modal at the FIRST detail of the clicked context.
   const handleEditorClick = useCallback((event) => {
-    const highlightEl = event.target.closest('[data-tag="true"]');
-    if (!highlightEl) return;
-
-    const rect = highlightEl.getBoundingClientRect();
-    const clickX = event.clientX;
-    const isTagArea = clickX < rect.left && clickX >= rect.left - 22;
-
-    if (!isTagArea) return;
+    const tagEl = event.target.closest('.suggestion-tag');
+    if (!tagEl) return;
 
     event.preventDefault();
     event.stopPropagation();
 
-    const clickedId = Number(highlightEl.dataset.detailId);
+    const clickedId = Number(tagEl.dataset.detailId);
     if (!Number.isFinite(clickedId) || !criteriaScores) return;
 
     const allDetails = criteriaScores.flatMap((cs) => cs.details || []);
