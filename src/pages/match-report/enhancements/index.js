@@ -72,8 +72,9 @@ const Enhancements = () => {
   const [reScoreEnhancement, { isLoading: isReScoring }] = useReScoreEnhancementMutation();
   const [triggerGetStatus] = useLazyGetMatchingStatusQuery();
   const [triggerGetDetail] = useLazyGetMatchingDetailQuery();
-  const [reScoreStatus, setReScoreStatus] = useState(null); // null | 'polling' | 'success' | 'error'
+  const [reScoreStatus, setReScoreStatus] = useState(null); // null | 'polling' | 'regenerating-suggestions' | 'success' | 'error'
   const [reScoreEvalId, setReScoreEvalId] = useState(null);
+  const reScoreInFlightRef = useRef(false);
 
   // Export modal state
   const [exportModalOpen, setExportModalOpen] = useState(false);
@@ -179,44 +180,93 @@ const Enhancements = () => {
 
   // Re-score handler: trigger POST /re-score then poll for status
   const handleReScore = useCallback(async () => {
-    if (!enhancement?.id || isReScoring || reScoreStatus === 'polling') return;
+    if (
+      !enhancement?.id ||
+      !editorApi?.editor ||
+      reScoreInFlightRef.current ||
+      isReScoring ||
+      reScoreStatus === 'polling' ||
+      reScoreStatus === 'regenerating-suggestions'
+    ) {
+      return;
+    }
+
+    reScoreInFlightRef.current = true;
+
+    try {
+      const html = editorApi.editor.getHTML();
+      await updateContent({ id: enhancement.id, content: html }).unwrap();
+    } catch {
+      reScoreInFlightRef.current = false;
+      message.error('Không thể lưu thay đổi trước khi chấm điểm lại');
+      return;
+    }
+
     try {
       const evalId = await reScoreEnhancement({ enhancementId: enhancement.id }).unwrap();
       setReScoreEvalId(evalId);
       setReScoreStatus('polling');
     } catch (err) {
+      reScoreInFlightRef.current = false;
       message.error('Không thể bắt đầu chấm điểm lại');
     }
-  }, [enhancement?.id, isReScoring, reScoreStatus, reScoreEnhancement]);
+  }, [
+    enhancement?.id,
+    editorApi?.editor,
+    isReScoring,
+    reScoreStatus,
+    updateContent,
+    reScoreEnhancement,
+  ]);
 
   // Polling effect: check re-score status every 2s until FINISH/FAIL or 3min timeout
   useEffect(() => {
-    if (reScoreStatus !== 'polling' || !reScoreEvalId) return;
+    if (reScoreStatus !== 'polling' || !reScoreEvalId || !enhancement?.id) return;
 
     const interval = setInterval(async () => {
       try {
         const status = await triggerGetStatus({ evaluationId: reScoreEvalId }).unwrap();
         if (status === 'FINISH') {
           clearInterval(interval);
-          setReScoreStatus('success');
+          clearTimeout(timeout);
+
           const data = await triggerGetDetail({ evaluationId: reScoreEvalId }).unwrap();
           if (data) {
             dispatch(setMatchingReportData(mapEvaluationToStore(data)));
           }
-          message.success('Chấm điểm lại thành công!');
+
+          setReScoreStatus('regenerating-suggestions');
+          try {
+            const suggestionData = await generateSuggestion({ enhancementId: enhancement.id }).unwrap();
+            if (suggestionData?.contexts) {
+              dispatch(setMatchingReportData(mapSuggestionsToStore(suggestionData)));
+            }
+            reScoreInFlightRef.current = false;
+            setReScoreStatus('success');
+            message.success('Chấm điểm và cập nhật gợi ý thành công!');
+          } catch {
+            reScoreInFlightRef.current = false;
+            setReScoreStatus('success');
+            message.warning('Điểm đã được cập nhật nhưng không thể tạo lại gợi ý');
+          }
         } else if (status === 'FAIL') {
           clearInterval(interval);
+          clearTimeout(timeout);
+          reScoreInFlightRef.current = false;
           setReScoreStatus('error');
           message.error('Chấm điểm lại thất bại');
         }
       } catch {
         clearInterval(interval);
+        clearTimeout(timeout);
+        reScoreInFlightRef.current = false;
         setReScoreStatus('error');
       }
     }, 2000);
 
     const timeout = setTimeout(() => {
       clearInterval(interval);
+      reScoreInFlightRef.current = false;
       setReScoreStatus('error');
       message.error('Chấm điểm lại quá thời gian');
     }, 180000);
@@ -225,7 +275,15 @@ const Enhancements = () => {
       clearInterval(interval);
       clearTimeout(timeout);
     };
-  }, [reScoreStatus, reScoreEvalId, triggerGetStatus, triggerGetDetail, dispatch]);
+  }, [
+    reScoreStatus,
+    reScoreEvalId,
+    enhancement?.id,
+    triggerGetStatus,
+    triggerGetDetail,
+    generateSuggestion,
+    dispatch,
+  ]);
 
   const handleOpenExportModal = useCallback(() => {
     if (!enhancement?.id || !editorApi?.editor) return;

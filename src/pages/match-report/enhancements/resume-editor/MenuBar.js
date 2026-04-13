@@ -56,6 +56,11 @@ const MenuBar = ({
 }) => {
   if (!editor) return null;
 
+  const isReScoreBusy =
+    isReScoring ||
+    reScoreStatus === 'polling' ||
+    reScoreStatus === 'regenerating-suggestions';
+
   const currentFormat = editor.isActive('heading', { level: 1 })
     ? 'h1'
     : editor.isActive('heading', { level: 2 })
@@ -129,16 +134,24 @@ const MenuBar = ({
       {/* Right zone: actions — always visible, never shrinks */}
       <div className="flex items-center gap-1.5 shrink-0 pl-2 ml-1 border-l border-neutral-200">
         {onReScore && (
-          <Tooltip title={reScoreStatus === 'polling' ? 'Re-scoring...' : 'Re-score'}>
+          <Tooltip
+            title={
+              reScoreStatus === 'polling'
+                ? 'Re-scoring...'
+                : reScoreStatus === 'regenerating-suggestions'
+                  ? 'Updating suggestions...'
+                  : 'Re-score'
+            }
+          >
             <button
               type="button"
               onClick={onReScore}
-              disabled={isReScoring || reScoreStatus === 'polling'}
+              disabled={isReScoreBusy}
               className="flex items-center justify-center rounded-lg w-8 h-8 text-white transition-all disabled:opacity-60 disabled:cursor-not-allowed bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 shadow-sm"
             >
               <RefreshCw
                 size={14}
-                className={(isReScoring || reScoreStatus === 'polling') ? 'animate-spin' : ''}
+                className={isReScoreBusy ? 'animate-spin' : ''}
               />
             </button>
           </Tooltip>
