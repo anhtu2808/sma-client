@@ -143,7 +143,7 @@ export const buildDecorationSet = (doc, highlights, pinnedRanges) => {
       decorations.push(
         Decoration.widget(from, () => createTagElement(item, tagIndex), {
           side: -1,
-          key: `tag-${highlightKey}-${from}`,
+          key: `tag-${highlightKey}-${from}-${item.status}`,
         })
       );
     }

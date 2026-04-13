@@ -197,7 +197,7 @@ export const mapSuggestionsToStore = (response: SuggestionsResponse): MatchingRe
   // Distribute context details into their parent criteria
   for (const [contextIndex, ctx] of (response.contexts ?? []).entries()) {
     const suggestions = normalizeSuggestions(ctx.suggestions);
-    const tagIndex = contextIndex + 1;
+    const tagIndex = ctx.details?.length ?? 0;
 
     for (const detail of ctx.details ?? []) {
       const criteria = criteriaMap.get(detail.evaluationCriteriaScoreId);
