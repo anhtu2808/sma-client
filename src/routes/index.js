@@ -18,6 +18,7 @@ import TemplateSelection from '@/pages/dashboard/resumes/template-selection';
 import Profile from '@/pages/dashboard/profile';
 import Invitations from '@/pages/dashboard/invitations';
 import BillingPlans from '@/pages/dashboard/billings';
+import PaymentHistory from '@/pages/dashboard/payment-history';
 import Usage from '@/pages/dashboard/usage';
 import CompanyList from '@/pages/company';
 import CompanyDetail from '@/pages/company-detail';
@@ -76,6 +77,7 @@ export const routes = createBrowserRouter(
                 </Route>
                 <Route path="profile" element={<Navigate to="/dashboard" replace />} />
                 <Route path="billing-plans" element={<BillingPlans />} />
+                <Route path="payment-history" element={<PaymentHistory />} />
                 <Route path="usage" element={<Usage />} />
             </Route>
             <Route path="dashboard/resumes/builder" element={<CvBuilder />} />

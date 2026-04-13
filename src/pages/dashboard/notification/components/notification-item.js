@@ -55,7 +55,7 @@ const NotificationItem = ({ noti }) => {
                 break;
             case 'PAYMENT_SUCCESS':
             case 'PAYMENT_FAILURE':
-                navigate('/dashboard/billing-plans');
+                navigate('/dashboard/payment-history');
                 break;
             case 'APPLICATION_STATUS':
                 navigate('/dashboard/jobs');

@@ -35,6 +35,7 @@ const Sidebar = () => {
         },
         { to: "/dashboard/notifications", icon: faBell, label: "Notifications", badge: unreadCount > 0 ? unreadCount : null },
         { to: "/dashboard/billing-plans", icon: faCreditCard, label: "Billing & Plans" },
+        { to: "/dashboard/payment-history", icon: faClockRotateLeft, label: "Payment History" },
         { to: "/dashboard/usage", icon: faClockRotateLeft, label: "Usage" },
         { to: "/dashboard/setting", icon: faGear, label: "Settings" },
     ];
