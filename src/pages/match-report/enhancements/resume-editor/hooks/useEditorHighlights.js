@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { stripHtml } from '../utils/prosemirrorSearch';
 
@@ -14,22 +14,8 @@ const useEditorHighlights = (editor) => {
     (state) => state.matchingReport.ui?.focusedItemId
   );
   const prevFocusedRef = useRef(null);
-  // Counter bumped on every doc update — lets the effect below re-run and
-  // rebuild decorations against the latest document (important after Apply).
-  const [docVersion, setDocVersion] = useState(0);
 
-  useEffect(() => {
-    if (!editor) return undefined;
-    const handler = ({ transaction }) => {
-      if (transaction?.docChanged) setDocVersion((v) => v + 1);
-    };
-    editor.on('update', handler);
-    return () => {
-      editor.off('update', handler);
-    };
-  }, [editor]);
-
-  // Build and apply highlight decorations whenever data, focus, or doc changes
+  // Build and apply highlight decorations whenever the source data changes.
   useEffect(() => {
     if (!editor || !criteriaScores) return;
 
@@ -78,8 +64,10 @@ const useEditorHighlights = (editor) => {
 
         highlights.push({
           detailId: detail.id,
+          highlightKey: detail.contextId != null ? `cid:${detail.contextId}` : `id:${detail.id}`,
           context: effectiveContext,
           pinnedRange: detail.pinnedRange || null,
+          tagIndex: detail.tagIndex ?? null,
           status: isPositive ? 'MATCHED' : detail.status,
           isFocused: ctxKey === focusedContextKey,
           label: detail.label,
@@ -88,7 +76,7 @@ const useEditorHighlights = (editor) => {
     }
 
     editor.commands.setHighlights(highlights);
-  }, [editor, criteriaScores, focusedItemId, docVersion]);
+  }, [editor, criteriaScores, focusedItemId]);
 
   // Scroll-to-focus when focusedItemId changes
   useEffect(() => {

@@ -1,7 +1,12 @@
 import { Extension } from '@tiptap/react';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
-import { Decoration, DecorationSet } from '@tiptap/pm/view';
-import { findTextInDocFuzzy } from '../utils/prosemirrorSearch';
+import { DecorationSet } from '@tiptap/pm/view';
+import {
+  buildDecorationSet,
+  buildHighlightMap,
+  buildPinnedRangeMap,
+  mapPinnedRangeMap,
+} from './suggestionDecorationUtils';
 
 export const suggestionHighlightKey = new PluginKey('suggestionHighlight');
 
@@ -13,10 +18,11 @@ export const suggestionHighlightKey = new PluginKey('suggestionHighlight');
  *    absolute doc positions captured at insertion time. Mapped through every
  *    docChanged transaction so manual edits keep the highlight anchored.
  * 2. **Text search** (fallback for highlights from initial API load):
- *    `findTextInDocFuzzy(item.context)`.
+ *    used only once to seed the initial pinned range.
  *
  * Commands:
- * - setHighlights(highlights) — array of { detailId, context, pinnedRange?, status, isFocused, label }
+ * - setHighlights(highlights) — array of
+ *   { detailId, highlightKey, context, pinnedRange?, tagIndex?, status, isFocused, label }
  * - clearHighlights()
  *
  * Decorations are view-only and never serialized to HTML.
@@ -55,7 +61,7 @@ const SuggestionHighlight = Extension.create({
             return {
               decorationSet: DecorationSet.empty,
               highlights: [],
-              pinnedRanges: new Map(), // detailId → {from, to}
+              pinnedRanges: new Map(), // highlightKey → {from, to}
             };
           },
 
@@ -63,33 +69,21 @@ const SuggestionHighlight = Extension.create({
             const meta = tr.getMeta(suggestionHighlightKey);
 
             if (meta) {
-              // Rebuild decorations from new highlight data.
-              // Seed pinnedRanges from incoming highlights AND preserve any existing
-              // mapped ranges (so a re-render after a manual edit doesn't drop them).
-              const newPinned = new Map(prevState.pinnedRanges);
-              for (const h of meta.highlights || []) {
-                if (h.pinnedRange &&
-                    Number.isFinite(h.pinnedRange.from) &&
-                    Number.isFinite(h.pinnedRange.to)) {
-                  newPinned.set(h.detailId, h.pinnedRange);
-                }
-              }
+              const previousHighlightsByKey = buildHighlightMap(prevState.highlights);
+              const newPinned = buildPinnedRangeMap(
+                tr.doc,
+                meta.highlights,
+                prevState.pinnedRanges,
+                previousHighlightsByKey
+              );
               const decorationSet = buildDecorationSet(tr.doc, meta.highlights, newPinned);
               return { decorationSet, highlights: meta.highlights, pinnedRanges: newPinned };
             }
 
-            // If the doc changed, map both decorations and pinned ranges
             if (tr.docChanged) {
-              const mappedPinned = new Map();
-              for (const [id, r] of prevState.pinnedRanges) {
-                const from = tr.mapping.map(r.from, 1);
-                const to = tr.mapping.map(r.to, -1);
-                if (from < to && to <= tr.doc.content.size) {
-                  mappedPinned.set(id, { from, to });
-                }
-              }
+              const mappedPinned = mapPinnedRangeMap(tr.mapping, tr.doc, prevState.pinnedRanges);
               return {
-                decorationSet: prevState.decorationSet.map(tr.mapping, tr.doc),
+                decorationSet: buildDecorationSet(tr.doc, prevState.highlights, mappedPinned),
                 highlights: prevState.highlights,
                 pinnedRanges: mappedPinned,
               };
@@ -108,72 +102,5 @@ const SuggestionHighlight = Extension.create({
     ];
   },
 });
-
-const getHighlightClass = (status, isFocused) => {
-  const base = 'suggestion-highlight';
-  const normalized = (status || '').toLowerCase();
-
-  let statusClass;
-  if (normalized === 'missing' || normalized === 'partial') {
-    statusClass = `${base}--missing`;
-  } else {
-    // MATCHED, FIXED, or any positive status
-    statusClass = `${base}--matched`;
-  }
-
-  return isFocused ? `${base} ${statusClass} ${base}--focused` : `${base} ${statusClass}`;
-};
-
-const getTagStatusClass = (status) => {
-  const normalized = (status || '').toLowerCase();
-  return normalized === 'missing' || normalized === 'partial'
-    ? 'suggestion-tag--missing'
-    : 'suggestion-tag--matched';
-};
-
-const buildDecorationSet = (doc, highlights, pinnedRanges) => {
-  if (!highlights || highlights.length === 0) {
-    return DecorationSet.empty;
-  }
-
-  const decorations = [];
-  let tagNumber = 0;
-
-  for (const item of highlights) {
-    let ranges = [];
-
-    // Strategy 1: pinned range from prior apply
-    const pinned = pinnedRanges?.get?.(item.detailId);
-    if (pinned &&
-        Number.isFinite(pinned.from) &&
-        Number.isFinite(pinned.to) &&
-        pinned.from < pinned.to &&
-        pinned.to <= doc.content.size) {
-      ranges = [{ from: pinned.from, to: pinned.to }];
-    } else if (item.context && typeof item.context === 'string') {
-      // Strategy 2: text search fallback
-      ranges = findTextInDocFuzzy(doc, item.context);
-    }
-
-    if (ranges.length === 0) {
-      continue;
-    }
-    tagNumber++;
-
-    for (const { from, to } of ranges) {
-      decorations.push(
-        Decoration.inline(from, to, {
-          class: `${getHighlightClass(item.status, item.isFocused)} suggestion-has-tag ${getTagStatusClass(item.status)}`,
-          'data-detail-id': String(item.detailId),
-          'data-tag': 'true',
-          'data-tag-number': String(tagNumber),
-          style: `--tag-number: "${tagNumber}"`,
-        })
-      );
-    }
-  }
-
-  return DecorationSet.create(doc, decorations);
-};
 
 export default SuggestionHighlight;

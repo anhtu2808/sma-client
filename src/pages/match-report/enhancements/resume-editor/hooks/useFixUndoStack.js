@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
-import { setDetailUnfixed, setDetailContext, revertScoresAfterUnfixed } from '@/store/slices/matchingReportSlice';
+import {
+  setDetailUnfixed,
+  setDetailContext,
+  setDetailPinnedRange,
+  revertScoresAfterUnfixed,
+} from '@/store/slices/matchingReportSlice';
 import { useUnmarkDetailAsFixedMutation } from '@/apis/matchingApi';
 
 /**
@@ -8,7 +13,7 @@ import { useUnmarkDetailAsFixedMutation } from '@/apis/matchingApi';
  * AND the "mark as fixed" state (Redux + backend).
  *
  * Stack entry shape:
- *   { beforeDoc, detailIds, criteriaScoreId, beforeOverallScore, beforeCriteriaScore }
+ *   { beforeDoc, detailIds, criteriaScoreId, beforeOverallScore, beforeCriteriaScore, originalPinnedRanges }
  *
  * - beforeDoc: ProseMirror Node captured before fixInEditor was called
  * - detailIds: array of detail IDs that were marked as fixed in that apply action
@@ -51,6 +56,9 @@ const useFixUndoStack = (editor) => {
           dispatch(setDetailContext({ detailId: id, context: top.originalContext }))
         );
       }
+      top.detailIds.forEach((id) =>
+        dispatch(setDetailPinnedRange({ detailId: id, range: top.originalPinnedRanges?.[id] ?? null }))
+      );
       dispatch(
         revertScoresAfterUnfixed({
           beforeOverallScore: top.beforeOverallScore,

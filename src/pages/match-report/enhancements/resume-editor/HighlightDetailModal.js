@@ -66,13 +66,14 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
   useEffect(() => {
     if (!open || !detail || !popoverRef.current) return;
 
-    const highlightEl = document.querySelector(`[data-detail-id="${detail.id}"][data-tag="true"]`);
-    if (!highlightEl) return;
+    const tagEl = document.querySelector(`.suggestion-tag[data-detail-id="${detail.id}"]`);
+    if (!tagEl) return;
 
-    const editorScroller = highlightEl.closest('.overflow-y-auto');
+    const editorScroller = tagEl.closest('.overflow-y-auto');
     if (!editorScroller) return;
 
-    const hlRect = highlightEl.getBoundingClientRect();
+    const anchorEl = tagEl.querySelector('.suggestion-tag__badge') || tagEl;
+    const hlRect = anchorEl.getBoundingClientRect();
     const scrollerRect = editorScroller.getBoundingClientRect();
     const popover = popoverRef.current;
 
@@ -123,8 +124,10 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
   if (!open || !detail) return null;
 
   const activeSibling = siblings[activeIdx] ?? detail;
-  const hasSuggestions = Array.isArray(detail.suggestions) && detail.suggestions.length > 0;
-  const isPositiveStatus = detail.isFixed || detail.status === 'MATCHED' || detail.status === 'FIXED';
+  const activeDetail = activeSibling ?? detail;
+  const hasSuggestions = Array.isArray(activeDetail.suggestions) && activeDetail.suggestions.length > 0;
+  const isPositiveStatus =
+    activeDetail.isFixed || activeDetail.status === 'MATCHED' || activeDetail.status === 'FIXED';
   const canRegenerate = !isPositiveStatus;
   const hasMultiple = siblings.length > 1;
 
@@ -163,37 +166,45 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
   };
 
   const handleApply = async () => {
-    const firstSuggestion = detail.suggestions?.[0]?.suggestion;
-    if (!firstSuggestion || !fixInEditor || !detail.context) return;
+    const firstSuggestion = activeDetail.suggestions?.[0]?.suggestion;
+    if (!firstSuggestion || !fixInEditor || !activeDetail.context) return;
 
     const siblingDetailIds = (() => {
-      if (!matchData?.criteriaScores) return [detail.id];
+      if (!matchData?.criteriaScores) return [activeDetail.id];
       const ids = [];
       for (const cs of matchData.criteriaScores) {
         for (const d of cs.details ?? []) {
-          if (detail.contextId != null) {
-            if (d.contextId === detail.contextId) ids.push(d.id);
-          } else if (detail.context && d.contextId == null && d.context === detail.context) {
+          if (activeDetail.contextId != null) {
+            if (d.contextId === activeDetail.contextId) ids.push(d.id);
+          } else if (activeDetail.context && d.contextId == null && d.context === activeDetail.context) {
             ids.push(d.id);
           }
         }
       }
-      return ids.length > 0 ? ids : [detail.id];
+      return ids.length > 0 ? ids : [activeDetail.id];
     })();
 
     const beforeDoc = editor?.state?.doc;
     const beforeOverallScore = matchData?.aiOverallScore;
+    const originalPinnedRanges = Object.fromEntries(
+      siblingDetailIds.map((sid) => {
+        const sibling = matchData?.criteriaScores
+          ?.flatMap((cs) => cs.details ?? [])
+          .find((d) => d.id === sid);
+        return [sid, sibling?.pinnedRange ?? null];
+      })
+    );
     const beforeCriteriaScore = matchData?.criteriaScores
       ? (() => {
           for (const cs of matchData.criteriaScores) {
-            if (cs.details?.some((d) => d.id === detail.id)) return cs.aiScore;
+            if (cs.details?.some((d) => d.id === activeDetail.id)) return cs.aiScore;
           }
           return undefined;
         })()
       : undefined;
 
     setIsApplying(true);
-    const result = await fixInEditor(detail.context, firstSuggestion, detail.id);
+    const result = await fixInEditor(activeDetail.context, firstSuggestion, activeDetail.id);
     const success = result?.success;
     const pinnedRange = result?.range || null;
     if (success) {
@@ -223,12 +234,13 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
               criteriaScoreId: response.criteriaScoreId,
               beforeOverallScore,
               beforeCriteriaScore,
-              originalContext: detail.context,
+              originalContext: activeDetail.context,
+              originalPinnedRanges,
             });
           }
         }
         toastMessage.success('Fix applied successfully.');
-        dispatch(setFocusedItemId(detail.id));
+        dispatch(setFocusedItemId(activeDetail.id));
         setTimeout(() => dispatch(setFocusedItemId(null)), 2500);
       } catch (error) {
         toastMessage.error(getErrorMessage(error, 'Fix applied but failed to update status.'));
@@ -331,15 +343,15 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
 
         {hasSuggestions && !isPositiveStatus && (
           <Suggestions
-            itemKey={detail.id}
-            suggestions={detail.suggestions}
+            itemKey={activeDetail.id}
+            suggestions={activeDetail.suggestions}
             isFocused={false}
             compact
             canRegenerate={canRegenerate}
             regeneratingSuggestionId={regeneratingSuggestionId}
             onRegenerateSuggestion={handleRegenerateSuggestion}
-            context={detail.context}
-            detailId={detail.id}
+            context={activeDetail.context}
+            detailId={activeDetail.id}
             allDetailIds={siblings.map((s) => s.id)}
           />
         )}
@@ -365,14 +377,16 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
           >
             Cancel
           </button>
-          <button
-            type="button"
-            disabled={isApplying || isPositiveStatus || !hasSuggestions}
-            onClick={handleApply}
-            className="rounded bg-primary px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isApplying ? 'Applying...' : 'Apply'}
-          </button>
+          {!isPositiveStatus && (
+            <button
+              type="button"
+              disabled={isApplying || !hasSuggestions}
+              onClick={handleApply}
+              className="rounded bg-primary px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isApplying ? 'Applying...' : 'Apply'}
+            </button>
+          )}
         </div>
       </div>
     </div>

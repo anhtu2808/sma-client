@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   setDetailContext,
   setDetailFixed,
+  setDetailPinnedRange,
   setFocusedItemId,
   updateScoresAfterFixed,
 } from "@/store/slices/matchingReportSlice";
@@ -74,15 +75,28 @@ const SuggestionCard = ({
     const beforeDoc = editor?.state?.doc;
     const beforeOverallScore = matchData?.aiOverallScore;
 
-    const success = await fixInEditor(context, text, detailId);
+    const idsToMark = allDetailIds ?? [detailId];
+    const originalPinnedRanges = Object.fromEntries(
+      idsToMark.map((id) => {
+        const existingDetail = matchData?.criteriaScores
+          ?.flatMap((criteria) => criteria.details || [])
+          .find((detail) => detail.id === id);
+        return [id, existingDetail?.pinnedRange ?? null];
+      })
+    );
+
+    const result = await fixInEditor(context, text, detailId);
+    const success = result?.success;
+    const pinnedRange = result?.range || null;
     if (!success) return;
 
     setFixApplied(true);
 
-    const idsToMark = allDetailIds ?? [detailId];
-
     for (const id of idsToMark) {
       dispatch(setDetailContext({ detailId: id, context: text }));
+      if (pinnedRange) {
+        dispatch(setDetailPinnedRange({ detailId: id, range: pinnedRange }));
+      }
     }
 
     let criteriaScoreId;
@@ -119,6 +133,7 @@ const SuggestionCard = ({
           beforeOverallScore,
           beforeCriteriaScore,
           originalContext: context,
+          originalPinnedRanges,
         });
       }
 
