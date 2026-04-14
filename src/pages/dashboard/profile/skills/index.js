@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Popconfirm } from "antd";
+import { Modal } from "antd";
 import toastMessage from "@/utils/toastMessage";
 import { useCandidateDashboardProfileQuery } from "@/apis/candidateApi";
 import {
@@ -134,29 +134,39 @@ const Skills = () => {
     }
   };
 
-  const handleDeleteGroup = async (group) => {
-    if (!profileResumeId) {
-      toastMessage.error("No PROFILE resume found.");
-      return;
-    }
-    const skills = group?.skills ?? [];
-    if (skills.length === 0) return;
+  const handleDeleteGroup = (group) => {
+    Modal.confirm({
+      title: "Delete this group?",
+      content: "This will remove all skills inside the group.",
+      okText: "Delete",
+      okType: "danger",
+      cancelText: "Cancel",
+      centered: true,
+      onOk: async () => {
+        if (!profileResumeId) {
+          toastMessage.error("No PROFILE resume found.");
+          return;
+        }
+        const skills = group?.skills ?? [];
+        if (skills.length === 0) return;
 
-    try {
-      await Promise.all(
-        skills
-          .filter((skill) => !!skill?.id)
-          .map((skill) =>
-            deleteSkill({
-              resumeId: profileResumeId,
-              resumeSkillId: skill.id,
-            }).unwrap()
-          )
-      );
-      toastMessage.success("Skill group deleted successfully.");
-    } catch (error) {
-      toastMessage.error(error?.data?.message || "Failed to delete skill group.");
-    }
+        try {
+          await Promise.all(
+            skills
+              .filter((skill) => !!skill?.id)
+              .map((skill) =>
+                deleteSkill({
+                  resumeId: profileResumeId,
+                  resumeSkillId: skill.id,
+                }).unwrap()
+              )
+          );
+          toastMessage.success("Skill group deleted successfully.");
+        } catch (error) {
+          toastMessage.error(error?.data?.message || "Failed to delete skill group.");
+        }
+      },
+    });
   };
 
   return (
@@ -209,21 +219,14 @@ const Skills = () => {
                   >
                     <FontAwesomeIcon icon={faPenToSquare} className="text-[18px]" />
                   </button>
-                  <Popconfirm
-                    title="Delete this group?"
-                    description="This will remove all skills inside the group."
-                    okText="Delete"
-                    okButtonProps={{ danger: true }}
-                    onConfirm={() => handleDeleteGroup(group)}
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteGroup(group)}
+                    className="text-gray-400 hover:text-red-500 transition-colors"
+                    title="Delete group"
                   >
-                    <button
-                      type="button"
-                      className="text-gray-400 hover:text-red-500 transition-colors"
-                      title="Delete group"
-                    >
-                      <FontAwesomeIcon icon={faTrash} className="text-[18px]" />
-                    </button>
-                  </Popconfirm>
+                    <FontAwesomeIcon icon={faTrash} className="text-[18px]" />
+                  </button>
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">

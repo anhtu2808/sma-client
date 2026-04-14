@@ -45,6 +45,7 @@ const WorkExperience = () => {
       okText: "Delete",
       okType: "danger",
       cancelText: "Cancel",
+      centered: true,
       onOk: async () => {
         try {
           await deleteExperience({ resumeId: profileResumeId, experienceId }).unwrap();

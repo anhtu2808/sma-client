@@ -242,6 +242,7 @@ const Enhancements = () => {
       content: creditInfo,
       okText: 'Confirm',
       cancelText: 'Cancel',
+      centered: true,
       onOk: executeReScore,
     });
   }, [

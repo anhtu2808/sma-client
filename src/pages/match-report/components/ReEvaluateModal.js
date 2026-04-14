@@ -237,6 +237,7 @@ const ReEvaluateModal = ({ open, onClose, jobId, currentResumeId, currentScore }
       okText: "Delete",
       okType: "danger",
       cancelText: "Cancel",
+      centered: true,
       onOk: async () => {
         try {
           await deleteCandidateResume({ resumeId }).unwrap();

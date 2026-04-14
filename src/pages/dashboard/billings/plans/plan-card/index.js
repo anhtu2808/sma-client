@@ -36,13 +36,11 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
   return (
     <article
       onClick={onClick}
-      className={`relative rounded-2xl border p-8 shadow-sm transition-all flex flex-col lg:h-[720px] cursor-pointer ${isSelected
+      className={`relative rounded-2xl border p-8 shadow-sm transition-all flex flex-col lg:h-[720px] cursor-pointer select-none ${isSelected
         ? "bg-white border-2 border-primary shadow-md"
         : isCurrent
           ? "bg-white border-gray-200 cursor-default"
-          : plan.popular
-            ? "bg-white border-primary border-2"
-            : "bg-white border-gray-200 hover:border-gray-300"
+          : "bg-white border-gray-200 hover:border-gray-300"
         }`}
     >
       {plan.popular ? (
@@ -88,9 +86,7 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
               }}
               className={`w-full py-3 px-4 rounded-lg font-semibold transition-all mb-8 ${isCurrent
                 ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : plan.popular
-                  ? "bg-primary hover:bg-primary-dark text-white shadow-md"
-                  : "bg-white border border-gray-300 hover:border-primary hover:text-primary text-gray-700"
+                : "bg-white border border-gray-300 hover:border-primary hover:text-primary text-gray-700"
                 }`}
             >
               {plan.cta}

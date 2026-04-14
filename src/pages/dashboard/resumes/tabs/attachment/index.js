@@ -373,6 +373,7 @@ const AttachmentsTab = () => {
       okText: "Delete",
       okType: "danger",
       cancelText: "Cancel",
+      centered: true,
       onOk: async () => {
         try {
           setDeletingId(resumeId);

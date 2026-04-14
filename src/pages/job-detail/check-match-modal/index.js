@@ -150,6 +150,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
       okText: "Delete",
       okType: "danger",
       cancelText: "Cancel",
+      centered: true,
       onOk: async () => {
         try {
           await deleteCandidateResume({ resumeId }).unwrap();

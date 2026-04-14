@@ -31,7 +31,7 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
   return (
     <article
       onClick={onClick}
-      className={`relative rounded-2xl border p-8 shadow-sm flex flex-col h-full md:h-[690px] transition-all cursor-pointer ${isSelected
+      className={`relative rounded-2xl border p-8 shadow-sm flex flex-col h-full md:h-[690px] transition-all cursor-pointer select-none ${isSelected
         ? "border-2 border-primary shadow-lg md:scale-[1.02] z-10"
         : "border-gray-200 hover:border-gray-300"
         }`}
@@ -59,22 +59,20 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
           </div>
 
           {!isDefault && (
-          <button
-            type="button"
-            disabled={isCurrent}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleAction();
-            }}
-            className={`w-full py-3 px-4 font-semibold rounded-lg mb-8 transition-all ${isCurrent
-              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-              : plan.popular || plan.code === "PREMIUM"
-                ? "bg-primary text-white hover:bg-primary-dark"
+            <button
+              type="button"
+              disabled={isCurrent}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAction();
+              }}
+              className={`w-full py-3 px-4 font-semibold rounded-lg mb-8 transition-all ${isCurrent
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-          >
-            {plan.cta}
-          </button>
+                }`}
+            >
+              {plan.cta}
+            </button>
           )}
 
           {plan.detailsHtml ? (
@@ -135,26 +133,26 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
           </div>
 
           {!isDefault && (
-          <Button
-            mode="primary"
-            shape="rounded"
-            onClick={(e) => {
-              e.stopPropagation();
-              const duration = selectedDuration || (plan.durations.length > 0 ? plan.durations[0].key : null);
-              if (onOpenPaymentModal) {
-                onOpenPaymentModal(plan, duration);
-              } else {
-                navigate('/checkout', { state: { plan, selectedDuration: duration } });
-              }
-            }}
-            className={`w-full py-4 font-bold rounded-xl transition-all shadow-lg text-sm tracking-wide ${isCurrent
-              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-              : "bg-primary text-white hover:bg-primary-dark"
-              }`}
-            disabled={isCurrent}
-          >
-            {isCurrent ? "Current Plan" : "Subscribe Now"}
-          </Button>
+            <Button
+              mode="primary"
+              shape="rounded"
+              onClick={(e) => {
+                e.stopPropagation();
+                const duration = selectedDuration || (plan.durations.length > 0 ? plan.durations[0].key : null);
+                if (onOpenPaymentModal) {
+                  onOpenPaymentModal(plan, duration);
+                } else {
+                  navigate('/checkout', { state: { plan, selectedDuration: duration } });
+                }
+              }}
+              className={`w-full py-4 font-bold rounded-xl transition-all shadow-lg text-sm tracking-wide ${isCurrent
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "bg-primary text-white hover:bg-primary-dark"
+                }`}
+              disabled={isCurrent}
+            >
+              {isCurrent ? "Current Plan" : "Subscribe Now"}
+            </Button>
           )}
         </div>
       )}

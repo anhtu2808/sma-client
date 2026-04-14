@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Popconfirm } from "antd";
+import { Modal } from "antd";
 import toastMessage from "@/utils/toastMessage";
 import { useGetCandidateResumesQuery, useDeleteCandidateResumeMutation, useUpdateCandidateResumeMutation } from "@/apis/resumeApi";
 import Loading from "@/components/Loading";
@@ -50,14 +50,24 @@ const ResumeBuilderTab = () => {
     }
   };
 
-  const handleDelete = async (e, resumeId) => {
+  const handleDelete = (e, resumeId) => {
     e.stopPropagation();
-    try {
-      await deleteResume({ resumeId }).unwrap();
-      toastMessage.success("Deleted successfully.");
-    } catch (error) {
-      toastMessage.error("Failed to delete. Please try again.");
-    }
+    Modal.confirm({
+      title: "Delete this resume?",
+      content: "Are you sure you want to delete this resume?",
+      okText: "Delete",
+      okType: "danger",
+      cancelText: "Cancel",
+      centered: true,
+      onOk: async () => {
+        try {
+          await deleteResume({ resumeId }).unwrap();
+          toastMessage.success("Deleted successfully.");
+        } catch (error) {
+          toastMessage.error("Failed to delete. Please try again.");
+        }
+      },
+    });
   };
 
   const formatDate = (dateString) => {
@@ -114,22 +124,12 @@ const ResumeBuilderTab = () => {
                   className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-surface-dark flex flex-col h-full cursor-pointer hover:shadow-lg hover:border-primary/30 transition-all group relative overflow-hidden"
                 >
                   {/* Delete button */}
-                  <Popconfirm
-                    title="Delete this resume?"
-                    description="Are you sure you want to delete this resume?"
-                    onConfirm={(e) => handleDelete(e, resume.id)}
-                    onCancel={(e) => e?.stopPropagation()}
-                    okText="Delete"
-                    cancelText="Cancel"
-                    okButtonProps={{ danger: true }}
+                  <button
+                    onClick={(e) => handleDelete(e, resume.id)}
+                    className="absolute top-2 right-2 z-20 w-7 h-7 rounded-full bg-white/90 dark:bg-gray-800/90 shadow-sm flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
                   >
-                    <button
-                      onClick={(e) => e.stopPropagation()}
-                      className="absolute top-2 right-2 z-20 w-7 h-7 rounded-full bg-white/90 dark:bg-gray-800/90 shadow-sm flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
-                    >
-                      <FontAwesomeIcon icon={faXmark} className="text-[16px]" />
-                    </button>
-                  </Popconfirm>
+                    <FontAwesomeIcon icon={faXmark} className="text-[16px]" />
+                  </button>
 
                   {/* CV Preview Skeleton & Hover Overlay */}
                   <div className={`flex-1 ${templateObj.bgColor || 'bg-gray-50'} dark:bg-gray-800/50 p-4 flex items-center justify-center relative`}>
