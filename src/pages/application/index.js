@@ -12,6 +12,7 @@ import Card from '@/components/Card';
 import Loading from '@/components/Loading';
 import { toast } from 'react-toastify';
 import { APPLICATION_ERROR_CODE } from '@/constant';
+import { useStartMatchingDetailMutation } from "@/apis/matchingApi";
 
 import ResumeSelection from '@/pages/application/steps/ResumeSelection';
 import PersonalInfo from '@/pages/application/steps/PersonalInfo';
@@ -32,7 +33,7 @@ const Application = () => {
     const [uploadCandidateResume, { isLoading: isSavingResume }] = useUploadCandidateResumeMutation();
     const [parseCandidateResume] = useParseCandidateResumeMutation();
     const [applyJob, { isLoading: isApplying }] = useApplyJobMutation();
-
+    const [startMatchingDetail, { isLoading: isStartingMatching }] = useStartMatchingDetailMutation();
     const { data: jobData, isLoading: jobLoading } = useGetJobByIdQuery(jobId, {
         skip: !jobId || jobId === 'undefined'
     });
@@ -44,7 +45,7 @@ const Application = () => {
     );
     const questions = Array.isArray(questionsData) ? questionsData : questionsData?.content || [];
 
-    const { data: resumes, isLoading: resumesLoading } = useGetCandidateResumesQuery({ type: 'ORIGINAL' });
+    const { data: resumes, isLoading: resumesLoading } = useGetCandidateResumesQuery({ type: 'ORIGINAL', jobId: jobId });
 
     const [selectedResumeId, setSelectedResumeId] = useState(null);
     const [newlyUploadedResume, setNewlyUploadedResume] = useState(null);
@@ -245,7 +246,23 @@ const Application = () => {
     if (isLoading) return (
         <Loading fullScreen className="bg-[#F3F4F6]" />
     );
+    const handleCheckMatch = async (resumeId) => {
+        try {
+            const evaluationId = await startMatchingDetail({
+                jobId: parseInt(jobId),
+                resumeId: resumeId,
+            }).unwrap();
 
+            if (evaluationId) {
+                navigate(`/match-report/${evaluationId}`, {
+                    state: { jobId, resumeId, matchSource: "new" }
+                });
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("AI matching failed to start. Please try again.");
+        }
+    };
     return (
         <div className="min-h-screen bg-[#F3F4F6] py-10 px-6 font-body">
             <div className="max-w-5xl mx-auto">
@@ -255,12 +272,15 @@ const Application = () => {
                     <form onSubmit={handleSubmit} className="space-y-10">
                         {/* STEP 1: RESUME SELECTION */}
                         <ResumeSelection
+                            jobId={jobId}
                             resumes={resumes}
                             selectedResumeId={selectedResumeId}
                             newlyUploadedResume={newlyUploadedResume}
                             isUploading={isUploading}
                             onSelectResume={handleSelectResume}
                             onUpload={handleFileUpload}
+                            onCheckMatch={handleCheckMatch}
+                            isStartingMatching={isStartingMatching}
                         />
 
                         {/* STEP 2: PERSONAL INFO */}
