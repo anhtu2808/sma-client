@@ -389,7 +389,7 @@ const ExportEnhancementModal = ({
 
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-neutral-700">
-              CV Name <span className="text-red-500">*</span>
+              Resume Name <span className="text-red-500">*</span>
             </label>
             <Input
               value={cvName}

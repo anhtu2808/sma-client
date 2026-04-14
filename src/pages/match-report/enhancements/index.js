@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { message } from 'antd';
+import { message, Modal } from 'antd';
 import {
   useGetResumeQuery,
   useGetOrCreateEnhancementQuery,
@@ -15,6 +15,7 @@ import {
   useLazyGetMatchingDetailQuery,
 } from '@/apis/matchingApi';
 import { useGetJobByIdQuery } from '@/apis/jobApi';
+import { useGetFeatureUsageQuery } from '@/apis/featureUsageApi';
 import { setMatchingReportData } from '@/store/slices/matchingReportSlice';
 import { mapSuggestionsToStore, mapEvaluationToStore } from '@/utils/matchingReportUtils';
 import MatchReportSidebar from '@/pages/match-report/sidebar';
@@ -24,6 +25,7 @@ import Button from '@/components/Button';
 import EditorContext from './EditorContext';
 import ResumeEditor from './resume-editor';
 import EnhancementLoading from './EnhancementLoading';
+import ReScoreLoading from './ReScoreLoading';
 import ExportEnhancementModal from './ExportEnhancementModal';
 import { buildResumeHtml } from './resume-editor/buildResumeHtml';
 
@@ -75,6 +77,13 @@ const Enhancements = () => {
   const [reScoreStatus, setReScoreStatus] = useState(null); // null | 'polling' | 'regenerating-suggestions' | 'success' | 'error'
   const [reScoreEvalId, setReScoreEvalId] = useState(null);
   const reScoreInFlightRef = useRef(false);
+
+  // Re-score loading screen state
+  const [isReScoreLoading, setIsReScoreLoading] = useState(false);
+
+  // Feature usage for credit info in confirmation modal
+  const { data: featureUsageData } = useGetFeatureUsageQuery();
+  const matchingScoreUsage = featureUsageData?.find((f) => f.featureKey === 'MATCHING_SCORE');
 
   // Export modal state
   const [exportModalOpen, setExportModalOpen] = useState(false);
@@ -178,8 +187,34 @@ const Enhancements = () => {
       });
   }, [phase, enhancement, triggerGetSuggestions, dispatch]);
 
-  // Re-score handler: trigger POST /re-score then poll for status
-  const handleReScore = useCallback(async () => {
+  // Internal rescore executor (called after user confirms modal)
+  const executeReScore = useCallback(async () => {
+    reScoreInFlightRef.current = true;
+    setIsReScoreLoading(true);
+
+    try {
+      const html = editorApi.editor.getHTML();
+      await updateContent({ id: enhancement.id, content: html }).unwrap();
+    } catch {
+      reScoreInFlightRef.current = false;
+      setIsReScoreLoading(false);
+      message.error('Could not save changes before re-scoring');
+      return;
+    }
+
+    try {
+      const evalId = await reScoreEnhancement({ enhancementId: enhancement.id }).unwrap();
+      setReScoreEvalId(evalId);
+      setReScoreStatus('polling');
+    } catch {
+      reScoreInFlightRef.current = false;
+      setIsReScoreLoading(false);
+      message.error('Could not start re-scoring');
+    }
+  }, [enhancement?.id, editorApi?.editor, updateContent, reScoreEnhancement]);
+
+  // Re-score handler: show confirmation modal then trigger rescore
+  const handleReScore = useCallback(() => {
     if (
       !enhancement?.id ||
       !editorApi?.editor ||
@@ -191,32 +226,26 @@ const Enhancements = () => {
       return;
     }
 
-    reScoreInFlightRef.current = true;
+    const remaining = matchingScoreUsage?.remaining;
+    const creditInfo =
+      remaining != null
+        ? `This action will use 1 scoring credit. You have ${remaining} credit${remaining !== 1 ? 's' : ''} remaining.`
+        : 'This action will use 1 scoring credit.';
 
-    try {
-      const html = editorApi.editor.getHTML();
-      await updateContent({ id: enhancement.id, content: html }).unwrap();
-    } catch {
-      reScoreInFlightRef.current = false;
-      message.error('Không thể lưu thay đổi trước khi chấm điểm lại');
-      return;
-    }
-
-    try {
-      const evalId = await reScoreEnhancement({ enhancementId: enhancement.id }).unwrap();
-      setReScoreEvalId(evalId);
-      setReScoreStatus('polling');
-    } catch (err) {
-      reScoreInFlightRef.current = false;
-      message.error('Không thể bắt đầu chấm điểm lại');
-    }
+    Modal.confirm({
+      title: 'Re-score Resume',
+      content: creditInfo,
+      okText: 'Confirm',
+      cancelText: 'Cancel',
+      onOk: executeReScore,
+    });
   }, [
     enhancement?.id,
     editorApi?.editor,
     isReScoring,
     reScoreStatus,
-    updateContent,
-    reScoreEnhancement,
+    matchingScoreUsage?.remaining,
+    executeReScore,
   ]);
 
   // Polling effect: check re-score status every 2s until FINISH/FAIL or 3min timeout
@@ -242,24 +271,28 @@ const Enhancements = () => {
               dispatch(setMatchingReportData(mapSuggestionsToStore(suggestionData)));
             }
             reScoreInFlightRef.current = false;
+            setIsReScoreLoading(false);
             setReScoreStatus('success');
-            message.success('Chấm điểm và cập nhật gợi ý thành công!');
+            message.success('Re-scored and updated suggestions successfully!');
           } catch {
             reScoreInFlightRef.current = false;
+            setIsReScoreLoading(false);
             setReScoreStatus('success');
-            message.warning('Điểm đã được cập nhật nhưng không thể tạo lại gợi ý');
+            message.warning('Score updated but could not regenerate suggestions');
           }
         } else if (status === 'FAIL') {
           clearInterval(interval);
           clearTimeout(timeout);
           reScoreInFlightRef.current = false;
+          setIsReScoreLoading(false);
           setReScoreStatus('error');
-          message.error('Chấm điểm lại thất bại');
+          message.error('Re-scoring failed');
         }
       } catch {
         clearInterval(interval);
         clearTimeout(timeout);
         reScoreInFlightRef.current = false;
+        setIsReScoreLoading(false);
         setReScoreStatus('error');
       }
     }, 2000);
@@ -267,8 +300,9 @@ const Enhancements = () => {
     const timeout = setTimeout(() => {
       clearInterval(interval);
       reScoreInFlightRef.current = false;
+      setIsReScoreLoading(false);
       setReScoreStatus('error');
-      message.error('Chấm điểm lại quá thời gian');
+      message.error('Re-scoring timed out');
     }, 180000);
 
     return () => {
@@ -365,8 +399,8 @@ const Enhancements = () => {
     );
   }
 
-  if (phase !== 'ready') {
-    return <EnhancementLoading />;
+  if (phase !== 'ready' || isReScoreLoading) {
+    return isReScoreLoading ? <ReScoreLoading /> : <EnhancementLoading />;
   }
 
   return (
