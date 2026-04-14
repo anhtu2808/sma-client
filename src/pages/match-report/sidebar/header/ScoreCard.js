@@ -1,7 +1,15 @@
 import useAnimatedScore from "@/hooks/useAnimatedScore";
 
+const getScoreColor = (score) => {
+  if (score >= 80) return "#22C55E";
+  if (score >= 60) return "#EAB308";
+  if (score >= 40) return "#F97316";
+  return "#EF4444";
+};
+
 const ScoreCard = ({ score = 88 }) => {
   const animatedScore = useAnimatedScore(score, 1000);
+  const color = getScoreColor(animatedScore);
   const size = 64;
   const strokeWidth = 5;
   const radius = (size - strokeWidth) / 2;
@@ -20,7 +28,7 @@ const ScoreCard = ({ score = 88 }) => {
           cy={size / 2}
         />
         <circle
-          stroke="#FF6B35"
+          stroke={color}
           fill="transparent"
           strokeWidth={strokeWidth}
           strokeDasharray={circumference}
@@ -32,7 +40,7 @@ const ScoreCard = ({ score = 88 }) => {
           className="transition-all duration-1000 ease-out"
         />
       </svg>
-      <span className="absolute font-heading text-[22px] font-bold text-[#FF6B35] leading-none">
+      <span className="absolute font-heading text-[22px] font-bold leading-none" style={{ color }}>
         {animatedScore}
       </span>
     </div>
