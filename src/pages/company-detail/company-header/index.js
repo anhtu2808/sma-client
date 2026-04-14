@@ -61,15 +61,7 @@ const CompanyHeader = ({ company }) => {
                         </div>
                     </div>
 
-                    <div className="h-px bg-slate-100 dark:bg-[#3d241b] my-6"></div>
 
-                    {/* Stats */}
-                    <div className="flex items-center gap-12">
-                        <div>
-                            <p className="text-sm text-slate-500 dark:text-[#8c6b5d] mb-1">Open Jobs</p>
-                            <p className="text-2xl font-bold text-slate-900 dark:text-white">{company.totalJobs || 0}</p>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

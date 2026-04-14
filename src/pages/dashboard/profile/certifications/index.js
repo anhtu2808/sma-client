@@ -32,6 +32,7 @@ const Certifications = () => {
       okText: "Delete",
       okType: "danger",
       cancelText: "Cancel",
+      centered: true,
       onOk: async () => {
         try {
           await deleteCertification({ resumeId: profileResumeId, certificationId }).unwrap();

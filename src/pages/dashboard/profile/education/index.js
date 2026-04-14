@@ -45,6 +45,7 @@ const Education = () => {
       okText: "Delete",
       okType: "danger",
       cancelText: "Cancel",
+      centered: true,
       onOk: async () => {
         try {
           await deleteEducation({ resumeId: profileResumeId, educationId }).unwrap();

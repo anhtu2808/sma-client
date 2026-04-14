@@ -37,6 +37,7 @@ const Projects = () => {
       okText: "Delete",
       okType: "danger",
       cancelText: "Cancel",
+      centered: true,
       onOk: async () => {
         try {
           await deleteProject({ resumeId: profileResumeId, projectId }).unwrap();
