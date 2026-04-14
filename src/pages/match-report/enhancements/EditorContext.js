@@ -2,6 +2,7 @@ import { createContext } from 'react';
 
 const EditorContext = createContext({
   fixInEditor: null,
+  applySuggestion: null,
   fixingDetailId: null,
   editor: null,
   pushFixUndo: null,

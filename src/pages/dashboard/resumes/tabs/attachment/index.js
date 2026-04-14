@@ -6,7 +6,7 @@ import {
   useGetCandidateResumesQuery,
   useLazyGetResumeParseStatusQuery,
   useParseCandidateResumeMutation,
-  useSetResumeAsDefaultMutation,
+  useSetResumeAsProfileMutation,
   useUploadCandidateResumeMutation,
   useUploadFilesMutation,
 } from "@/apis/resumeApi";
@@ -64,7 +64,7 @@ const AttachmentsTab = () => {
   const [parseCandidateResume] = useParseCandidateResumeMutation();
   const [triggerResumeParseStatus] = useLazyGetResumeParseStatusQuery();
   const [deleteCandidateResume] = useDeleteCandidateResumeMutation();
-  const [setResumeAsDefault, { isLoading: isSettingProfile }] = useSetResumeAsDefaultMutation();
+  const [setResumeAsProfile, { isLoading: isSettingProfile }] = useSetResumeAsProfileMutation();
 
   const [settingProfileId, setSettingProfileId] = useState(null);
   const [parseStatusOverrides, setParseStatusOverrides] = useState({});
@@ -412,7 +412,7 @@ const AttachmentsTab = () => {
       setIsConfirmLoading(true);
       setSettingProfileId(confirmResumeId);
       const delay = new Promise((resolve) => setTimeout(resolve, 800));
-      await Promise.all([setResumeAsDefault({ resumeId: confirmResumeId }).unwrap(), delay]);
+      await Promise.all([setResumeAsProfile({ resumeId: confirmResumeId }).unwrap(), delay]);
       toastMessage.success("Set profile resume successfully");
       closeSetProfileConfirm();
     } catch (error) {
@@ -487,9 +487,22 @@ const AttachmentsTab = () => {
         open={Boolean(previewResumeId)}
         resumeId={previewResumeId}
         onClose={() => setPreviewResumeId(null)}
-        onSetAsProfile={(id) => {
+        onSetAsProfile={async (id) => {
           setPreviewResumeId(null);
-          openSetProfileConfirm(id);
+          setConfirmResumeId(id);
+          try {
+            setIsConfirmLoading(true);
+            setSettingProfileId(id);
+            const delay = new Promise((resolve) => setTimeout(resolve, 800));
+            await Promise.all([setResumeAsProfile({ resumeId: id }).unwrap(), delay]);
+            toastMessage.success("Set profile resume successfully");
+          } catch (error) {
+            toastMessage.error(getErrorMessage(error, "Set profile resume failed"));
+          } finally {
+            setIsConfirmLoading(false);
+            setSettingProfileId(null);
+            setConfirmResumeId(null);
+          }
         }}
       />
 

@@ -1,16 +1,6 @@
 import { useContext, useMemo, useState } from "react";
 import { Tooltip } from "antd";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  setDetailContext,
-  setDetailFixed,
-  setDetailPinnedRange,
-  setFocusedItemId,
-  updateScoresAfterFixed,
-} from "@/store/slices/matchingReportSlice";
-import { useMarkDetailAsFixedBatchMutation } from "@/apis/matchingApi";
-import { getErrorMessage } from "@/constant/attachment";
-import toastMessage from "@/utils/toastMessage";
+import { useSelector } from "react-redux";
 import EditorContext from "@/pages/match-report/enhancements/EditorContext";
 import { findTextInDoc } from "@/pages/match-report/enhancements/resume-editor/utils/prosemirrorSearch";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -25,15 +15,14 @@ const SuggestionCard = ({
   detailId = null,
   allDetailIds = null,
 }) => {
-  const dispatch = useDispatch();
   const [copied, setCopied] = useState(false);
-  const [fixApplied, setFixApplied] = useState(false);
-  const { fixInEditor, fixingDetailId, editor, pushFixUndo } = useContext(EditorContext);
-  const [markDetailAsFixedBatch] = useMarkDetailAsFixedBatchMutation();
+  const { applySuggestion, fixInEditor, fixingDetailId, editor } = useContext(EditorContext);
   const text = suggestion?.suggestion || "";
-
-  // Capture current scores for undo purposes (before applying fix)
   const matchData = useSelector((state) => state.matchingReport.data);
+  const idsToMark = useMemo(
+    () => (Array.isArray(allDetailIds) && allDetailIds.length > 0 ? allDetailIds : detailId != null ? [detailId] : []),
+    [allDetailIds, detailId]
+  );
 
   // Check if context text is findable in the editor document
   const isTextFoundInEditor = useMemo(() => {
@@ -47,6 +36,16 @@ const SuggestionCard = ({
 
   const canFixInEditor = !!fixInEditor && !!context && !!text && isTextFoundInEditor;
   const isFixingThis = fixingDetailId === detailId;
+  const isApplied = useMemo(
+    () =>
+      idsToMark.length > 0 &&
+      idsToMark.every((id) =>
+        matchData?.criteriaScores
+          ?.flatMap((criteria) => criteria.details || [])
+          .some((detail) => detail.id === id && detail.isFixed)
+      ),
+    [idsToMark, matchData?.criteriaScores]
+  );
 
   // Strip HTML tags to get plain text for clipboard
   const getPlainText = (html) => {
@@ -69,82 +68,14 @@ const SuggestionCard = ({
 
   const handleFixInEditor = async (event) => {
     event.stopPropagation();
-    if (!canFixInEditor || isFixingThis || fixApplied) return;
+    if (!canFixInEditor || isFixingThis || isApplied || !applySuggestion) return;
 
-    // Capture pre-fix state for undo
-    const beforeDoc = editor?.state?.doc;
-    const beforeOverallScore = matchData?.aiOverallScore;
-
-    const idsToMark = allDetailIds ?? [detailId];
-    const originalPinnedRanges = Object.fromEntries(
-      idsToMark.map((id) => {
-        const existingDetail = matchData?.criteriaScores
-          ?.flatMap((criteria) => criteria.details || [])
-          .find((detail) => detail.id === id);
-        return [id, existingDetail?.pinnedRange ?? null];
-      })
-    );
-
-    const result = await fixInEditor(context, text, detailId);
-    const success = result?.success;
-    const pinnedRange = result?.range || null;
-    if (!success) return;
-
-    setFixApplied(true);
-
-    for (const id of idsToMark) {
-      dispatch(setDetailContext({ detailId: id, context: text }));
-      if (pinnedRange) {
-        dispatch(setDetailPinnedRange({ detailId: id, range: pinnedRange }));
-      }
-    }
-
-    let criteriaScoreId;
-    let beforeCriteriaScore;
-
-    try {
-      const response = await markDetailAsFixedBatch({ detailIds: idsToMark }).unwrap();
-
-      for (const id of idsToMark) {
-        dispatch(setDetailFixed({ detailId: id }));
-      }
-
-      if (response) {
-        criteriaScoreId = response.criteriaScoreId;
-        if (beforeCriteriaScore === undefined && matchData?.criteriaScores) {
-          const cs = matchData.criteriaScores.find((c) => c.id === response.criteriaScoreId);
-          beforeCriteriaScore = cs?.aiScore;
-        }
-        dispatch(
-          updateScoresAfterFixed({
-            afterOverallScore: response.afterOverallScore,
-            criteriaScoreId: response.criteriaScoreId,
-            afterCriteriaScore: response.afterCriteriaScore,
-          })
-        );
-      }
-
-      // Register this fix in the undo stack so Ctrl+Z can roll it back
-      if (beforeDoc && pushFixUndo) {
-        pushFixUndo({
-          beforeDoc,
-          detailIds: idsToMark,
-          criteriaScoreId,
-          beforeOverallScore,
-          beforeCriteriaScore,
-          originalContext: context,
-          originalPinnedRanges,
-        });
-      }
-
-      toastMessage.success("Fix applied successfully.");
-      dispatch(setFocusedItemId(detailId));
-      setTimeout(() => dispatch(setFocusedItemId(null)), 2500);
-    } catch (error) {
-      toastMessage.error(
-        getErrorMessage(error, "Fix applied but failed to update status.")
-      );
-    }
+    await applySuggestion({
+      detailId,
+      context,
+      suggestionText: text,
+      detailIds: idsToMark,
+    });
   };
 
   return (
@@ -165,15 +96,15 @@ const SuggestionCard = ({
               <button
                 type="button"
                 aria-label="Apply suggestion to editor"
-                disabled={isFixingThis || fixApplied || !!fixingDetailId}
+                disabled={isFixingThis || isApplied || !!fixingDetailId}
                 onClick={handleFixInEditor}
                 className="flex shrink-0 items-center justify-center rounded p-1 text-neutral-500 transition-colors hover:bg-amber-50 hover:text-amber-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <FontAwesomeIcon
-                  icon={isFixingThis ? faArrowsRotate : fixApplied ? faCircleCheck : faWandMagicSparkles}
+                  icon={isFixingThis ? faArrowsRotate : isApplied ? faCircleCheck : faWandMagicSparkles}
                   className={`text-[18px] ${
                     isFixingThis ? "animate-spin" : ""
-                  } ${fixApplied ? "text-emerald-500" : ""}`}
+                  } ${isApplied ? "text-emerald-500" : ""}`}
                 />
               </button>
             </Tooltip>

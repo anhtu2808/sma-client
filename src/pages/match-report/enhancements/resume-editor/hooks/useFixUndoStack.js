@@ -1,16 +1,17 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import {
-  setDetailUnfixed,
   setDetailContext,
   setDetailPinnedRange,
+  setDetailUnfixed,
   revertScoresAfterUnfixed,
 } from '@/store/slices/matchingReportSlice';
 import { useUnmarkDetailAsFixedMutation } from '@/apis/matchingApi';
 
 /**
- * Manages a fix-undo stack so that Ctrl+Z rolls back both the editor text change
- * AND the "mark as fixed" state (Redux + backend).
+ * Manages a fix-undo stack so that native editor undo rolls back both the editor
+ * text change and the "mark as fixed" side effects once the document returns to
+ * the exact pre-fix snapshot.
  *
  * Stack entry shape:
  *   { beforeDoc, detailIds, criteriaScoreId, beforeOverallScore, beforeCriteriaScore, originalPinnedRanges }
@@ -21,6 +22,53 @@ import { useUnmarkDetailAsFixedMutation } from '@/apis/matchingApi';
  * - beforeOverallScore: aiOverallScore before the fix
  * - beforeCriteriaScore: criteria aiScore before the fix
  */
+export const reconcileFixUndoStack = ({
+  currentDoc,
+  fixUndoStack,
+  dispatch,
+  unmarkDetailAsFixed,
+}) => {
+  if (!currentDoc || !Array.isArray(fixUndoStack) || fixUndoStack.length === 0) {
+    return false;
+  }
+
+  let didReconcile = false;
+
+  while (fixUndoStack.length > 0) {
+    const top = fixUndoStack[fixUndoStack.length - 1];
+    if (!top?.beforeDoc || !currentDoc.eq(top.beforeDoc)) {
+      break;
+    }
+
+    fixUndoStack.pop();
+    didReconcile = true;
+
+    top.detailIds.forEach((id) => dispatch(setDetailUnfixed({ detailId: id })));
+
+    if (top.originalContext) {
+      top.detailIds.forEach((id) =>
+        dispatch(setDetailContext({ detailId: id, context: top.originalContext }))
+      );
+    }
+
+    top.detailIds.forEach((id) =>
+      dispatch(setDetailPinnedRange({ detailId: id, range: top.originalPinnedRanges?.[id] ?? null }))
+    );
+
+    dispatch(
+      revertScoresAfterUnfixed({
+        beforeOverallScore: top.beforeOverallScore,
+        criteriaScoreId: top.criteriaScoreId,
+        beforeCriteriaScore: top.beforeCriteriaScore,
+      })
+    );
+
+    top.detailIds.forEach((id) => unmarkDetailAsFixed({ detailId: id }));
+  }
+
+  return didReconcile;
+};
+
 const useFixUndoStack = (editor) => {
   const dispatch = useDispatch();
   const [unmarkDetailAsFixed] = useUnmarkDetailAsFixedMutation();
@@ -29,50 +77,17 @@ const useFixUndoStack = (editor) => {
   useEffect(() => {
     if (!editor) return;
 
-    const handleKeyDown = (e) => {
-      const isUndo = (e.metaKey || e.ctrlKey) && !e.shiftKey && e.key === 'z';
-      if (!isUndo || !editor.view.hasFocus()) return;
-
-      // Run undo in the editor ourselves (synchronous)
-      const didUndo = editor.commands.undo();
-
-      // Prevent Tiptap / browser from running undo a second time
-      e.preventDefault();
-      e.stopImmediatePropagation();
-
-      if (!didUndo || fixUndoStackRef.current.length === 0) return;
-
-      // Check whether the undo just restored the exact pre-fix document state
-      const top = fixUndoStackRef.current[fixUndoStackRef.current.length - 1];
-      if (!editor.state.doc.eq(top.beforeDoc)) return;
-
-      fixUndoStackRef.current.pop();
-
-      // Revert Redux state immediately (optimistic)
-      top.detailIds.forEach((id) => dispatch(setDetailUnfixed({ detailId: id })));
-      // Restore original context so the highlight decoration can find the text again
-      if (top.originalContext) {
-        top.detailIds.forEach((id) =>
-          dispatch(setDetailContext({ detailId: id, context: top.originalContext }))
-        );
-      }
-      top.detailIds.forEach((id) =>
-        dispatch(setDetailPinnedRange({ detailId: id, range: top.originalPinnedRanges?.[id] ?? null }))
-      );
-      dispatch(
-        revertScoresAfterUnfixed({
-          beforeOverallScore: top.beforeOverallScore,
-          criteriaScoreId: top.criteriaScoreId,
-          beforeCriteriaScore: top.beforeCriteriaScore,
-        })
-      );
-
-      // Persist to backend (fire-and-forget — failures are non-critical)
-      top.detailIds.forEach((id) => unmarkDetailAsFixed({ detailId: id }));
+    const handleTransaction = () => {
+      reconcileFixUndoStack({
+        currentDoc: editor.state.doc,
+        fixUndoStack: fixUndoStackRef.current,
+        dispatch,
+        unmarkDetailAsFixed,
+      });
     };
 
-    window.addEventListener('keydown', handleKeyDown, true);
-    return () => window.removeEventListener('keydown', handleKeyDown, true);
+    editor.on('transaction', handleTransaction);
+    return () => editor.off('transaction', handleTransaction);
   }, [editor, dispatch, unmarkDetailAsFixed]);
 
   const pushFixUndo = useCallback((entry) => {

@@ -117,6 +117,7 @@ const CvVisibilityControl = () => {
       <ProfileSettingModal
         open={isModalOpen}
         profileResume={profileResume}
+        profileCompleteness={profile?.profileCompleteness ?? 0}
         originalResumes={originalResumes}
         selectedResumeId={selectedResumeId}
         onSelectResume={(resume) => setSelectedResumeId(resume?.id ?? null)}

@@ -2,6 +2,12 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Suggestions from "./index";
 
+jest.mock("./SuggestionCard", () => ({ suggestion, onRegenerate }) => (
+  <button type="button" aria-label="Regenerate suggestion" onClick={() => onRegenerate?.(suggestion?.id)}>
+    Regenerate
+  </button>
+));
+
 describe("Suggestions", () => {
   it("regenerates the clicked suggestion by id", async () => {
     const onRegenerateSuggestion = jest.fn();

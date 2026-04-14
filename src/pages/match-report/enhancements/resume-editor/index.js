@@ -10,7 +10,7 @@ import { message } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useGetResumeQuery, useUpdateEnhancementContentMutation } from '@/apis/resumeApi';
-import { useMarkDetailAsFixedMutation } from '@/apis/matchingApi';
+import { useMarkDetailAsFixedBatchMutation, useMarkDetailAsFixedMutation } from '@/apis/matchingApi';
 import { setDetailFixed, setHighlightModalDetailId, updateScoresAfterFixed } from '@/store/slices/matchingReportSlice';
 import Loading from '@/components/Loading';
 import EntryHeader from './EntryHeaderNode';
@@ -23,6 +23,7 @@ import HighlightDetailModal from './HighlightDetailModal';
 import useEditorHighlights from './hooks/useEditorHighlights';
 import useTypewriterFix from './hooks/useTypewriterFix';
 import useFixUndoStack from './hooks/useFixUndoStack';
+import applySuggestionFix from './utils/applySuggestionFix';
 import { findTextInDocFuzzy } from './utils/prosemirrorSearch';
 import './resumeEditor.css';
 
@@ -54,6 +55,7 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
 
   const [saveStatus, setSaveStatus] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const matchData = useSelector((state) => state.matchingReport.data);
   const criteriaScores = useSelector(
     (state) => state.matchingReport.data?.criteriaScores
   );
@@ -62,19 +64,30 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
   );
   const autoSaveTimerRef = useRef(null);
   const initialSaveDoneRef = useRef(false);
+  const initialEditorHtmlRef = useRef('');
+  const initialEditorEnhancementIdRef = useRef(null);
   const lastSavedHtmlRef = useRef(null);
 
-  const initialHtml = useMemo(() => {
+  const resolvedInitialHtml = useMemo(() => {
     if (initialContent) return initialContent;
     if (!resumeData) return '';
     return buildResumeHtml(resumeData);
   }, [initialContent, resumeData]);
 
+  if (initialEditorEnhancementIdRef.current !== enhancementId) {
+    initialEditorEnhancementIdRef.current = enhancementId;
+    initialEditorHtmlRef.current = resolvedInitialHtml;
+  } else if (!initialEditorHtmlRef.current && resolvedInitialHtml) {
+    initialEditorHtmlRef.current = resolvedInitialHtml;
+  }
+
+  const initialHtml = initialEditorHtmlRef.current || resolvedInitialHtml;
+
   const editor = useEditor({
     extensions: EXTENSIONS,
     content: initialHtml || '',
     editable: true,
-  }, [initialHtml]);
+  }, [enhancementId]);
 
   const saveContent = useCallback(async (html) => {
     if (!enhancementId || !html) return;
@@ -200,8 +213,9 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
 
   // Typewriter fix animation
   const { applyFix, fixingDetailId, cancelAnimation } = useTypewriterFix();
+  const [markDetailAsFixedBatch] = useMarkDetailAsFixedBatchMutation();
 
-  // Fix undo stack — rolls back isFixed state when Ctrl+Z is pressed
+  // Fix undo stack — reconciles fixed-state side effects after native undo restores the previous doc
   const { pushFixUndo } = useFixUndoStack(editor);
 
   const fixInEditor = useCallback(
@@ -215,6 +229,23 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
       return success;
     },
     [editor, applyFix]
+  );
+
+  const applySuggestion = useCallback(
+    async ({ detailId, context, suggestionText, detailIds }) =>
+      applySuggestionFix({
+        detailId,
+        context,
+        suggestionText,
+        detailIds,
+        editor,
+        matchData,
+        fixInEditor,
+        markDetailAsFixedBatch,
+        dispatch,
+        pushFixUndo,
+      }),
+    [editor, matchData, fixInEditor, markDetailAsFixedBatch, dispatch, pushFixUndo]
   );
 
   // Cleanup animation on unmount
@@ -302,10 +333,10 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
     }
   }, [editor, criteriaScores, isOptimizing, markDetailAsFixed, dispatch, saveContent, applyFix]);
 
-  // Expose fixInEditor + fixingDetailId + editor + pushFixUndo to parent via callback
+  // Expose editor actions to parent via callback
   useEffect(() => {
-    onEditorReady?.({ fixInEditor, fixingDetailId, editor, pushFixUndo });
-  }, [fixInEditor, fixingDetailId, editor, pushFixUndo, onEditorReady]);
+    onEditorReady?.({ fixInEditor, applySuggestion, fixingDetailId, editor, pushFixUndo });
+  }, [fixInEditor, applySuggestion, fixingDetailId, editor, pushFixUndo, onEditorReady]);
 
   if (isLoading || !resumeData) {
     return <Loading className="py-20" />;
