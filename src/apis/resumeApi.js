@@ -259,9 +259,9 @@ export const resumeApi = api.injectEndpoints({
             ],
         }),
 
-        setResumeAsDefault: builder.mutation({
+        setResumeAsProfile: builder.mutation({
             query: ({ resumeId }) => ({
-                url: `${API_VERSION}/resumes/${resumeId}/set-default`,
+                url: `${API_VERSION}/resumes/${resumeId}/set-profile`,
                 method: "POST",
             }),
             transformResponse: (response) => response?.data ?? response,
@@ -596,6 +596,9 @@ export const resumeApi = api.injectEndpoints({
                 method: "PUT",
                 body: { content },
             }),
+            invalidatesTags: (result, error, { id }) => [
+                { type: "Enhancement", id },
+            ],
         }),
 
         generateEnhancementSuggestion: builder.mutation({

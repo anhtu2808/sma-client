@@ -39,7 +39,12 @@ const Enhancements = () => {
   const { resumeId, jobId } = location.state || {};
 
   // Editor↔Sidebar communication via context
-  const [editorApi, setEditorApi] = useState({ fixInEditor: null, fixingDetailId: null, editor: null });
+  const [editorApi, setEditorApi] = useState({
+    fixInEditor: null,
+    applySuggestion: null,
+    fixingDetailId: null,
+    editor: null,
+  });
   const handleEditorReady = useCallback((api) => setEditorApi(api), []);
   const editorContextValue = useMemo(() => editorApi, [editorApi]);
 

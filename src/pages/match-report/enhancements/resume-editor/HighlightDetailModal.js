@@ -1,14 +1,9 @@
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Suggestions from '@/pages/match-report/sidebar/content/suggestions';
-import { useMarkDetailAsFixedBatchMutation, useRegenerateSuggestionMutation } from '@/apis/matchingApi';
+import { useRegenerateSuggestionMutation } from '@/apis/matchingApi';
 import {
-  setDetailContext,
-  setDetailFixed,
-  setDetailPinnedRange,
-  setFocusedItemId,
   setHighlightModalDetailId,
-  updateScoresAfterFixed,
   updateSuggestion,
 } from '@/store/slices/matchingReportSlice';
 import { getErrorMessage } from '@/constant/attachment';
@@ -23,18 +18,16 @@ import {
   faThumbsUp,
   faXmark,
 } from '../../../../utils/icons';
-import { stripHtml } from './utils/prosemirrorSearch';
 
 const HighlightDetailModal = ({ detail, open, onClose }) => {
   const dispatch = useDispatch();
   const popoverRef = useRef(null);
   const cleanupRef = useRef(null);
   const [regenerateSuggestion] = useRegenerateSuggestionMutation();
-  const [markDetailAsFixedBatch] = useMarkDetailAsFixedBatchMutation();
   const [regeneratingSuggestionId, setRegeneratingSuggestionId] = useState(null);
   const [isApplying, setIsApplying] = useState(false);
   const [activeIdx, setActiveIdx] = useState(0);
-  const { fixInEditor, editor, pushFixUndo } = useContext(EditorContext);
+  const { applySuggestion } = useContext(EditorContext);
   const matchData = useSelector((state) => state.matchingReport.data);
 
   // Siblings = all details sharing the same contextId, in document order.
@@ -53,6 +46,7 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
     }
     return result.length > 0 ? result : [detail];
   }, [detail, matchData?.criteriaScores]);
+  const anchorDetailId = siblings[0]?.id ?? null;
 
   // Sync carousel index to whichever sibling matches the incoming `detail` prop
   // (sidebar click → jump to that sibling; editor tag click → first sibling).
@@ -64,18 +58,36 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
 
   // Position popover below the clicked highlight.
   useEffect(() => {
-    if (!open || !detail || !popoverRef.current) return;
+    if (!open || !detail || !popoverRef.current) return undefined;
 
-    const tagEl = document.querySelector(`.suggestion-tag[data-detail-id="${detail.id}"]`);
-    if (!tagEl) return;
+    const popover = popoverRef.current;
+    const resetPosition = () => {
+      popover.style.top = '';
+      popover.style.left = '';
+    };
+
+    if (!anchorDetailId) {
+      resetPosition();
+      return undefined;
+    }
+
+    const tagEl = document.querySelector(`.suggestion-tag[data-detail-id="${anchorDetailId}"]`);
+    if (!tagEl) {
+      resetPosition();
+      return undefined;
+    }
 
     const editorScroller = tagEl.closest('.overflow-y-auto');
-    if (!editorScroller) return;
+    if (!editorScroller) {
+      resetPosition();
+      return undefined;
+    }
+
+    tagEl.scrollIntoView({ block: 'center', behavior: 'instant' });
 
     const anchorEl = tagEl.querySelector('.suggestion-tag__badge') || tagEl;
     const hlRect = anchorEl.getBoundingClientRect();
     const scrollerRect = editorScroller.getBoundingClientRect();
-    const popover = popoverRef.current;
 
     const top = hlRect.bottom - scrollerRect.top + editorScroller.scrollTop + 8;
     const left = Math.max(8, hlRect.left - scrollerRect.left);
@@ -83,7 +95,9 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
 
     popover.style.top = `${top}px`;
     popover.style.left = `${Math.min(left, maxLeft)}px`;
-  }, [open, detail]);
+
+    return resetPosition;
+  }, [open, detail, anchorDetailId]);
 
   // Close on outside click / Escape. Delayed listener attach avoids closing from the opening click.
   useEffect(() => {
@@ -167,92 +181,25 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
 
   const handleApply = async () => {
     const firstSuggestion = activeDetail.suggestions?.[0]?.suggestion;
-    if (!firstSuggestion || !fixInEditor || !activeDetail.context) return;
-
-    const siblingDetailIds = (() => {
-      if (!matchData?.criteriaScores) return [activeDetail.id];
-      const ids = [];
-      for (const cs of matchData.criteriaScores) {
-        for (const d of cs.details ?? []) {
-          if (activeDetail.contextId != null) {
-            if (d.contextId === activeDetail.contextId) ids.push(d.id);
-          } else if (activeDetail.context && d.contextId == null && d.context === activeDetail.context) {
-            ids.push(d.id);
-          }
-        }
-      }
-      return ids.length > 0 ? ids : [activeDetail.id];
-    })();
-
-    const beforeDoc = editor?.state?.doc;
-    const beforeOverallScore = matchData?.aiOverallScore;
-    const originalPinnedRanges = Object.fromEntries(
-      siblingDetailIds.map((sid) => {
-        const sibling = matchData?.criteriaScores
-          ?.flatMap((cs) => cs.details ?? [])
-          .find((d) => d.id === sid);
-        return [sid, sibling?.pinnedRange ?? null];
-      })
-    );
-    const beforeCriteriaScore = matchData?.criteriaScores
-      ? (() => {
-          for (const cs of matchData.criteriaScores) {
-            if (cs.details?.some((d) => d.id === activeDetail.id)) return cs.aiScore;
-          }
-          return undefined;
-        })()
-      : undefined;
+    if (!firstSuggestion || !applySuggestion || !activeDetail.context) return;
 
     setIsApplying(true);
-    const result = await fixInEditor(activeDetail.context, firstSuggestion, activeDetail.id);
-    const success = result?.success;
-    const pinnedRange = result?.range || null;
-    if (success) {
-      const plainSuggestion = stripHtml(firstSuggestion);
-      for (const sid of siblingDetailIds) {
-        dispatch(setDetailContext({ detailId: sid, context: plainSuggestion }));
-        if (pinnedRange) {
-          dispatch(setDetailPinnedRange({ detailId: sid, range: pinnedRange }));
-        }
-      }
-      try {
-        const response = await markDetailAsFixedBatch({ detailIds: siblingDetailIds }).unwrap();
-        for (const sid of siblingDetailIds) {
-          dispatch(setDetailFixed({ detailId: sid }));
-        }
-        if (response) {
-          dispatch(updateScoresAfterFixed({
-            afterOverallScore: response.afterOverallScore,
-            criteriaScoreId: response.criteriaScoreId,
-            afterCriteriaScore: response.afterCriteriaScore,
-          }));
-
-          if (beforeDoc && pushFixUndo) {
-            pushFixUndo({
-              beforeDoc,
-              detailIds: siblingDetailIds,
-              criteriaScoreId: response.criteriaScoreId,
-              beforeOverallScore,
-              beforeCriteriaScore,
-              originalContext: activeDetail.context,
-              originalPinnedRanges,
-            });
-          }
-        }
-        toastMessage.success('Fix applied successfully.');
-        dispatch(setFocusedItemId(activeDetail.id));
-        setTimeout(() => dispatch(setFocusedItemId(null)), 2500);
-      } catch (error) {
-        toastMessage.error(getErrorMessage(error, 'Fix applied but failed to update status.'));
-      }
+    const result = await applySuggestion({
+      detailId: activeDetail.id,
+      context: activeDetail.context,
+      suggestionText: firstSuggestion,
+      detailIds: siblings.map((s) => s.id),
+    });
+    if (result?.success) {
+      onClose();
     }
     setIsApplying(false);
-    onClose();
   };
 
   return (
     <div
       ref={popoverRef}
+      data-testid="highlight-detail-modal"
       className="absolute z-50 w-[580px] rounded-lg border border-neutral-200 bg-white shadow-xl"
       style={{ maxHeight: 400 }}
     >
