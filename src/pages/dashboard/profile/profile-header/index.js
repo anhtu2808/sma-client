@@ -23,6 +23,7 @@ const ProfileHeader = () => {
     () => ({
       fullName: profile?.fullName ?? "",
       jobTitle: profile?.jobTitle ?? "",
+      phone: profile?.phone ?? "",
       address: profile?.address ?? "",
       githubUrl: profile?.githubUrl ?? "",
       linkedinUrl: profile?.linkedinUrl ?? "",
