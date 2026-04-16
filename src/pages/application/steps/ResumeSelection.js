@@ -47,42 +47,47 @@ const ResumeSelection = ({
                         <div
                             key={resume.id}
                             onClick={() => onSelectResume(resume.id)}
-                            className={`group relative p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${isSelected
+                            className={`group relative p-4 rounded-xl border transition-all cursor-pointer flex items-center gap-3 ${isSelected
                                 ? 'border-orange-500 bg-orange-50 shadow-sm'
                                 : 'border-gray-100 bg-white hover:border-orange-200 hover:shadow-sm'
                                 }`}
                         >
-                            <div className="flex items-center gap-4 min-w-0 flex-1">
-                                <div className={`p-2.5 rounded-lg shrink-0 ${isSelected ? 'bg-orange-500/10 text-orange-600' : 'bg-gray-100 text-gray-500'}`}>
-                                    <FileText size={18} />
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                    <div className="flex items-center gap-2">
-                                        <p className="text-sm font-semibold text-gray-900 truncate" title={resume.resumeName || resume.fileName}>
-                                            {resume.resumeName || resume.fileName}
-                                        </p>
-
-                                        {score !== null && score !== undefined && (
-                                            <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-100">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                                <span className="text-[11px] font-black">{score}% Match</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                    <p className="text-[11px] text-gray-500 mt-1">
-                                        Last updated: {resume.updatedAt ? new Date(resume.updatedAt).toLocaleDateString('vi-VN') : 'N/A'}
-                                    </p>
-                                </div>
+                            {/* Left Icon */}
+                            <div className={`p-2.5 rounded-lg shrink-0 ${isSelected ? 'bg-orange-500/10 text-orange-600' : 'bg-gray-100 text-gray-500'}`}>
+                                <FileText size={18} />
                             </div>
 
-                            <div className="flex items-center gap-3">
+                            {/* Main Content: Info & Score */}
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 overflow-hidden">
+                                    <p
+                                        className="text-sm font-semibold text-gray-900 truncate"
+                                        title={resume.resumeName || resume.fileName}
+                                    >
+                                        {resume.resumeName || resume.fileName}
+                                    </p>
+
+                                    {score !== null && score !== undefined && (
+                                        <div className="flex shrink-0 items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-100">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                            <span className="text-[11px] font-black whitespace-nowrap">{score}% Match</span>
+                                        </div>
+                                    )}
+                                </div>
+                                {/* <p className="text-[11px] text-gray-500 mt-1">
+                                    Last updated: {resume.updatedAt ? new Date(resume.updatedAt).toLocaleDateString('vi-VN') : 'N/A'}
+                                </p> */}
+                            </div>
+
+                            {/* Right Actions: Buttons & Selection */}
+                            <div className="flex items-center gap-2 shrink-0 ml-auto">
                                 <button
                                     type="button"
                                     disabled={isStartingMatching}
                                     onClick={(e) => handleActionClick(e, resume)}
                                     className={`flex items-center justify-center w-9 h-9 rounded-xl transition-all ${evaluationId
-                                            ? 'bg-amber-100 text-amber-600 hover:bg-amber-200'
-                                            : 'bg-indigo-100 text-indigo-600 hover:bg-indigo-200'
+                                        ? 'bg-amber-100 text-amber-600 hover:bg-amber-200'
+                                        : 'bg-indigo-100 text-indigo-600 hover:bg-indigo-200'
                                         }`}
                                     title={evaluationId ? 'View Report' : 'Check AI Match'}
                                 >
@@ -95,11 +100,13 @@ const ResumeSelection = ({
                                     )}
                                 </button>
 
-                                {isSelected ? (
-                                    <CheckCircle2 className="text-orange-500" size={20} />
-                                ) : (
-                                    <div className="w-5 h-5 rounded-full border-2 border-gray-200 group-hover:border-orange-300" />
-                                )}
+                                <div className="flex items-center justify-center w-6">
+                                    {isSelected ? (
+                                        <CheckCircle2 className="text-orange-500" size={20} />
+                                    ) : (
+                                        <div className="w-5 h-5 rounded-full border-2 border-gray-200 group-hover:border-orange-300" />
+                                    )}
+                                </div>
                             </div>
                         </div>
                     );
