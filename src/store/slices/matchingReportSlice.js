@@ -106,19 +106,18 @@ const matchingReportSlice = createSlice({
     },
 
     revertScoresAfterUnfixed: (state, action) => {
-      const { beforeOverallScore, criteriaScoreId, beforeCriteriaScore } = action.payload;
-      if (!state.data) return;
-
-      if (beforeOverallScore !== undefined) {
-        state.data.aiOverallScore = beforeOverallScore;
-      }
-
-      if (criteriaScoreId !== undefined && beforeCriteriaScore !== undefined) {
-        const criteria = state.data.criteriaScores.find((c) => c.id === criteriaScoreId);
-        if (criteria) {
-          criteria.aiScore = beforeCriteriaScore;
-        }
-      }
+      // [DISABLED] Score revert — scores no longer change on apply/undo
+      // const { beforeOverallScore, criteriaScoreId, beforeCriteriaScore } = action.payload;
+      // if (!state.data) return;
+      // if (beforeOverallScore !== undefined) {
+      //   state.data.aiOverallScore = beforeOverallScore;
+      // }
+      // if (criteriaScoreId !== undefined && beforeCriteriaScore !== undefined) {
+      //   const criteria = state.data.criteriaScores.find((c) => c.id === criteriaScoreId);
+      //   if (criteria) {
+      //     criteria.aiScore = beforeCriteriaScore;
+      //   }
+      // }
     },
 
     setDetailContext: (state, action) => {
@@ -146,21 +145,18 @@ const matchingReportSlice = createSlice({
     },
 
     updateScoresAfterFixed: (state, action) => {
-      const { afterOverallScore, criteriaScoreId, afterCriteriaScore } = action.payload;
-      if (!state.data) return;
-
-      // Update overall score
-      if (afterOverallScore !== undefined) {
-        state.data.aiOverallScore = afterOverallScore;
-      }
-
-      // Update criteria score
-      if (criteriaScoreId !== undefined && afterCriteriaScore !== undefined) {
-        const criteria = state.data.criteriaScores.find((c) => c.id === criteriaScoreId);
-        if (criteria) {
-          criteria.aiScore = afterCriteriaScore;
-        }
-      }
+      // [DISABLED] Score recalculation — only track fixed status, don't update scores
+      // const { afterOverallScore, criteriaScoreId, afterCriteriaScore } = action.payload;
+      // if (!state.data) return;
+      // if (afterOverallScore !== undefined) {
+      //   state.data.aiOverallScore = afterOverallScore;
+      // }
+      // if (criteriaScoreId !== undefined && afterCriteriaScore !== undefined) {
+      //   const criteria = state.data.criteriaScores.find((c) => c.id === criteriaScoreId);
+      //   if (criteria) {
+      //     criteria.aiScore = afterCriteriaScore;
+      //   }
+      // }
     },
 
     updateSuggestion: (state, action) => {
