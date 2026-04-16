@@ -100,8 +100,10 @@ const useTypewriterFix = () => {
 
             const newLen = (paraContentEnd - paraContentStart) + (sizeAfter - sizeBefore);
             let textFrom = paraContentStart;
+            let foundFirst = false;
             editor.state.doc.nodesBetween(paraContentStart, paraContentStart + newLen, (node, pos) => {
-              if (node.isText) { textFrom = pos; return false; }
+              if (foundFirst) return false;
+              if (node.isText) { textFrom = pos; foundFirst = true; return false; }
               return true;
             });
             insertedFrom = textFrom;
@@ -130,8 +132,10 @@ const useTypewriterFix = () => {
             // Find the first text-node position inside the newly inserted content
             // so the badge widget renders inline with text rather than between blocks.
             let textFrom = parentStart + 1; // safe fallback
+            let foundFirst = false;
             editor.state.doc.nodesBetween(parentStart, parentStart + newLen, (node, pos) => {
-              if (node.isText) { textFrom = pos; return false; }
+              if (foundFirst) return false;
+              if (node.isText) { textFrom = pos; foundFirst = true; return false; }
               return true;
             });
             insertedFrom = textFrom;
