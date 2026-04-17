@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleCheck, faMagnifyingGlass } from '../../../utils/icons';
+import { faCheck, faMagnifyingGlass } from '../../../utils/icons';
 
 const ApplicationSuccess = () => {
     const navigate = useNavigate();
@@ -20,7 +20,7 @@ const ApplicationSuccess = () => {
                     <div className="relative w-24 h-24 mx-auto mb-8">
                         <div className="absolute inset-0 bg-green-500/15 rounded-full animate-ping" />
                         <div className="relative flex items-center justify-center w-full h-full bg-gradient-to-br from-green-500 to-emerald-400 rounded-full shadow-[0_8px_20px_rgba(16,185,129,0.3)]">
-                            <FontAwesomeIcon icon={faCircleCheck} className="text-white text-5xl" />
+                            <FontAwesomeIcon icon={faCheck} className="text-white text-5xl" />
                         </div>
                     </div>
                     <h2 className="text-3xl font-extrabold text-neutral-900 mb-4 font-heading tracking-tight italic">

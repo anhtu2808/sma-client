@@ -2,7 +2,7 @@ import { Building2 } from 'lucide-react';
 import PropTypes from 'prop-types';
 import { getIndustryLabel } from '@/constant/job';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBuilding } from '../../utils/icons';
+import { faBuilding, faBriefcase } from '../../utils/icons';
 
 const CompanyCard = ({
     logo,
@@ -11,6 +11,7 @@ const CompanyCard = ({
     description,
     industry,
     location,
+    publishJob,
 
     onViewDetails,
     className = ""
@@ -58,12 +59,20 @@ const CompanyCard = ({
 
                 {/* Footer Badges */}
                 <div className="mt-auto flex flex-col gap-2 pt-2 border-t border-slate-100">
+                    <div className="flex items-center justify-between">
                     {industry && (
                         <div className="flex items-center gap-2 text-slate-500 text-xs">
                             <FontAwesomeIcon icon={faBuilding} className="text-[16px]" />
                             <span className="truncate uppercase font-medium">{getIndustryLabel(industry)}</span>
                         </div>
                     )}
+                    {publishJob !== undefined && (
+                        <div className="flex items-center gap-2 text-slate-500 text-xs font-semibold bg-slate-50 px-2.5 py-1 rounded-md">
+                            <FontAwesomeIcon icon={faBriefcase} className="text-[14px]" />
+                            <span>{publishJob} {publishJob === 1 ? 'Job' : 'Jobs'}</span>
+                        </div>
+                    )}
+                    </div>
                 </div>
             </div>
         </article>
@@ -77,6 +86,7 @@ CompanyCard.propTypes = {
     description: PropTypes.string,
     industry: PropTypes.string,
     location: PropTypes.string,
+    publishJob: PropTypes.number,
     followers: PropTypes.number,
     onViewDetails: PropTypes.func,
     className: PropTypes.string

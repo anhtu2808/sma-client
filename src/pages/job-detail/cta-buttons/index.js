@@ -55,11 +55,11 @@ const CTAButtons = () => {
             };
         }
         if (attempt === 1) {
-            return { text: "Re-apply (2/3)", disabled: false, mode: "primary" };
+            return { text: "Re-apply", disabled: false, mode: "primary" };
         }
 
         if (attempt === 2) {
-            return { text: "Final Re-apply (3/3)", disabled: false, mode: "primary" };
+            return { text: "Final Re-apply", disabled: false, mode: "primary" };
         }
 
         return { text: "Apply Now", disabled: false, mode: "primary" };
