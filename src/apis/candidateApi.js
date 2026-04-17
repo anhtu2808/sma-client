@@ -42,7 +42,6 @@ export const candidateApi = api.injectEndpoints({
                             "expectedSalaryMax",
                             "availabilityDate",
                             "isProfilePublic",
-                            "showAs",
                         ];
                         for (const key of fields) {
                             if (Object.prototype.hasOwnProperty.call(arg, key)) {
