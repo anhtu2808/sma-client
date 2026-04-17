@@ -100,7 +100,7 @@ const mapPlanToCard = (plan) => {
 };
 
 const Plans = () => {
-  const { data: plans = [], isLoading } = useGetPlansQuery();
+  const { data: plans = [], isLoading, refetch } = useGetPlansQuery();
   const [expandedPlan, setExpandedPlan] = useState(null);
   const [selectedDurationByPlan, setSelectedDurationByPlan] = useState({});
   const [selectedPlanCode, setSelectedPlanCode] = useState(null);
@@ -187,6 +187,7 @@ const Plans = () => {
         onClose={handleClosePaymentModal}
         plan={selectedPlanForPayment}
         selectedDuration={selectedDurationForPayment}
+        onSuccess={refetch}
       />
     </>
   );
