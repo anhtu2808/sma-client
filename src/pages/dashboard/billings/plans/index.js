@@ -107,7 +107,7 @@ const mapPlanToCard = (plan, currentPlanId) => {
   };
 };
 
-const Plans = ({ plans = [], currentPlanId = null }) => {
+const Plans = ({ plans = [], currentPlanId = null, onPaymentSuccess }) => {
   const [expandedPlanCode, setExpandedPlanCode] = useState(null);
   const [selectedDurationByPlan, setSelectedDurationByPlan] = useState({});
   const [selectedPlanCode, setSelectedPlanCode] = useState(null);
@@ -193,6 +193,7 @@ const Plans = ({ plans = [], currentPlanId = null }) => {
         onClose={handleClosePaymentModal}
         plan={selectedPlanForModal}
         selectedDuration={selectedDurationForModal}
+        onSuccess={onPaymentSuccess}
       />
     </>
   );
