@@ -11,7 +11,7 @@ const formatCurrency = (amount) => {
   }).format(Number(amount));
 };
 
-const Addons = ({ plans = [] }) => {
+const Addons = ({ plans = [], onPaymentSuccess }) => {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [selectedAddonForModal, setSelectedAddonForModal] = useState(null);
 
@@ -89,6 +89,7 @@ const Addons = ({ plans = [] }) => {
         onClose={handleClosePaymentModal}
         plan={selectedAddonForModal}
         selectedDuration={null}
+        onSuccess={onPaymentSuccess}
       />
     </div>
   );

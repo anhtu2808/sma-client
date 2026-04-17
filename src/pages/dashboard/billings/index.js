@@ -8,15 +8,20 @@ import Addons from "@/pages/dashboard/billings/addons";
 import Loading from "@/components/Loading";
 
 const BillingPlans = () => {
-  const { data: plans = [], isLoading: isPlansLoading } = useGetPlansQuery({
+  const { data: plans = [], isLoading: isPlansLoading, refetch: refetchPlans } = useGetPlansQuery({
     planType: PLAN_TYPES.MAIN,
     planTarget: PLAN_TARGETS.CANDIDATE,
   });
 
-  const { data: addons = [], isLoading: isAddonsLoading } = useGetPlansQuery({
+  const { data: addons = [], isLoading: isAddonsLoading, refetch: refetchAddons } = useGetPlansQuery({
     planType: PLAN_TYPES.ADDONS_QUOTA,
     planTarget: PLAN_TARGETS.CANDIDATE,
   });
+
+  const handleRefetch = () => {
+    refetchPlans();
+    refetchAddons();
+  };
 
   const currentPlan = useMemo(() => {
     if (!Array.isArray(plans)) return null;
@@ -37,10 +42,10 @@ const BillingPlans = () => {
   return (
     <Row gutter={[24, 24]}>
       <Col span={24}>
-        <Plans plans={plans} currentPlanId={currentPlanId} />
+        <Plans plans={plans} currentPlanId={currentPlanId} onPaymentSuccess={handleRefetch} />
       </Col>
       <Col span={24}>
-        <Addons plans={addons} currentPlanId={currentPlanId} />
+        <Addons plans={addons} currentPlanId={currentPlanId} onPaymentSuccess={handleRefetch} />
       </Col>
 
     </Row>

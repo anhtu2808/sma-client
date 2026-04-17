@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faCircleCheck, faQrcode, faRotate } from '../../../../utils/icons';
 import formatCurrency from "@/utils/formatCurrency";
 
-const PaymentModal = ({ isOpen, onClose, plan, selectedDuration }) => {
+const PaymentModal = ({ isOpen, onClose, plan, selectedDuration, onSuccess }) => {
     const [createSubscription, { isLoading: isApiLoading }] = useCreateSubscriptionMutation();
     const [previewSubscription] = usePreviewSubscriptionMutation();
     const [qrCodeUrl, setQrCodeUrl] = useState(null);
@@ -85,6 +85,9 @@ const PaymentModal = ({ isOpen, onClose, plan, selectedDuration }) => {
             : '';
 
     const handleClose = () => {
+        if (paymentStatus === "SUCCESS" && onSuccess) {
+            onSuccess();
+        }
         setPaymentStatus("PENDING");
         setQrCodeUrl(null);
         setPaymentId(null);
