@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useGetNotificationsQuery } from '@/apis/notificationApi';
+import { useGetInvitationStatusCountQuery } from '@/apis/invitationApi';
 import { useCandidateDashboardProfileQuery } from '@/apis/candidateApi';
 import CvVisibilityControl from "@/pages/dashboard/layout/cv-visibility-control";
 import {
@@ -18,6 +19,9 @@ const Sidebar = () => {
     });
     const unreadCount = data?.data?.unreadCount || 0;
 
+    const { data: invitationStatusCount } = useGetInvitationStatusCountQuery();
+    const pendingInvitationCount = invitationStatusCount?.statuses?.find(s => s.status === "INVITED")?.count || 0;
+
     const { data: profile } = useCandidateDashboardProfileQuery();
     const profileCompleteness = profile?.profileCompleteness ?? 0;
 
@@ -25,13 +29,13 @@ const Sidebar = () => {
 
         { to: "/dashboard", icon: faUser, label: "Profile", end: true },
         { to: "/dashboard/resumes", icon: faFileLines, label: "Resumes" },
-        { to: "/dashboard/matching-history", icon: faClipboardCheck, label: "Resume Checker", badge: "New" },
+        { to: "/dashboard/matching-history", icon: faClipboardCheck, label: "Resume Checker" },
         { to: "/dashboard/jobs", icon: faClockRotateLeft, label: "My Jobs" },
         {
             to: "/dashboard/invitations",
             icon: faEnvelope,
             label: "Job Invitation",
-            badge: 3,
+            badge: pendingInvitationCount > 0 ? pendingInvitationCount : null,
         },
         { to: "/dashboard/notifications", icon: faBell, label: "Notifications", badge: unreadCount > 0 ? unreadCount : null },
         { to: "/dashboard/billing-plans", icon: faCreditCard, label: "Billing & Plans" },
