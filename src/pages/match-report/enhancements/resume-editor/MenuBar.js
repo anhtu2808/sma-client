@@ -16,7 +16,7 @@ import {
   FileCheck,
 } from 'lucide-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRotateLeft, faRotateRight, faWandMagicSparkles } from '../../../../utils/icons';
+import { faRotateLeft, faRotateRight } from '../../../../utils/icons';
 import ColorPicker from './ColorPicker';
 
 const ToolbarButton = ({ onClick, isActive, icon: Icon, disabled }) => (
@@ -46,8 +46,6 @@ const MenuBar = ({
   onSave,
   isSaving,
   saveStatus,
-  onRegenerateSuggestions,
-  isRegenerating,
   onReScore,
   isReScoring,
   reScoreStatus,
@@ -77,7 +75,7 @@ const MenuBar = ({
   };
 
   const isExportDisabled =
-    !editor || isSaving || isExporting || reScoreStatus === 'polling' || isRegenerating;
+    !editor || isSaving || isExporting || reScoreStatus === 'polling';
 
   return (
     <div className="sticky top-0 z-10 flex flex-nowrap items-center gap-1 p-2 border-b border-neutral-200 bg-white">
@@ -152,21 +150,6 @@ const MenuBar = ({
               <RefreshCw
                 size={14}
                 className={isReScoreBusy ? 'animate-spin' : ''}
-              />
-            </button>
-          </Tooltip>
-        )}
-        {onRegenerateSuggestions && (
-          <Tooltip title={isRegenerating ? 'Generating...' : 'Re-generate suggestions'}>
-            <button
-              type="button"
-              onClick={onRegenerateSuggestions}
-              disabled={isRegenerating}
-              className="flex items-center justify-center rounded-lg w-8 h-8 text-white transition-all disabled:opacity-60 disabled:cursor-not-allowed bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 shadow-sm"
-            >
-              <FontAwesomeIcon
-                icon={faWandMagicSparkles}
-                className={`text-[14px] ${isRegenerating ? 'animate-spin' : ''}`}
               />
             </button>
           </Tooltip>
