@@ -38,12 +38,8 @@ const CvVisibilityControl = () => {
     const explicitDefault = selectableResumes.find((resume) => Boolean(resume?.isDefault));
     if (explicitDefault) return explicitDefault;
 
-    if (profile?.showAs === "PROFILE" && profileResume) {
-      return profileResume;
-    }
-
     return profileResume || originalResumes?.[0] || null;
-  }, [originalResumes, profile?.showAs, profileResume, selectableResumes]);
+  }, [originalResumes, profileResume, selectableResumes]);
 
   const selectedResume = useMemo(
     () => selectableResumes.find((resume) => resume?.id === selectedResumeId) || null,
@@ -79,8 +75,6 @@ const CvVisibilityControl = () => {
 
     try {
       await setResumeAsDefault({ resumeId: selectedResume.id }).unwrap();
-      const showAs = selectedResume.type === RESUME_TYPES.PROFILE ? "PROFILE" : "RESUME";
-      await updateCandidateDashboardProfile({ showAs }).unwrap();
       toastMessage.success("Visible resume settings updated successfully.");
       setIsModalOpen(false);
     } catch (error) {
