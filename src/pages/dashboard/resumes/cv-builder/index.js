@@ -96,6 +96,7 @@ export default function CvBuilder({ onBack }) {
     const [exportResumeToOriginal] = useExportResumeToOriginalMutation();
     const [isSaving, setIsSaving] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
+    const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
     const [activeSection, setActiveSection] = useState(null);
 
 
@@ -104,56 +105,114 @@ export default function CvBuilder({ onBack }) {
         { skip: !resumeId }
     );
 
-    const handleDownloadPdf = () => {
-        window.print();
+    const generatePdf = async () => {
+        const element = pdfRef.current;
+
+        // Apply print styles to html2canvas via a global stylesheet
+        const styleId = 'pdf-export-overrides';
+        let styleEl = document.getElementById(styleId);
+        if (!styleEl) {
+            styleEl = document.createElement('style');
+            styleEl.id = styleId;
+            styleEl.innerHTML = `
+                .pdf-export-mode .print\\:hidden { display: none !important; }
+                .pdf-export-mode .print\\:block { display: block !important; }
+                .pdf-export-mode .print\\:inline-block { display: inline-block !important; }
+                .pdf-export-mode .print\\:border-none { border: none !important; }
+                .pdf-export-mode .print\\:shadow-none { box-shadow: none !important; }
+                .pdf-export-mode .print\\:p-0 { padding: 0 !important; }
+                .pdf-export-mode .print\\:m-0 { margin: 0 !important; }
+                .pdf-export-mode .print\\:mt-0 { margin-top: 0 !important; }
+                .pdf-export-mode .print\\:bg-white { background-color: #fff !important; }
+                .pdf-export-mode .print\\:text-black { color: #000 !important; }
+                .pdf-export-mode .print\\:px-8 { padding-left: 2rem !important; padding-right: 2rem !important; }
+                .pdf-export-mode .print\\:py-8 { padding-top: 2rem !important; padding-bottom: 2rem !important; }
+                .pdf-export-mode .print\\:pb-4 { padding-bottom: 1rem !important; }
+                .pdf-export-mode .print\\:pb-6 { padding-bottom: 1.5rem !important; }
+                .pdf-export-mode .print\\:pt-8 { padding-top: 2rem !important; }
+                .pdf-export-mode .print\\:space-y-8 > :not([hidden]) ~ :not([hidden]) { margin-top: 2rem !important; margin-bottom: 0 !important; }
+                .pdf-export-mode .print\\:space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem !important; margin-bottom: 0 !important; }
+                .pdf-export-mode .print\\:space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem !important; margin-bottom: 0 !important; }
+                .pdf-export-mode .print\\:space-y-1\\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.375rem !important; margin-bottom: 0 !important; }
+                .pdf-export-mode .print\\:gap-4 { gap: 1rem !important; }
+                .pdf-export-mode .print\\:gap-6 { gap: 1.5rem !important; }
+                .pdf-export-mode .print\\:rounded-none { border-radius: 0px !important; }
+                .pdf-export-mode .print\\:aspect-auto { aspect-ratio: auto !important; }
+                .pdf-export-mode .print\\:min-h-0 { min-height: 0px !important; }
+                .pdf-export-mode .print\\:w-full { width: 100% !important; }
+                .pdf-export-mode .print\\:break-inside-avoid { break-inside: avoid !important; }
+            `;
+            document.head.appendChild(styleEl);
+        }
+        
+        element.classList.add('pdf-export-mode');
+
+        // Convert cross-origin avatar to inline base64 so html2canvas can render it
+        const avatarImg = element.querySelector('img[alt="Avatar"]');
+        let originalSrc = null;
+        if (avatarImg && avatarImg.src && !avatarImg.src.startsWith('data:')) {
+            originalSrc = avatarImg.src;
+            try {
+                const response = await fetch(avatarImg.src);
+                const blob = await response.blob();
+                const dataUrl = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    reader.readAsDataURL(blob);
+                });
+                avatarImg.src = dataUrl;
+            } catch (e) {
+                console.warn("Could not convert avatar to base64, it may be missing in PDF:", e);
+            }
+        }
+
+        const canvas = await html2canvas(element, { scale: 2, useCORS: true, logging: false });
+
+        // Restore original avatar src after capture
+        if (originalSrc) {
+            avatarImg.src = originalSrc;
+        }
+
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF("p", "mm", "a4");
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+        let heightLeft = imgHeight, position = 0;
+        pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
+        heightLeft -= pdfHeight;
+        while (heightLeft > 0) {
+            position -= pdfHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
+            heightLeft -= pdfHeight;
+        }
+
+        element.classList.remove('pdf-export-mode');
+
+        return pdf;
+    };
+
+    const handleDownloadPdf = async () => {
+        setIsDownloadingPdf(true);
+        try {
+            const pdf = await generatePdf();
+            const fileName = `${cvData.personalInfo?.fullName || "Resume"}_CV.pdf`;
+            pdf.save(fileName);
+            toastMessage.success("PDF downloaded successfully!");
+        } catch (err) {
+            console.error("Download PDF error:", err);
+            toastMessage.error("Failed to download PDF. Please try again.");
+        } finally {
+            setIsDownloadingPdf(false);
+        }
     };
 
     const handleExportToApply = async () => {
         if (!resumeId) return toastMessage.error("Resume not found.");
         setIsExporting(true);
         try {
-            const element = pdfRef.current;
-
-            // Convert cross-origin avatar to inline base64 so html2canvas can render it
-            const avatarImg = element.querySelector('img[alt="Avatar"]');
-            let originalSrc = null;
-            if (avatarImg && avatarImg.src && !avatarImg.src.startsWith('data:')) {
-                originalSrc = avatarImg.src;
-                try {
-                    const response = await fetch(avatarImg.src);
-                    const blob = await response.blob();
-                    const dataUrl = await new Promise((resolve) => {
-                        const reader = new FileReader();
-                        reader.onloadend = () => resolve(reader.result);
-                        reader.readAsDataURL(blob);
-                    });
-                    avatarImg.src = dataUrl;
-                } catch (e) {
-                    console.warn("Could not convert avatar to base64, it may be missing in PDF:", e);
-                }
-            }
-
-            const canvas = await html2canvas(element, { scale: 2, useCORS: true, logging: false });
-
-            // Restore original avatar src after capture
-            if (originalSrc) {
-                avatarImg.src = originalSrc;
-            }
-
-            const imgData = canvas.toDataURL("image/png");
-            const pdf = new jsPDF("p", "mm", "a4");
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = pdf.internal.pageSize.getHeight();
-            const imgHeight = (canvas.height * pdfWidth) / canvas.width;
-            let heightLeft = imgHeight, position = 0;
-            pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
-            heightLeft -= pdfHeight;
-            while (heightLeft > 0) {
-                position -= pdfHeight;
-                pdf.addPage();
-                pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
-                heightLeft -= pdfHeight;
-            }
+            const pdf = await generatePdf();
 
             const pdfBlob = pdf.output("blob");
             const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -278,22 +337,22 @@ export default function CvBuilder({ onBack }) {
                     ? resumeData.experiences.map(exp => ({
                         id: exp.id || `exp_${Date.now()}_${Math.random()}`,
                         detailId: exp.details?.[0]?.id || null, // Capture detail ID for PUT updates
-                        title: exp.details?.[0]?.title || exp.title || "",
-                        company: exp.company || "",
+                        title: exp.details?.[0]?.title || exp.title || "Role/Position",
+                        company: exp.company || "Company Name",
                         startDate: exp.startDate || "",
                         endDate: exp.endDate || "",
                         isCurrent: exp.isCurrent || false,
-                        description: exp.details?.[0]?.description || exp.description || "",
-                        workingModel: exp.workingModel || null,
-                        employmentType: exp.employmentType || null,
+                        description: exp.details?.[0]?.description || exp.description || "Job Description",
+                        workingModel: exp.workingModel || "ONSITE",
+                        employmentType: exp.employmentType || "FULL_TIME",
                     }))
                     : prevData.experience,
                 education: resumeData.educations && resumeData.educations.length > 0
                     ? resumeData.educations.map(edu => ({
                         id: edu.id || `edu_${Date.now()}_${Math.random()}`,
-                        institution: edu.institution || "",
-                        degree: edu.degree || "",
-                        majorField: edu.majorField || "",
+                        institution: edu.institution || "Institution Name",
+                        degree: edu.degree || "BACHELOR",
+                        majorField: edu.majorField || "Major Field",
                         gpa: edu.gpa || 0,
                         startDate: edu.startDate || "",
                         endDate: edu.endDate || "",
@@ -303,24 +362,24 @@ export default function CvBuilder({ onBack }) {
                 certificates: resumeData.certifications && resumeData.certifications.length > 0
                     ? resumeData.certifications.map(cert => ({
                         id: cert.id || `cert_${Date.now()}_${Math.random()}`,
-                        name: cert.name || "",
-                        issuer: cert.issuer || "",
-                        credentialUrl: cert.credentialUrl || "",
-                        description: cert.description || "",
+                        name: cert.name || "Certificate Name",
+                        issuer: cert.issuer || "Issuing Organization",
+                        credentialUrl: cert.credentialUrl || "https://",
+                        description: cert.description || "Certificate Description",
                     }))
                     : prevData.certificates,
                 projects: resumeData.projects && resumeData.projects.length > 0
                     ? resumeData.projects.map(proj => ({
                         id: proj.id || `proj_${Date.now()}_${Math.random()}`,
-                        title: proj.title || "",
-                        position: proj.position || "",
-                        description: proj.description || "",
+                        title: proj.title || "Project Name",
+                        position: proj.position || "Role/Position",
+                        description: proj.description || "Project Description",
                         startDate: proj.startDate || "",
                         endDate: proj.endDate || "",
                         isCurrent: proj.isCurrent || false,
-                        projectUrl: proj.projectUrl || "",
-                        teamSize: proj.teamSize || null,
-                        projectType: proj.projectType || null,
+                        projectUrl: proj.projectUrl || "https://project-url.com",
+                        teamSize: proj.teamSize || 1,
+                        projectType: proj.projectType || "PROFESSIONAL",
                     }))
                     : prevData.projects,
             }));
@@ -876,8 +935,10 @@ export default function CvBuilder({ onBack }) {
                                 mode="primary"
                                 shape="rounded"
                                 onClick={handleDownloadPdf}
+                                disabled={isDownloadingPdf || isSaving}
                                 className="px-4 py-2 bg-[#1F8A70] text-white rounded-md text-sm font-medium hover:bg-[#19755f] flex items-center gap-2">
-                                <Download size={16} /> Download PDF
+                                {isDownloadingPdf ? <Loading size={16} inline /> : <Download size={16} />}
+                                {isDownloadingPdf ? "Downloading..." : "Download PDF"}
                             </Button>
                             <Button
                                 mode="primary"

@@ -238,12 +238,10 @@ const ProfessionalTemplate = ({
                                                                 <span>&nbsp;-&nbsp;</span>
                                                                 <EditableText as="span" value={edu.majorField} onChange={v => updateField(`education.${itemIndex}.majorField`, v)} />
                                                             </li>
-                                                            {edu.gpa > 0 && (
-                                                                <li className="flex items-center gap-1">
-                                                                    <span className="font-semibold text-gray-900">GPA:</span>
-                                                                    <EditableText as="span" className="min-w-[20px]" value={edu.gpa} onChange={v => updateField(`education.${itemIndex}.gpa`, v)} />
-                                                                </li>
-                                                            )}
+                                                            <li className={`flex items-center gap-1 ${!edu.gpa || edu.gpa == 0 ? "print:hidden" : ""}`}>
+                                                                <span className={`font-semibold text-gray-900 ${!edu.gpa || edu.gpa == 0 ? "text-gray-400" : ""}`}>GPA:</span>
+                                                                <EditableText type="number" as="span" className="min-w-[20px]" value={edu.gpa || ""} onChange={v => updateField(`education.${itemIndex}.gpa`, v)} />
+                                                            </li>
                                                         </ul>
                                                     </div>
                                                 </EditableItemWrapper>

@@ -24,46 +24,58 @@ export const EditableDateRange = React.memo(({ startDate, endDate, isCurrent, on
 
     return (
         <div className={`flex items-center gap-2 flex-nowrap whitespace-nowrap ${className}`}>
-            <DatePicker
-                picker="month"
-                format="MM/YYYY"
-                suffixIcon={null}
-                value={parsedStart}
-                onChange={(date) => {
-                    if (date) {
-                        onStartDateChangeRef.current(date.startOf('month').format('YYYY-MM-DD'));
-                    } else {
-                        onStartDateChangeRef.current('');
-                    }
-                }}
-                placeholder="Start"
-                allowClear={false}
-                bordered={false}
-                className="w-[60px] p-0 text-center font-inherit bg-transparent cursor-pointer flex-shrink-0 flex-nowrap"
-                style={{ color: 'inherit', fontWeight: 'inherit', fontSize: 'inherit' }}
-            />
-            <span className="flex-shrink-0">-</span>
-            {isCurrent ? (
-                <span className="w-[60px] text-center flex-shrink-0">Now</span>
-            ) : (
+            <div className="print:hidden inline-flex">
                 <DatePicker
                     picker="month"
                     format="MM/YYYY"
                     suffixIcon={null}
-                    value={parsedEnd}
+                    value={parsedStart}
                     onChange={(date) => {
                         if (date) {
-                            onEndDateChangeRef.current(date.startOf('month').format('YYYY-MM-DD'));
+                            onStartDateChangeRef.current(date.startOf('month').format('YYYY-MM-DD'));
                         } else {
-                            onEndDateChangeRef.current('');
+                            onStartDateChangeRef.current('');
                         }
                     }}
-                    placeholder="End"
+                    placeholder="Start"
                     allowClear={false}
                     bordered={false}
                     className="w-[60px] p-0 text-center font-inherit bg-transparent cursor-pointer flex-shrink-0 flex-nowrap"
                     style={{ color: 'inherit', fontWeight: 'inherit', fontSize: 'inherit' }}
                 />
+            </div>
+            <span className="hidden print:inline-block w-[60px] text-center font-inherit flex-shrink-0 truncate overflow-visible">
+                {parsedStart ? parsedStart.format('MM/YYYY') : 'Start'}
+            </span>
+            <span className="flex-shrink-0">-</span>
+            {isCurrent ? (
+                <span className="w-[60px] text-center flex-shrink-0">Now</span>
+            ) : (
+                <>
+                    <div className="print:hidden inline-flex">
+                        <DatePicker
+                            picker="month"
+                            format="MM/YYYY"
+                            suffixIcon={null}
+                            value={parsedEnd}
+                            onChange={(date) => {
+                                if (date) {
+                                    onEndDateChangeRef.current(date.startOf('month').format('YYYY-MM-DD'));
+                                } else {
+                                    onEndDateChangeRef.current('');
+                                }
+                            }}
+                            placeholder="End"
+                            allowClear={false}
+                            bordered={false}
+                            className="w-[60px] p-0 text-center font-inherit bg-transparent cursor-pointer flex-shrink-0 flex-nowrap"
+                            style={{ color: 'inherit', fontWeight: 'inherit', fontSize: 'inherit' }}
+                        />
+                    </div>
+                    <span className="hidden print:inline-block w-[60px] text-center font-inherit flex-shrink-0 truncate overflow-visible">
+                        {parsedEnd ? parsedEnd.format('MM/YYYY') : 'End'}
+                    </span>
+                </>
             )}
             <Checkbox
                 label="Now"

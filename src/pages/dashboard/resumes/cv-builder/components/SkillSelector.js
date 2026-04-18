@@ -113,7 +113,7 @@ export const SkillSelector = ({ titleClassName, itemClassName, groupClassName, g
                             <h4 className={`font-semibold text-[15px] border-b pb-1.5 mb-1 ${groupClassName || 'text-gray-800 border-gray-200'}`}>{group}</h4>
                             <div className="flex flex-wrap gap-2.5">
                                 {skills.map((skill) => (
-                                    <div key={skill.skillId} className={`inline-flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-md text-[13px] font-medium group/skill transition-colors ${itemClassName || 'bg-transparent text-gray-800 border border-gray-200'}`}>
+                                    <div key={skill.skillId} className={`inline-flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-md text-[13px] font-medium group/skill transition-colors ${itemClassName || 'bg-transparent text-gray-800 border border-gray-200 print:border-none print:px-0'}`}>
                                         <span>{skill.skillName}</span>
                                         {skill.yearsOfExperience > 0 && (
                                             <span className="opacity-70 text-[11px] tracking-wide">({skill.yearsOfExperience}y)</span>

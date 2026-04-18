@@ -166,21 +166,14 @@ const Invitations = () => {
     navigate(`/jobs/${jobId}`);
   };
 
-  const handleAccept = useCallback(async (invitationId) => {
-    setProcessingIds((prev) => ({ ...prev, [invitationId]: true }));
-    try {
-      const response = await takeAction({ id: invitationId, action: 'ACCEPTED' }).unwrap();
-      if (response?.data) {
-        toastMessage.success('Invitation accepted successfully!');
-      } else {
-        toastMessage.error(response?.message || 'Failed to accept invitation');
-      }
-    } catch (err) {
-      toastMessage.error(err?.data?.message || 'Failed to accept invitation. Please try again.');
-    } finally {
-      setProcessingIds((prev) => ({ ...prev, [invitationId]: false }));
+  const handleAccept = useCallback((invitationId) => {
+    const invitation = invitations.find(inv => inv.id === invitationId);
+    if (!invitation || !invitation.jobId) {
+      toastMessage.error("Cannot find the job details for this invitation.");
+      return;
     }
-  }, [takeAction]);
+    navigate(`/jobs/${invitation.jobId}/application`, { state: { invitationId } });
+  }, [invitations, navigate]);
 
   const handleDecline = useCallback(async (invitationId) => {
     setProcessingIds((prev) => ({ ...prev, [invitationId]: true }));
