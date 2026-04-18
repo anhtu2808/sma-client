@@ -63,7 +63,6 @@ const CompanyList = () => {
                                 description={company.description}
                                 industry={company.companyIndustry}
                                 location={company.country}
-                                followers={company.followerNumber || 0}
                                 isApproved={company.companyStatus === "APPROVED"}
                                 onViewDetails={() => navigate(`/companies/${company.id}`)}
                             />

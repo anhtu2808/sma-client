@@ -77,7 +77,6 @@ CompanyCard.propTypes = {
     description: PropTypes.string,
     industry: PropTypes.string,
     location: PropTypes.string,
-    followers: PropTypes.number,
     onViewDetails: PropTypes.func,
     className: PropTypes.string
 };
