@@ -243,6 +243,7 @@ const Enhancements = () => {
       okText: 'Confirm',
       cancelText: 'Cancel',
       centered: true,
+      okButtonProps: { style: { backgroundColor: '#f97316', borderColor: '#f97316' } },
       onOk: executeReScore,
     });
   }, [

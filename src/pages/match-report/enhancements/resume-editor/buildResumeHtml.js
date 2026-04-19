@@ -47,12 +47,12 @@ const STYLES = {
   h2Section: 'color: #2551A5; font-size: 18px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em;',
   hr: 'border-color: #2551A5; border-width: 1.5px; margin: 4px 0 8px 0;',
   hrFirst: 'border-color: #2551A5; border-width: 1.5px; margin: 16px 0 8px 0;',
-  contactP: 'font-size: 13px; line-height: 1.4;',
-  ul: 'font-size: 13px; line-height: 1.6; padding-left: 24px;',
-  ulCompact: 'font-size: 13px; padding-left: 24px;',
+  contactP: 'font-size: 14px; line-height: 1.4;',
+  ul: 'font-size: 14px; line-height: 1.6; padding-left: 24px;',
+  ulCompact: 'font-size: 14px; padding-left: 24px;',
   subHeader: 'font-size: 14px;',
-  bodyText: 'font-size: 13px; text-align: justify;',
-  bodyTextPlain: 'font-size: 13px;',
+  bodyText: 'font-size: 14px; text-align: justify;',
+  bodyTextPlain: 'font-size: 14px;',
 };
 
 // ── Helpers ────────────────────────────────────────────────────────

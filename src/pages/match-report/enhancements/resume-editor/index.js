@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { useGetResumeQuery, useUpdateEnhancementContentMutation } from '@/apis/resumeApi';
 import { useMarkDetailAsFixedBatchMutation, useMarkDetailAsFixedMutation } from '@/apis/matchingApi';
-import { setDetailFixed, setHighlightModalDetailId, updateScoresAfterFixed } from '@/store/slices/matchingReportSlice';
+import { setActiveCriteriaId, setDetailFixed, setFocusedItemId, setHighlightModalDetailId, updateScoresAfterFixed } from '@/store/slices/matchingReportSlice';
 import Loading from '@/components/Loading';
 import EntryHeader from './EntryHeaderNode';
 import SuggestionHighlight from './extensions/SuggestionHighlight';
@@ -162,15 +162,19 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
 
   // Editor tag-badge click opens the modal at the FIRST detail of the clicked context.
   const handleEditorClick = useCallback((event) => {
-    const tagEl = event.target.closest('.suggestion-tag');
+    const badgeEl = event.target.closest('.suggestion-tag__badge');
+    const tagEl = badgeEl?.closest('.suggestion-tag') || event.target.closest('.suggestion-tag');
     if (!tagEl) return;
 
     event.preventDefault();
     event.stopPropagation();
 
-    const clickedId = Number(tagEl.dataset.detailId);
+    const clickedId = Number(badgeEl?.dataset.detailId || tagEl.dataset.detailId);
     if (!Number.isFinite(clickedId) || !criteriaScores) return;
 
+    const owningCriteria = criteriaScores.find((cs) =>
+      (cs.details || []).some((d) => d.id === clickedId)
+    );
     const allDetails = criteriaScores.flatMap((cs) => cs.details || []);
     const clicked = allDetails.find((d) => d.id === clickedId);
     if (!clicked) return;
@@ -181,11 +185,22 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
         ? allDetails.find((d) => d.contextId == null && d.context === clicked.context) || clicked
       : clicked;
 
+    if (owningCriteria?.id != null) {
+      dispatch(setActiveCriteriaId(owningCriteria.id));
+    }
+    dispatch(setFocusedItemId(clicked.id));
     dispatch(setHighlightModalDetailId(firstSibling.id));
+
+    // Let the sidebar render the switched criteria first, then scroll its item into view.
+    setTimeout(() => {
+      const el = document.getElementById(`sidebar-item-${firstSibling.id}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 50);
   }, [criteriaScores, dispatch]);
 
   const handleModalClose = useCallback(() => {
     dispatch(setHighlightModalDetailId(null));
+    dispatch(setFocusedItemId(null));
   }, [dispatch]);
 
   const resolvedModalDetail = useMemo(() => {

@@ -154,9 +154,9 @@ const ContentDetail = ({ item, siblingDetailIds, isLast }) => {
           className={`mt-0.5 text-[18px] ${statusConfig.iconClassName}`}
         />
         <div className="flex min-w-0 flex-col gap-1">
-          <span className={`text-sm font-medium ${
+          <span className={`text-sm font-semibold ${
             item.isFixed
-              ? "text-emerald-600 line-through decoration-emerald-300"
+              ? "text-emerald-700 line-through decoration-emerald-700 decoration-2"
               : isFocused ? focusStyles.text : "text-neutral-900"
           }`}>
             {item.label}

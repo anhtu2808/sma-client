@@ -138,11 +138,21 @@
   border-bottom: 2px solid #10b981;
 }
 
-.suggestion-highlight--focused {
+/* Mixed: range carries both MATCHED and MISSING/PARTIAL highlights.
+   Prefer the MISSING (red) line — single underline, no stacking. */
+.suggestion-highlight--mixed,
+.suggestion-highlight--matched.suggestion-highlight--missing {
+  border-bottom: 2px solid #ef4444;
+  box-shadow: none;
+}
+
+/* Focus background follows the status of the SPECIFIC focused detail
+   (important for mixed ranges with both matched and missing items). */
+.suggestion-highlight--focus-missing {
   background: rgba(239, 68, 68, 0.10) !important;
 }
 
-.suggestion-highlight--matched.suggestion-highlight--focused {
+.suggestion-highlight--focus-matched {
   background: rgba(16, 185, 129, 0.28) !important;
 }
 
@@ -160,30 +170,75 @@
 
 .suggestion-tag__badge {
   position: relative;
-  top: -2px;
+  top: -26px;
   left: -20px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 16px;
-  height: 16px;
-  padding: 0 3px;
-  font-size: 9px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  font-size: 11px;
   font-weight: 700;
   line-height: 1;
   color: #fff;
   cursor: pointer;
-  border-radius: 3px 0 0 3px;
+  border-radius: 5px 5px 0 5px;
   z-index: 2;
+}
+
+.suggestion-tag__badge::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: -6px;
+  width: 0;
+  height: 0;
+  border-top: 6px solid transparent;
+  border-left: 6px solid transparent;
 }
 
 .suggestion-tag--missing .suggestion-tag__badge {
   background: #F97316;
 }
 
+.suggestion-tag--missing .suggestion-tag__badge::after {
+  border-top-color: #F97316;
+}
+
 .suggestion-tag--matched .suggestion-tag__badge {
   background: #10b981;
 }
+
+.suggestion-tag--matched .suggestion-tag__badge::after {
+  border-top-color: #10b981;
+}
+
+/* Per-badge color classes used when a mixed tag bundles multiple badges. */
+.suggestion-tag__badge--matched {
+  background: #10b981;
+}
+.suggestion-tag__badge--matched::after {
+  border-top-color: #10b981;
+}
+.suggestion-tag__badge--missing {
+  background: #F97316;
+}
+.suggestion-tag__badge--missing::after {
+  border-top-color: #F97316;
+}
+
+/* Mixed tag: zero-size anchor (does not displace text); badges float above
+   via absolute positioning, ordered left→right (matched then missing). */
+.suggestion-tag--mixed {
+  position: relative;
+}
+.suggestion-tag--mixed .suggestion-tag__badge {
+  position: absolute;
+  top: -26px;
+}
+.suggestion-tag--mixed .suggestion-tag__badge:nth-child(1) { left: -44px; }
+.suggestion-tag--mixed .suggestion-tag__badge:nth-child(2) { left: -20px; }
 
 .resume-editor .tiptap-content blockquote {
   border-left: 3px solid #e5e7eb;

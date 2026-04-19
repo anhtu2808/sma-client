@@ -11,11 +11,8 @@ import toastMessage from '@/utils/toastMessage';
 import EditorContext from '@/pages/match-report/enhancements/EditorContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faArrowsRotate,
   faChevronLeft,
   faChevronRight,
-  faThumbsDown,
-  faThumbsUp,
   faXmark,
 } from '../../../../utils/icons';
 
@@ -71,7 +68,15 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
       return undefined;
     }
 
-    const tagEl = document.querySelector(`.suggestion-tag[data-detail-id="${anchorDetailId}"]`);
+    // Mixed tags carry multiple badges under one wrapper; the wrapper's
+    // data-detail-id only reflects the first badge. Look up the badge first,
+    // then fall back to the wrapper for single-status tags.
+    const badgeEl = document.querySelector(
+      `.suggestion-tag__badge[data-detail-id="${anchorDetailId}"]`
+    );
+    const tagEl =
+      badgeEl?.closest('.suggestion-tag') ||
+      document.querySelector(`.suggestion-tag[data-detail-id="${anchorDetailId}"]`);
     if (!tagEl) {
       resetPosition();
       return undefined;
@@ -85,15 +90,28 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
 
     tagEl.scrollIntoView({ block: 'center', behavior: 'instant' });
 
-    const anchorEl = tagEl.querySelector('.suggestion-tag__badge') || tagEl;
+    const anchorEl =
+      badgeEl ||
+      tagEl.querySelector(`.suggestion-tag__badge[data-detail-id="${anchorDetailId}"]`) ||
+      tagEl.querySelector('.suggestion-tag__badge') ||
+      tagEl;
     const hlRect = anchorEl.getBoundingClientRect();
     const scrollerRect = editorScroller.getBoundingClientRect();
 
-    const top = hlRect.bottom - scrollerRect.top + editorScroller.scrollTop + 8;
+    // Measure popover height (default to max 400 before first paint).
+    const popoverHeight = popover.offsetHeight || 400;
+    const spaceAbove = hlRect.top - scrollerRect.top;
+    const spaceBelow = scrollerRect.bottom - hlRect.bottom;
+    // Prefer above; fall back to below only when not enough room above.
+    const placeAbove = spaceAbove >= popoverHeight + 8 || spaceAbove >= spaceBelow;
+
+    const top = placeAbove
+      ? hlRect.top - scrollerRect.top + editorScroller.scrollTop - popoverHeight - 8
+      : hlRect.bottom - scrollerRect.top + editorScroller.scrollTop + 8;
     const left = Math.max(8, hlRect.left - scrollerRect.left);
     const maxLeft = scrollerRect.width - 580;
 
-    popover.style.top = `${top}px`;
+    popover.style.top = `${Math.max(8, top)}px`;
     popover.style.left = `${Math.min(left, maxLeft)}px`;
 
     return resetPosition;
@@ -204,7 +222,7 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
       style={{ maxHeight: 400 }}
     >
       <div className="flex items-center justify-between border-b border-neutral-100 px-4 py-2.5">
-        <span className="text-[13px] font-medium text-neutral-500">Suggestion Preview</span>
+        <span className="text-base font-bold text-neutral-900">Suggestion Preview</span>
         <button
           type="button"
           onClick={onClose}
@@ -304,18 +322,7 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
         )}
       </div>
 
-      <div className="flex items-center justify-between border-t border-neutral-100 px-4 py-2">
-        <div className="flex items-center gap-2">
-          <button type="button" className="flex h-7 w-7 items-center justify-center rounded text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600">
-            <FontAwesomeIcon icon={faArrowsRotate} className="text-[16px]" />
-          </button>
-          <button type="button" className="flex h-7 w-7 items-center justify-center rounded text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600">
-            <FontAwesomeIcon icon={faThumbsUp} className="text-[16px]" />
-          </button>
-          <button type="button" className="flex h-7 w-7 items-center justify-center rounded text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600">
-            <FontAwesomeIcon icon={faThumbsDown} className="text-[16px]" />
-          </button>
-        </div>
+      <div className="flex items-center justify-end border-t border-neutral-100 px-4 py-2">
         <div className="flex items-center gap-2">
           <button
             type="button"

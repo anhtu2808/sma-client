@@ -1,6 +1,8 @@
+import { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Tooltip } from "antd";
 import { setActiveCriteriaId } from "@/store/slices/matchingReportSlice";
-import useAnimatedScore from "@/hooks/useAnimatedScore";
+import { getFixProgress, getScoreColor } from "../utils";
 
 const getProgressColors = (progress) => {
   if (progress < 50) return { fill: "bg-red-400", track: "bg-red-100", border: "border-red-200" };
@@ -13,8 +15,9 @@ const Tab = ({ tab }) => {
   const activeCriteriaId = useSelector((state) => state.matchingReport.ui.activeCriteriaId);
 
   const isActive = tab.id === activeCriteriaId;
-  const animatedScore = useAnimatedScore(tab.aiScore || 0, 1000);
-  const { fill, track, border } = getProgressColors(animatedScore);
+  const { fixed, total, percent } = useMemo(() => getFixProgress(tab.details), [tab.details]);
+  const { fill, track, border } = getProgressColors(percent);
+  const aiScore = Math.round(tab.aiScore || 0);
 
   return (
     <button
@@ -24,26 +27,30 @@ const Tab = ({ tab }) => {
         isActive ? "bg-neutral-100" : "hover:bg-neutral-50"
       }`}
     >
-      <p
-        className={`text-sm ${
-          isActive ? "font-bold text-neutral-900" : "font-semibold text-neutral-700"
-        }`}
-      >
-        {tab.criteriaName || tab.criteriaType || "Criteria"}
-      </p>
+      <Tooltip title="AI matching score for this criterion">
+        <p
+          className={`text-sm ${
+            isActive ? "font-bold text-neutral-900" : "font-semibold text-neutral-700"
+          }`}
+        >
+          {tab.criteriaName || tab.criteriaType || "Criteria"}
+          <span className={`ml-1 font-bold ${getScoreColor(aiScore)}`}>({aiScore})</span>
+        </p>
+      </Tooltip>
 
-      <div className="mt-1.5 flex items-center gap-1.5">
-        <div className={`h-[6px] w-[35px] overflow-hidden rounded-full border ${border} ${track}`}>
-          <div
-            className={`h-full rounded-full ${fill}`}
-            style={{ width: `${Math.max(0, Math.min(100, animatedScore))}%` }}
-          />
+      <Tooltip title={total === 0 ? "No gaps to fix" : `${fixed} of ${total} issues fixed`}>
+        <div className="mt-1.5 flex items-center gap-1.5">
+          <div className={`h-[6px] w-[80px] overflow-hidden rounded-full border ${border} ${track}`}>
+            <div
+              className={`h-full rounded-full ${fill} transition-[width] duration-500 ease-out`}
+              style={{ width: `${percent}%` }}
+            />
+          </div>
+          <span className={`text-[10px] tabular-nums font-bold ${isActive ? "text-neutral-900" : "text-neutral-500"}`}>
+            {total === 0 ? "—" : `${fixed}/${total}`}
+          </span>
         </div>
-        <span className={`text-[10px] tabular-nums font-bold ${isActive ? "text-neutral-900" : "text-neutral-500"}`}>
-          {animatedScore}%
-        </span>
-      </div>
-
+      </Tooltip>
     </button>
   );
 };

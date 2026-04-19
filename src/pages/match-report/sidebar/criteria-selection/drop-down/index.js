@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Tooltip } from "antd";
 import { setActiveCriteriaId } from "@/store/slices/matchingReportSlice";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faSliders } from '../../../../../utils/icons';
+import { getFixProgress, getScoreColor } from "../utils";
 
 const DropDown = ({ items = [] }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -53,8 +55,9 @@ const DropDown = ({ items = [] }) => {
           <div className="max-h-[350px] overflow-y-auto overflow-x-hidden space-y-1 custom-scrollbar">
             {items.map((item) => {
               const isActive = item.id === activeCriteriaId;
-              const progress = Math.max(0, Math.min(100, item.aiScore || 0));
-              
+              const { fixed, total, percent } = getFixProgress(item.details);
+              const aiScore = Math.round(item.aiScore || 0);
+
               return (
                 <button
                   key={item.id}
@@ -64,26 +67,31 @@ const DropDown = ({ items = [] }) => {
                     setIsOpen(false);
                   }}
                   className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left transition-all ${
-                    isActive 
-                      ? "bg-primary/5 text-primary ring-1 ring-inset ring-primary/20" 
+                    isActive
+                      ? "bg-primary/5 text-primary ring-1 ring-inset ring-primary/20"
                       : "text-neutral-700 hover:bg-neutral-50"
                   }`}
                 >
                   <div className="flex flex-col min-w-0 flex-1 mr-3">
-                    <span className={`truncate text-sm ${isActive ? "font-bold" : "font-semibold"}`}>
-                      {item.criteriaName || item.criteriaType}
-                    </span>
-                    <div className="mt-1.5 flex items-center gap-2">
-                      <div className="h-1.5 w-20 overflow-hidden rounded-full bg-neutral-100">
-                        <div 
-                          className={`h-full ${progress < 50 ? "bg-red-400" : progress < 80 ? "bg-amber-400" : "bg-emerald-400"}`}
-                          style={{ width: `${progress}%` }}
-                        />
-                      </div>
-                      <span className="text-[10px] font-bold text-neutral-400">
-                        {Math.round(progress)}%
+                    <Tooltip title="AI matching score for this criterion">
+                      <span className={`truncate text-sm ${isActive ? "font-bold" : "font-semibold"}`}>
+                        {item.criteriaName || item.criteriaType}
+                        <span className={`ml-1 font-bold ${getScoreColor(aiScore)}`}>({aiScore})</span>
                       </span>
-                    </div>
+                    </Tooltip>
+                    <Tooltip title={total === 0 ? "No gaps to fix" : `${fixed} of ${total} issues fixed`}>
+                      <div className="mt-1.5 flex items-center gap-2">
+                        <div className="h-1.5 w-20 overflow-hidden rounded-full bg-neutral-100">
+                          <div
+                            className={`h-full transition-[width] duration-500 ease-out ${percent < 50 ? "bg-red-400" : percent < 80 ? "bg-amber-400" : "bg-emerald-400"}`}
+                            style={{ width: `${percent}%` }}
+                          />
+                        </div>
+                        <span className="text-[10px] font-bold tabular-nums text-neutral-400">
+                          {total === 0 ? "—" : `${fixed}/${total}`}
+                        </span>
+                      </div>
+                    </Tooltip>
                   </div>
                   {isActive && (
                     <FontAwesomeIcon icon={faCheck} className="text-primary text-[20px] shrink-0" />

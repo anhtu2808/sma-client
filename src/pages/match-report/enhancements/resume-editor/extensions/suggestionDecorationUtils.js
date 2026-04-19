@@ -10,26 +10,33 @@ const isValidRange = (range, doc) =>
   range.from < range.to &&
   range.to <= doc.content.size;
 
-const getHighlightClass = (status, isFocused) => {
+const isNegativeStatus = (status) => {
+  const n = (status || '').toLowerCase();
+  return n === 'missing' || n === 'partial';
+};
+
+const getGroupHighlightClass = (group, focusedItem) => {
   const base = 'suggestion-highlight';
-  const normalized = (status || '').toLowerCase();
+  const hasNeg = group.some((h) => isNegativeStatus(h.status));
+  const hasPos = group.some((h) => !isNegativeStatus(h.status));
 
-  let statusClass;
-  if (normalized === 'missing' || normalized === 'partial') {
-    statusClass = `${base}--missing`;
-  } else {
-    statusClass = `${base}--matched`;
+  const classes = [base];
+  if (hasPos) classes.push(`${base}--matched`);
+  if (hasNeg) classes.push(`${base}--missing`);
+  if (hasPos && hasNeg) classes.push(`${base}--mixed`);
+  if (focusedItem) {
+    classes.push(`${base}--focused`);
+    classes.push(
+      isNegativeStatus(focusedItem.status)
+        ? `${base}--focus-missing`
+        : `${base}--focus-matched`
+    );
   }
-
-  return isFocused ? `${base} ${statusClass} ${base}--focused` : `${base} ${statusClass}`;
+  return classes.join(' ');
 };
 
-const getTagStatusClass = (status) => {
-  const normalized = (status || '').toLowerCase();
-  return normalized === 'missing' || normalized === 'partial'
-    ? 'suggestion-tag--missing'
-    : 'suggestion-tag--matched';
-};
+const getBadgeStatusClass = (status) =>
+  isNegativeStatus(status) ? 'suggestion-tag__badge--missing' : 'suggestion-tag__badge--matched';
 
 export const buildHighlightMap = (highlights = []) =>
   new Map(highlights.map((item) => [getHighlightKey(item), item]));
@@ -107,19 +114,38 @@ export const buildPinnedRangeMap = (
   return pinnedRanges;
 };
 
-export const createTagElement = (item, tagIndex) => {
+export const createTagElement = (entries) => {
+  const list = Array.isArray(entries) ? entries : [entries];
   const tag = document.createElement('span');
-  tag.className = `suggestion-tag ${getTagStatusClass(item.status)}`;
   tag.setAttribute('contenteditable', 'false');
   tag.setAttribute('data-tag', 'true');
-  tag.setAttribute('data-detail-id', String(item.detailId));
-  tag.setAttribute('data-tag-number', String(tagIndex));
 
-  const badge = document.createElement('span');
-  badge.className = 'suggestion-tag__badge';
-  badge.textContent = String(tagIndex);
-  tag.appendChild(badge);
+  if (list.length === 1) {
+    const { item, tagIndex } = list[0];
+    const statusClass = isNegativeStatus(item.status)
+      ? 'suggestion-tag--missing'
+      : 'suggestion-tag--matched';
+    tag.className = `suggestion-tag ${statusClass}`;
+    tag.setAttribute('data-detail-id', String(item.detailId));
+    tag.setAttribute('data-tag-number', String(tagIndex));
 
+    const badge = document.createElement('span');
+    badge.className = `suggestion-tag__badge ${getBadgeStatusClass(item.status)}`;
+    badge.textContent = String(tagIndex);
+    badge.setAttribute('data-detail-id', String(item.detailId));
+    tag.appendChild(badge);
+    return tag;
+  }
+
+  tag.className = 'suggestion-tag suggestion-tag--mixed';
+  tag.setAttribute('data-detail-id', String(list[0].item.detailId));
+  for (const { item, tagIndex } of list) {
+    const badge = document.createElement('span');
+    badge.className = `suggestion-tag__badge ${getBadgeStatusClass(item.status)}`;
+    badge.textContent = String(tagIndex);
+    badge.setAttribute('data-detail-id', String(item.detailId));
+    tag.appendChild(badge);
+  }
   return tag;
 };
 
@@ -128,29 +154,51 @@ export const buildDecorationSet = (doc, highlights, pinnedRanges) => {
     return DecorationSet.empty;
   }
 
-  const decorations = [];
-
+  // Group highlights that resolve to the same text range so a bullet used
+  // as evidence for both MATCHED and MISSING details renders both states.
+  const groups = new Map();
   for (const item of highlights) {
     const highlightKey = getHighlightKey(item);
     const pinned = pinnedRanges?.get?.(highlightKey);
-    if (!isValidRange(pinned, doc)) {
-      continue;
-    }
+    if (!isValidRange(pinned, doc)) continue;
 
-    const { from, to } = pinned;
-    const tagIndex = Number.isFinite(item.tagIndex) ? item.tagIndex : null;
-    if (tagIndex !== null) {
+    const rangeKey = `${pinned.from}-${pinned.to}`;
+    let group = groups.get(rangeKey);
+    if (!group) {
+      group = { from: pinned.from, to: pinned.to, items: [] };
+      groups.set(rangeKey, group);
+    }
+    group.items.push(item);
+  }
+
+  const decorations = [];
+  for (const { from, to, items } of groups.values()) {
+    const focusedItem = items.find((i) => i.isFocused) || null;
+    const detailIds = items.map((i) => i.detailId).join(',');
+
+    const tagEntries = items
+      .filter((i) => Number.isFinite(i.tagIndex))
+      .map((i) => ({ item: i, tagIndex: i.tagIndex }))
+      // Green (MATCHED) on the left, red (MISSING/PARTIAL) on the right.
+      .sort((a, b) => {
+        const an = isNegativeStatus(a.item.status) ? 1 : 0;
+        const bn = isNegativeStatus(b.item.status) ? 1 : 0;
+        return an - bn;
+      });
+    if (tagEntries.length > 0) {
+      const keySig = tagEntries.map((e) => `${e.item.detailId}:${e.item.status}`).join('|');
       decorations.push(
-        Decoration.widget(from, () => createTagElement(item, tagIndex), {
+        Decoration.widget(from, () => createTagElement(tagEntries), {
           side: -1,
-          key: `tag-${highlightKey}-${from}-${item.status}`,
+          key: `tag-${from}-${keySig}`,
         })
       );
     }
+
     decorations.push(
       Decoration.inline(from, to, {
-        class: getHighlightClass(item.status, item.isFocused),
-        'data-detail-id': String(item.detailId),
+        class: getGroupHighlightClass(items, focusedItem),
+        'data-detail-id': detailIds,
       })
     );
   }
