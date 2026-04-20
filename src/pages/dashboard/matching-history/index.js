@@ -18,6 +18,16 @@ const getScoreColor = (score) => {
   return { text: "text-red-500", accent: "bg-red-400" };
 };
 
+const CANDIDATE_LEVEL_BADGE = {
+  INTERN: 'bg-slate-100 text-slate-700',
+  FRESHER: 'bg-sky-100 text-sky-700',
+  JUNIOR: 'bg-emerald-100 text-emerald-700',
+  MIDDLE: 'bg-amber-100 text-amber-700',
+  SENIOR: 'bg-violet-100 text-violet-700',
+  LEAD: 'bg-orange-100 text-orange-700',
+  MANAGER: 'bg-rose-100 text-rose-700',
+};
+
 const formatRelativeDate = (dateString) => {
   if (!dateString) return "N/A";
   const date = dayjs(dateString);
@@ -82,6 +92,11 @@ const MatchingHistoryItem = ({ item, onViewReport }) => {
                 <FontAwesomeIcon icon={faFileLines} className="text-[13px]" />
                 {resumeName}
               </p>
+            )}
+            {item.candidateLevel && (
+              <span className={`inline-flex items-center mt-1.5 rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide ${CANDIDATE_LEVEL_BADGE[item.candidateLevel] || 'bg-gray-100 text-gray-700'}`}>
+                {item.candidateLevel}
+              </span>
             )}
           </div>
 

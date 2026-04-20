@@ -58,6 +58,7 @@ export interface EvaluationData {
   isTrueLevel: boolean;
   hasRelatedExperience: boolean;
   transferabilityToRole: TransferabilityLevel;
+  candidateLevel?: 'INTERN' | 'FRESHER' | 'JUNIOR' | 'MIDDLE' | 'SENIOR' | 'LEAD' | 'MANAGER' | null;
   criteriaScores: CriteriaScore[];
   evaluationStatus?: string | null;
   evaluationType?: string | null;
