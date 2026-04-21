@@ -50,7 +50,7 @@ const ExportCvModal = ({
     setIsExporting(true);
     try {
       const fileName = buildPdfFileName(cvName.trim(), initialResumeName);
-      
+
       const result = await onExport({
         type, // 'save', 'apply', 'download'
         cvName: cvName.trim(),
@@ -70,8 +70,8 @@ const ExportCvModal = ({
           onClose();
           navigate('/dashboard/resumes');
         } else if (type === 'download') {
-           // handled by parent
-           onClose();
+          // handled by parent
+          onClose();
         }
       }
     } catch (err) {
@@ -122,14 +122,14 @@ const ExportCvModal = ({
           </div>
           <div className="flex-1 overflow-y-auto p-8 flex justify-center items-start min-h-0 bg-slate-50">
             {previewImage ? (
-                <div className="shadow-2xl border border-slate-200 bg-white">
-                    <img 
-                        src={previewImage} 
-                        alt="CV Preview" 
-                        className="w-full h-auto block"
-                        style={{ width: '794px' }} // Standard A4 width at 96dpi
-                    />
-                </div>
+              <div className="shadow-2xl border border-slate-200 bg-white">
+                <img
+                  src={previewImage}
+                  alt="CV Preview"
+                  className="w-full h-auto block"
+                  style={{ width: '794px' }} // Standard A4 width at 96dpi
+                />
+              </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-20 text-slate-400 gap-3">
                 <Loader2 size={28} className="animate-spin text-primary" />
@@ -171,7 +171,7 @@ const ExportCvModal = ({
               <label className="text-xs font-bold uppercase tracking-wider text-neutral-500">Applying for</label>
               <div className="flex items-center gap-3 rounded-xl border border-blue-100 bg-blue-50/50 p-4">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white shadow-sm border border-blue-100">
-                    < LucideIcons.Briefcase size={20} className="text-blue-500" />
+                  < LucideIcons.Briefcase size={20} className="text-blue-500" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-bold text-neutral-900">
@@ -201,19 +201,19 @@ const ExportCvModal = ({
 
           <div className="mt-auto flex flex-col gap-3">
             {jobId && (
-                <Tooltip title={!canSubmit ? 'Please enter a CV name' : ''}>
+              <Tooltip title={!canSubmit ? 'Please enter a CV name' : ''}>
                 <button
-                    type="button"
-                    onClick={() => handleAction('apply')}
-                    disabled={!canSubmit}
-                    className="flex h-12 items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 shadow-lg shadow-orange-500/20 active:scale-[0.98]"
+                  type="button"
+                  onClick={() => handleAction('apply')}
+                  disabled={!canSubmit}
+                  className="flex h-12 items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 shadow-lg shadow-orange-500/20 active:scale-[0.98]"
                 >
-                    <Send size={18} />
-                    Save & Apply Now
+                  <Send size={18} />
+                  Save & Apply Now
                 </button>
-                </Tooltip>
+              </Tooltip>
             )}
-            
+
             <button
               type="button"
               onClick={() => handleAction('save')}
@@ -240,12 +240,12 @@ const ExportCvModal = ({
 
 // Internal LucideIcons for the modal
 const LucideIcons = {
-    Briefcase: (props) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-            <rect width="20" height="14" x="2" y="7" rx="2" ry="2"/>
-            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-        </svg>
-    )
+  Briefcase: (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <rect width="20" height="14" x="2" y="7" rx="2" ry="2" />
+      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+    </svg>
+  )
 };
 
 export default ExportCvModal;

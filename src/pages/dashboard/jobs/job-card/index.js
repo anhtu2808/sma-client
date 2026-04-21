@@ -61,8 +61,8 @@ const DashboardJobCard = ({ job, activeTab }) => {
     >
       <div className="flex flex-col xl:flex-row gap-6 xl:gap-8">
         <div className="flex-1 flex gap-4 md:gap-6 min-w-0">
-          <div className="w-14 h-14 md:w-16 md:h-16 rounded-full border border-gray-100 bg-white shadow-sm p-2 shrink-0 overflow-hidden">
-            <img alt={`${job.company} logo`} className="w-full h-full object-cover rounded-full" src={job.companyLogo} />
+          <div className="w-14 h-14 md:w-16 md:h-16 rounded-none border border-gray-100 bg-white shadow-sm p-2 shrink-0 overflow-hidden">
+            <img alt={`${job.company} logo`} className="w-full h-full object-contain rounded-none" src={job.companyLogo} />
           </div>
 
           <div className="space-y-3 min-w-0">

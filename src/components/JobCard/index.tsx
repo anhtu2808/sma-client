@@ -44,7 +44,7 @@ const JobCard = ({
             className="group relative flex gap-5 p-5 md:p-6 rounded-xl bg-white dark:bg-[#2c1a14] border border-slate-200 dark:border-[#3d241b] hover:border-primary/50 dark:hover:border-primary/40 hover:shadow-[0_4px_24px_rgba(255,107,53,0.08)] transition-all duration-300 cursor-pointer"
         >
             {/* Left: Company Logo */}
-            <div className="w-[72px] h-[72px] md:w-20 md:h-20 rounded-xl border border-slate-100 dark:border-[#3d241b] bg-white dark:bg-[#1a100c] p-2 shrink-0 flex items-center justify-center overflow-hidden">
+            <div className="w-[72px] h-[72px] md:w-20 md:h-20 rounded-none border border-slate-100 dark:border-[#3d241b] bg-white dark:bg-[#1a100c] p-2 shrink-0 flex items-center justify-center overflow-hidden">
                 {companyLogo ? (
                     <img
                         alt={`${company} Logo`}
