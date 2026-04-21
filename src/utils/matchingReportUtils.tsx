@@ -4,8 +4,6 @@ export type MatchLevel = "EXCELLENT" | "GOOD" | "FAIR" | "POOR";
 
 export type CandidateLevel = "SENIOR" | "MID" | "JUNIOR";
 
-export type TransferabilityLevel = "HIGH" | "MEDIUM" | "LOW";
-
 export interface SuggestionItem {
   id: number;
   suggestion: string;
@@ -55,14 +53,10 @@ export interface EvaluationData {
   candidateName: string;
   jobId: number;
   jobName: string;
-  isTrueLevel: boolean;
-  hasRelatedExperience: boolean;
-  transferabilityToRole: TransferabilityLevel;
   candidateLevel?: 'INTERN' | 'FRESHER' | 'JUNIOR' | 'MIDDLE' | 'SENIOR' | 'LEAD' | 'MANAGER' | null;
   criteriaScores: CriteriaScore[];
   evaluationStatus?: string | null;
   evaluationType?: string | null;
-  isSpecificJd?: boolean | null;
   processingTimeSecond?: number | null;
   aiModelVersion?: string | null;
   weaknesses?: unknown[];
