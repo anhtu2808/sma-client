@@ -92,24 +92,29 @@ const ResumeBuilderTab = () => {
             {/* Create New Card */}
             <div
               onClick={() => navigate('/dashboard/resumes/templates')}
-              className="rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex flex-col items-center justify-center min-h-[450px] h-full cursor-pointer hover:border-primary hover:bg-orange-50/50 dark:hover:bg-gray-700/50 transition-all group"
+              className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-surface-dark flex flex-col h-full cursor-pointer hover:shadow-lg hover:border-primary/30 transition-all group relative overflow-hidden"
             >
-              <div className="w-12 h-12 rounded-full bg-orange-100 dark:bg-gray-700 flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-white transition-colors">
-                <FontAwesomeIcon icon={faPlus} className="text-[24px] text-primary group-hover:text-white" />
+              <div className="aspect-[4/5] bg-gray-50 dark:bg-gray-800/50 flex flex-col items-center justify-center border-b border-gray-100 dark:border-gray-700 group-hover:bg-orange-50/50 transition-colors">
+                <div className="w-12 h-12 rounded-full bg-white dark:bg-gray-700 flex items-center justify-center mb-3 shadow-sm group-hover:bg-primary group-hover:text-white transition-colors">
+                  <FontAwesomeIcon icon={faPlus} className="text-[20px] text-primary group-hover:text-white" />
+                </div>
+                <h3 className="font-bold text-sm text-gray-900 dark:text-white">Create New</h3>
+                <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1">Start from scratch</p>
               </div>
-              <h3 className="font-bold text-sm text-gray-900 dark:text-white">Create New</h3>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Start from scratch</p>
+              <div className="px-3 py-5 flex items-center justify-center">
+                <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">New Resume</p>
+              </div>
             </div>
 
             {/* Existing CV Cards */}
             {builderResumes.map((resume) => {
               const nameRaw = resume.resumeName || resume.fileName || resume.fullName || `Resume #${resume.id}`;
               const match = nameRaw.match(/^\[(tpl_[a-z0-9_]+)\]\s*(.*)$/);
-              
+
               let templateId = match ? match[1] : null;
               if (!templateId) {
-                  const stored = localStorage.getItem(`cv_template_${resume.id}`);
-                  templateId = stored || resume.template || 'tpl_modern_1';
+                const stored = localStorage.getItem(`cv_template_${resume.id}`);
+                templateId = stored || resume.template || 'tpl_prof_2';
               }
 
               const displayTitle = match ? (match[2] || `Resume #${resume.id}`) : nameRaw;
@@ -132,13 +137,15 @@ const ResumeBuilderTab = () => {
                   </button>
 
                   {/* CV Preview Skeleton & Hover Overlay */}
-                  <div className={`flex-1 ${templateObj.bgColor || 'bg-gray-50'} dark:bg-gray-800/50 p-4 flex items-center justify-center relative`}>
+                  <div className={`aspect-[4/5] ${templateObj.bgColor || 'bg-gray-50'} dark:bg-gray-800/50 p-6 flex items-center justify-center relative overflow-hidden border-b border-gray-100 dark:border-gray-700`}>
                     {templateObj.preview ? (
-                      <img
-                        src={templateObj.preview}
-                        alt={templateObj.name}
-                        className="max-h-full max-w-full object-contain rounded shadow-sm border border-gray-100 dark:border-gray-600"
-                      />
+                      <div className="w-full h-full flex items-center justify-center">
+                        <img
+                          src={templateObj.preview}
+                          alt={templateObj.name}
+                          className="max-h-full max-w-full object-contain rounded shadow-md border border-white dark:border-gray-600"
+                        />
+                      </div>
                     ) : (
                       <div className="w-full max-w-[120px] bg-white dark:bg-gray-700 rounded shadow-sm border border-gray-100 dark:border-gray-600 aspect-[3/4] flex items-center justify-center">
                         <FontAwesomeIcon icon={faFileLines} className="text-gray-300 text-[32px]" />

@@ -49,8 +49,8 @@ const ProfessionalTemplate = ({
     avatarInputRef,
 }) => {
     return (
-        <div className="w-[850px] mx-auto mt-8 bg-white shadow-xl min-h-[1100px] relative font-sans print:min-h-0 print:w-full print:mt-0 print:shadow-none print:break-inside-avoid">
-            <div className="px-10 pt-10 pb-10 print:px-8 print:py-8">
+        <div className="w-[850px] mx-auto mt-8 bg-white shadow-xl min-h-[1100px] relative font-sans print:min-h-0 print:mt-0 print:shadow-none print:break-inside-avoid">
+            <div className="px-10 pt-10 pb-10">
                 {/* Header Info */}
                 <div className="mb-4 flex flex-col md:flex-row justify-between items-start gap-6">
                     <div className="flex-1 min-w-0">
@@ -68,54 +68,54 @@ const ProfessionalTemplate = ({
                         />
 
                         <div className="text-[13px] leading-[1.4] text-gray-900 flex flex-col gap-0.5 mt-2">
-                            <div className="flex gap-2">
-                                <strong>Phone:</strong>
+                            <div className="flex items-center gap-1">
+                                <strong className="inline-block w-[75px] shrink-0">Phone:</strong>
                                 <EditableText value={cvData.contact.phoneInResume} onChange={v => updateField('contact.phoneInResume', v)} className="flex-1" />
                             </div>
-                            <div className="flex gap-2">
-                                <strong>Email:</strong>
+                            <div className="flex items-center gap-1">
+                                <strong className="inline-block w-[75px] shrink-0">Email:</strong>
                                 <EditableText value={cvData.contact.emailInResume} onChange={v => updateField('contact.emailInResume', v)} className="flex-1" />
                             </div>
-                            <div className="flex gap-2">
-                                <strong>Address:</strong>
+                            <div className="flex items-center gap-1">
+                                <strong className="inline-block w-[75px] shrink-0">Address:</strong>
                                 <EditableText value={cvData.contact.addressInResume} onChange={v => updateField('contact.addressInResume', v)} className="flex-1" />
                             </div>
                             {contactVisibility.portfolioLink && (
-                                <div className="flex gap-2">
-                                    <strong>Website:</strong>
+                                <div className="flex items-center gap-1">
+                                    <strong className="inline-block w-[75px] shrink-0">Website:</strong>
                                     <EditableText value={cvData.contact.portfolioLink} onChange={v => updateField('contact.portfolioLink', v)} className="flex-1 text-[#2551A5] hover:underline" />
                                 </div>
                             )}
                             {contactVisibility.githubLink && (
-                                <div className="flex gap-2">
-                                    <strong>GitHub:</strong>
+                                <div className="flex items-center gap-1">
+                                    <strong className="inline-block w-[75px] shrink-0">GitHub:</strong>
                                     <EditableText value={cvData.contact.githubLink} onChange={v => updateField('contact.githubLink', v)} className="flex-1 text-[#2551A5] hover:underline" />
                                 </div>
                             )}
                             {contactVisibility.linkedinLink && (
-                                <div className="flex gap-2">
-                                    <strong>LinkedIn:</strong>
+                                <div className="flex items-center gap-1">
+                                    <strong className="inline-block w-[75px] shrink-0">LinkedIn:</strong>
                                     <EditableText value={cvData.contact.linkedinLink} onChange={v => updateField('contact.linkedinLink', v)} className="flex-1 text-[#2551A5] hover:underline" />
                                 </div>
                             )}
 
                             <div className="flex gap-2 mt-2 print:hidden">
-                                <button onClick={() => toggleContactVisibility('portfolioLink')} className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${contactVisibility.portfolioLink ? 'bg-[#2551A5]/10 text-[#2551A5]' : 'bg-gray-100 text-gray-400'}`}>
+                                <button onClick={() => toggleContactVisibility('portfolioLink')} className={`flex items-center gap-1 px-2 py-1 rounded-sm text-xs font-medium transition-colors cursor-pointer ${contactVisibility.portfolioLink ? 'bg-[#2551A5]/10 text-[#2551A5]' : 'bg-gray-100 text-gray-400'}`}>
                                     {contactVisibility.portfolioLink ? <Eye size={12} /> : <EyeOff size={12} />} Website
                                 </button>
-                                <button onClick={() => toggleContactVisibility('githubLink')} className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${contactVisibility.githubLink ? 'bg-[#2551A5]/10 text-[#2551A5]' : 'bg-gray-100 text-gray-400'}`}>
+                                <button onClick={() => toggleContactVisibility('githubLink')} className={`flex items-center gap-1 px-2 py-1 rounded-sm text-xs font-medium transition-colors cursor-pointer ${contactVisibility.githubLink ? 'bg-[#2551A5]/10 text-[#2551A5]' : 'bg-gray-100 text-gray-400'}`}>
                                     {contactVisibility.githubLink ? <Eye size={12} /> : <EyeOff size={12} />} GitHub
                                 </button>
-                                <button onClick={() => toggleContactVisibility('linkedinLink')} className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${contactVisibility.linkedinLink ? 'bg-[#2551A5]/10 text-[#2551A5]' : 'bg-gray-100 text-gray-400'}`}>
+                                <button onClick={() => toggleContactVisibility('linkedinLink')} className={`flex items-center gap-1 px-2 py-1 rounded-sm text-xs font-medium transition-colors cursor-pointer ${contactVisibility.linkedinLink ? 'bg-[#2551A5]/10 text-[#2551A5]' : 'bg-gray-100 text-gray-400'}`}>
                                     {contactVisibility.linkedinLink ? <Eye size={12} /> : <EyeOff size={12} />} LinkedIn
                                 </button>
                             </div>
                         </div>
                     </div>
-                    
+
                     {/* Avatar Box */}
                     <div className="flex-shrink-0 relative group print:p-0">
-                        <img src={cvData.personalInfo.avatar} alt="Avatar" className="w-[130px] h-[130px] object-cover border-[3px] border-[#2551A5] shadow-sm print:shadow-none" />
+                        <img src={cvData.personalInfo.avatar} alt="Avatar" className="w-[170px] h-[170px] object-cover border-[3px] border-[#2551A5] shadow-sm print:shadow-none" />
                         <button onClick={() => avatarInputRef?.current?.click()} className="absolute inset-0 m-auto w-10 h-10 bg-white/90 rounded-full shadow-sm flex items-center justify-center text-[#2551A5] opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer print:hidden">
                             <LucideIcons.Camera size={18} />
                         </button>
@@ -159,7 +159,7 @@ const ProfessionalTemplate = ({
                                             title: "Position", company: "Company Name", startDate: "", endDate: "", isCurrent: false, description: "Job Description", workingModel: "ONSITE", employmentType: "FULL_TIME"
                                         })}
                                     >
-                                        <div className="flex flex-col gap-5 print:block print:space-y-4">
+                                        <div className="flex flex-col gap-6 print:block print:space-y-6">
                                             {cvData.experience.map((exp, itemIndex) => (
                                                 <EditableItemWrapper key={exp.id} id={exp.id} section="experience" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.experience.length - 1} contentClassName="pl-0">
                                                     <div className="flex flex-col text-[13px] text-gray-900 leading-relaxed print:break-inside-avoid">
@@ -188,8 +188,8 @@ const ProfessionalTemplate = ({
                                                                 />
                                                             </div>
                                                         </div>
-                                                        <div className="text-justify mt-1">
-                                                            <EditableText as="div" className="whitespace-pre-line text-[13px] leading-[1.6]" value={exp.description} onChange={v => updateField(`experience.${itemIndex}.description`, v)} />
+                                                        <div className="text-justify mt-2">
+                                                            <EditableText multiline={true} as="div" className="whitespace-pre-line text-[13px] leading-[1.6]" value={exp.description} onChange={v => updateField(`experience.${itemIndex}.description`, v)} />
                                                         </div>
                                                     </div>
                                                 </EditableItemWrapper>
@@ -212,7 +212,7 @@ const ProfessionalTemplate = ({
                                             institution: "Institution Name", degree: "BACHELOR", majorField: "Major", gpa: 0, startDate: "", endDate: "", isCurrent: false
                                         })}
                                     >
-                                        <div className="flex flex-col gap-4 print:block print:space-y-4">
+                                        <div className="flex flex-col gap-6 print:block print:space-y-6">
                                             {cvData.education.map((edu, itemIndex) => (
                                                 <EditableItemWrapper key={edu.id} id={edu.id} section="education" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.education.length - 1} contentClassName="pl-0">
                                                     <div className="flex flex-col text-[13px] text-gray-900 leading-[1.6] print:break-inside-avoid">
@@ -232,17 +232,17 @@ const ProfessionalTemplate = ({
                                                                 />
                                                             </div>
                                                         </div>
-                                                        <ul className="list-disc list-inside ml-2 space-y-0.5">
-                                                            <li>
+                                                        <div className="flex flex-col gap-1 mt-2">
+                                                            <div className="flex items-center">
                                                                 <InlineSelect value={edu.degree} options={degreeOptions} onChange={v => updateField(`education.${itemIndex}.degree`, v)} />
                                                                 <span>&nbsp;-&nbsp;</span>
                                                                 <EditableText as="span" value={edu.majorField} onChange={v => updateField(`education.${itemIndex}.majorField`, v)} />
-                                                            </li>
-                                                            <li className={`flex items-center gap-1 ${!edu.gpa || edu.gpa == 0 ? "print:hidden" : ""}`}>
+                                                            </div>
+                                                            <div className={`flex items-center gap-1 ${!edu.gpa || edu.gpa == 0 ? "print:hidden" : ""}`}>
                                                                 <span className={`font-semibold text-gray-900 ${!edu.gpa || edu.gpa == 0 ? "text-gray-400" : ""}`}>GPA:</span>
                                                                 <EditableText type="number" as="span" className="min-w-[20px]" value={edu.gpa || ""} onChange={v => updateField(`education.${itemIndex}.gpa`, v)} />
-                                                            </li>
-                                                        </ul>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </EditableItemWrapper>
                                             ))}
@@ -264,18 +264,17 @@ const ProfessionalTemplate = ({
                                             name: "Certificate Name", issuer: "Issuing Organization", credentialUrl: "https://", description: "Certificate description"
                                         })}
                                     >
-                                        <div className="flex flex-col gap-4 print:block print:space-y-4">
+                                        <div className="flex flex-col gap-6 print:block print:space-y-6">
                                             {cvData.certificates.map((cert, itemIndex) => (
                                                 <EditableItemWrapper key={cert.id} id={cert.id} section="certificates" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.certificates.length - 1} contentClassName="pl-0">
                                                     <div className="flex flex-col text-[13px] text-gray-900 leading-[1.6] print:break-inside-avoid">
-                                                        <div className="font-bold mb-0.5">
+                                                        <div className="font-bold mb-2">
                                                             <EditableText as="span" value={cert.name} onChange={v => updateField(`certificates.${itemIndex}.name`, v)} />
                                                         </div>
-                                                        <div className="mb-0.5">
-                                                            <span className="text-gray-700">Issued by: </span>
+                                                        <div className="mb-2">
                                                             <EditableText as="span" value={cert.issuer} onChange={v => updateField(`certificates.${itemIndex}.issuer`, v)} />
                                                         </div>
-                                                        <EditableText as="div" className="mb-0.5 text-justify" value={cert.description} onChange={v => updateField(`certificates.${itemIndex}.description`, v)} />
+                                                        <EditableText multiline={true} as="div" className="mb-2 text-justify" value={cert.description} onChange={v => updateField(`certificates.${itemIndex}.description`, v)} />
                                                         <div>
                                                             <EditableText as="a" className="text-[#2551A5] hover:underline" value={cert.credentialUrl} onChange={v => updateField(`certificates.${itemIndex}.credentialUrl`, v)} />
                                                         </div>
@@ -300,15 +299,13 @@ const ProfessionalTemplate = ({
                                             title: "Project Name", position: "Role/Position", description: "Project Description", startDate: "", endDate: "", isCurrent: false, projectUrl: "https://project-url.com", projectType: "PROFESSIONAL", teamSize: 1
                                         })}
                                     >
-                                        <div className="flex flex-col gap-5 print:block print:space-y-4">
+                                        <div className="flex flex-col gap-6 print:block print:space-y-6">
                                             {cvData.projects.map((proj, itemIndex) => (
                                                 <EditableItemWrapper key={proj.id} id={proj.id} section="projects" index={itemIndex} isFirst={itemIndex === 0} isLast={itemIndex === cvData.projects.length - 1} contentClassName="pl-0">
                                                     <div className="flex flex-col text-[13px] text-gray-900 leading-relaxed print:break-inside-avoid">
                                                         <div className="flex justify-between items-start gap-2 mb-1">
                                                             <div className="flex-1 font-bold">
                                                                 <EditableText as="span" value={proj.title} onChange={v => updateField(`projects.${itemIndex}.title`, v)} />
-                                                                <span>&nbsp;-&nbsp;</span>
-                                                                <InlineSelect value={proj.projectType} options={projectTypeOptions} onChange={v => updateField(`projects.${itemIndex}.projectType`, v)} />
                                                             </div>
                                                             <div className="flex-shrink-0 text-right font-bold whitespace-nowrap">
                                                                 <EditableDateRange
@@ -322,9 +319,13 @@ const ProfessionalTemplate = ({
                                                                 />
                                                             </div>
                                                         </div>
-                                                        <EditableText as="div" className="text-justify whitespace-pre-line text-[13px] leading-[1.6] mb-1.5" value={proj.description} onChange={v => updateField(`projects.${itemIndex}.description`, v)} />
+                                                        <EditableText multiline={true} as="div" className="text-justify whitespace-pre-line text-[13px] leading-[1.6] mb-1.5" value={proj.description} onChange={v => updateField(`projects.${itemIndex}.description`, v)} />
 
-                                                        <ul className="list-disc list-inside ml-2 space-y-0.5">
+                                                        <ul className="list-disc list-inside space-y-0.5 mt-2">
+                                                            <li className="flex items-center gap-1 group">
+                                                                <strong>Project Type:</strong>
+                                                                <InlineSelect value={proj.projectType} options={projectTypeOptions} onChange={v => updateField(`projects.${itemIndex}.projectType`, v)} />
+                                                            </li>
                                                             <li className="flex items-center gap-1 group">
                                                                 <strong>Position:</strong>
                                                                 <EditableText as="span" className="min-w-[30px]" value={proj.position} onChange={v => updateField(`projects.${itemIndex}.position`, v)} />

@@ -32,7 +32,7 @@ const CompanyCard = ({
 
             {/* Logo Overlay */}
             <div className="px-4 relative -mt-8 mb-2">
-                <div className="size-16 rounded-md bg-white p-1 border border-slate-200 overflow-hidden shadow-sm flex items-center justify-center">
+                <div className="size-16 rounded-none bg-white p-1 border border-slate-200 overflow-hidden shadow-sm flex items-center justify-center">
                     {logo ? (
                         <img
                             src={logo}
