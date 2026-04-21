@@ -113,7 +113,7 @@ export const SkillSelector = ({ titleClassName, itemClassName, groupClassName, g
                             <h4 className={`font-semibold text-[15px] border-b pb-1.5 mb-1 ${groupClassName || 'text-gray-800 border-gray-200'}`}>{group}</h4>
                             <div className="flex flex-wrap gap-2.5">
                                 {skills.map((skill) => (
-                                    <div key={skill.skillId} className={`inline-flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-md text-[13px] font-medium group/skill transition-colors ${itemClassName || 'bg-transparent text-gray-800 border border-gray-200 print:border-none print:px-0'}`}>
+                                    <div key={skill.skillId} className={`inline-flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-sm text-[13px] font-medium group/skill transition-colors ${itemClassName || 'bg-transparent text-gray-800 border border-gray-200 print:border-none print:px-0'}`}>
                                         <span>{skill.skillName}</span>
                                         {skill.yearsOfExperience > 0 && (
                                             <span className="opacity-70 text-[11px] tracking-wide">({skill.yearsOfExperience}y)</span>
@@ -133,14 +133,14 @@ export const SkillSelector = ({ titleClassName, itemClassName, groupClassName, g
 
                 {/* Inline Add Skill Form */}
                 {isAdding ? (
-                    <div ref={addFormRef} className="print:hidden flex flex-col gap-2.5 p-3 rounded-lg border border-blue-200 bg-blue-50/50" onClick={e => e.stopPropagation()}>
+                    <div ref={addFormRef} className="print:hidden flex flex-col gap-2.5 p-3 rounded border border-blue-200 bg-blue-50/50" onClick={e => e.stopPropagation()}>
                         {/* Group Name */}
                         <input
                             type="text"
                             value={groupName}
                             onChange={e => setGroupName(e.target.value)}
                             placeholder="Skill Group (e.g. Frontend)"
-                            className="w-full text-sm px-2.5 py-1.5 border border-gray-200 rounded-md outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 bg-white"
+                            className="w-full text-sm px-2.5 py-1.5 border border-gray-200 rounded-sm outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 bg-white"
                         />
 
                         {/* Skill Search */}
@@ -159,7 +159,7 @@ export const SkillSelector = ({ titleClassName, itemClassName, groupClassName, g
                                     }}
                                     onFocus={() => { if (searchText.length >= 1) setShowDropdown(true); }}
                                     placeholder="Search skill..."
-                                    className="w-full text-sm pl-8 pr-2.5 py-1.5 border border-gray-200 rounded-md outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 bg-white"
+                                    className="w-full text-sm pl-8 pr-2.5 py-1.5 border border-gray-200 rounded-sm outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 bg-white"
                                 />
                                 {selectedSkillId && (
                                     <LucideIcons.Check size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-green-500" />
@@ -168,7 +168,7 @@ export const SkillSelector = ({ titleClassName, itemClassName, groupClassName, g
 
                             {/* Search Dropdown */}
                             {showDropdown && searchText.length >= 1 && (
-                                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-[160px] overflow-y-auto py-1">
+                                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded shadow-lg z-50 max-h-[160px] overflow-y-auto py-1">
                                     {isFetching ? (
                                         <div className="px-3 py-2 text-xs text-gray-400 text-center">Searching...</div>
                                     ) : skillOptions.length === 0 ? (
@@ -201,7 +201,7 @@ export const SkillSelector = ({ titleClassName, itemClassName, groupClassName, g
                         <select
                             value={yearsOfExp}
                             onChange={e => setYearsOfExp(e.target.value)}
-                            className="w-full text-sm px-2.5 py-1.5 border border-gray-200 rounded-md outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 bg-white text-gray-700"
+                            className="w-full text-sm px-2.5 py-1.5 border border-gray-200 rounded-sm outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 bg-white text-gray-700"
                         >
                             <option value="">Years of exp (optional)</option>
                             {Array.from({ length: 21 }, (_, i) => (
@@ -215,14 +215,14 @@ export const SkillSelector = ({ titleClassName, itemClassName, groupClassName, g
                                 type="button"
                                 onClick={handleAddSkill}
                                 disabled={!selectedSkillId || !groupName.trim()}
-                                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                                 <LucideIcons.Plus size={14} /> Add
                             </button>
                             <button
                                 type="button"
                                 onClick={handleCancel}
-                                className="px-3 py-1.5 rounded-md text-sm font-medium text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
+                                className="px-3 py-1.5 rounded-sm text-sm font-medium text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
                             >
                                 Done
                             </button>

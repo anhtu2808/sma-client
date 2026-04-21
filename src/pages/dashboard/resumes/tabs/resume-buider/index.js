@@ -105,11 +105,11 @@ const ResumeBuilderTab = () => {
             {builderResumes.map((resume) => {
               const nameRaw = resume.resumeName || resume.fileName || resume.fullName || `Resume #${resume.id}`;
               const match = nameRaw.match(/^\[(tpl_[a-z0-9_]+)\]\s*(.*)$/);
-              
+
               let templateId = match ? match[1] : null;
               if (!templateId) {
-                  const stored = localStorage.getItem(`cv_template_${resume.id}`);
-                  templateId = stored || resume.template || 'tpl_modern_1';
+                const stored = localStorage.getItem(`cv_template_${resume.id}`);
+                templateId = stored || resume.template || 'tpl_prof_2';
               }
 
               const displayTitle = match ? (match[2] || `Resume #${resume.id}`) : nameRaw;

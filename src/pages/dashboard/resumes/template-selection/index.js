@@ -6,24 +6,21 @@ import { TemplateCard } from "../resume-card";
 import UseTemplateModal from "./UseTemplateModal";
 import { useCreateResumeBuilderMutation, useCloneResumeBuilderMutation } from "@/apis/resumeApi";
 
-import ModernMinimalistImg from "@/assets/template/ModernMinimalist.png";
 import ExecutiveProfessionalImg from "@/assets/template/ExecutiveProfessional.png";
-import CreativeStudioImg from "@/assets/template/CreativeStudio.png";
-import TechInnovatorImg from "@/assets/template/TechInnovator.png";
 import ProfessionalATSImg from "@/assets/template/ProfessionalATS.png";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '../../../../utils/icons';
 
 export const CV_TEMPLATES = [
     {
-        id: "tpl_modern_1",
-        name: "Modern Minimalist",
-        description: "Clean and contemporary design focusing on readability.",
-        layout: "modern",
+        id: "tpl_prof_2",
+        name: "Professional Template",
+        description: "Standard single column ATS-friendly minimalist design.",
+        layout: "professional",
         bgColor: "bg-blue-50 dark:bg-blue-900/20",
         themeColor: "bg-blue-600",
-        isPremium: false,
-        preview: ModernMinimalistImg,
+        isPremium: true,
+        preview: ProfessionalATSImg,
     },
     {
         id: "tpl_prof_1",
@@ -34,36 +31,6 @@ export const CV_TEMPLATES = [
         themeColor: "bg-gray-800 dark:bg-gray-400",
         isPremium: false,
         preview: ExecutiveProfessionalImg,
-    },
-    {
-        id: "tpl_creative_1",
-        name: "Creative Studio",
-        description: "Stand out with bold colors and a unique structure.",
-        layout: "creative",
-        bgColor: "bg-purple-50 dark:bg-purple-900/20",
-        themeColor: "bg-purple-600",
-        isPremium: true,
-        preview: CreativeStudioImg,
-    },
-    {
-        id: "tpl_modern_2",
-        name: "Tech Innovator",
-        description: "Sleek dark design with modern organized sections.",
-        layout: "modern",
-        bgColor: "bg-teal-50 dark:bg-teal-900/20",
-        themeColor: "bg-teal-600",
-        isPremium: true,
-        preview: TechInnovatorImg,
-    },
-    {
-        id: "tpl_prof_2",
-        name: "Professional Template",
-        description: "Standard single column ATS-friendly minimalist design.",
-        layout: "professional",
-        bgColor: "bg-blue-50 dark:bg-blue-900/20",
-        themeColor: "bg-blue-600",
-        isPremium: true,
-        preview: ProfessionalATSImg,
     }
 ];
 

@@ -32,13 +32,13 @@ const InlineSelect = ({ value, options = [], onChange, className = '', placehold
     return (
         <span
             ref={containerRef}
-            className="relative inline-block print:static"
+            className={`relative inline-block print:static ${isOpen ? 'z-50' : 'z-10'}`}
             onClick={(e) => e.stopPropagation()}
         >
             {/* Display text - clickable */}
             <span
                 onClick={() => setIsOpen(!isOpen)}
-                className={`cursor-pointer hover:bg-blue-50 hover:text-blue-600 px-1 py-0.5 rounded transition-colors print:p-0 print:hover:bg-transparent ${className}`}
+                className={`cursor-pointer hover:bg-blue-50 hover:text-blue-600 px-2 -mx-2 py-1 rounded-sm transition-colors print:hover:bg-transparent font-[inherit] text-[inherit] leading-[inherit] ${className}`}
                 title="Click to change"
             >
                 {displayLabel}
@@ -55,9 +55,8 @@ const InlineSelect = ({ value, options = [], onChange, className = '', placehold
                                 onChange(opt.value);
                                 setIsOpen(false);
                             }}
-                            className={`w-full text-left px-3 py-1.5 text-sm hover:bg-blue-50 hover:text-blue-600 transition-colors cursor-pointer ${
-                                value === opt.value ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700'
-                            }`}
+                            className={`w-full text-left px-3 py-1.5 text-sm hover:bg-blue-50 hover:text-blue-600 transition-colors cursor-pointer ${value === opt.value ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700'
+                                }`}
                         >
                             {opt.label}
                         </button>

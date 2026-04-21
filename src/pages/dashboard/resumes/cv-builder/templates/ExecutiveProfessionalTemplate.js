@@ -104,17 +104,17 @@ const ExecutiveProfessionalTemplate = ({
                         </div>
                     )}
                 </div>
-                <div className="flex justify-center gap-2 mt-4 print:hidden">
-                    <button onClick={() => toggleContactVisibility('githubLink')} className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${contactVisibility.githubLink ? 'bg-gray-200 text-gray-700' : 'bg-gray-100 text-gray-400'}`}>
-                        {contactVisibility.githubLink ? <Eye size={12} /> : <EyeOff size={12} />} GitHub
-                    </button>
-                    <button onClick={() => toggleContactVisibility('linkedinLink')} className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${contactVisibility.linkedinLink ? 'bg-gray-200 text-gray-700' : 'bg-gray-100 text-gray-400'}`}>
-                        {contactVisibility.linkedinLink ? <Eye size={12} /> : <EyeOff size={12} />} LinkedIn
-                    </button>
-                    <button onClick={() => toggleContactVisibility('portfolioLink')} className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${contactVisibility.portfolioLink ? 'bg-gray-200 text-gray-700' : 'bg-gray-100 text-gray-400'}`}>
-                        {contactVisibility.portfolioLink ? <Eye size={12} /> : <EyeOff size={12} />} Portfolio
-                    </button>
-                </div>
+                    <div className="flex justify-center gap-2 mt-4 print:hidden">
+                        <button onClick={() => toggleContactVisibility('githubLink')} className={`flex items-center gap-1 px-2 py-1 rounded-sm text-xs font-medium transition-colors cursor-pointer ${contactVisibility.githubLink ? 'bg-gray-200 text-gray-700' : 'bg-gray-100 text-gray-400'}`}>
+                            {contactVisibility.githubLink ? <Eye size={12} /> : <EyeOff size={12} />} GitHub
+                        </button>
+                        <button onClick={() => toggleContactVisibility('linkedinLink')} className={`flex items-center gap-1 px-2 py-1 rounded-sm text-xs font-medium transition-colors cursor-pointer ${contactVisibility.linkedinLink ? 'bg-gray-200 text-gray-700' : 'bg-gray-100 text-gray-400'}`}>
+                            {contactVisibility.linkedinLink ? <Eye size={12} /> : <EyeOff size={12} />} LinkedIn
+                        </button>
+                        <button onClick={() => toggleContactVisibility('portfolioLink')} className={`flex items-center gap-1 px-2 py-1 rounded-sm text-xs font-medium transition-colors cursor-pointer ${contactVisibility.portfolioLink ? 'bg-gray-200 text-gray-700' : 'bg-gray-100 text-gray-400'}`}>
+                            {contactVisibility.portfolioLink ? <Eye size={12} /> : <EyeOff size={12} />} Portfolio
+                        </button>
+                    </div>
             </div>
 
             <div className="px-14 border-b border-gray-300 mx-14 mb-8"></div>
@@ -157,7 +157,7 @@ const ExecutiveProfessionalTemplate = ({
                                                                 onStartDateChange={v => updateField(`experience.${itemIndex}.startDate`, v)}
                                                                 onEndDateChange={v => updateField(`experience.${itemIndex}.endDate`, v)}
                                                                 onIsCurrentChange={v => updateField(`experience.${itemIndex}.isCurrent`, v)}
-                                                                className="text-sm font-semibold text-gray-800 bg-gray-100 px-2 py-1 rounded"
+                                                                className="text-sm font-semibold text-gray-800 bg-gray-100 px-2 py-1 rounded-sm"
                                                             />
                                                         </div>
                                                     </div>
@@ -167,7 +167,7 @@ const ExecutiveProfessionalTemplate = ({
                                                         <InlineSelect value={exp.employmentType} options={employmentTypeOptions} onChange={v => updateField(`experience.${itemIndex}.employmentType`, v)} />
                                                     </div>
                                                     <EditableText as="p" className="font-medium mt-0.5 text-sm" value={exp.company} onChange={v => updateField(`experience.${itemIndex}.company`, v)} />
-                                                    <EditableText as="p" className="font-medium mt-0.5 text-sm" value={exp.description} onChange={v => updateField(`experience.${itemIndex}.description`, v)} />
+                                                    <EditableText multiline={true} as="p" className="font-medium mt-1 text-sm text-justify" value={exp.description} onChange={v => updateField(`experience.${itemIndex}.description`, v)} />
                                                 </div>
                                             </EditableItemWrapper>
                                         ))}
@@ -208,7 +208,7 @@ const ExecutiveProfessionalTemplate = ({
                                                                 onStartDateChange={v => updateField(`education.${itemIndex}.startDate`, v)}
                                                                 onEndDateChange={v => updateField(`education.${itemIndex}.endDate`, v)}
                                                                 onIsCurrentChange={v => updateField(`education.${itemIndex}.isCurrent`, v)}
-                                                                className="text-sm font-semibold text-gray-800 bg-gray-100 px-2 py-1 rounded"
+                                                                className="text-sm font-semibold text-gray-800 bg-gray-100 px-2 py-1 rounded-sm"
                                                             />
                                                             <div className="flex items-center gap-1 mt-0.5 justify-end">
                                                                 <span className={`font-medium text-sm ${!edu.gpa ? "text-gray-400 print:hidden" : ""}`}>GPA:</span>
@@ -245,7 +245,7 @@ const ExecutiveProfessionalTemplate = ({
                                                             <EditableText as="h4" className="font-bold text-gray-900 text-lg" value={cert.name} onChange={v => updateField(`certificates.${itemIndex}.name`, v)} />
                                                         </div>
                                                     </div>
-                                                    <EditableText as="p" className="font-medium mt-0.5 text-sm" value={cert.description} onChange={v => updateField(`certificates.${itemIndex}.description`, v)} />
+                                                    <EditableText multiline={true} as="p" className="font-medium mt-0.5 text-sm" value={cert.description} onChange={v => updateField(`certificates.${itemIndex}.description`, v)} />
                                                     <EditableText as="p" className="text-gray-600 hover:underline text-sm" value={cert.issuer} onChange={v => updateField(`certificates.${itemIndex}.issuer`, v)} />
                                                     <EditableText as="a" className="text-gray-600 hover:underline text-sm" value={cert.credentialUrl} onChange={v => updateField(`certificates.${itemIndex}.credentialUrl`, v)} />
                                                 </div>
@@ -284,18 +284,19 @@ const ExecutiveProfessionalTemplate = ({
                                                                 onStartDateChange={v => updateField(`projects.${itemIndex}.startDate`, v)}
                                                                 onEndDateChange={v => updateField(`projects.${itemIndex}.endDate`, v)}
                                                                 onIsCurrentChange={v => updateField(`projects.${itemIndex}.isCurrent`, v)}
-                                                                className="text-sm font-semibold text-gray-800 bg-gray-100 px-2 py-1 rounded"
+                                                                className="text-sm font-semibold text-gray-800 bg-gray-100 px-2 py-1 rounded-sm"
                                                             />
                                                         </div>
                                                     </div>
                                                     <EditableText as="p" className="font-medium mt-0.5 text-sm" value={proj.position} onChange={v => updateField(`projects.${itemIndex}.position`, v)} />
-                                                    <div className="font-medium mt-0.5 text-sm flex items-center">
+                                                    <div className="font-medium mt-0.5 text-sm flex items-center gap-1">
+                                                        <strong>Type:</strong>
                                                         <InlineSelect value={proj.projectType} options={projectTypeOptions} onChange={v => updateField(`projects.${itemIndex}.projectType`, v)} />
                                                         <span className="mx-1">•</span>
-                                                        <span className={`${!proj.teamSize ? "text-gray-400 print:hidden" : ""}`}>Team:</span>
+                                                        <span className={`${!proj.teamSize ? "text-gray-400 print:hidden" : ""}`}><strong>Team:</strong></span>
                                                         <EditableText as="span" className={`ml-1 min-w-[20px] ${!proj.teamSize ? "print:hidden" : ""}`} value={proj.teamSize} onChange={v => updateField(`projects.${itemIndex}.teamSize`, v)} />
                                                     </div>
-                                                    <EditableText as="p" className="font-medium mt-0.5 text-sm" value={proj.description} onChange={v => updateField(`projects.${itemIndex}.description`, v)} />
+                                                    <EditableText multiline={true} as="p" className="font-medium mt-2 text-sm text-justify" value={proj.description} onChange={v => updateField(`projects.${itemIndex}.description`, v)} />
                                                     <EditableText as="a" className="text-gray-600 hover:underline text-sm" value={proj.projectUrl || "https://project-url.com"} onChange={v => updateField(`projects.${itemIndex}.projectUrl`, v)} />
                                                 </div>
                                             </EditableItemWrapper>

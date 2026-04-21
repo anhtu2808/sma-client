@@ -12,10 +12,7 @@ import {
     Download, Save, FileCheck,
 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
-import ModernMinimalistTemplate from "./templates/ModernMinimalistTemplate";
 import ExecutiveProfessionalTemplate from "./templates/ExecutiveProfessionalTemplate";
-import CreativeStudioTemplate from "./templates/CreativeStudioTemplate";
-import TechInnovatorTemplate from "./templates/TechInnovatorTemplate";
 import ProfessionalTemplate from "./templates/ProfessionalTemplate";
 import PropertiesSidebar from "./PropertiesSidebar";
 import Button from "@/components/Button";
@@ -115,6 +112,7 @@ export default function CvBuilder({ onBack }) {
             styleEl = document.createElement('style');
             styleEl.id = styleId;
             styleEl.innerHTML = `
+                .pdf-export-mode { width: 850px !important; margin: 0 !important; }
                 .pdf-export-mode .print\\:hidden { display: none !important; }
                 .pdf-export-mode .print\\:block { display: block !important; }
                 .pdf-export-mode .print\\:inline-block { display: inline-block !important; }
@@ -122,29 +120,16 @@ export default function CvBuilder({ onBack }) {
                 .pdf-export-mode .print\\:shadow-none { box-shadow: none !important; }
                 .pdf-export-mode .print\\:p-0 { padding: 0 !important; }
                 .pdf-export-mode .print\\:m-0 { margin: 0 !important; }
-                .pdf-export-mode .print\\:mt-0 { margin-top: 0 !important; }
                 .pdf-export-mode .print\\:bg-white { background-color: #fff !important; }
                 .pdf-export-mode .print\\:text-black { color: #000 !important; }
-                .pdf-export-mode .print\\:px-8 { padding-left: 2rem !important; padding-right: 2rem !important; }
-                .pdf-export-mode .print\\:py-8 { padding-top: 2rem !important; padding-bottom: 2rem !important; }
-                .pdf-export-mode .print\\:pb-4 { padding-bottom: 1rem !important; }
-                .pdf-export-mode .print\\:pb-6 { padding-bottom: 1.5rem !important; }
-                .pdf-export-mode .print\\:pt-8 { padding-top: 2rem !important; }
-                .pdf-export-mode .print\\:space-y-8 > :not([hidden]) ~ :not([hidden]) { margin-top: 2rem !important; margin-bottom: 0 !important; }
-                .pdf-export-mode .print\\:space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem !important; margin-bottom: 0 !important; }
-                .pdf-export-mode .print\\:space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem !important; margin-bottom: 0 !important; }
-                .pdf-export-mode .print\\:space-y-1\\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.375rem !important; margin-bottom: 0 !important; }
-                .pdf-export-mode .print\\:gap-4 { gap: 1rem !important; }
-                .pdf-export-mode .print\\:gap-6 { gap: 1.5rem !important; }
                 .pdf-export-mode .print\\:rounded-none { border-radius: 0px !important; }
                 .pdf-export-mode .print\\:aspect-auto { aspect-ratio: auto !important; }
                 .pdf-export-mode .print\\:min-h-0 { min-height: 0px !important; }
-                .pdf-export-mode .print\\:w-full { width: 100% !important; }
                 .pdf-export-mode .print\\:break-inside-avoid { break-inside: avoid !important; }
             `;
             document.head.appendChild(styleEl);
         }
-        
+
         element.classList.add('pdf-export-mode');
 
         // Convert cross-origin avatar to inline base64 so html2canvas can render it
@@ -523,7 +508,7 @@ export default function CvBuilder({ onBack }) {
         try {
             // Save personal info
             try {
-                const currentTemplate = searchParams.get('template') || 'tpl_modern_1';
+                const currentTemplate = searchParams.get('template') || 'tpl_prof_2';
                 await updateCandidateResume({
                     resumeId,
                     payload: {
@@ -830,7 +815,7 @@ export default function CvBuilder({ onBack }) {
 
 
 
-    const templateId = searchParams.get('template') || 'tpl_modern_1';
+    const templateId = searchParams.get('template') || 'tpl_prof_2';
 
     useEffect(() => {
         if (resumeId && templateId) {
@@ -838,10 +823,8 @@ export default function CvBuilder({ onBack }) {
         }
     }, [resumeId, templateId]);
 
-    let TemplateComponent = ModernMinimalistTemplate;
+    let TemplateComponent = ProfessionalTemplate;
     if (templateId === 'tpl_prof_1') TemplateComponent = ExecutiveProfessionalTemplate;
-    if (templateId === 'tpl_creative_1') TemplateComponent = CreativeStudioTemplate;
-    if (templateId === 'tpl_modern_2') TemplateComponent = TechInnovatorTemplate;
     if (templateId === 'tpl_prof_2') TemplateComponent = ProfessionalTemplate;
 
     const handleAvatarUpload = async (event) => {

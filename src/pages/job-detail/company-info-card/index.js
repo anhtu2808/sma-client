@@ -25,7 +25,7 @@ const CompanyInfoCard = () => {
     return (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <div className="flex items-center gap-4 mb-4">
-                <div className="size-14 rounded-xl bg-gradient-to-br from-gray-800 to-gray-600 flex items-center justify-center overflow-hidden">
+                <div className="size-14 bg-gradient-to-br from-gray-800 to-gray-600 flex items-center justify-center overflow-hidden">
                     {company.logo ? (
                         <img src={company.logo} alt={company.name} className="w-full h-full object-cover" />
                     ) : (
