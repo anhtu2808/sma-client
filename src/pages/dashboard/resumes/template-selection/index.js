@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Col, Row } from "antd";
 import toastMessage from "@/utils/toastMessage";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { TemplateCard } from "../resume-card";
 import UseTemplateModal from "./UseTemplateModal";
 import { useCreateResumeBuilderMutation, useCloneResumeBuilderMutation } from "@/apis/resumeApi";
@@ -38,6 +38,9 @@ const TemplateSelection = () => {
     const navigate = useNavigate();
     const [selectedTemplate, setSelectedTemplate] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [searchParams] = useSearchParams();
+    const jobId = searchParams.get("jobId");
+
     const [createResumeBuilder, { isLoading: isCreating }] = useCreateResumeBuilderMutation();
     const [cloneResumeBuilder, { isLoading: isCloning }] = useCloneResumeBuilderMutation();
 
@@ -52,7 +55,8 @@ const TemplateSelection = () => {
                 resumeName: `[${template.id}] Mới`
             }).unwrap();
             setIsModalOpen(false);
-            navigate(`/dashboard/resumes/builder?template=${template.id}&resumeId=${newResume.id}`);
+            const jobPart = jobId ? `&jobId=${jobId}` : "";
+            navigate(`/dashboard/resumes/builder?template=${template.id}&resumeId=${newResume.id}${jobPart}`);
         } catch (error) {
             toastMessage.error("Không thể tạo CV mới. Vui lòng thử lại.");
         }
@@ -62,7 +66,8 @@ const TemplateSelection = () => {
         try {
             const clonedResume = await cloneResumeBuilder({ resumeId }).unwrap();
             setIsModalOpen(false);
-            navigate(`/dashboard/resumes/builder?template=${template.id}&resumeId=${clonedResume.id}`);
+            const jobPart = jobId ? `&jobId=${jobId}` : "";
+            navigate(`/dashboard/resumes/builder?template=${template.id}&resumeId=${clonedResume.id}${jobPart}`);
         } catch (error) {
             toastMessage.error("Không thể clone CV. Vui lòng thử lại.");
         }
