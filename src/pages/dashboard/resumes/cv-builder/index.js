@@ -210,7 +210,7 @@ export default function CvBuilder({ onBack }) {
 
     const handleExportToApply = async () => {
         if (!resumeId) return toastMessage.error("Resume not found.");
-        
+
         // Capture snapshot for modal preview
         try {
             const element = pdfRef.current;
@@ -227,10 +227,13 @@ export default function CvBuilder({ onBack }) {
 
     const handleExportAction = async ({ type, cvName, fileName, setStep }) => {
         try {
+            setStep("Saving changes...");
+            await handleSave();
+
             setStep("Generating PDF...");
             const pdf = await generatePdf();
             const pdfBlob = pdf.output("blob");
-            
+
             console.log(`Generated PDF size: ${(pdfBlob.size / 1024 / 1024).toFixed(2)} MB`);
 
             if (type === 'download') {
@@ -247,13 +250,13 @@ export default function CvBuilder({ onBack }) {
             if (!uploadedUrl) throw new Error("Upload failed");
 
             setStep("Finalizing...");
-            await exportResumeToOriginal({ 
-                resumeId, 
-                payload: { 
-                    resumeUrl: uploadedUrl, 
+            await exportResumeToOriginal({
+                resumeId,
+                payload: {
+                    resumeUrl: uploadedUrl,
                     fileName,
                     resumeName: cvName
-                } 
+                }
             }).unwrap();
 
             return { success: true, resumeId };
@@ -953,7 +956,7 @@ export default function CvBuilder({ onBack }) {
                                 {isSaving ? <Loading size={16} inline /> : <Save size={16} />}
                                 {isSaving ? "Saving..." : "Save CV"}
                             </Button>
-                            <Button
+                            {/* <Button
                                 mode="primary"
                                 shape="rounded"
                                 onClick={handleDownloadPdf}
@@ -961,7 +964,7 @@ export default function CvBuilder({ onBack }) {
                                 className="px-4 py-2 bg-[#1F8A70] text-white rounded-md text-sm font-medium hover:bg-[#19755f] flex items-center gap-2">
                                 {isDownloadingPdf ? <Loading size={16} inline /> : <Download size={16} />}
                                 {isDownloadingPdf ? "Downloading..." : "Download PDF"}
-                            </Button>
+                            </Button> */}
                             <Button
                                 mode="primary"
                                 shape="rounded"

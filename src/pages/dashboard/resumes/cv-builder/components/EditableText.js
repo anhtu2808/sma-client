@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
 import ContentEditable from 'react-contenteditable';
-import { Bold, Italic, Underline as UnderlineIcon } from 'lucide-react';
 
 export const EditableText = React.memo(({ value, onChange, className, as = "span", multiline = false }) => {
     const textRef = useRef(null);
@@ -20,14 +19,6 @@ export const EditableText = React.memo(({ value, onChange, className, as = "span
         onChange(e.target.value);
     };
 
-    const handleToolbarAction = (e, command) => {
-        e.preventDefault();
-        e.stopPropagation();
-        document.execCommand(command, false, null);
-        // Important: focus back to editor if lost, but onMouseDown usually prevents loss
-        textRef.current?.focus();
-    };
-
     const baseStyles = "outline-none transition-all duration-200 rounded-sm";
     
     // Standard style: transparent -> dashed hover -> solid focus
@@ -37,8 +28,8 @@ export const EditableText = React.memo(({ value, onChange, className, as = "span
         px-2 py-1 -mx-2
     `;
 
-    // Rich Text (Description) style: matches Image 1 (hover) and Image 2 (active)
-    const richTextStyles = `
+    // Multiline style: matches Image 1 (hover) and Image 2 (active)
+    const multilineStyles = `
         border-[1.5px] -mx-2
         ${isFocused 
             ? 'border-solid border-blue-500 bg-white shadow-sm' 
@@ -48,32 +39,7 @@ export const EditableText = React.memo(({ value, onChange, className, as = "span
 
     if (multiline) {
         return (
-            <div className={`${baseStyles} ${richTextStyles} ${className}`}>
-                {isFocused && (
-                    <div className="flex items-center gap-1 p-1.5 border-b border-blue-100 bg-blue-50/30 print:hidden animate-in fade-in slide-in-from-top-1 duration-200">
-                        <button
-                            onMouseDown={(e) => handleToolbarAction(e, 'bold')}
-                            className="w-8 h-8 flex items-center justify-center hover:bg-white rounded text-gray-700 transition-colors cursor-pointer shadow-sm hover:shadow"
-                            title="Bold"
-                        >
-                            <Bold size={14} strokeWidth={3} />
-                        </button>
-                        <button
-                            onMouseDown={(e) => handleToolbarAction(e, 'italic')}
-                            className="w-8 h-8 flex items-center justify-center hover:bg-white rounded text-gray-700 transition-colors cursor-pointer shadow-sm hover:shadow"
-                            title="Italic"
-                        >
-                            <Italic size={14} strokeWidth={3} />
-                        </button>
-                        <button
-                            onMouseDown={(e) => handleToolbarAction(e, 'underline')}
-                            className="w-8 h-8 flex items-center justify-center hover:bg-white rounded text-gray-700 transition-colors cursor-pointer shadow-sm hover:shadow"
-                            title="Underline"
-                        >
-                            <UnderlineIcon size={14} strokeWidth={3} />
-                        </button>
-                    </div>
-                )}
+            <div className={`${baseStyles} ${multilineStyles} ${className}`}>
                 <ContentEditable
                     innerRef={textRef}
                     html={html}
@@ -101,3 +67,4 @@ export const EditableText = React.memo(({ value, onChange, className, as = "span
         />
     );
 });
+
