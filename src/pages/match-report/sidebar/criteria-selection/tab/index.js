@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Tooltip } from "antd";
 import { setActiveCriteriaId } from "@/store/slices/matchingReportSlice";
 import { getFixProgress, getScoreColor } from "../utils";
+import { formatScore } from "@/utils/formatScore";
 
 const getProgressColors = (progress) => {
   if (progress < 50) return { fill: "bg-red-400", track: "bg-red-100", border: "border-red-200" };
@@ -17,7 +18,7 @@ const Tab = ({ tab }) => {
   const isActive = tab.id === activeCriteriaId;
   const { fixed, total, percent } = useMemo(() => getFixProgress(tab.details), [tab.details]);
   const { fill, track, border } = getProgressColors(percent);
-  const aiScore = Math.round(tab.aiScore || 0);
+  const aiScore = formatScore(tab.aiScore);
 
   return (
     <button

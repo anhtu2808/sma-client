@@ -7,6 +7,7 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
+import { formatScore } from "@/utils/formatScore";
 
 const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
@@ -47,7 +48,7 @@ const OverviewRadarChart = ({ criteriaScores = [] }) => {
       criteriaName:
         cs.criteriaName.length > 20 ? cs.criteriaName.substring(0, 18) + "..." : cs.criteriaName,
       fullName: cs.criteriaName,
-      score: typeof cs.aiScore === "number" ? cs.aiScore : 0,
+      score: formatScore(cs.aiScore),
     }));
 
   if (radarData.length === 0) {

@@ -1,5 +1,6 @@
 import { getMatchLevelConfig } from "./overviewUtils";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { formatScore } from '@/utils/formatScore';
 
 const CANDIDATE_LEVEL_STYLE = {
   INTERN: 'bg-slate-100 text-slate-700',
@@ -25,7 +26,7 @@ const OverviewScoreSection = ({ score = 0, matchLevel = "FAIR", summary = "", ca
           {levelConfig.label}
         </div>
         <span className="font-heading text-2xl font-bold leading-none" style={{ color: levelConfig.ringColor }}>
-          {score}
+          {formatScore(score)}
         </span>
         <span className="text-sm text-neutral-400">/ 100</span>
         {candidateLevel && (

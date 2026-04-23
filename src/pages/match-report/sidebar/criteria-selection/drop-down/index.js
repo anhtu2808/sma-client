@@ -5,6 +5,7 @@ import { setActiveCriteriaId } from "@/store/slices/matchingReportSlice";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faSliders } from '../../../../../utils/icons';
 import { getFixProgress, getScoreColor } from "../utils";
+import { formatScore } from "@/utils/formatScore";
 
 const DropDown = ({ items = [] }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -56,7 +57,7 @@ const DropDown = ({ items = [] }) => {
             {items.map((item) => {
               const isActive = item.id === activeCriteriaId;
               const { fixed, total, percent } = getFixProgress(item.details);
-              const aiScore = Math.round(item.aiScore || 0);
+              const aiScore = formatScore(item.aiScore);
 
               return (
                 <button

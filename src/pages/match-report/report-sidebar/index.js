@@ -4,6 +4,7 @@ import ScoreCard from '@/pages/match-report/sidebar/header/ScoreCard';
 import { useGetOrCreateEnhancementQuery } from '@/apis/resumeApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleCheck, faCircleExclamation, faCircleXmark, faPen } from '../../../utils/icons';
+import { formatScore } from '@/utils/formatScore';
 
 const getBarColor = (score) => {
   if (score >= 80) return 'bg-blue-500';
@@ -23,7 +24,7 @@ const ReportSidebar = () => {
 
   if (!matchData) return null;
 
-  const score = Number.isFinite(matchData.aiOverallScore) ? matchData.aiOverallScore : 0;
+  const score = formatScore(matchData.aiOverallScore);
   const title = matchData.jobName || 'Matching Report';
   const subtitle = matchData.resumeFullName || matchData.candidateName || 'Candidate';
   const criteriaScores = matchData.criteriaScores || [];
@@ -88,7 +89,7 @@ const ReportSidebar = () => {
       <div className="flex-1 overflow-y-auto">
         <div className="divide-y divide-neutral-100">
           {criteriaScores.map((cs) => {
-            const criteriaScore = Number.isFinite(cs.aiScore) ? cs.aiScore : 0;
+            const criteriaScore = formatScore(cs.aiScore);
             const details = cs.details || [];
 
             const getDetailIcon = (status) => {
