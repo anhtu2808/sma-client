@@ -29,8 +29,8 @@ const InvitationCard = ({ item, activeTab, onViewDetails, onAccept, onDecline, i
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="flex-1 min-w-0">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-2 shrink-0 shadow-sm overflow-hidden">
-              <img alt={`${item.company} logo`} className="w-full h-full object-cover rounded-md" src={item.companyLogo} />
+            <div className="w-14 h-14 rounded-none bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-2 shrink-0 shadow-sm overflow-hidden">
+              <img alt={`${item.company} logo`} className="w-full h-full object-contain rounded-none" src={item.companyLogo} />
             </div>
 
             <div className="min-w-0 flex-1">

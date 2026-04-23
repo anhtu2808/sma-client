@@ -12,10 +12,7 @@ import {
     Download, Save, FileCheck,
 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
-import ModernMinimalistTemplate from "./templates/ModernMinimalistTemplate";
 import ExecutiveProfessionalTemplate from "./templates/ExecutiveProfessionalTemplate";
-import CreativeStudioTemplate from "./templates/CreativeStudioTemplate";
-import TechInnovatorTemplate from "./templates/TechInnovatorTemplate";
 import ProfessionalTemplate from "./templates/ProfessionalTemplate";
 import PropertiesSidebar from "./PropertiesSidebar";
 import Button from "@/components/Button";
@@ -42,6 +39,7 @@ import {
     useUpdateCandidateResumeMutation,
     useExportResumeToOriginalMutation,
 } from "@/apis/resumeApi";
+import { useGetJobByIdQuery } from "@/apis/jobApi";
 import { useGetSkillsQuery } from "@/apis/skillApi";
 
 import { CvBuilderContext } from "./CvBuilderContext";
@@ -51,6 +49,7 @@ import { SectionWrapper } from "./components/SectionWrapper";
 import { EditableItemWrapper } from "./components/EditableItemWrapper";
 import { SkillSelector } from "./components/SkillSelector";
 import InlineSelect from "./components/InlineSelect";
+import ExportCvModal from "./components/ExportCvModal";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '../../../../utils/icons';
 
@@ -69,6 +68,7 @@ export default function CvBuilder({ onBack }) {
     const { id: paramResumeId } = useParams();
     const [searchParams] = useSearchParams();
     const resumeId = paramResumeId || searchParams.get("resumeId");
+    const jobId = searchParams.get("jobId");
     const navigate = useNavigate();
     const pdfRef = useRef(null);
     const avatarInputRef = useRef(null);
@@ -98,12 +98,17 @@ export default function CvBuilder({ onBack }) {
     const [isExporting, setIsExporting] = useState(false);
     const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
     const [activeSection, setActiveSection] = useState(null);
+    const [showExportModal, setShowExportModal] = useState(false);
+    const [previewImage, setPreviewImage] = useState(null);
 
 
     const { data: resumeData, isLoading: isFetchingResume, refetch } = useGetResumeQuery(
         { resumeId },
         { skip: !resumeId }
     );
+
+    const { data: jobResponse } = useGetJobByIdQuery(jobId, { skip: !jobId });
+    const jobData = jobResponse?.data;
 
     const generatePdf = async () => {
         const element = pdfRef.current;
@@ -115,6 +120,7 @@ export default function CvBuilder({ onBack }) {
             styleEl = document.createElement('style');
             styleEl.id = styleId;
             styleEl.innerHTML = `
+                .pdf-export-mode { width: 850px !important; margin: 0 !important; }
                 .pdf-export-mode .print\\:hidden { display: none !important; }
                 .pdf-export-mode .print\\:block { display: block !important; }
                 .pdf-export-mode .print\\:inline-block { display: inline-block !important; }
@@ -122,29 +128,16 @@ export default function CvBuilder({ onBack }) {
                 .pdf-export-mode .print\\:shadow-none { box-shadow: none !important; }
                 .pdf-export-mode .print\\:p-0 { padding: 0 !important; }
                 .pdf-export-mode .print\\:m-0 { margin: 0 !important; }
-                .pdf-export-mode .print\\:mt-0 { margin-top: 0 !important; }
                 .pdf-export-mode .print\\:bg-white { background-color: #fff !important; }
                 .pdf-export-mode .print\\:text-black { color: #000 !important; }
-                .pdf-export-mode .print\\:px-8 { padding-left: 2rem !important; padding-right: 2rem !important; }
-                .pdf-export-mode .print\\:py-8 { padding-top: 2rem !important; padding-bottom: 2rem !important; }
-                .pdf-export-mode .print\\:pb-4 { padding-bottom: 1rem !important; }
-                .pdf-export-mode .print\\:pb-6 { padding-bottom: 1.5rem !important; }
-                .pdf-export-mode .print\\:pt-8 { padding-top: 2rem !important; }
-                .pdf-export-mode .print\\:space-y-8 > :not([hidden]) ~ :not([hidden]) { margin-top: 2rem !important; margin-bottom: 0 !important; }
-                .pdf-export-mode .print\\:space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem !important; margin-bottom: 0 !important; }
-                .pdf-export-mode .print\\:space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem !important; margin-bottom: 0 !important; }
-                .pdf-export-mode .print\\:space-y-1\\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.375rem !important; margin-bottom: 0 !important; }
-                .pdf-export-mode .print\\:gap-4 { gap: 1rem !important; }
-                .pdf-export-mode .print\\:gap-6 { gap: 1.5rem !important; }
                 .pdf-export-mode .print\\:rounded-none { border-radius: 0px !important; }
                 .pdf-export-mode .print\\:aspect-auto { aspect-ratio: auto !important; }
                 .pdf-export-mode .print\\:min-h-0 { min-height: 0px !important; }
-                .pdf-export-mode .print\\:w-full { width: 100% !important; }
                 .pdf-export-mode .print\\:break-inside-avoid { break-inside: avoid !important; }
             `;
             document.head.appendChild(styleEl);
         }
-        
+
         element.classList.add('pdf-export-mode');
 
         // Convert cross-origin avatar to inline base64 so html2canvas can render it
@@ -173,18 +166,25 @@ export default function CvBuilder({ onBack }) {
             avatarImg.src = originalSrc;
         }
 
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF("p", "mm", "a4");
+        const imgData = canvas.toDataURL("image/jpeg", 0.82); // JPEG is much smaller than PNG
+        const pdf = new jsPDF({
+            orientation: "p",
+            unit: "mm",
+            format: "a4",
+            compress: true // Enable PDF compression
+        });
+
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = pdf.internal.pageSize.getHeight();
         const imgHeight = (canvas.height * pdfWidth) / canvas.width;
         let heightLeft = imgHeight, position = 0;
-        pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
+
+        pdf.addImage(imgData, "JPEG", 0, position, pdfWidth, imgHeight, undefined, 'FAST');
         heightLeft -= pdfHeight;
         while (heightLeft > 0) {
             position -= pdfHeight;
             pdf.addPage();
-            pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
+            pdf.addImage(imgData, "JPEG", 0, position, pdfWidth, imgHeight, undefined, 'FAST');
             heightLeft -= pdfHeight;
         }
 
@@ -210,32 +210,59 @@ export default function CvBuilder({ onBack }) {
 
     const handleExportToApply = async () => {
         if (!resumeId) return toastMessage.error("Resume not found.");
-        setIsExporting(true);
-        try {
-            const pdf = await generatePdf();
 
+        // Capture snapshot for modal preview
+        try {
+            const element = pdfRef.current;
+            element.classList.add('pdf-export-mode');
+            const canvas = await html2canvas(element, { scale: 1.5, useCORS: true, logging: false });
+            setPreviewImage(canvas.toDataURL("image/png"));
+            element.classList.remove('pdf-export-mode');
+            setShowExportModal(true);
+        } catch (err) {
+            console.error("Preview capture error:", err);
+            setShowExportModal(true); // fall back to showing modal without preview
+        }
+    };
+
+    const handleExportAction = async ({ type, cvName, fileName, setStep }) => {
+        try {
+            setStep("Saving changes...");
+            await handleSave();
+
+            setStep("Generating PDF...");
+            const pdf = await generatePdf();
             const pdfBlob = pdf.output("blob");
-            const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-            if (pdfBlob.size > MAX_FILE_SIZE) {
-                toastMessage.error("Exported PDF exceeds 10MB. Please reduce CV content and try again.");
-                return;
+
+            console.log(`Generated PDF size: ${(pdfBlob.size / 1024 / 1024).toFixed(2)} MB`);
+
+            if (type === 'download') {
+                pdf.save(fileName);
+                toastMessage.success("PDF downloaded!");
+                return { success: true };
             }
 
-            const fileName = `${cvData.personalInfo?.fullName || "Resume"}_CV.pdf`;
+            setStep("Uploading...");
             const formData = new FormData();
             formData.append("files", new File([pdfBlob], fileName, { type: "application/pdf" }));
             const uploadResult = await uploadFiles(formData).unwrap();
             const uploadedUrl = (Array.isArray(uploadResult) ? uploadResult[0] : uploadResult)?.downloadUrl;
             if (!uploadedUrl) throw new Error("Upload failed");
 
-            await exportResumeToOriginal({ resumeId, payload: { resumeUrl: uploadedUrl, fileName } }).unwrap();
-            toastMessage.success("CV exported! You can now use it to apply for jobs.");
-            navigate("/dashboard/resumes");
+            setStep("Finalizing...");
+            await exportResumeToOriginal({
+                resumeId,
+                payload: {
+                    resumeUrl: uploadedUrl,
+                    fileName,
+                    resumeName: cvName
+                }
+            }).unwrap();
+
+            return { success: true, resumeId };
         } catch (err) {
-            console.error("Export to apply error:", err);
-            toastMessage.error("Failed to export CV. Please try again.");
-        } finally {
-            setIsExporting(false);
+            console.error("Export action error:", err);
+            throw err;
         }
     };
 
@@ -523,7 +550,7 @@ export default function CvBuilder({ onBack }) {
         try {
             // Save personal info
             try {
-                const currentTemplate = searchParams.get('template') || 'tpl_modern_1';
+                const currentTemplate = searchParams.get('template') || 'tpl_prof_2';
                 await updateCandidateResume({
                     resumeId,
                     payload: {
@@ -830,7 +857,7 @@ export default function CvBuilder({ onBack }) {
 
 
 
-    const templateId = searchParams.get('template') || 'tpl_modern_1';
+    const templateId = searchParams.get('template') || 'tpl_prof_2';
 
     useEffect(() => {
         if (resumeId && templateId) {
@@ -838,10 +865,8 @@ export default function CvBuilder({ onBack }) {
         }
     }, [resumeId, templateId]);
 
-    let TemplateComponent = ModernMinimalistTemplate;
+    let TemplateComponent = ProfessionalTemplate;
     if (templateId === 'tpl_prof_1') TemplateComponent = ExecutiveProfessionalTemplate;
-    if (templateId === 'tpl_creative_1') TemplateComponent = CreativeStudioTemplate;
-    if (templateId === 'tpl_modern_2') TemplateComponent = TechInnovatorTemplate;
     if (templateId === 'tpl_prof_2') TemplateComponent = ProfessionalTemplate;
 
     const handleAvatarUpload = async (event) => {
@@ -931,7 +956,7 @@ export default function CvBuilder({ onBack }) {
                                 {isSaving ? <Loading size={16} inline /> : <Save size={16} />}
                                 {isSaving ? "Saving..." : "Save CV"}
                             </Button>
-                            <Button
+                            {/* <Button
                                 mode="primary"
                                 shape="rounded"
                                 onClick={handleDownloadPdf}
@@ -939,7 +964,7 @@ export default function CvBuilder({ onBack }) {
                                 className="px-4 py-2 bg-[#1F8A70] text-white rounded-md text-sm font-medium hover:bg-[#19755f] flex items-center gap-2">
                                 {isDownloadingPdf ? <Loading size={16} inline /> : <Download size={16} />}
                                 {isDownloadingPdf ? "Downloading..." : "Download PDF"}
-                            </Button>
+                            </Button> */}
                             <Button
                                 mode="primary"
                                 shape="rounded"
@@ -968,6 +993,17 @@ export default function CvBuilder({ onBack }) {
                     />
                 </div>
             </div>
+
+            <ExportCvModal
+                open={showExportModal}
+                onClose={() => setShowExportModal(false)}
+                previewImage={previewImage}
+                resumeName={resumeData?.resumeName}
+                jobId={jobId}
+                jobTitle={jobData?.name}
+                companyName={jobData?.company?.name}
+                onExport={handleExportAction}
+            />
         </CvBuilderContext.Provider>
     );
 }

@@ -33,7 +33,7 @@ const SimilarJobsCard = () => {
     // Skeleton loader
     const SkeletonItem = () => (
         <div className="animate-pulse flex items-start gap-3 py-3">
-            <div className="w-10 h-10 rounded-lg bg-gray-200 shrink-0"></div>
+            <div className="w-10 h-10 bg-gray-200 shrink-0"></div>
             <div className="flex-1 space-y-2">
                 <div className="h-3.5 bg-gray-200 rounded w-4/5"></div>
                 <div className="h-3 bg-gray-200 rounded w-3/5"></div>
@@ -67,7 +67,7 @@ const SimilarJobsCard = () => {
                             className="flex items-start gap-3 py-3 cursor-pointer group hover:bg-gray-50/50 -mx-2 px-2 rounded-lg transition-colors"
                         >
                             {/* Logo */}
-                            <div className="w-10 h-10 rounded-lg border border-gray-100 bg-white p-1 shrink-0 flex items-center justify-center overflow-hidden">
+                            <div className="w-10 h-10 border border-gray-100 bg-white p-1 shrink-0 flex items-center justify-center overflow-hidden">
                                 {job.companyLogo ? (
                                     <img src={job.companyLogo} alt={job.company} className="w-full h-full object-contain" />
                                 ) : (

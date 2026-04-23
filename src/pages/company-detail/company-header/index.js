@@ -14,12 +14,12 @@ const CompanyHeader = ({ company }) => {
         <div className="bg-white dark:bg-[#2c1a14] rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100 dark:border-[#3d241b] mb-6">
             <div className="flex flex-col md:flex-row items-start gap-6">
                 {/* Logo */}
-                <div className="size-24 md:size-32 rounded-2xl bg-white p-2 shadow-sm border border-slate-100 dark:border-white/10 shrink-0">
+                <div className="size-24 md:size-32 rounded-none bg-white p-2 shadow-sm border border-slate-100 dark:border-white/10 shrink-0">
                     {company.logo ? (
                         <img
                             src={company.logo}
                             alt={`${company.name} logo`}
-                            className="w-full h-full object-contain rounded-xl"
+                            className="w-full h-full object-contain rounded-none"
                         />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center bg-slate-50 dark:bg-white/5">
