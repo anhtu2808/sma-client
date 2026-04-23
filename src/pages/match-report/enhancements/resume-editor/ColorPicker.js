@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Palette } from 'lucide-react';
 
 const CV_COLORS = [
@@ -18,24 +19,47 @@ const CV_COLORS = [
 
 const ColorPicker = ({ editor }) => {
   const [open, setOpen] = useState(false);
-  const ref = useRef(null);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+  const btnRef = useRef(null);
+  const popRef = useRef(null);
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    if (!open) return;
+
+    const updatePos = () => {
+      const rect = btnRef.current?.getBoundingClientRect();
+      if (rect) setPos({ top: rect.bottom + 4, left: rect.left });
     };
-    if (open) document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    updatePos();
+
+    const handleClickOutside = (e) => {
+      if (
+        !btnRef.current?.contains(e.target) &&
+        !popRef.current?.contains(e.target)
+      ) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    window.addEventListener('resize', updatePos);
+    window.addEventListener('scroll', updatePos, true);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('resize', updatePos);
+      window.removeEventListener('scroll', updatePos, true);
+    };
   }, [open]);
 
   const currentColor = editor?.getAttributes('textStyle')?.color || '#000000';
 
   return (
-    <div className="relative" ref={ref}>
+    <>
       <button
+        ref={btnRef}
         type="button"
         onClick={() => setOpen(!open)}
-        className="p-1.5 flex items-center justify-center rounded text-gray-700 hover:bg-gray-200 transition-colors"
+        className="relative p-1.5 flex items-center justify-center rounded text-gray-700 hover:bg-gray-200 transition-colors"
       >
         <Palette size={18} strokeWidth={2} />
         <div
@@ -43,37 +67,43 @@ const ColorPicker = ({ editor }) => {
           style={{ backgroundColor: currentColor }}
         />
       </button>
-      {open && (
-        <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-20 grid grid-cols-4 gap-1 w-[136px]">
-          {CV_COLORS.map((c) => (
+      {open &&
+        createPortal(
+          <div
+            ref={popRef}
+            style={{ position: 'fixed', top: pos.top, left: pos.left, zIndex: 1000 }}
+            className="bg-white border border-gray-200 rounded-lg shadow-lg p-2 grid grid-cols-4 gap-1 w-[136px]"
+          >
+            {CV_COLORS.map((c) => (
+              <button
+                key={c.value}
+                type="button"
+                title={c.label}
+                onClick={() => {
+                  editor.chain().focus().setColor(c.value).run();
+                  setOpen(false);
+                }}
+                className={`w-7 h-7 rounded-md border-2 transition-transform hover:scale-110 ${
+                  currentColor === c.value ? 'border-primary ring-1 ring-primary' : 'border-gray-200'
+                }`}
+                style={{ backgroundColor: c.value }}
+              />
+            ))}
             <button
-              key={c.value}
               type="button"
-              title={c.label}
+              title="Remove color"
               onClick={() => {
-                editor.chain().focus().setColor(c.value).run();
+                editor.chain().focus().unsetColor().run();
                 setOpen(false);
               }}
-              className={`w-7 h-7 rounded-md border-2 transition-transform hover:scale-110 ${
-                currentColor === c.value ? 'border-primary ring-1 ring-primary' : 'border-gray-200'
-              }`}
-              style={{ backgroundColor: c.value }}
-            />
-          ))}
-          <button
-            type="button"
-            title="Remove color"
-            onClick={() => {
-              editor.chain().focus().unsetColor().run();
-              setOpen(false);
-            }}
-            className="w-7 h-7 rounded-md border-2 border-gray-200 hover:scale-110 transition-transform flex items-center justify-center text-gray-400 text-xs bg-white"
-          >
-            ✕
-          </button>
-        </div>
-      )}
-    </div>
+              className="w-7 h-7 rounded-md border-2 border-gray-200 hover:scale-110 transition-transform flex items-center justify-center text-gray-400 text-xs bg-white"
+            >
+              ✕
+            </button>
+          </div>,
+          document.body
+        )}
+    </>
   );
 };
 

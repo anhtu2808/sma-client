@@ -14,27 +14,27 @@ const Home = () => {
         <div className="flex flex-col">
             <HeroSection />
 
-            <Reveal delay={0.2}>
+            <Reveal>
                 <InteractiveFeaturesSection />
             </Reveal>
 
-            <Reveal delay={0.2}>
+            <Reveal>
                 <AIMatchingSection />
             </Reveal>
 
-            <Reveal delay={0.2}>
+            <Reveal>
                 <DashboardPreviewSection />
             </Reveal>
 
-            <Reveal delay={0.2}>
+            <Reveal>
                 <FeaturesSection />
             </Reveal>
 
-            <Reveal delay={0.2}>
+            <Reveal>
                 <CandidateFAQ />
             </Reveal>
 
-            <Reveal delay={0.2}>
+            <Reveal>
                 <CTASection />
             </Reveal>
         </div>
