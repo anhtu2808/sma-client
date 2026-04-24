@@ -39,9 +39,10 @@ const ResumeSelection = ({
         >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {resumes?.map((resume) => {
-                    const isSelected = selectedResumeId === resume.id && !newlyUploadedResume;
+                    const isSelected = selectedResumeId === resume.id;
                     const score = getEvaluationHistoryScore(resume);
                     const evaluationId = getEvaluationHistoryId(resume);
+                    const isNew = newlyUploadedResume?.id === resume.id;
 
                     return (
                         <div
@@ -112,7 +113,7 @@ const ResumeSelection = ({
                     );
                 })}
 
-                {newlyUploadedResume && (
+                {/* {newlyUploadedResume && (
                     <div
                         onClick={() => onSelectResume(newlyUploadedResume.id, true)}
                         className={`group relative p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${selectedResumeId === newlyUploadedResume.id
@@ -135,7 +136,7 @@ const ResumeSelection = ({
                             </div>
                         )}
                     </div>
-                )}
+                )} */}
 
                 <label className="flex items-center justify-center gap-3 p-4 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:bg-gray-50 hover:border-orange-200 transition-all group">
                     {isUploading ? (
