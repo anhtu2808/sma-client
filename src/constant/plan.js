@@ -1,6 +1,6 @@
 export const PLAN_TYPES = Object.freeze({
     MAIN: "MAIN",
-    ADDONS_FEATURES: "ADDONS_FEATURES",
+    ADDONS_FEATURE: "ADDONS_FEATURE",
     ADDONS_QUOTA: "ADDONS_QUOTA",
 });
 

@@ -83,7 +83,13 @@ const PaymentModal = ({ isOpen, onClose, plan, selectedDuration, onSuccess }) =>
         : months > 0
             ? `${months} month${months > 1 ? 's' : ''}`
             : '';
+    const activePriceFromPlan = plan?.planPrices?.find(p =>
+        selectedDuration ? p.id === Number(selectedDuration) : p.isActive
+    );
 
+    const actualOriginal = activePriceFromPlan?.originalPrice || 0;
+    const actualSale = activePriceFromPlan?.salePrice || 0;
+    const hasDiscount = actualSale < actualOriginal;
     const handleClose = () => {
         if (paymentStatus === "SUCCESS" && onSuccess) {
             onSuccess();
@@ -139,26 +145,38 @@ const PaymentModal = ({ isOpen, onClose, plan, selectedDuration, onSuccess }) =>
                         {previewData?.isUpgrade ? (
                             <>
                                 <div className="flex items-baseline gap-2">
-                                    <span className="text-lg text-gray-400 line-through">
-                                        {formatCurrency(previewData.originalPrice)}
-                                    </span>
+                                    {hasDiscount && (
+                                        <span className="text-lg text-gray-400 line-through">
+                                            {formatCurrency(actualOriginal)}
+                                        </span>
+                                    )}
+
                                     <span className="text-3xl font-extrabold text-[#111e3b]">
                                         {formatCurrency(previewData.upgradePrice)}
                                     </span>
                                 </div>
-                                <p className="text-xs text-green-600 mt-1 font-medium">
-                                    Upgrade discount applied — prorated from {previewData.currentPlanName}
-                                </p>
-                            </>
-                        ) : previewData?.isScheduled ? (
-                            <>
-                                <span className="text-3xl font-extrabold text-[#111e3b]">{totalPrice}</span>
-                                <p className="text-xs text-amber-600 mt-1 font-medium">
-                                    Your new plan will activate after your current plan ({previewData.currentPlanName}) expires
-                                </p>
+
+                                {previewData.upgradePrice < actualSale ? (
+                                    <p className="text-xs text-green-600 mt-1 font-medium">
+                                        Upgrade discount & Promo applied — prorated from {previewData.currentPlanName}
+                                    </p>
+                                ) : (
+                                    <p className="text-xs text-gray-500 mt-1 font-medium">
+                                        Prorated price from {previewData.currentPlanName}
+                                    </p>
+                                )}
                             </>
                         ) : (
-                            <span className="text-3xl font-extrabold text-[#111e3b]">{totalPrice}</span>
+                            <div className="flex items-baseline gap-2">
+                                {hasDiscount && (
+                                    <span className="text-lg text-gray-400 line-through">
+                                        {formatCurrency(actualOriginal)}
+                                    </span>
+                                )}
+                                <span className="text-3xl font-extrabold text-[#111e3b]">
+                                    {formatCurrency(actualSale)}
+                                </span>
+                            </div>
                         )}
                     </div>
                     {durationLabel && (
@@ -171,7 +189,6 @@ const PaymentModal = ({ isOpen, onClose, plan, selectedDuration, onSuccess }) =>
                         </div>
                     </div>
 
-                    {/* Payment Instructions */}
                     <div className="w-full text-left bg-[#fff8f5] border border-[#ffeedd] rounded-2xl p-4 mt-4">
                         <div className="flex items-center gap-2 mb-3">
                             <span className="text-[#3b4356] font-bold text-sm">Payment Instructions</span>
@@ -193,7 +210,6 @@ const PaymentModal = ({ isOpen, onClose, plan, selectedDuration, onSuccess }) =>
                     </div>
                 </div>
 
-                {/* Right Column - QR Payment or Scheduled */}
                 {previewData?.isScheduled && !qrCodeUrl && !isApiLoading ? (
                     <div className="flex flex-col items-center justify-center text-center py-8">
                         <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mb-4">

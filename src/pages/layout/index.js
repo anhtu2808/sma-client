@@ -16,13 +16,13 @@ const Layout = () => {
             </main>
             <Footer />
 
-            <Link
+            {/* <Link
                 to="/ui-kit"
                 className="fixed bottom-2 right-2 p-2 bg-gray-100 dark:bg-gray-800 rounded-full opacity-20 hover:opacity-100 transition-opacity z-[100]"
                 title="UI Kit"
             >
                 <FontAwesomeIcon icon={faPalette} className="text-xs" />
-            </Link>
+            </Link> */}
         </div>
     );
 };
