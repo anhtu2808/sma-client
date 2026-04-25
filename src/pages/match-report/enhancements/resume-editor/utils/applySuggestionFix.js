@@ -3,13 +3,10 @@ import {
   setDetailContext,
   setDetailFixed,
   setDetailPinnedRange,
-  setFocusedItemId,
   updateScoresAfterFixed,
 } from '@/store/slices/matchingReportSlice';
 import toastMessage from '@/utils/toastMessage';
 import { stripHtml } from './prosemirrorSearch';
-
-const FOCUS_DURATION_MS = 2500;
 
 const getCriteriaScoreForDetail = (criteriaScores, detailId) => {
   for (const criteriaScore of criteriaScores ?? []) {
@@ -97,8 +94,6 @@ export const applySuggestionFix = async ({
     }
 
     toastMessage.success('Fix applied successfully.');
-    dispatch(setFocusedItemId(detailId));
-    setTimeout(() => dispatch(setFocusedItemId(null)), FOCUS_DURATION_MS);
 
     return {
       success: true,

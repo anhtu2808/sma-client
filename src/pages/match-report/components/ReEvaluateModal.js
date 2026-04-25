@@ -15,7 +15,8 @@ import Loading from "@/components/Loading";
 import { getErrorMessage, normalizeParseStatus } from "@/constant/attachment";
 import { RESUME_TYPES } from "@/constant";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCloudArrowUp, faFileArrowUp, faTrashCan, faWandMagicSparkles } from '../../../utils/icons';
+import { faCloudArrowUp, faFileArrowUp, faTrashCan } from '../../../utils/icons';
+import { Sparkles } from 'lucide-react';
 
 dayjs.extend(relativeTime);
 
@@ -363,7 +364,7 @@ const ReEvaluateModal = ({ open, onClose, jobId, currentResumeId, currentScore }
           disabled={!canSubmit || isStartingMatching}
           className="inline-flex h-11 items-center gap-2 rounded-lg bg-primary px-6 text-sm font-semibold text-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <FontAwesomeIcon icon={faWandMagicSparkles} className="text-[18px]" />
+          <Sparkles size={18} />
           {isStartingMatching ? "Starting..." : "Check Match with AI"}
         </button>
       </div>

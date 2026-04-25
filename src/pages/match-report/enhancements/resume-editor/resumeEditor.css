@@ -263,3 +263,25 @@
   background: none;
   font-size: 0.875rem;
 }
+
+.tiptap-content ins.diff-add,
+.version-diff ins.diff-add {
+  background: #d1fae5;
+  text-decoration: none;
+  padding: 0 2px;
+  border-radius: 2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.tiptap-content del.diff-del,
+.version-diff del.diff-del {
+  background: #fee2e2;
+  color: #9ca3af;
+  text-decoration: line-through;
+  padding: 0 2px;
+  border-radius: 2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+

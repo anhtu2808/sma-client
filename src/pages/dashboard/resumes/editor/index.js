@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button as AntButton } from 'antd';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, FileWarning, FolderOpen } from 'lucide-react';
 
 import { useGetResumeQuery } from '@/apis/resumeApi';
 import Loading from '@/components/Loading';
@@ -20,9 +20,43 @@ const ResumeEditorPage = () => {
 
   if (error || !resumeData) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen gap-4">
-        <p className="text-gray-500">Resume not found or you don't have permission to edit it.</p>
-        <AntButton onClick={() => navigate('/dashboard/resumes')}>Back to Resumes</AntButton>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-orange-50/40 px-6">
+        <div className="w-full max-w-lg">
+          <div className="relative bg-white rounded-3xl shadow-xl shadow-gray-200/60 border border-gray-100 px-8 py-12 sm:px-12 sm:py-14 text-center overflow-hidden">
+            <div className="pointer-events-none absolute -top-24 -right-24 w-64 h-64 rounded-full bg-orange-100/60 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-24 -left-24 w-64 h-64 rounded-full bg-amber-100/40 blur-3xl" />
+
+            <div className="relative mx-auto mb-7 w-20 h-20 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center shadow-lg shadow-orange-500/30">
+              <FileWarning size={40} className="text-white" strokeWidth={2} />
+            </div>
+
+            <h2 className="relative text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+              Resume not available
+            </h2>
+            <p className="relative mt-3 text-sm sm:text-base text-gray-500 leading-relaxed max-w-sm mx-auto">
+              This resume doesn't exist or you don't have permission to edit it. Head back to your resume library to continue.
+            </p>
+
+            <div className="relative mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold px-6 py-3 transition-all"
+              >
+                <ArrowLeft size={18} />
+                Go back
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/dashboard/resumes')}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-3 shadow-md shadow-orange-500/20 transition-all"
+              >
+                <FolderOpen size={18} />
+                Back to Resumes
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

@@ -1,9 +1,22 @@
-import React from 'react';
-import { FileText, CheckCircle2, Upload, Briefcase, Sparkles, Eye } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { Modal } from 'antd';
+import { FileText, CheckCircle2, Upload, Briefcase, Sparkles, Eye, Clock } from 'lucide-react';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import Loading from '@/components/Loading';
 import StepWrapper from './StepWrapper';
 import { useNavigate } from 'react-router-dom';
 import { getEvaluationHistoryScore, getEvaluationHistoryId } from '@/pages/job-detail/check-match-modal/matchHistory';
+import PdfCvViewer from '@/pages/cv-preview/pdf-viewer';
+
+dayjs.extend(relativeTime);
+
+const getScoreColor = (score) => {
+    if (score >= 80) return 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100';
+    if (score >= 60) return 'bg-lime-50 text-lime-700 border-lime-200 hover:bg-lime-100';
+    if (score >= 40) return 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100';
+    return 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100';
+};
 
 const ResumeSelection = ({
     jobId,
@@ -16,20 +29,35 @@ const ResumeSelection = ({
     isStartingMatching
 }) => {
     const navigate = useNavigate();
+    const [previewResume, setPreviewResume] = useState(null);
 
-    const handleActionClick = (e, resume) => {
+    const sortedResumes = useMemo(() => {
+        if (!resumes) return [];
+        const getTime = (r) => {
+            const t = r.updatedAt || r.createdAt;
+            return t ? new Date(t).getTime() : 0;
+        };
+        return [...resumes].sort((a, b) => getTime(b) - getTime(a));
+    }, [resumes]);
+
+    const handleScoreClick = (e, resume) => {
         e.stopPropagation();
         const evaluationId = getEvaluationHistoryId(resume);
-
         if (evaluationId) {
             navigate(`/match-report/${evaluationId}`, {
                 state: { jobId, resumeId: resume.id, matchSource: "existing" }
             });
-        } else {
-            if (onCheckMatch) {
-                onCheckMatch(resume.id);
-            }
         }
+    };
+
+    const handleCheckMatchClick = (e, resume) => {
+        e.stopPropagation();
+        if (onCheckMatch) onCheckMatch(resume.id);
+    };
+
+    const handlePreviewClick = (e, resume) => {
+        e.stopPropagation();
+        setPreviewResume(resume);
     };
     return (
         <StepWrapper
@@ -37,8 +65,8 @@ const ResumeSelection = ({
             title="Select Resume"
             step="01"
         >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {resumes?.map((resume) => {
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                {sortedResumes.map((resume) => {
                     const isSelected = selectedResumeId === resume.id;
                     const score = getEvaluationHistoryScore(resume);
                     const evaluationId = getEvaluationHistoryId(resume);
@@ -60,45 +88,54 @@ const ResumeSelection = ({
 
                             {/* Main Content: Info & Score */}
                             <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 overflow-hidden">
-                                    <p
-                                        className="text-sm font-semibold text-gray-900 truncate"
-                                        title={resume.resumeName || resume.fileName}
-                                    >
-                                        {resume.resumeName || resume.fileName}
-                                    </p>
-
-                                    {score !== null && score !== undefined && (
-                                        <div className="flex shrink-0 items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-100">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                            <span className="text-[11px] font-black whitespace-nowrap">{score}% Match</span>
+                                <p
+                                    className="text-sm font-semibold text-gray-900 truncate"
+                                    title={resume.resumeName || resume.fileName}
+                                >
+                                    {resume.resumeName || resume.fileName}
+                                </p>
+                                <div className="mt-1 flex items-center gap-2 flex-wrap">
+                                    {(resume.updatedAt || resume.createdAt) && (
+                                        <div className="flex items-center gap-1 text-[11px] text-gray-500">
+                                            <Clock size={11} />
+                                            <span title={dayjs(resume.updatedAt || resume.createdAt).format('DD/MM/YYYY HH:mm')}>
+                                                Uploaded {dayjs(resume.updatedAt || resume.createdAt).fromNow()}
+                                            </span>
                                         </div>
                                     )}
+                                    {score !== null && score !== undefined ? (
+                                        <button
+                                            type="button"
+                                            onClick={(e) => handleScoreClick(e, resume)}
+                                            title="View match report"
+                                            className={`flex shrink-0 items-center gap-1 px-2 py-0.5 rounded-md border transition-colors cursor-pointer ${getScoreColor(score)}`}
+                                        >
+                                            <span className="text-[12px] font-black whitespace-nowrap">{Math.round(score)}</span>
+                                        </button>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            disabled={isStartingMatching}
+                                            onClick={(e) => handleCheckMatchClick(e, resume)}
+                                            title="Check AI Match"
+                                            className="flex shrink-0 items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-600 border border-indigo-100 hover:bg-indigo-100 transition-colors cursor-pointer disabled:opacity-60"
+                                        >
+                                            <Sparkles size={11} />
+                                            <span className="text-[11px] font-semibold whitespace-nowrap">Check</span>
+                                        </button>
+                                    )}
                                 </div>
-                                {/* <p className="text-[11px] text-gray-500 mt-1">
-                                    Last updated: {resume.updatedAt ? new Date(resume.updatedAt).toLocaleDateString('vi-VN') : 'N/A'}
-                                </p> */}
                             </div>
 
                             {/* Right Actions: Buttons & Selection */}
                             <div className="flex items-center gap-2 shrink-0 ml-auto">
                                 <button
                                     type="button"
-                                    disabled={isStartingMatching}
-                                    onClick={(e) => handleActionClick(e, resume)}
-                                    className={`flex items-center justify-center w-9 h-9 rounded-xl transition-all ${evaluationId
-                                        ? 'bg-amber-100 text-amber-600 hover:bg-amber-200'
-                                        : 'bg-indigo-100 text-indigo-600 hover:bg-indigo-200'
-                                        }`}
-                                    title={evaluationId ? 'View Report' : 'Check AI Match'}
+                                    onClick={(e) => handlePreviewClick(e, resume)}
+                                    className="flex items-center justify-center w-9 h-9 rounded-xl bg-transparent text-gray-700 hover:bg-black/5 hover:text-gray-900 transition-all"
+                                    title="Preview resume"
                                 >
-                                    {isStartingMatching ? (
-                                        <Loading inline size={16} />
-                                    ) : evaluationId ? (
-                                        <Eye size={18} />
-                                    ) : (
-                                        <Sparkles size={18} />
-                                    )}
+                                    <Eye size={18} />
                                 </button>
 
                                 <div className="flex items-center justify-center w-6">
@@ -148,6 +185,26 @@ const ResumeSelection = ({
                     <input type="file" className="hidden" onChange={onUpload} accept=".pdf,.doc,.docx" />
                 </label>
             </div>
+
+            <Modal
+                open={!!previewResume}
+                onCancel={() => setPreviewResume(null)}
+                footer={null}
+                width={1200}
+                title={previewResume?.resumeName || previewResume?.fileName || 'Resume Preview'}
+                destroyOnClose
+                styles={{ body: { padding: 0, height: '85vh' } }}
+            >
+                {previewResume?.resumeUrl ? (
+                    <div className="h-full w-full">
+                        <PdfCvViewer fileUrl={previewResume.resumeUrl} />
+                    </div>
+                ) : (
+                    <div className="flex h-full items-center justify-center text-sm text-gray-500">
+                        No file available for preview.
+                    </div>
+                )}
+            </Modal>
         </StepWrapper>
     );
 };

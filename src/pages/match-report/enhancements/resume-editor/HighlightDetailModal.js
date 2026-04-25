@@ -20,6 +20,7 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
   const dispatch = useDispatch();
   const popoverRef = useRef(null);
   const cleanupRef = useRef(null);
+  const scrolledForDetailRef = useRef(null);
   const [regenerateSuggestion] = useRegenerateSuggestionMutation();
   const [regeneratingSuggestionId, setRegeneratingSuggestionId] = useState(null);
   const [isApplying, setIsApplying] = useState(false);
@@ -53,8 +54,10 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
     setActiveIdx(idx >= 0 ? idx : 0);
   }, [detail?.id, siblings]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Position popover below the clicked highlight.
   useEffect(() => {
+    if (!open) {
+      scrolledForDetailRef.current = null;
+    }
     if (!open || !detail || !popoverRef.current) return undefined;
 
     const popover = popoverRef.current;
@@ -68,9 +71,8 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
       return undefined;
     }
 
-    // Mixed tags carry multiple badges under one wrapper; the wrapper's
-    // data-detail-id only reflects the first badge. Look up the badge first,
-    // then fall back to the wrapper for single-status tags.
+    // Mixed tags share a wrapper whose data-detail-id reflects only the first
+    // badge — query the badge directly first.
     const badgeEl = document.querySelector(
       `.suggestion-tag__badge[data-detail-id="${anchorDetailId}"]`
     );
@@ -88,26 +90,57 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
       return undefined;
     }
 
-    tagEl.scrollIntoView({ block: 'center', behavior: 'instant' });
+    // Anchor on the highlighted text span, not the badge (which floats 26px
+    // above the text and would cause the popover to overlap the highlight).
+    const highlightEl = editorScroller.querySelector(
+      `.suggestion-highlight[data-detail-id*="${anchorDetailId}"]`
+    );
+    const anchorEl = highlightEl || badgeEl || tagEl;
 
-    const anchorEl =
-      badgeEl ||
-      tagEl.querySelector(`.suggestion-tag__badge[data-detail-id="${anchorDetailId}"]`) ||
-      tagEl.querySelector('.suggestion-tag__badge') ||
-      tagEl;
+    // Only scroll into view the first time we open this modal for a given
+    // detail. Re-running positioning (e.g. after a state update) shouldn't
+    // re-scroll and disrupt the user.
+    // Native scrollIntoView({behavior:'smooth'}) stutters on the Tiptap-heavy
+    // container; rAF easing on scrollTop gives a consistently smooth result.
+    if (scrolledForDetailRef.current !== anchorDetailId) {
+      scrolledForDetailRef.current = anchorDetailId;
+      const anchorRect = anchorEl.getBoundingClientRect();
+      const sRect = editorScroller.getBoundingClientRect();
+      const targetTop =
+        editorScroller.scrollTop +
+        (anchorRect.top - sRect.top) -
+        (editorScroller.clientHeight - anchorRect.height) / 2;
+      const startTop = editorScroller.scrollTop;
+      const maxTop = editorScroller.scrollHeight - editorScroller.clientHeight;
+      const clampedTarget = Math.max(0, Math.min(maxTop, targetTop));
+      const distance = clampedTarget - startTop;
+      if (Math.abs(distance) > 1) {
+        const duration = Math.min(450, 200 + Math.abs(distance) * 0.4);
+        const startTime = performance.now();
+        const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+        const step = (now) => {
+          const t = Math.min(1, (now - startTime) / duration);
+          editorScroller.scrollTop = startTop + distance * easeOutCubic(t);
+          if (t < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      }
+    }
+
     const hlRect = anchorEl.getBoundingClientRect();
     const scrollerRect = editorScroller.getBoundingClientRect();
 
-    // Measure popover height (default to max 400 before first paint).
     const popoverHeight = popover.offsetHeight || 400;
-    const spaceAbove = hlRect.top - scrollerRect.top;
+    // Reserve space for the badge that floats above the highlighted text.
+    const BADGE_OFFSET = 26;
+    const GAP = 8;
+    const spaceAbove = hlRect.top - scrollerRect.top - BADGE_OFFSET;
     const spaceBelow = scrollerRect.bottom - hlRect.bottom;
-    // Prefer above; fall back to below only when not enough room above.
-    const placeAbove = spaceAbove >= popoverHeight + 8 || spaceAbove >= spaceBelow;
+    const placeAbove = spaceAbove >= popoverHeight + GAP || spaceAbove >= spaceBelow;
 
     const top = placeAbove
-      ? hlRect.top - scrollerRect.top + editorScroller.scrollTop - popoverHeight - 8
-      : hlRect.bottom - scrollerRect.top + editorScroller.scrollTop + 8;
+      ? hlRect.top - scrollerRect.top + editorScroller.scrollTop - popoverHeight - GAP - BADGE_OFFSET
+      : hlRect.bottom - scrollerRect.top + editorScroller.scrollTop + GAP;
     const left = Math.max(8, hlRect.left - scrollerRect.left);
     const maxLeft = scrollerRect.width - 580;
 
@@ -117,7 +150,7 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
     return resetPosition;
   }, [open, detail, anchorDetailId]);
 
-  // Close on outside click / Escape. Delayed listener attach avoids closing from the opening click.
+  // Delayed attach so the opening click itself doesn't close the modal.
   useEffect(() => {
     if (!open) return;
 
@@ -202,15 +235,15 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
     if (!firstSuggestion || !applySuggestion || !activeDetail.context) return;
 
     setIsApplying(true);
-    const result = await applySuggestion({
+    // Close before the apply pipeline runs — its editor re-render, badge
+    // recolor and decoration rebuilds cause visible jitter if the modal stays.
+    onClose();
+    await applySuggestion({
       detailId: activeDetail.id,
       context: activeDetail.context,
       suggestionText: firstSuggestion,
       detailIds: siblings.map((s) => s.id),
     });
-    if (result?.success) {
-      onClose();
-    }
     setIsApplying(false);
   };
 

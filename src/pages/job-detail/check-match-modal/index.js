@@ -16,7 +16,8 @@ import { getErrorMessage } from "@/constant/attachment";
 import { getEvaluationHistoryId, getResumeMatchMode } from "./matchHistory";
 import ResumeOption from "./resume-option";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCloudArrowUp, faWandMagicSparkles } from '../../../utils/icons';
+import { faCloudArrowUp } from '../../../utils/icons';
+import { Sparkles } from 'lucide-react';
 
 const isSupportedResumeFile = (fileName = "") => /\.(pdf|doc|docx)$/i.test(`${fileName}`.trim());
 
@@ -217,7 +218,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
     >
       <div className="-mx-6 -mt-2 rounded-t-xl border-b border-gray-100 bg-gray-50/80 px-6 pb-5">
         <h3 className="flex items-center gap-2 text-2xl font-bold text-gray-900">
-          <FontAwesomeIcon icon={faWandMagicSparkles} className="text-primary" />
+          <Sparkles size={24} className="text-primary" />
           Select Resume to Match
         </h3>
         <p className="mt-1 text-sm text-gray-600">
@@ -227,7 +228,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
 
       <div className="-mr-3 max-h-[62vh] overflow-y-auto pr-3 pt-6">
         {isResumesLoading ? (
-          <Loading size={80} className="py-8" />
+          <Loading />
         ) : resumes.length === 0 ? (
           <div className="rounded-xl border border-gray-200 bg-gray-50 p-6 text-center">
             <p className="text-sm font-medium text-gray-700">No resume found.</p>
@@ -288,7 +289,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
           disabled={!canSubmit || isStartingMatching}
           className="inline-flex h-11 items-center gap-2 rounded-lg bg-primary px-6 text-sm font-semibold text-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <FontAwesomeIcon icon={faWandMagicSparkles} className="text-[18px]" />
+          <Sparkles size={18} />
           {isStartingMatching ? "Starting..." : "Check Match with AI"}
         </button>
       </div>

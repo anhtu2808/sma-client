@@ -48,7 +48,7 @@ const CTAButtons = () => {
         }
         if (attempt > 0 && lastStatus !== 'APPLIED') {
             return {
-                text: "APPLICATION IN PROCESSED",
+                text: "Application in process",
                 disabled: true,
                 mode: "secondary",
                 note: "Your application is currently being processed and cannot re-apply."

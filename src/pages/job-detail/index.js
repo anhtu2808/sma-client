@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams, useNavigate, Link, Outlet } from 'react-router-dom';
+import { SearchX, ArrowLeft, Briefcase } from 'lucide-react';
 import { useGetJobByIdQuery } from '@/apis/jobApi';
 import Button from '@/components/Button';
 import Loading from '@/components/Loading';
@@ -30,9 +31,43 @@ const JobDetail = () => {
 
     if (isError || !jobData) {
         return (
-            <div className="min-h-screen flex flex-col justify-center items-center bg-[#F3F4F6]">
-                <h2 className="text-xl font-bold text-red-500 mb-4">Job not found or failed to load.</h2>
-                <Button mode="secondary" onClick={() => navigate('/jobs')}>Back to Jobs</Button>
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F3F4F6] via-white to-orange-50/40 px-6">
+                <div className="w-full max-w-lg">
+                    <div className="relative bg-white rounded-3xl shadow-xl shadow-gray-200/60 border border-gray-100 px-8 py-12 sm:px-12 sm:py-14 text-center overflow-hidden">
+                        <div className="pointer-events-none absolute -top-24 -right-24 w-64 h-64 rounded-full bg-orange-100/60 blur-3xl" />
+                        <div className="pointer-events-none absolute -bottom-24 -left-24 w-64 h-64 rounded-full bg-amber-100/40 blur-3xl" />
+
+                        <div className="relative mx-auto mb-7 w-20 h-20 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center shadow-lg shadow-orange-500/30">
+                            <SearchX size={40} className="text-white" strokeWidth={2} />
+                        </div>
+
+                        <h2 className="relative text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                            Job not found
+                        </h2>
+                        <p className="relative mt-3 text-sm sm:text-base text-gray-500 leading-relaxed max-w-sm mx-auto">
+                            The job you're looking for may have been removed, expired, or the link is incorrect. Try browsing other opportunities instead.
+                        </p>
+
+                        <div className="relative mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+                            <button
+                                type="button"
+                                onClick={() => navigate(-1)}
+                                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold px-6 py-3 transition-all"
+                            >
+                                <ArrowLeft size={18} />
+                                Go back
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => navigate('/jobs')}
+                                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-3 shadow-md shadow-orange-500/20 transition-all"
+                            >
+                                <Briefcase size={18} />
+                                Browse all jobs
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

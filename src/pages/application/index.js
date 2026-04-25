@@ -277,7 +277,7 @@ const Application = () => {
     };
     return (
         <div className="min-h-screen bg-[#F3F4F6] py-10 px-6 font-body">
-            <div className="max-w-5xl mx-auto">
+            <div className="max-w-7xl mx-auto">
                 <Header />
 
                 <Card className="!p-8 md:!p-10 border border-gray-100 bg-white shadow-sm hover:shadow-md rounded-2xl">

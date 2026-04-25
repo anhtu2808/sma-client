@@ -157,10 +157,10 @@ const MenuBar = ({
               type="button"
               onClick={onReScore}
               disabled={isReScoreBusy}
-              className="flex items-center justify-center rounded-lg w-8 h-8 text-white transition-all disabled:opacity-60 disabled:cursor-not-allowed bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 shadow-sm"
+              className="flex items-center justify-center rounded-lg w-9 h-9 text-white transition-all disabled:opacity-60 disabled:cursor-not-allowed bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 shadow-sm"
             >
               <RefreshCw
-                size={14}
+                size={16}
                 className={isReScoreBusy ? 'animate-spin' : ''}
               />
             </button>
@@ -171,9 +171,9 @@ const MenuBar = ({
             <button
               type="button"
               onClick={onOpenHistory}
-              className="flex items-center justify-center rounded-lg w-8 h-8 text-gray-700 transition-all bg-gray-100 hover:bg-gray-200 shadow-sm"
+              className="flex items-center justify-center rounded-lg w-9 h-9 text-gray-700 transition-all bg-gray-100 hover:bg-gray-200 shadow-sm"
             >
-              <History size={14} />
+              <History size={16} />
             </button>
           </Tooltip>
         )}
@@ -182,9 +182,9 @@ const MenuBar = ({
             type="button"
             onClick={onSave}
             disabled={isSaving}
-            className="flex items-center justify-center rounded-lg w-8 h-8 text-white transition-all disabled:opacity-60 disabled:cursor-not-allowed bg-primary hover:bg-primary-dark shadow-sm"
+            className="flex items-center justify-center rounded-lg w-9 h-9 text-white transition-all disabled:opacity-60 disabled:cursor-not-allowed bg-primary hover:bg-primary-dark shadow-sm"
           >
-            {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+            {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
           </button>
         </Tooltip>
         {onExport && (
@@ -193,12 +193,12 @@ const MenuBar = ({
               type="button"
               onClick={onExport}
               disabled={isExportDisabled}
-              className="flex items-center gap-1.5 rounded-lg px-2.5 md:px-3.5 py-1.5 text-xs font-semibold text-white transition-all disabled:opacity-60 disabled:cursor-not-allowed bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 shadow-sm"
+              className="flex items-center gap-1.5 rounded-lg h-9 px-3.5 text-xs font-semibold text-white transition-all disabled:opacity-60 disabled:cursor-not-allowed bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 shadow-sm"
             >
               {isExporting ? (
-                <Loader2 size={13} className="animate-spin" />
+                <Loader2 size={16} className="animate-spin" />
               ) : (
-                <FileCheck size={13} />
+                <FileCheck size={16} />
               )}
               <span className="hidden lg:inline">Use this CV to Apply</span>
               <span className="hidden md:inline lg:hidden">Apply</span>

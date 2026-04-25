@@ -33,7 +33,7 @@ const Benefits = () => {
                 {benefits.map((benefit) => {
                     const Icon = BENEFIT_ICONS[benefit.type] || MoreHorizontal;
                     return (
-                        <div key={benefit.id} className="flex items-start gap-3 border border-gray-200 rounded-lg p-4">
+                        <div key={benefit.id} className="flex items-center gap-3 border border-gray-200 rounded-lg p-4">
                             <div className="shrink-0 w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center">
                                 <Icon className="w-[18px] h-[18px] text-blue-500" />
                             </div>
