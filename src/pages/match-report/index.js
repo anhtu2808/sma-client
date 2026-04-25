@@ -13,7 +13,8 @@ import MatchingLoading from "@/pages/match-report/loading";
 import Loading from "@/components/Loading";
 import Button from "@/components/Button";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faArrowRotateLeft, faArrowsRotate, faRotate, faTriangleExclamation } from '../../utils/icons';
+import { faArrowLeft, faArrowsRotate, faCircleInfo, faRotate } from '../../utils/icons';
+import { Sparkles } from 'lucide-react';
 
 const MATCHING_POLL_INTERVAL_MS = 2_000;
 const MATCHING_POLL_TIMEOUT_MS = 180_000;
@@ -77,14 +78,24 @@ const MatchReport = () => {
         resumeId: Number(resumeId),
       }).unwrap();
 
-      if (!Number.isFinite(Number(newEvaluationId))) {
+      const nextEvaluationId = Number(newEvaluationId);
+      if (!Number.isFinite(nextEvaluationId)) {
         throw new Error("Invalid matching evaluation id");
       }
 
-      navigate(`/match-report/${Number(newEvaluationId)}`, {
-        state: { jobId, resumeId, matchSource: "new" },
-        replace: true,
-      });
+      setErrorMessage("");
+      setLatestStatus("WAITING");
+      setHasInitialStatus(false);
+      setActiveEvaluationId(nextEvaluationId);
+      setPhase("polling");
+      pollingStartedAtRef.current = null;
+
+      if (nextEvaluationId !== evaluationIdFromParams) {
+        navigate(`/match-report/${nextEvaluationId}`, {
+          state: { jobId, resumeId, matchSource: "new" },
+          replace: true,
+        });
+      }
     } catch (error) {
       setErrorMessage(
         error?.data?.message || "Retry failed. Please go back to job details and try again."
@@ -240,51 +251,48 @@ const MatchReport = () => {
 
   if (phase === "failed") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#F8FAFC] px-6 py-10">
-        <div className="w-full max-w-[480px] overflow-hidden rounded-2xl bg-white text-center shadow-sm p-8 ring-1 ring-gray-900/5 transition-all">
-          <div className="mx-auto flex h-[64px] w-[64px] items-center justify-center rounded-2xl bg-red-50 mb-5">
-            <FontAwesomeIcon icon={faTriangleExclamation} className="text-[32px] text-red-500" />
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-slate-50 to-white px-6 py-10">
+        <div className="relative w-full max-w-[460px] overflow-hidden rounded-2xl bg-white p-8 text-center shadow-[0_8px_32px_-12px_rgba(15,23,42,0.12)] ring-1 ring-slate-200/70">
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-400 via-primary to-orange-500" />
+          <div className="mx-auto mb-5 flex h-[64px] w-[64px] items-center justify-center rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50 ring-1 ring-orange-100">
+            <Sparkles size={28} className="text-primary" strokeWidth={2.2} />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
-            Oops, something went wrong!
+          <h1 className="text-[22px] font-bold tracking-tight text-neutral-900">
+            We couldn't finish your match
           </h1>
-          <p className="mt-3 text-[15px] text-gray-500 leading-relaxed px-2">
+          <p className="mt-2 text-[14px] leading-relaxed text-neutral-500 px-2">
             {errorMessage || "AI matching failed. Please go back and try matching again."}
           </p>
-          <div className="mt-6 rounded-xl bg-orange-50 p-4 border border-orange-100 flex items-center justify-center gap-2">
-            <FontAwesomeIcon icon={faArrowRotateLeft} className="text-orange-500 text-[18px]" />
-            <p className="text-[14px] font-semibold text-orange-700 tracking-tight">Your AI credit has been refunded.</p>
+          <div className="mt-6 flex items-center justify-center gap-2 rounded-xl bg-slate-50 px-4 py-2.5 ring-1 ring-slate-200/70">
+            <FontAwesomeIcon icon={faCircleInfo} className="text-[14px] text-emerald-500" />
+            <p className="text-[13px] text-neutral-600">
+              No worries — your AI credit was refunded.
+            </p>
           </div>
-          
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button
-              mode="primary"
-              shape="rounded"
-              fullWidth
-              className="py-2.5 text-[14px] whitespace-nowrap"
-              onClick={handleRetry}
-              disabled={isRetrying}
-              iconLeft={
-                isRetrying ? (
-                  <FontAwesomeIcon icon={faArrowsRotate} className="animate-spin text-[18px]" />
-                ) : (
-                  <FontAwesomeIcon icon={faRotate} className="text-[18px] group-hover:-rotate-90 transition-transform duration-300" />
-                )
-              }
-            >
-              {isRetrying ? "Retrying..." : "Try Again"}
-            </Button>
-            <Button
-              mode="default"
-              shape="rounded"
-              fullWidth
-              className="py-2.5 text-[14px] bg-white text-gray-700 ring-1 ring-inset ring-gray-200 hover:bg-gray-50 hover:text-gray-900 whitespace-nowrap"
+
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+            <button
+              type="button"
               onClick={() => jobId ? navigate(`/jobs/${jobId}`) : navigate(-1)}
               disabled={isRetrying}
-              iconLeft={<FontAwesomeIcon icon={faArrowLeft} className="text-[18px] text-gray-500" />}
+              className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-[14px] font-semibold text-neutral-700 transition-all hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
             >
+              <FontAwesomeIcon icon={faArrowLeft} className="text-[16px] text-gray-500" />
               Back to Job Detail
-            </Button>
+            </button>
+            <button
+              type="button"
+              onClick={handleRetry}
+              disabled={isRetrying}
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-[14px] font-semibold text-white shadow-sm transition-all hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isRetrying ? (
+                <FontAwesomeIcon icon={faArrowsRotate} className="animate-spin text-[16px]" />
+              ) : (
+                <FontAwesomeIcon icon={faRotate} className="text-[16px]" />
+              )}
+              {isRetrying ? "Retrying..." : "Try Again"}
+            </button>
           </div>
         </div>
       </div>

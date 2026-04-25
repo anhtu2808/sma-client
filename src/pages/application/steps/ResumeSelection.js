@@ -190,10 +190,11 @@ const ResumeSelection = ({
                 open={!!previewResume}
                 onCancel={() => setPreviewResume(null)}
                 footer={null}
+                centered
                 width={1200}
                 title={previewResume?.resumeName || previewResume?.fileName || 'Resume Preview'}
                 destroyOnClose
-                styles={{ body: { padding: 0, height: '85vh' } }}
+                styles={{ body: { padding: 0, height: '80vh' } }}
             >
                 {previewResume?.resumeUrl ? (
                     <div className="h-full w-full">

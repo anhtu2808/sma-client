@@ -21,7 +21,17 @@ const Header = () => {
                     <span className="text-xs font-semibold uppercase tracking-widest">Back</span>
                 </button>
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900 font-heading tracking-tight">
-                    Apply for <span className="text-primary">{jobData?.name}</span>
+                    Apply for{' '}
+                    {jobData?.name ? (
+                        <button
+                            type="button"
+                            onClick={() => navigate(`/jobs/${jobId}`)}
+                            className="text-primary hover:text-primary-dark hover:underline underline-offset-4 transition-colors"
+                            title="View job details"
+                        >
+                            {jobData.name}
+                        </button>
+                    ) : null}
                 </h1>
                 <p className="text-sm text-gray-500 mt-1">{jobData?.company?.name} • {jobData?.workingModel}</p>
             </header>

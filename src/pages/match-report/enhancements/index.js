@@ -10,7 +10,9 @@ import {
   useLazyGetEnhancementSuggestionQuery,
   useUpdateEnhancementContentMutation,
   useReScoreEnhancementMutation,
+  useParseCandidateResumeMutation,
 } from '@/apis/resumeApi';
+import { Sparkles, Loader2, RotateCw, ArrowLeft } from 'lucide-react';
 import {
   useLazyGetMatchingStatusQuery,
   useLazyGetMatchingDetailQuery,
@@ -59,13 +61,32 @@ const Enhancements = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const phaseHandledRef = useRef(false);
 
-  // Fetch original resume to check parse status
-  const { data: resumeData, isLoading: isLoadingResume, isError } = useGetResumeQuery(
-    { resumeId },
-    { skip: !resumeId }
-  );
+  // Fetch original resume to check parse status.
+  const { data: resumeData, isLoading: isLoadingResume, isError, refetch: refetchResume } =
+    useGetResumeQuery({ resumeId }, { skip: !resumeId });
+
+  const [parseCandidateResume, { isLoading: isReParsing }] = useParseCandidateResumeMutation();
 
   const isParsed = resumeData && PARSED_STATUSES.includes(resumeData.parseStatus);
+
+  // Auto-poll while parsing is still in flight so the screen transitions on its own.
+  useEffect(() => {
+    if (!resumeId) return undefined;
+    const status = resumeData?.parseStatus;
+    if (status !== 'WAITING' && status !== 'PARSING') return undefined;
+    const id = setInterval(() => refetchResume(), 2500);
+    return () => clearInterval(id);
+  }, [resumeId, resumeData?.parseStatus, refetchResume]);
+
+  const handleRetryParse = useCallback(async () => {
+    if (!resumeId) return;
+    try {
+      await parseCandidateResume({ resumeId }).unwrap();
+      refetchResume();
+    } catch {
+      toastMessage.error('Could not restart parsing. Please try again.');
+    }
+  }, [resumeId, parseCandidateResume, refetchResume]);
 
   // Get or create enhancement (idempotent - safe on F5)
   const { data: enhancement, isLoading: isLoadingEnhancement } = useGetOrCreateEnhancementQuery(
@@ -376,23 +397,62 @@ const Enhancements = () => {
   }
 
   if (resumeData && !isParsed) {
-    const statusMessages = {
-      WAITING: 'Your resume is waiting to be parsed. Please check back later.',
-      PARSING: 'Your resume is currently being parsed. Please wait...',
-      FAIL: 'Resume parsing failed. Please try uploading again.',
-    };
+    const isFail = resumeData.parseStatus === 'FAIL';
+    const isInProgress = resumeData.parseStatus === 'WAITING' || resumeData.parseStatus === 'PARSING';
+    const title = isFail
+      ? "We couldn't read your resume"
+      : isInProgress
+        ? 'Preparing your resume'
+        : 'Resume not ready yet';
+    const subtitle = isFail
+      ? 'Resume parsing failed. Try parsing it again or upload a new file.'
+      : resumeData.parseStatus === 'PARSING'
+        ? 'Your resume is being parsed. This usually takes a few seconds…'
+        : resumeData.parseStatus === 'WAITING'
+          ? 'Your resume is queued for parsing. It will start shortly.'
+          : 'Resume is not available for editing.';
+
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
-        <Result
-          status={resumeData.parseStatus === 'FAIL' ? 'error' : 'info'}
-          title="Resume Not Ready"
-          subTitle={statusMessages[resumeData.parseStatus] || 'Resume is not available for editing.'}
-          extra={
-            <Button mode="primary" shape="rounded" onClick={() => navigate(-1)}>
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-slate-50 to-white px-6 py-10">
+        <div className="relative w-full max-w-[460px] overflow-hidden rounded-2xl bg-white p-8 text-center shadow-[0_8px_32px_-12px_rgba(15,23,42,0.12)] ring-1 ring-slate-200/70">
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-400 via-primary to-orange-500" />
+          <div className="mx-auto mb-5 flex h-[64px] w-[64px] items-center justify-center rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50 ring-1 ring-orange-100">
+            {isInProgress ? (
+              <Loader2 size={28} className="animate-spin text-primary" strokeWidth={2.2} />
+            ) : (
+              <Sparkles size={28} className="text-primary" strokeWidth={2.2} />
+            )}
+          </div>
+          <h1 className="text-[22px] font-bold tracking-tight text-neutral-900">{title}</h1>
+          <p className="mt-2 px-2 text-[14px] leading-relaxed text-neutral-500">{subtitle}</p>
+
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              disabled={isReParsing}
+              className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-[14px] font-semibold text-neutral-700 transition-all hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <ArrowLeft size={16} className="text-gray-500" />
               Go Back
-            </Button>
-          }
-        />
+            </button>
+            {isFail && (
+              <button
+                type="button"
+                onClick={handleRetryParse}
+                disabled={isReParsing}
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-[14px] font-semibold text-white shadow-sm transition-all hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isReParsing ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  <RotateCw size={16} />
+                )}
+                {isReParsing ? 'Retrying...' : 'Try Again'}
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     );
   }

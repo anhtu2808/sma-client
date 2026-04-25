@@ -291,7 +291,7 @@ const ExportEnhancementModal = ({
       open={open}
       onCancel={isBusy ? undefined : onClose}
       footer={null}
-      width={1180}
+      width={1440}
       centered
       destroyOnHidden
       maskClosable={!isBusy}
@@ -313,7 +313,7 @@ const ExportEnhancementModal = ({
         </button>
 
         {/* Left: Preview — live HTML, crisp & readable */}
-        <div className="relative flex-1 md:max-w-[62%] bg-slate-100 border-r border-slate-200 flex flex-col min-h-0">
+        <div className="relative flex-1 md:max-w-[58%] bg-slate-100 border-r border-slate-200 flex flex-col min-h-0">
           <div className="flex items-center justify-between px-5 py-3 border-b border-slate-200 bg-white shrink-0">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-primary">
               Preview
@@ -376,7 +376,7 @@ const ExportEnhancementModal = ({
         </div>
 
         {/* Right: Form */}
-        <div className="flex flex-col w-full md:w-[38%] p-6 gap-5 overflow-y-auto min-h-0">
+        <div className="flex flex-col w-full md:w-[42%] p-6 gap-5 overflow-y-auto min-h-0">
           <div>
             <h2 className="text-xl font-bold text-neutral-900 flex items-center gap-2">
               <FileCheck size={20} className="text-primary" />
