@@ -77,7 +77,12 @@ const useFixUndoStack = (editor) => {
   useEffect(() => {
     if (!editor) return;
 
-    const handleTransaction = () => {
+    const handleTransaction = ({ transaction }) => {
+      // Only reconcile on native history UNDO transactions. Ignore redo,
+      // selection changes, decoration updates (setHighlights), focus changes, etc.
+      const historyMeta = transaction.getMeta('history$');
+      if (!historyMeta || historyMeta.redo) return;
+
       reconcileFixUndoStack({
         currentDoc: editor.state.doc,
         fixUndoStack: fixUndoStackRef.current,

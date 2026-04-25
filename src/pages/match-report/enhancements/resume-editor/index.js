@@ -6,12 +6,24 @@ import TextAlign from '@tiptap/extension-text-align';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
 import { TextStyleKit } from '@tiptap/extension-text-style';
-import { message } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
+import toastMessage from '@/utils/toastMessage';
 
-import { useGetResumeQuery, useUpdateEnhancementContentMutation } from '@/apis/resumeApi';
-import { useMarkDetailAsFixedBatchMutation, useMarkDetailAsFixedMutation } from '@/apis/matchingApi';
-import { setActiveCriteriaId, setDetailFixed, setFocusedItemId, setHighlightModalDetailId, updateScoresAfterFixed } from '@/store/slices/matchingReportSlice';
+import {
+  useGetResumeQuery,
+  useRedoEnhancementVersionMutation,
+  useUndoEnhancementVersionMutation,
+  useUpdateEnhancementContentMutation,
+} from '@/apis/resumeApi';
+import { useMarkDetailAsFixedBatchMutation } from '@/apis/matchingApi';
+import {
+  applySuggestionState,
+  setActiveCriteriaId,
+  setDetailFixed,
+  setFocusedItemId,
+  setHighlightModalDetailId,
+  updateScoresAfterFixed,
+} from '@/store/slices/matchingReportSlice';
 import Loading from '@/components/Loading';
 import EntryHeader from './EntryHeaderNode';
 import SuggestionHighlight from './extensions/SuggestionHighlight';
@@ -27,8 +39,8 @@ import applySuggestionFix from './utils/applySuggestionFix';
 import { findTextInDocFuzzy } from './utils/prosemirrorSearch';
 import './resumeEditor.css';
 
-const AUTOSAVE_DEBOUNCE = 3000;
-const AUTOSAVE_INTERVAL = 3000;
+const AUTOSAVE_DEBOUNCE = 15000;
+const AUTOSAVE_INTERVAL = 60000;
 
 const EXTENSIONS = [
   StarterKit,
@@ -45,16 +57,33 @@ const EXTENSIONS = [
   SmartBreakSpacer,
 ];
 
-const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, onRegenerateSuggestions, isRegenerating, onReScore, isReScoring, reScoreStatus, onExport, isExporting }) => {
+const ResumeEditor = ({
+  resumeId,
+  enhancementId,
+  initialContent,
+  onEditorReady,
+  onRegenerateSuggestions,
+  isRegenerating,
+  onReScore,
+  isReScoring,
+  reScoreStatus,
+  onExport,
+  isExporting,
+  onOpenHistory,
+  onVersionRestored,
+}) => {
   const dispatch = useDispatch();
   const { data: resumeData, isLoading } = useGetResumeQuery(
     { resumeId },
     { skip: !resumeId }
   );
   const [updateContent] = useUpdateEnhancementContentMutation();
+  const [undoEnhancementVersion, { isLoading: isBackendUndoing }] = useUndoEnhancementVersionMutation();
+  const [redoEnhancementVersion, { isLoading: isBackendRedoing }] = useRedoEnhancementVersionMutation();
 
   const [saveStatus, setSaveStatus] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [backendHistoryState, setBackendHistoryState] = useState({ canUndo: true, canRedo: false });
   const matchData = useSelector((state) => state.matchingReport.data);
   const criteriaScores = useSelector(
     (state) => state.matchingReport.data?.criteriaScores
@@ -67,6 +96,7 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
   const initialEditorHtmlRef = useRef('');
   const initialEditorEnhancementIdRef = useRef(null);
   const lastSavedHtmlRef = useRef(null);
+  const suppressAutosaveRef = useRef(false);
 
   const resolvedInitialHtml = useMemo(() => {
     if (initialContent) return initialContent;
@@ -89,18 +119,25 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
     editable: true,
   }, [enhancementId]);
 
-  const saveContent = useCallback(async (html) => {
+  // Typewriter fix animation
+  const { applyFix, fixingDetailId, cancelAnimation } = useTypewriterFix();
+  const [markDetailAsFixedBatch] = useMarkDetailAsFixedBatchMutation();
+
+  // Fix undo stack — reconciles fixed-state side effects after native undo restores the previous doc
+  const { pushFixUndo } = useFixUndoStack(editor);
+
+  const saveContent = useCallback(async (html, saveType = 'AUTOSAVE') => {
     if (!enhancementId || !html) return;
-    if (html === lastSavedHtmlRef.current) return;
+    if (saveType === 'AUTOSAVE' && html === lastSavedHtmlRef.current) return;
 
     setIsSaving(true);
     try {
-      await updateContent({ id: enhancementId, content: html }).unwrap();
+      await updateContent({ id: enhancementId, content: html, saveType }).unwrap();
       lastSavedHtmlRef.current = html;
       setSaveStatus('Saved');
       setTimeout(() => setSaveStatus(null), 3000);
     } catch {
-      message.error('Failed to save changes');
+      toastMessage.error('Failed to save changes');
     } finally {
       setIsSaving(false);
     }
@@ -119,8 +156,10 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
 
     // Debounce: save 3s after last edit
     const handleUpdate = () => {
+      if (suppressAutosaveRef.current || fixingDetailId) return;
       if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
       autoSaveTimerRef.current = setTimeout(() => {
+        if (suppressAutosaveRef.current || fixingDetailId) return;
         saveContent(editor.getHTML());
       }, AUTOSAVE_DEBOUNCE);
     };
@@ -129,6 +168,7 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
     // Periodic: save every 3s if there are unsaved changes
     const intervalId = setInterval(() => {
       if (editor.isDestroyed) return;
+      if (suppressAutosaveRef.current || fixingDetailId) return;
       const html = editor.getHTML();
       if (html && html !== lastSavedHtmlRef.current) {
         saveContent(html);
@@ -140,25 +180,86 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
       if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
       clearInterval(intervalId);
     };
-  }, [editor, enhancementId, saveContent]);
+  }, [editor, enhancementId, saveContent, fixingDetailId]);
 
   const handleManualSave = useCallback(() => {
     if (!editor) return;
     if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
-    saveContent(editor.getHTML());
+    saveContent(editor.getHTML(), 'MANUAL_SAVE');
   }, [editor, saveContent]);
 
-  // Cmd+S / Ctrl+S to save
+  const applyVersionResponse = useCallback((response) => {
+    if (!editor || !response?.content) return;
+
+    if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+    suppressAutosaveRef.current = true;
+    editor.commands.setContent(response.content, false);
+    lastSavedHtmlRef.current = response.content;
+    dispatch(applySuggestionState(response.suggestionState));
+    setBackendHistoryState({
+      canUndo: Boolean(response.canUndo),
+      canRedo: Boolean(response.canRedo),
+    });
+    onVersionRestored?.(response);
+
+    setTimeout(() => {
+      suppressAutosaveRef.current = false;
+    }, 0);
+  }, [dispatch, editor, onVersionRestored]);
+
+  const handleBackendUndo = useCallback(async () => {
+    if (!editor || !enhancementId || isBackendUndoing) return;
+    if (editor.can().undo()) {
+      editor.chain().focus().undo().run();
+      return;
+    }
+
+    try {
+      const response = await undoEnhancementVersion({ enhancementId }).unwrap();
+      applyVersionResponse(response);
+    } catch (error) {
+      toastMessage.info(error?.data?.message || 'Nothing to undo');
+      setBackendHistoryState((state) => ({ ...state, canUndo: false }));
+    }
+  }, [applyVersionResponse, editor, enhancementId, isBackendUndoing, undoEnhancementVersion]);
+
+  const handleBackendRedo = useCallback(async () => {
+    if (!editor || !enhancementId || isBackendRedoing) return;
+    if (editor.can().redo()) {
+      editor.chain().focus().redo().run();
+      return;
+    }
+
+    try {
+      const response = await redoEnhancementVersion({ enhancementId }).unwrap();
+      applyVersionResponse(response);
+    } catch (error) {
+      toastMessage.info(error?.data?.message || 'Nothing to redo');
+      setBackendHistoryState((state) => ({ ...state, canRedo: false }));
+    }
+  }, [applyVersionResponse, editor, enhancementId, isBackendRedoing, redoEnhancementVersion]);
+
+  // Cmd/Ctrl shortcuts for save and persistent undo/redo
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+      if (!(e.metaKey || e.ctrlKey)) return;
+
+      const key = e.key.toLowerCase();
+      if (key === 's') {
         e.preventDefault();
         handleManualSave();
+      } else if (key === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          handleBackendRedo();
+        } else {
+          handleBackendUndo();
+        }
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleManualSave]);
+    window.addEventListener('keydown', handleKeyDown, true);
+    return () => window.removeEventListener('keydown', handleKeyDown, true);
+  }, [handleBackendRedo, handleBackendUndo, handleManualSave]);
 
   // Editor tag-badge click opens the modal at the FIRST detail of the clicked context.
   const handleEditorClick = useCallback((event) => {
@@ -226,41 +327,46 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
   // AI highlight decorations synced from Redux
   useEditorHighlights(editor);
 
-  // Typewriter fix animation
-  const { applyFix, fixingDetailId, cancelAnimation } = useTypewriterFix();
-  const [markDetailAsFixedBatch] = useMarkDetailAsFixedBatchMutation();
-
-  // Fix undo stack — reconciles fixed-state side effects after native undo restores the previous doc
-  const { pushFixUndo } = useFixUndoStack(editor);
-
   const fixInEditor = useCallback(
     async (context, suggestionText, detailId) => {
       if (!editor) return false;
 
-      const success = await applyFix(editor, context, suggestionText, detailId);
-      if (!success) {
-        message.error('Could not find matching text in your resume. Please edit manually.');
+      const result = await applyFix(editor, context, suggestionText, detailId);
+      if (!result?.success) {
+        toastMessage.error('Could not find matching text in your resume. Please edit manually.');
       }
-      return success;
+      return result;
     },
     [editor, applyFix]
   );
 
   const applySuggestion = useCallback(
-    async ({ detailId, context, suggestionText, detailIds }) =>
-      applySuggestionFix({
-        detailId,
-        context,
-        suggestionText,
-        detailIds,
-        editor,
-        matchData,
-        fixInEditor,
-        markDetailAsFixedBatch,
-        dispatch,
-        pushFixUndo,
-      }),
-    [editor, matchData, fixInEditor, markDetailAsFixedBatch, dispatch, pushFixUndo]
+    async ({ detailId, context, suggestionText, detailIds }) => {
+      suppressAutosaveRef.current = true;
+      if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+      try {
+        const result = await applySuggestionFix({
+          detailId,
+          context,
+          suggestionText,
+          detailIds,
+          editor,
+          enhancementId,
+          matchData,
+          fixInEditor,
+          markDetailAsFixedBatch,
+          dispatch,
+          pushFixUndo,
+        });
+        if (result?.success && result?.statusUpdated && result?.content) {
+          lastSavedHtmlRef.current = result.content;
+        }
+        return result;
+      } finally {
+        suppressAutosaveRef.current = false;
+      }
+    },
+    [editor, enhancementId, matchData, fixInEditor, markDetailAsFixedBatch, dispatch, pushFixUndo]
   );
 
   // Cleanup animation on unmount
@@ -269,13 +375,14 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
   }, [cancelAnimation]);
 
   // One-click optimize: apply first suggestion for all findable contexts
-  const [markDetailAsFixed] = useMarkDetailAsFixedMutation();
   const [isOptimizing, setIsOptimizing] = useState(false);
 
   const handleOptimizeAll = useCallback(async () => {
     if (!editor || !criteriaScores || isOptimizing) return;
 
     setIsOptimizing(true);
+    suppressAutosaveRef.current = true;
+    if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
 
     // Collect all unique contexts with their details (dedup by context text)
     const seen = new Set();
@@ -290,68 +397,78 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
     }
 
     let applied = 0;
+    const appliedDetailIds = new Set();
 
-    for (const detail of items) {
-      const suggestionText = detail.suggestions[0]?.suggestion;
-      if (!suggestionText) continue;
+    try {
+      for (const detail of items) {
+        const suggestionText = detail.suggestions[0]?.suggestion;
+        if (!suggestionText) continue;
 
-      // Check if text exists in current doc state
-      const ranges = findTextInDocFuzzy(editor.state.doc, detail.context);
-      if (ranges.length === 0) continue;
+        // Check if text exists in current doc state
+        const ranges = findTextInDocFuzzy(editor.state.doc, detail.context);
+        if (ranges.length === 0) continue;
 
-      // Scroll to the text before replacing
-      const { from } = ranges[0];
-      const resolvedPos = editor.state.doc.resolve(from);
-      const domPos = editor.view.domAtPos(resolvedPos.pos);
-      const targetNode = domPos.node?.nodeType === 1 ? domPos.node : domPos.node?.parentElement;
-      if (targetNode) {
-        targetNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        // Brief pause so user can see where the edit happens
-        await new Promise((r) => setTimeout(r, 400));
+        // Scroll to the text before replacing
+        const { from } = ranges[0];
+        const resolvedPos = editor.state.doc.resolve(from);
+        const domPos = editor.view.domAtPos(resolvedPos.pos);
+        const targetNode = domPos.node?.nodeType === 1 ? domPos.node : domPos.node?.parentElement;
+        if (targetNode) {
+          targetNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Brief pause so user can see where the edit happens
+          await new Promise((r) => setTimeout(r, 400));
+        }
+
+        // Apply typewriter animation (sequential — waits for each to finish)
+        const result = await applyFix(editor, detail.context, suggestionText, detail.id);
+        if (!result?.success) continue;
+
+        // Collect all detail IDs sharing same contextId for marking
+        const detailIds = detail.contextId
+          ? criteriaScores.flatMap((cs) => cs.details || []).filter((d) => d.contextId === detail.contextId && !d.isFixed).map((d) => d.id)
+          : [detail.id];
+
+        detailIds.forEach((id) => appliedDetailIds.add(id));
+        applied++;
+
+        // Small pause between items so user can follow
+        await new Promise((r) => setTimeout(r, 300));
       }
 
-      // Apply typewriter animation (sequential — waits for each to finish)
-      const success = await applyFix(editor, detail.context, suggestionText, detail.id);
-      if (!success) continue;
+      if (applied > 0) {
+        const detailIds = [...appliedDetailIds];
+        const content = editor.getHTML();
+        const response = await markDetailAsFixedBatch({
+          detailIds,
+          enhancementId,
+          content,
+        }).unwrap();
 
-      // Collect all detail IDs sharing same contextId for marking
-      const detailIds = detail.contextId
-        ? criteriaScores.flatMap((cs) => cs.details || []).filter((d) => d.contextId === detail.contextId && !d.isFixed).map((d) => d.id)
-        : [detail.id];
-
-      for (const id of detailIds) {
-        try {
-          const response = await markDetailAsFixed({ detailId: id }).unwrap();
-          dispatch(setDetailFixed({ detailId: id }));
-          if (response) {
-            dispatch(updateScoresAfterFixed({
-              afterOverallScore: response.afterOverallScore,
-              criteriaScoreId: response.criteriaScoreId,
-              afterCriteriaScore: response.afterCriteriaScore,
-            }));
-          }
-        } catch { /* continue with next */ }
+        detailIds.forEach((id) => dispatch(setDetailFixed({ detailId: id })));
+        if (response) {
+          dispatch(updateScoresAfterFixed({
+            afterOverallScore: response.afterOverallScore,
+            criteriaScoreId: response.criteriaScoreId,
+            afterCriteriaScore: response.afterCriteriaScore,
+          }));
+        }
+        lastSavedHtmlRef.current = content;
+        toastMessage.success(`Optimized ${applied} suggestion${applied > 1 ? 's' : ''} successfully.`);
+      } else {
+        toastMessage.info('No suggestions could be applied automatically.');
       }
-
-      applied++;
-
-      // Small pause between items so user can follow
-      await new Promise((r) => setTimeout(r, 300));
+    } catch {
+      toastMessage.error('Optimized text but failed to save version history.');
+    } finally {
+      suppressAutosaveRef.current = false;
+      setIsOptimizing(false);
     }
-
-    setIsOptimizing(false);
-    if (applied > 0) {
-      message.success(`Optimized ${applied} suggestion${applied > 1 ? 's' : ''} successfully.`);
-      saveContent(editor.getHTML());
-    } else {
-      message.info('No suggestions could be applied automatically.');
-    }
-  }, [editor, criteriaScores, isOptimizing, markDetailAsFixed, dispatch, saveContent, applyFix]);
+  }, [editor, criteriaScores, isOptimizing, markDetailAsFixedBatch, enhancementId, dispatch, applyFix]);
 
   // Expose editor actions to parent via callback
   useEffect(() => {
-    onEditorReady?.({ fixInEditor, applySuggestion, fixingDetailId, editor, pushFixUndo });
-  }, [fixInEditor, applySuggestion, fixingDetailId, editor, pushFixUndo, onEditorReady]);
+    onEditorReady?.({ fixInEditor, applySuggestion, fixingDetailId, editor, pushFixUndo, applyVersionResponse });
+  }, [fixInEditor, applySuggestion, fixingDetailId, editor, pushFixUndo, applyVersionResponse, onEditorReady]);
 
   if (isLoading || !resumeData) {
     return <Loading className="py-20" />;
@@ -359,7 +476,26 @@ const ResumeEditor = ({ resumeId, enhancementId, initialContent, onEditorReady, 
 
   return (
     <div className="resume-editor flex flex-col h-full">
-      <MenuBar editor={editor} onSave={handleManualSave} isSaving={isSaving} saveStatus={saveStatus} onRegenerateSuggestions={onRegenerateSuggestions} isRegenerating={isRegenerating} onReScore={onReScore} isReScoring={isReScoring} reScoreStatus={reScoreStatus} onExport={onExport} isExporting={isExporting} />
+      <MenuBar
+        editor={editor}
+        onSave={handleManualSave}
+        isSaving={isSaving}
+        saveStatus={saveStatus}
+        onUndo={handleBackendUndo}
+        onRedo={handleBackendRedo}
+        canBackendUndo={backendHistoryState.canUndo}
+        canBackendRedo={backendHistoryState.canRedo}
+        isBackendUndoing={isBackendUndoing}
+        isBackendRedoing={isBackendRedoing}
+        onOpenHistory={onOpenHistory}
+        onRegenerateSuggestions={onRegenerateSuggestions}
+        isRegenerating={isRegenerating}
+        onReScore={onReScore}
+        isReScoring={isReScoring}
+        reScoreStatus={reScoreStatus}
+        onExport={onExport}
+        isExporting={isExporting}
+      />
       <div className="relative flex-1 overflow-y-auto bg-gray-200 py-10 flex justify-center items-start">
         <div
           className="bg-white cursor-text"

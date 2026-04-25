@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { message, Modal } from 'antd';
+import { Modal } from 'antd';
+import toastMessage from '@/utils/toastMessage';
 import {
   useGetResumeQuery,
   useGetOrCreateEnhancementQuery,
@@ -28,6 +29,7 @@ import EnhancementLoading from './EnhancementLoading';
 import ReScoreLoading from './ReScoreLoading';
 import ExportEnhancementModal from './ExportEnhancementModal';
 import { buildResumeHtml } from './resume-editor/buildResumeHtml';
+import VersionHistoryDrawer from './version-history/VersionHistoryDrawer';
 
 const PARSED_STATUSES = ['FINISH', 'DONE', 'SUCCESS'];
 
@@ -44,6 +46,7 @@ const Enhancements = () => {
     applySuggestion: null,
     fixingDetailId: null,
     editor: null,
+    applyVersionResponse: null,
   });
   const handleEditorReady = useCallback((api) => setEditorApi(api), []);
   const editorContextValue = useMemo(() => editorApi, [editorApi]);
@@ -92,6 +95,7 @@ const Enhancements = () => {
 
   // Export modal state
   const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   // Fetch job info for export modal context
   const { data: jobResponse } = useGetJobByIdQuery(jobId, { skip: !jobId });
@@ -116,7 +120,7 @@ const Enhancements = () => {
     phaseHandledRef.current = true;
 
     const html = buildResumeHtml(resumeData);
-    updateContent({ id: enhancement.id, content: html })
+    updateContent({ id: enhancement.id, content: html, saveType: 'AUTOSAVE' })
       .unwrap()
       .then(() => {
         phaseHandledRef.current = false;
@@ -199,11 +203,11 @@ const Enhancements = () => {
 
     try {
       const html = editorApi.editor.getHTML();
-      await updateContent({ id: enhancement.id, content: html }).unwrap();
+      await updateContent({ id: enhancement.id, content: html, saveType: 'MANUAL_SAVE' }).unwrap();
     } catch {
       reScoreInFlightRef.current = false;
       setIsReScoreLoading(false);
-      message.error('Could not save changes before re-scoring');
+      toastMessage.error('Could not save changes before re-scoring');
       return;
     }
 
@@ -214,7 +218,7 @@ const Enhancements = () => {
     } catch {
       reScoreInFlightRef.current = false;
       setIsReScoreLoading(false);
-      message.error('Could not start re-scoring');
+      toastMessage.error('Could not start re-scoring');
     }
   }, [enhancement?.id, editorApi?.editor, updateContent, reScoreEnhancement]);
 
@@ -280,12 +284,12 @@ const Enhancements = () => {
             reScoreInFlightRef.current = false;
             setIsReScoreLoading(false);
             setReScoreStatus('success');
-            message.success('Re-scored and updated suggestions successfully!');
+            toastMessage.success('Re-scored and updated suggestions successfully!');
           } catch {
             reScoreInFlightRef.current = false;
             setIsReScoreLoading(false);
             setReScoreStatus('success');
-            message.warning('Score updated but could not regenerate suggestions');
+            toastMessage.warning('Score updated but could not regenerate suggestions');
           }
         } else if (status === 'FAIL') {
           clearInterval(interval);
@@ -293,7 +297,7 @@ const Enhancements = () => {
           reScoreInFlightRef.current = false;
           setIsReScoreLoading(false);
           setReScoreStatus('error');
-          message.error('Re-scoring failed');
+          toastMessage.error('Re-scoring failed');
         }
       } catch {
         clearInterval(interval);
@@ -309,7 +313,7 @@ const Enhancements = () => {
       reScoreInFlightRef.current = false;
       setIsReScoreLoading(false);
       setReScoreStatus('error');
-      message.error('Re-scoring timed out');
+      toastMessage.error('Re-scoring timed out');
     }, 180000);
 
     return () => {
@@ -330,6 +334,10 @@ const Enhancements = () => {
     if (!enhancement?.id || !editorApi?.editor) return;
     setExportModalOpen(true);
   }, [enhancement?.id, editorApi?.editor]);
+
+  const handleRestoreVersion = useCallback((response) => {
+    editorApi?.applyVersionResponse?.(response);
+  }, [editorApi]);
 
   // Manual re-generate: save current editor content then call POST suggestion
   const handleRegenerateSuggestions = useCallback(async () => {
@@ -428,6 +436,7 @@ const Enhancements = () => {
               reScoreStatus={reScoreStatus}
               onExport={handleOpenExportModal}
               isExporting={exportModalOpen}
+              onOpenHistory={() => setHistoryOpen(true)}
             />
           </main>
         </div>
@@ -441,6 +450,12 @@ const Enhancements = () => {
         jobId={jobId}
         jobTitle={jobData?.name}
         companyName={jobData?.company?.name}
+      />
+      <VersionHistoryDrawer
+        open={historyOpen}
+        enhancementId={enhancement?.id}
+        onClose={() => setHistoryOpen(false)}
+        onRestore={handleRestoreVersion}
       />
     </EditorContext.Provider>
   );

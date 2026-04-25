@@ -591,13 +591,70 @@ export const resumeApi = api.injectEndpoints({
         }),
 
         updateEnhancementContent: builder.mutation({
-            query: ({ id, content }) => ({
+            query: ({ id, content, saveType = "AUTOSAVE" }) => ({
                 url: `${API_VERSION}/resume-enhancements/${id}/content`,
                 method: "PUT",
-                body: { content },
+                body: { content, saveType },
             }),
             invalidatesTags: (result, error, { id }) => [
                 { type: "Enhancement", id },
+                { type: "EnhancementVersions", id },
+            ],
+        }),
+
+        getEnhancementVersions: builder.query({
+            query: ({ enhancementId, page = 0, size = 20 }) => ({
+                url: `${API_VERSION}/resume-enhancements/${enhancementId}/versions`,
+                method: "GET",
+                params: { page, size },
+            }),
+            transformResponse: (response) => response?.data ?? null,
+            providesTags: (result, error, arg) => [
+                { type: "EnhancementVersions", id: arg?.enhancementId },
+            ],
+        }),
+
+        getEnhancementVersionDetail: builder.query({
+            query: ({ enhancementId, versionId }) => ({
+                url: `${API_VERSION}/resume-enhancements/${enhancementId}/versions/${versionId}`,
+                method: "GET",
+            }),
+            transformResponse: (response) => response?.data ?? null,
+        }),
+
+        undoEnhancementVersion: builder.mutation({
+            query: ({ enhancementId }) => ({
+                url: `${API_VERSION}/resume-enhancements/${enhancementId}/undo`,
+                method: "POST",
+            }),
+            transformResponse: (response) => response?.data ?? null,
+            invalidatesTags: (result, error, { enhancementId }) => [
+                { type: "Enhancement", id: enhancementId },
+                { type: "EnhancementVersions", id: enhancementId },
+            ],
+        }),
+
+        redoEnhancementVersion: builder.mutation({
+            query: ({ enhancementId }) => ({
+                url: `${API_VERSION}/resume-enhancements/${enhancementId}/redo`,
+                method: "POST",
+            }),
+            transformResponse: (response) => response?.data ?? null,
+            invalidatesTags: (result, error, { enhancementId }) => [
+                { type: "Enhancement", id: enhancementId },
+                { type: "EnhancementVersions", id: enhancementId },
+            ],
+        }),
+
+        restoreEnhancementVersion: builder.mutation({
+            query: ({ enhancementId, versionId }) => ({
+                url: `${API_VERSION}/resume-enhancements/${enhancementId}/versions/${versionId}/restore`,
+                method: "POST",
+            }),
+            transformResponse: (response) => response?.data ?? null,
+            invalidatesTags: (result, error, { enhancementId }) => [
+                { type: "Enhancement", id: enhancementId },
+                { type: "EnhancementVersions", id: enhancementId },
             ],
         }),
 
@@ -695,6 +752,11 @@ export const {
     useDeleteResumeCertificationMutation,
     useGetOrCreateEnhancementQuery,
     useUpdateEnhancementContentMutation,
+    useGetEnhancementVersionsQuery,
+    useLazyGetEnhancementVersionDetailQuery,
+    useUndoEnhancementVersionMutation,
+    useRedoEnhancementVersionMutation,
+    useRestoreEnhancementVersionMutation,
     useGenerateEnhancementSuggestionMutation,
     useLazyGetEnhancementSuggestionQuery,
     useReScoreEnhancementMutation,

@@ -9,6 +9,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashCan } from '../../../utils/icons';
 import { Sparkles } from 'lucide-react';
+import { formatScore } from '@/utils/formatScore';
 
 const ResumeOption = ({
   resume,
@@ -107,7 +108,7 @@ const ResumeOption = ({
             {hasFinishedScore && evaluationHistoryScore != null && (
               <span className="inline-flex items-center gap-1 rounded-md border-2 border-emerald-400 bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-700">
                 <span className="h-1.5 w-1.5 rounded-md bg-emerald-400" />
-                {evaluationHistoryScore}%
+                {formatScore(evaluationHistoryScore, 2)}%
               </span>
             )}
           </div>

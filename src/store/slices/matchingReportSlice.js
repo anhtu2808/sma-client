@@ -144,6 +144,27 @@ const matchingReportSlice = createSlice({
       });
     },
 
+    applySuggestionState: (state, action) => {
+      const suggestionState = Array.isArray(action.payload) ? action.payload : [];
+      if (!state.data || suggestionState.length === 0) return;
+
+      const stateByDetailId = new Map(
+        suggestionState
+          .filter((item) => item?.detailId != null)
+          .map((item) => [Number(item.detailId), item])
+      );
+
+      state.data.criteriaScores.forEach((criteria) => {
+        criteria.details.forEach((detail) => {
+          const item = stateByDetailId.get(Number(detail.id));
+          if (!item) return;
+          detail.isFixed = Boolean(item.isFixed);
+          detail.context = item.matchingContext ?? detail.context;
+          detail.pinnedRange = null;
+        });
+      });
+    },
+
     updateScoresAfterFixed: (state, action) => {
       // [DISABLED] Score recalculation — only track fixed status, don't update scores
       // const { afterOverallScore, criteriaScoreId, afterCriteriaScore } = action.payload;
@@ -190,6 +211,7 @@ export const {
   setDetailUnfixed,
   setDetailContext,
   setDetailPinnedRange,
+  applySuggestionState,
   updateSuggestion,
   updateScoresAfterFixed,
   revertScoresAfterUnfixed,

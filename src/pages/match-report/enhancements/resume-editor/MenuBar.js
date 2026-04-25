@@ -14,6 +14,7 @@ import {
   Loader2,
   RefreshCw,
   FileCheck,
+  History,
 } from 'lucide-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRotateLeft, faRotateRight } from '../../../../utils/icons';
@@ -46,6 +47,13 @@ const MenuBar = ({
   onSave,
   isSaving,
   saveStatus,
+  onUndo,
+  onRedo,
+  canBackendUndo,
+  canBackendRedo,
+  isBackendUndoing,
+  isBackendRedoing,
+  onOpenHistory,
   onReScore,
   isReScoring,
   reScoreStatus,
@@ -81,22 +89,26 @@ const MenuBar = ({
     <div className="sticky top-0 z-10 flex flex-nowrap items-center gap-1 p-2 border-b border-neutral-200 bg-white">
       {/* Left zone: formatting tools — scrolls horizontally if overflow */}
       <div className="flex flex-nowrap items-center gap-1 min-w-0 flex-1 overflow-x-auto">
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().undo().run()}
-          disabled={!editor.can().undo()}
-          className="p-1.5 flex items-center justify-center rounded text-gray-700 hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
-        >
-          <FontAwesomeIcon icon={faRotateLeft} className="text-[16px]" />
-        </button>
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().redo().run()}
-          disabled={!editor.can().redo()}
-          className="p-1.5 flex items-center justify-center rounded text-gray-700 hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
-        >
-          <FontAwesomeIcon icon={faRotateRight} className="text-[16px]" />
-        </button>
+        <Tooltip title="Undo">
+          <button
+            type="button"
+            onClick={onUndo || (() => editor.chain().focus().undo().run())}
+            disabled={isBackendUndoing || (!editor.can().undo() && !canBackendUndo)}
+            className="p-1.5 flex items-center justify-center rounded text-gray-700 hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+          >
+            {isBackendUndoing ? <Loader2 size={16} className="animate-spin" /> : <FontAwesomeIcon icon={faRotateLeft} className="text-[16px]" />}
+          </button>
+        </Tooltip>
+        <Tooltip title="Redo">
+          <button
+            type="button"
+            onClick={onRedo || (() => editor.chain().focus().redo().run())}
+            disabled={isBackendRedoing || (!editor.can().redo() && !canBackendRedo)}
+            className="p-1.5 flex items-center justify-center rounded text-gray-700 hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+          >
+            {isBackendRedoing ? <Loader2 size={16} className="animate-spin" /> : <FontAwesomeIcon icon={faRotateRight} className="text-[16px]" />}
+          </button>
+        </Tooltip>
 
         <Divider />
 
@@ -151,6 +163,17 @@ const MenuBar = ({
                 size={14}
                 className={isReScoreBusy ? 'animate-spin' : ''}
               />
+            </button>
+          </Tooltip>
+        )}
+        {onOpenHistory && (
+          <Tooltip title="Version history">
+            <button
+              type="button"
+              onClick={onOpenHistory}
+              className="flex items-center justify-center rounded-lg w-8 h-8 text-gray-700 transition-all bg-gray-100 hover:bg-gray-200 shadow-sm"
+            >
+              <History size={14} />
             </button>
           </Tooltip>
         )}

@@ -29,6 +29,7 @@ export const applySuggestionFix = async ({
   suggestionText,
   detailIds,
   editor,
+  enhancementId,
   matchData,
   fixInEditor,
   markDetailAsFixedBatch,
@@ -62,7 +63,12 @@ export const applySuggestionFix = async ({
   });
 
   try {
-    const response = await markDetailAsFixedBatch({ detailIds: idsToMark }).unwrap();
+    const content = editor?.getHTML?.();
+    const response = await markDetailAsFixedBatch({
+      detailIds: idsToMark,
+      enhancementId,
+      content,
+    }).unwrap();
 
     idsToMark.forEach((id) => {
       dispatch(setDetailFixed({ detailId: id }));
@@ -100,6 +106,7 @@ export const applySuggestionFix = async ({
       detailIds: idsToMark,
       pinnedRange,
       response,
+      content,
     };
   } catch (error) {
     toastMessage.error(getErrorMessage(error, 'Fix applied but failed to update status.'));

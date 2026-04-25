@@ -57,10 +57,10 @@ export const matchingApi = api.injectEndpoints({
     }),
 
     markDetailAsFixedBatch: builder.mutation({
-      query: ({ detailIds }) => ({
+      query: ({ detailIds, enhancementId, content }) => ({
         url: `${API_VERSION}/criteria-score/details/mark-as-fixed-batch`,
         method: "PUT",
-        body: { detailIds },
+        body: { detailIds, enhancementId, content },
       }),
       transformResponse: (response) => response?.data ?? null,
     }),
