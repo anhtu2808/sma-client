@@ -8,7 +8,6 @@ import {
     useUploadFilesMutation,
 } from '@/apis/resumeApi';
 import { useApplyJobMutation } from '@/apis/applicationApi';
-import { useTakeActionOnInvitationMutation } from '@/apis/invitationApi';
 import Card from '@/components/Card';
 import Loading from '@/components/Loading';
 import { toast } from 'react-toastify';
@@ -35,8 +34,6 @@ const Application = () => {
     const [parseCandidateResume] = useParseCandidateResumeMutation();
     const [applyJob, { isLoading: isApplying }] = useApplyJobMutation();
     const [startMatchingDetail, { isLoading: isStartingMatching }] = useStartMatchingDetailMutation();
-    const [takeActionOnInvitation] = useTakeActionOnInvitationMutation();
-    const invitationId = location.state?.invitationId;
     const { data: jobData, isLoading: jobLoading } = useGetJobByIdQuery(jobId, {
         skip: !jobId || jobId === 'undefined'
     });
@@ -186,14 +183,6 @@ const Application = () => {
         try {
             // Gọi API nộp đơn
             await applyJob(payload).unwrap();
-
-            if (invitationId) {
-                try {
-                    await takeActionOnInvitation({ id: invitationId, action: 'ACCEPTED' }).unwrap();
-                } catch (e) {
-                    console.error("Failed to automatically accept invitation", e);
-                }
-            }
 
             // toast.success("Application submitted successfully!");
             navigate(`/jobs/${jobId}/application/success`, { state: { companyName: job?.company?.name } });
