@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import { LoadingOutlined } from '@ant-design/icons';
 import {
   useStartSuggestionConversationMutation,
   useSendSuggestionConversationAnswerMutation,
@@ -37,12 +38,31 @@ const SuggestionChatPanel = ({
   const startedKeyRef = useRef(null);
   const messagesScrollRef = useRef(null);
   const bottomAnchorRef = useRef(null);
+  const completedNotifiedRef = useRef(null);
 
   useEffect(() => {
     setConversation(initialConversation || null);
     setAnswerDraft('');
     startedKeyRef.current = null;
+    completedNotifiedRef.current = null;
   }, [initialConversation, contextId]);
+
+  // Notify parent whenever the conversation reaches COMPLETED, regardless of
+  // which path got us there (answer, skip, or already-completed conversation
+  // returned by startConversation on remount). Without this the parent modal
+  // never learns the chat finished and Apply stays disabled.
+  useEffect(() => {
+    if (conversation?.status !== 'COMPLETED' || !conversation?.id) return;
+    if (completedNotifiedRef.current === conversation.id) return;
+    completedNotifiedRef.current = conversation.id;
+    if (conversation.finalSuggestion && contextId) {
+      dispatch(addSuggestionToContext({
+        contextId,
+        suggestion: conversation.finalSuggestion,
+      }));
+    }
+    onCompleted?.(conversation);
+  }, [conversation, contextId, dispatch, onCompleted]);
 
   // Auto-start: as soon as the modal mounts for a gap with no existing
   // conversation, trigger the first AI question. Guarded against double-firing
@@ -106,15 +126,6 @@ const SuggestionChatPanel = ({
       }).unwrap();
       setConversation(data);
       setAnswerDraft('');
-      if (data?.status === 'COMPLETED') {
-        if (data.finalSuggestion) {
-          dispatch(addSuggestionToContext({
-            contextId,
-            suggestion: data.finalSuggestion,
-          }));
-        }
-        onCompleted?.(data);
-      }
     } catch (error) {
       toastMessage.error(getErrorMessage(error, 'Failed to send the answer.'));
     }
@@ -128,7 +139,9 @@ const SuggestionChatPanel = ({
         conversationId: conversation.id,
       }).unwrap();
       setConversation(data);
-      onSkipped?.(data);
+      if (data?.status !== 'COMPLETED') {
+        onSkipped?.(data);
+      }
     } catch (error) {
       toastMessage.error(getErrorMessage(error, 'Failed to skip.'));
     }
@@ -245,6 +258,11 @@ const QUANTIFY_DEFAULT_OPTIONS = [
 const PendingQuestionInput = ({ question, draft, setDraft, onSubmit, isSending }) => {
   const kind = question.questionKind || 'DESCRIBE';
   const options = Array.isArray(question.options) ? question.options : [];
+  const [showOther, setShowOther] = useState(false);
+
+  useEffect(() => {
+    setShowOther(false);
+  }, [question.content]);
 
   if (kind === 'YES_NO' || kind === 'PROFICIENCY' || kind === 'QUANTIFY') {
     const fallback =
@@ -269,18 +287,30 @@ const PendingQuestionInput = ({ question, draft, setDraft, onSubmit, isSending }
               {opt}
             </button>
           ))}
+          {!showOther && (
+            <button
+              type="button"
+              onClick={() => setShowOther(true)}
+              disabled={isSending}
+              className="rounded-full border border-dashed border-neutral-300 px-3 py-1 text-xs font-semibold text-neutral-600 transition-colors hover:bg-neutral-100 disabled:opacity-60"
+            >
+              Other…
+            </button>
+          )}
         </div>
-        <FreeTextRow
-          draft={draft}
-          setDraft={setDraft}
-          onSubmit={onSubmit}
-          isSending={isSending}
-          placeholder={
-            kind === 'QUANTIFY'
-              ? 'Or type a specific amount (e.g. 18 months, 4 projects)…'
-              : 'Or type a more detailed answer…'
-          }
-        />
+        {showOther && (
+          <FreeTextRow
+            draft={draft}
+            setDraft={setDraft}
+            onSubmit={onSubmit}
+            isSending={isSending}
+            placeholder={
+              kind === 'QUANTIFY'
+                ? 'Type a specific amount (e.g. 18 months, 4 projects)…'
+                : 'Type your own answer…'
+            }
+          />
+        )}
       </div>
     );
   }
@@ -315,9 +345,14 @@ const FreeTextRow = ({ draft, setDraft, onSubmit, isSending, placeholder }) => (
       type="button"
       onClick={() => onSubmit(draft)}
       disabled={isSending || !draft.trim()}
-      className="rounded bg-orange-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-orange-600 disabled:opacity-60"
+      className="relative inline-flex items-center justify-center rounded bg-orange-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-orange-600 disabled:opacity-60"
     >
-      {isSending ? 'Sending…' : 'Send'}
+      <span className={isSending ? 'opacity-0' : ''}>Send</span>
+      {isSending && (
+        <span className="absolute inset-0 flex items-center justify-center">
+          <LoadingOutlined spin style={{ fontSize: 14 }} />
+        </span>
+      )}
     </button>
   </div>
 );
