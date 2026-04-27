@@ -702,6 +702,39 @@ export const resumeApi = api.injectEndpoints({
             invalidatesTags: ["FeatureUsage"],
         }),
 
+        startSuggestionConversation: builder.mutation({
+            query: ({ enhancementId, contextId }) => ({
+                url: `${API_VERSION}/resume-enhancements/${enhancementId}/contexts/${contextId}/conversation/start`,
+                method: "POST",
+            }),
+            transformResponse: (response) => response?.data ?? null,
+        }),
+
+        sendSuggestionConversationAnswer: builder.mutation({
+            query: ({ enhancementId, conversationId, content, questionKind }) => ({
+                url: `${API_VERSION}/resume-enhancements/${enhancementId}/conversation/${conversationId}/answer`,
+                method: "POST",
+                body: { content, questionKind },
+            }),
+            transformResponse: (response) => response?.data ?? null,
+        }),
+
+        skipSuggestionConversation: builder.mutation({
+            query: ({ enhancementId, conversationId }) => ({
+                url: `${API_VERSION}/resume-enhancements/${enhancementId}/conversation/${conversationId}/skip`,
+                method: "POST",
+            }),
+            transformResponse: (response) => response?.data ?? null,
+        }),
+
+        getSuggestionConversation: builder.query({
+            query: ({ enhancementId, conversationId }) => ({
+                url: `${API_VERSION}/resume-enhancements/${enhancementId}/conversation/${conversationId}`,
+                method: "GET",
+            }),
+            transformResponse: (response) => response?.data ?? null,
+        }),
+
         exportEnhancementToOriginal: builder.mutation({
             query: ({ enhancementId, payload }) => ({
                 url: `${API_VERSION}/resume-enhancements/${enhancementId}/export`,
@@ -761,4 +794,9 @@ export const {
     useLazyGetEnhancementSuggestionQuery,
     useReScoreEnhancementMutation,
     useExportEnhancementToOriginalMutation,
+    useStartSuggestionConversationMutation,
+    useSendSuggestionConversationAnswerMutation,
+    useSkipSuggestionConversationMutation,
+    useGetSuggestionConversationQuery,
+    useLazyGetSuggestionConversationQuery,
 } = resumeApi;

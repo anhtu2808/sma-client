@@ -54,20 +54,6 @@ const SuggestionCard = ({
     return div.textContent || div.innerText || '';
   };
 
-  // Highlight user-owned placeholders like [project name] so candidates know to self-fill them.
-  // Regex avoids matching inside HTML tag attributes (excludes < and >).
-  const PLACEHOLDER_HINT =
-    "Đây là chỗ bạn cần tự điền bằng thông tin thật của mình (tên dự án, vai trò, số liệu…) trước khi dùng.";
-  const decorated = useMemo(() => {
-    if (!text) return "";
-    return text.replace(
-      /\[([^\]<>]{1,80})\]/g,
-      (_m, inner) =>
-        `<span class="inline-block rounded bg-amber-100 px-1 text-amber-800 border border-amber-300" title="${PLACEHOLDER_HINT}">[${inner}]</span>`
-    );
-  }, [text]);
-  const hasPlaceholder = /\[[^\]<>]{1,80}\]/.test(text || "");
-
   const handleCopy = async () => {
     if (!text) return;
 
@@ -102,7 +88,7 @@ const SuggestionCard = ({
       }`}
     >
       <div className="flex items-start gap-3">
-        <div className="min-w-0 flex-1 prose prose-sm max-w-none [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5" dangerouslySetInnerHTML={{ __html: decorated }} />
+        <div className="min-w-0 flex-1 prose prose-sm max-w-none [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5" dangerouslySetInnerHTML={{ __html: text }} />
 
         <div className="flex shrink-0 items-center gap-1">
           {canFixInEditor ? (
@@ -149,12 +135,6 @@ const SuggestionCard = ({
           ) : null}
         </div>
       </div>
-
-      {hasPlaceholder && (
-        <div className="mt-2 rounded bg-amber-50 px-2 py-1 text-[11px] text-amber-800">
-          {PLACEHOLDER_HINT}
-        </div>
-      )}
 
       {copied && (
         <div className="absolute bottom-0 right-0 flex items-center gap-0.5 rounded-tl-md bg-emerald-500 px-2 py-1 text-[10px] font-medium text-white animate-in fade-in zoom-in duration-200">

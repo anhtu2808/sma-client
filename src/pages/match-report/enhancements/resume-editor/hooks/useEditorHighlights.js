@@ -13,11 +13,23 @@ const useEditorHighlights = (editor) => {
   const focusedItemId = useSelector(
     (state) => state.matchingReport.ui?.focusedItemId
   );
+  const visibility = useSelector(
+    (state) => state.matchingReport.ui?.highlightVisibility
+  );
   const prevFocusedRef = useRef(null);
 
   // Build and apply highlight decorations whenever the source data changes.
   useEffect(() => {
-    if (!editor || !criteriaScores) return;
+    if (!editor) return;
+
+    const enabled = visibility?.enabled !== false;
+    const showMatched = visibility?.showMatched !== false;
+    const showMismatch = visibility?.showMismatch !== false;
+
+    if (!enabled || !criteriaScores) {
+      editor.commands.setHighlights([]);
+      return;
+    }
 
     const highlights = [];
     const seenContextKeys = new Set();
@@ -43,10 +55,7 @@ const useEditorHighlights = (editor) => {
       for (const detail of criteria.details) {
         if (!detail.context) continue;
 
-        // Dedupe per context: siblings share one highlight.
         const ctxKey = detail.contextId != null ? `cid:${detail.contextId}` : `ctx:${detail.context}`;
-        if (seenContextKeys.has(ctxKey)) continue;
-        seenContextKeys.add(ctxKey);
 
         const isPositive =
           detail.isFixed ||
@@ -54,6 +63,13 @@ const useEditorHighlights = (editor) => {
           detail.status === 'matched' ||
           detail.status === 'FIXED' ||
           detail.status === 'fixed';
+
+        if (isPositive && !showMatched) continue;
+        if (!isPositive && !showMismatch) continue;
+
+        // Dedupe per context: siblings share one highlight.
+        if (seenContextKeys.has(ctxKey)) continue;
+        seenContextKeys.add(ctxKey);
 
         // For fixed items with suggestions, use the suggestion text as fallback context
         // (since the original context no longer exists in the editor after Apply)
@@ -76,7 +92,7 @@ const useEditorHighlights = (editor) => {
     }
 
     editor.commands.setHighlights(highlights);
-  }, [editor, criteriaScores, focusedItemId]);
+  }, [editor, criteriaScores, focusedItemId, visibility]);
 
   // Scroll-to-focus when focusedItemId changes
   useEffect(() => {

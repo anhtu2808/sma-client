@@ -59,6 +59,7 @@ const Enhancements = () => {
   //   init → loading-suggestions → ready           (suggestions already exist)
   const [phase, setPhase] = useState('init');
   const [errorMessage, setErrorMessage] = useState('');
+  const [failedPhase, setFailedPhase] = useState(null);
   const phaseHandledRef = useRef(false);
 
   // Fetch original resume to check parse status.
@@ -149,6 +150,7 @@ const Enhancements = () => {
       })
       .catch((err) => {
         phaseHandledRef.current = false;
+        setFailedPhase('saving-content');
         setPhase('error');
         setErrorMessage(err?.data?.message || err?.message || 'Failed to save resume content.');
       });
@@ -174,6 +176,7 @@ const Enhancements = () => {
       })
       .catch((err) => {
         phaseHandledRef.current = false;
+        setFailedPhase('generating');
         setPhase('error');
         setErrorMessage(
           err?.data?.message || err?.message || 'Failed to generate suggestions. Please try again.'
@@ -209,6 +212,7 @@ const Enhancements = () => {
         if (enhancement?.content && enhancement?.generateSuggestion === 'NONE') {
           setPhase('generating');
         } else {
+          setFailedPhase('loading-suggestions');
           setPhase('error');
           setErrorMessage(
             err?.data?.message || err?.message || 'Failed to load suggestions. Please try again.'
@@ -360,6 +364,14 @@ const Enhancements = () => {
     editorApi?.applyVersionResponse?.(response);
   }, [editorApi]);
 
+  const handleRetry = useCallback(() => {
+    if (!failedPhase) return;
+    setErrorMessage('');
+    phaseHandledRef.current = false;
+    setPhase(failedPhase);
+    setFailedPhase(null);
+  }, [failedPhase]);
+
   // Manual re-generate: save current editor content then call POST suggestion
   const handleRegenerateSuggestions = useCallback(async () => {
     if (!enhancement?.id || isRegenerating) return;
@@ -465,9 +477,16 @@ const Enhancements = () => {
           title="Something went wrong"
           subTitle={errorMessage || 'Failed to generate suggestions.'}
           extra={
-            <Button mode="primary" shape="rounded" onClick={() => navigate(-1)}>
-              Go Back
-            </Button>
+            <div className="flex items-center justify-center gap-3">
+              {failedPhase ? (
+                <Button mode="primary" shape="rounded" onClick={handleRetry}>
+                  Try Again
+                </Button>
+              ) : null}
+              <Button mode="secondary" shape="rounded" onClick={() => navigate(-1)}>
+                Go Back
+              </Button>
+            </div>
           }
         />
       </div>

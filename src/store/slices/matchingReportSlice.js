@@ -8,6 +8,11 @@ const createInitialState = () => ({
     expandedItemIds: [],
     activeDocumentTab: "resume",
     highlightModalDetailId: null,
+    highlightVisibility: {
+      enabled: true,
+      showMatched: true,
+      showMismatch: true,
+    },
   },
 });
 
@@ -79,6 +84,22 @@ const matchingReportSlice = createSlice({
 
     setActiveDocumentTab: (state, action) => {
       state.ui.activeDocumentTab = action.payload;
+    },
+
+    setHighlightEnabled: (state, action) => {
+      if (!state.ui.highlightVisibility) {
+        state.ui.highlightVisibility = { enabled: true, showMatched: true, showMismatch: true };
+      }
+      state.ui.highlightVisibility.enabled = Boolean(action.payload);
+    },
+
+    setHighlightCategory: (state, action) => {
+      const { key, value } = action.payload || {};
+      if (key !== "showMatched" && key !== "showMismatch") return;
+      if (!state.ui.highlightVisibility) {
+        state.ui.highlightVisibility = { enabled: true, showMatched: true, showMismatch: true };
+      }
+      state.ui.highlightVisibility[key] = Boolean(value);
     },
 
     setDetailFixed: (state, action) => {
@@ -180,6 +201,23 @@ const matchingReportSlice = createSlice({
       // }
     },
 
+    addSuggestionToContext: (state, action) => {
+      const { contextId, suggestion } = action.payload || {};
+      if (!state.data || !Number.isFinite(Number(contextId)) || !suggestion) return;
+      const ctxId = Number(contextId);
+      state.data.criteriaScores?.forEach((criteria) => {
+        criteria.details?.forEach((detail) => {
+          if (detail.contextId === ctxId) {
+            detail.suggestions = Array.isArray(detail.suggestions) ? [...detail.suggestions] : [];
+            const exists = detail.suggestions.some((s) => s.id === suggestion.id);
+            if (!exists) {
+              detail.suggestions.push(suggestion);
+            }
+          }
+        });
+      });
+    },
+
     updateSuggestion: (state, action) => {
       const { id, suggestion } = action.payload || {};
       if (!state.data || !Number.isFinite(Number(id)) || typeof suggestion !== "string") return;
@@ -212,9 +250,12 @@ export const {
   setDetailContext,
   setDetailPinnedRange,
   applySuggestionState,
+  addSuggestionToContext,
   updateSuggestion,
   updateScoresAfterFixed,
   revertScoresAfterUnfixed,
+  setHighlightEnabled,
+  setHighlightCategory,
 } = matchingReportSlice.actions;
 
 export default matchingReportSlice.reducer;

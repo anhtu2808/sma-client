@@ -1,0 +1,7 @@
+.hl-orange-switch.ant-switch.ant-switch-checked {
+  background-color: #f97316 !important;
+}
+
+.hl-orange-switch.ant-switch.ant-switch-checked:hover:not(.ant-switch-disabled) {
+  background-color: #ea580c !important;
+}
