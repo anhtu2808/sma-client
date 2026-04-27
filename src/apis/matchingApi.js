@@ -46,6 +46,7 @@ export const matchingApi = api.injectEndpoints({
         method: "PUT",
       }),
       transformResponse: (response) => response?.data ?? null,
+      invalidatesTags: ["FeatureUsage"],
     }),
 
     markDetailAsFixed: builder.mutation({

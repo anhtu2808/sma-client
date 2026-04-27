@@ -708,6 +708,7 @@ export const resumeApi = api.injectEndpoints({
                 method: "POST",
             }),
             transformResponse: (response) => response?.data ?? null,
+            invalidatesTags: ["FeatureUsage"],
         }),
 
         sendSuggestionConversationAnswer: builder.mutation({
@@ -717,6 +718,7 @@ export const resumeApi = api.injectEndpoints({
                 body: { content, questionKind },
             }),
             transformResponse: (response) => response?.data ?? null,
+            invalidatesTags: ["FeatureUsage"],
         }),
 
         skipSuggestionConversation: builder.mutation({
@@ -725,6 +727,7 @@ export const resumeApi = api.injectEndpoints({
                 method: "POST",
             }),
             transformResponse: (response) => response?.data ?? null,
+            invalidatesTags: ["FeatureUsage"],
         }),
 
         getSuggestionConversation: builder.query({
