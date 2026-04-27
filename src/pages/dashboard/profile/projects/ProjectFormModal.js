@@ -3,6 +3,7 @@ import { Checkbox, DatePicker, Form, Input, Select } from "antd";
 import dayjs from "dayjs";
 import ProfileSectionModal from "@/components/ProfileSectionModal";
 import SimpleTextEditor from "@/components/SimpleTextEditor";
+import { formatDescriptionToHtml } from "@/utils/formatDescription";
 
 const FORM_ID = "project-form";
 
@@ -44,6 +45,7 @@ const ProjectFormModal = ({
 
     merged.startMonth = merged.startMonth ? dayjs(merged.startMonth) : null;
     merged.endMonth = merged.endMonth ? dayjs(merged.endMonth) : null;
+    merged.description = formatDescriptionToHtml(merged.description);
 
     form.setFieldsValue(merged);
   }, [form, initialValues, open]);

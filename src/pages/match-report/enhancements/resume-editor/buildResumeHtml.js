@@ -3,6 +3,8 @@
  * No side effects, no hooks, no DOM access.
  */
 
+import { formatDescriptionToHtml } from '@/utils/formatDescription';
+
 // ── Enum display maps ──────────────────────────────────────────────
 
 const DEGREE_TYPE = {
@@ -263,7 +265,7 @@ const buildExperience = (experiences) => {
 
         // Description
         if (hasValue(detail.description)) {
-          lines.push(`<p style="${STYLES.bodyText}">${escapeHtml(detail.description)}</p>`);
+          lines.push(formatDescriptionToHtml(detail.description));
         }
 
         // Technology skills
@@ -302,7 +304,7 @@ const buildProjects = (projects) => {
     lines.push(buildEntryHeaderLine(titleParts.join(' - '), dateRange));
 
     if (hasValue(proj.description)) {
-      lines.push(`<p style="${STYLES.bodyText}">${escapeHtml(proj.description)}</p>`);
+      lines.push(formatDescriptionToHtml(proj.description));
     }
 
     const bullets = [];
