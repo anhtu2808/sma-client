@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { Tooltip } from "antd";
 import useAnimatedScore from "@/hooks/useAnimatedScore";
+import HighlightVisibilityToggle from "../../enhancements/HighlightVisibilityToggle";
 
 const getScoreColor = (score) => {
   if (score >= 80) return "#22C55E";
@@ -37,9 +38,12 @@ const SidebarHeader = () => {
     <div className="flex flex-col border-b border-neutral-200 bg-white">
       <div className="p-5 pb-4">
         {/* Title row */}
-        <div className="mb-4">
-          <div className="text-base font-bold text-neutral-900 truncate leading-tight">{title}</div>
-          <div className="text-[13px] font-medium text-neutral-500 mt-0.5">{subtitle}</div>
+        <div className="mb-4 flex items-start gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="text-base font-bold text-neutral-900 truncate leading-tight">{title}</div>
+            <div className="text-[13px] font-medium text-neutral-500 mt-0.5">{subtitle}</div>
+          </div>
+          <HighlightVisibilityToggle />
         </div>
 
         {/* Stats row */}

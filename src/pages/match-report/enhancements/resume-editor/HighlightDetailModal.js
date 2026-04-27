@@ -1,6 +1,7 @@
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Suggestions from '@/pages/match-report/sidebar/content/suggestions';
+import SuggestionChatPanel from '@/pages/match-report/resume-preview/suggest-modal/SuggestionChatPanel';
 import { useRegenerateSuggestionMutation } from '@/apis/matchingApi';
 import {
   setHighlightModalDetailId,
@@ -25,6 +26,7 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
   const [regeneratingSuggestionId, setRegeneratingSuggestionId] = useState(null);
   const [isApplying, setIsApplying] = useState(false);
   const [activeIdx, setActiveIdx] = useState(0);
+  const [chatFinalSuggestion, setChatFinalSuggestion] = useState(null);
   const { applySuggestion } = useContext(EditorContext);
   const matchData = useSelector((state) => state.matchingReport.data);
 
@@ -190,7 +192,9 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
 
   const activeSibling = siblings[activeIdx] ?? detail;
   const activeDetail = activeSibling ?? detail;
-  const hasSuggestions = Array.isArray(activeDetail.suggestions) && activeDetail.suggestions.length > 0;
+  const hasStoredSuggestions = Array.isArray(activeDetail.suggestions) && activeDetail.suggestions.length > 0;
+  const hasChatFinal = !!chatFinalSuggestion?.suggestion;
+  const hasSuggestions = hasStoredSuggestions || hasChatFinal;
   const isPositiveStatus =
     activeDetail.isFixed || activeDetail.status === 'MATCHED' || activeDetail.status === 'FIXED';
   const canRegenerate = !isPositiveStatus;
@@ -231,7 +235,8 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
   };
 
   const handleApply = async () => {
-    const firstSuggestion = activeDetail.suggestions?.[0]?.suggestion;
+    const firstSuggestion =
+      activeDetail.suggestions?.[0]?.suggestion ?? chatFinalSuggestion?.suggestion;
     if (!firstSuggestion || !applySuggestion || !activeDetail.context) return;
 
     setIsApplying(true);
@@ -339,7 +344,7 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
           </div>
         )}
 
-        {hasSuggestions && !isPositiveStatus && (
+        {hasStoredSuggestions && !isPositiveStatus && (
           <Suggestions
             itemKey={activeDetail.id}
             suggestions={activeDetail.suggestions}
@@ -352,6 +357,19 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
             detailId={activeDetail.id}
             allDetailIds={siblings.map((s) => s.id)}
           />
+        )}
+
+        {!hasStoredSuggestions && !isPositiveStatus && activeDetail.contextId != null && (
+          <div className="mx-4 my-3">
+            <SuggestionChatPanel
+              contextId={activeDetail.contextId}
+              onCompleted={(data) => {
+                if (data?.finalSuggestion) {
+                  setChatFinalSuggestion(data.finalSuggestion);
+                }
+              }}
+            />
+          </div>
         )}
       </div>
 

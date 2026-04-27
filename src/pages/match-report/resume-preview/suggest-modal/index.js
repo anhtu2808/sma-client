@@ -1,6 +1,7 @@
 import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowsRotate } from '../../../../utils/icons';
+import SuggestionChatPanel from "./SuggestionChatPanel";
 
 const SuggestModal = ({
   status,
@@ -16,10 +17,15 @@ const SuggestModal = ({
   style,
   onMouseEnter,
   onMouseLeave,
+  contextId,
+  enhancementId,
+  conversation = null,
+  onConversationChange,
 }) => {
-  if ((!suggestions || suggestions.length === 0) && !description) return null;
-
   const isDone = status === "MATCHED" || isFixed;
+  const hasSuggestions = Array.isArray(suggestions) && suggestions.length > 0;
+  const showChat = !isDone && !hasSuggestions && contextId != null;
+  if (!hasSuggestions && !description && !showChat) return null;
 
   return (
     <div
@@ -38,6 +44,18 @@ const SuggestModal = ({
         </div>
       )}
       
+      {showChat && (
+        <div className="mb-4">
+          <SuggestionChatPanel
+            contextId={contextId}
+            enhancementId={enhancementId}
+            initialConversation={conversation}
+            onCompleted={onConversationChange}
+            onSkipped={onConversationChange}
+          />
+        </div>
+      )}
+
       {suggestions.length > 0 && (
         <div className="mb-4 max-h-[250px] overflow-y-auto rounded-lg bg-emerald-50/60 p-4 pb-4">
           <ul className="space-y-3 text-sm text-neutral-700">

@@ -339,6 +339,7 @@ const PdfViewer = ({ resumeUrl, activeDetails = [], renderError }) => {
               isFixed={modalEntry.detail?.isFixed}
               description={modalEntry.detail?.description}
               suggestions={modalEntry.detail?.suggestions || []}
+              contextId={modalEntry.detail?.contextId}
               onRegenerateSuggestion={handleRegenerateSuggestion}
               regeneratingSuggestionId={regeneratingSuggestionId}
               isMarkingFixed={markingDetailId === modalEntry.detail?.id}
