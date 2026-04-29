@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Modal } from 'antd';
-import { FileText, CheckCircle2, Upload, Briefcase, Sparkles, Eye, Clock } from 'lucide-react';
+import { FileText, CheckCircle2, Upload, Briefcase, Sparkles, Eye, Clock, Lock } from 'lucide-react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import Loading from '@/components/Loading';
@@ -26,7 +26,9 @@ const ResumeSelection = ({
     isUploading,
     onSelectResume,
     onUpload, onCheckMatch,
-    isStartingMatching
+    isStartingMatching,
+    isLocked = false,
+    lockedMessage = null,
 }) => {
     const navigate = useNavigate();
     const [previewResume, setPreviewResume] = useState(null);
@@ -65,17 +67,29 @@ const ResumeSelection = ({
             title="Select Resume"
             step="01"
         >
+            {isLocked && (
+                <div className="mb-4 flex items-start gap-3 rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-700">
+                    <Lock size={16} className="mt-0.5 shrink-0" />
+                    <span>{lockedMessage || 'This application is locked to the resume from your accepted invitation.'}</span>
+                </div>
+            )}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                {sortedResumes.length === 0 && (
+                    <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 px-4 py-6 text-sm text-gray-500">
+                        {isLocked
+                            ? 'The invited resume is no longer available for this application.'
+                            : 'No resumes available yet. Upload one to continue.'}
+                    </div>
+                )}
                 {sortedResumes.map((resume) => {
                     const isSelected = selectedResumeId === resume.id;
                     const score = getEvaluationHistoryScore(resume);
-                    const evaluationId = getEvaluationHistoryId(resume);
-                    const isNew = newlyUploadedResume?.id === resume.id;
+                    const hasEvaluation = Boolean(getEvaluationHistoryId(resume));
 
                     return (
                         <div
                             key={resume.id}
-                            onClick={() => onSelectResume(resume.id)}
+                            onClick={() => !isLocked && onSelectResume(resume.id)}
                             className={`group relative p-4 rounded-xl border transition-all cursor-pointer flex items-center gap-3 ${isSelected
                                 ? 'border-orange-500 bg-orange-50 shadow-sm'
                                 : 'border-gray-100 bg-white hover:border-orange-200 hover:shadow-sm'
@@ -103,7 +117,7 @@ const ResumeSelection = ({
                                             </span>
                                         </div>
                                     )}
-                                    {score !== null && score !== undefined ? (
+                                    {score !== null && score !== undefined && hasEvaluation ? (
                                         <button
                                             type="button"
                                             onClick={(e) => handleScoreClick(e, resume)}
@@ -175,15 +189,17 @@ const ResumeSelection = ({
                     </div>
                 )} */}
 
-                <label className="flex items-center justify-center gap-3 p-4 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:bg-gray-50 hover:border-orange-200 transition-all group">
-                    {isUploading ? (
-                        <Loading inline size={24} />
-                    ) : (
-                        <Upload size={18} className="text-gray-500 group-hover:text-orange-500" />
-                    )}
-                    <span className="text-sm font-semibold text-gray-600 group-hover:text-orange-500">Upload New CV</span>
-                    <input type="file" className="hidden" onChange={onUpload} accept=".pdf,.doc,.docx" />
-                </label>
+                {!isLocked && (
+                    <label className="flex items-center justify-center gap-3 p-4 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:bg-gray-50 hover:border-orange-200 transition-all group">
+                        {isUploading ? (
+                            <Loading inline size={24} />
+                        ) : (
+                            <Upload size={18} className="text-gray-500 group-hover:text-orange-500" />
+                        )}
+                        <span className="text-sm font-semibold text-gray-600 group-hover:text-orange-500">Upload New CV</span>
+                        <input type="file" className="hidden" onChange={onUpload} accept=".pdf,.doc,.docx" />
+                    </label>
+                )}
             </div>
 
             <Modal

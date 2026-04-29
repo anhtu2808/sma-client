@@ -21,6 +21,15 @@ export const invitationApi = api.injectEndpoints({
             providesTags: ["Invitations"],
         }),
 
+        getInvitationById: builder.query({
+            query: (id) => ({
+                url: `${API_VERSION}/invitations/${id}`,
+                method: "GET",
+            }),
+            transformResponse: (response) => response?.data,
+            providesTags: (result, error, id) => [{ type: "Invitations", id }],
+        }),
+
         updateInvitationStatus: builder.mutation({
             query: ({ id, status }) => ({
                 url: `${API_VERSION}/invitations/${id}/status`,
@@ -53,6 +62,7 @@ export const invitationApi = api.injectEndpoints({
 export const {
     useGetMyInvitationsQuery,
     useGetInvitationSummaryQuery,
+    useGetInvitationByIdQuery,
     useUpdateInvitationStatusMutation,
     useTakeActionOnInvitationMutation,
     useGetInvitationStatusCountQuery,
