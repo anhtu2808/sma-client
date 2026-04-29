@@ -12,11 +12,13 @@ const getSaveClass = (save) => {
 const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSelectDuration, isSelected, onClick, onOpenPaymentModal }) => {
   const navigate = useNavigate();
   const isCurrent = plan.current;
+  const isDowngrade = plan.isDowngrade;
   const isDefault = Boolean(plan.isDefault);
   const hasDurations = plan.durations && plan.durations.length > 0;
-
+  const isDisabled = isCurrent || isDowngrade;
   const handleAction = () => {
     if (isCurrent) return;
+    if (isDisabled) return;
     if (hasDurations) {
       onExpand();
     } else {
@@ -30,10 +32,12 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
 
   return (
     <article
-      onClick={onClick}
-      className={`relative rounded-2xl border p-8 shadow-sm flex flex-col h-full md:h-[690px] transition-all cursor-pointer select-none ${isSelected
-        ? "border-2 border-primary shadow-lg md:scale-[1.02] z-10"
-        : "border-gray-200 hover:border-gray-300"
+      onClick={!isDisabled ? onClick : undefined}
+      className={`relative rounded-2xl border p-8 shadow-sm flex flex-col h-full md:h-[690px] transition-all select-none ${isSelected
+        ? "border-2 border-primary shadow-lg md:scale-[1.02] z-10 cursor-pointer"
+        : isDisabled
+          ? "border-gray-200 opacity-80 cursor-default"
+          : "border-gray-200 hover:border-gray-300 cursor-pointer"
         }`}
     >
       {plan.popular ? (
@@ -45,7 +49,12 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
       {!isExpanded ? (
         <>
           <div className="mb-8">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+            <div className="flex justify-between items-start mb-2">
+              <h3 className="text-xl font-bold text-gray-900">{plan.name}</h3>
+              {isCurrent && (
+                <span className="bg-green-100 text-green-700 text-[9px] font-bold px-2 py-0.5 rounded uppercase">Current</span>
+              )}
+            </div>
             <p
               className="text-sm text-gray-500 line-clamp-2 min-h-[42px]"
               title={plan.description}
@@ -61,12 +70,12 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
           {!isDefault && (
             <button
               type="button"
-              disabled={isCurrent}
+              disabled={isDisabled}
               onClick={(e) => {
                 e.stopPropagation();
                 handleAction();
               }}
-              className={`w-full py-3 px-4 font-semibold rounded-lg mb-8 transition-all ${isCurrent
+              className={`w-full py-3 px-4 font-semibold rounded-lg mb-8 transition-all ${isDisabled
                 ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
@@ -149,7 +158,7 @@ const PlanCard = ({ plan, isExpanded, onExpand, onClose, selectedDuration, onSel
                 ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                 : "bg-primary text-white hover:bg-primary-dark"
                 }`}
-              disabled={isCurrent}
+              disabled={isDisabled}
             >
               {isCurrent ? "Current Plan" : "Subscribe Now"}
             </Button>
