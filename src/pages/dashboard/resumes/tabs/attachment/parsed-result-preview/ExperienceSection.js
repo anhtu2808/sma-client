@@ -1,5 +1,6 @@
 import React from "react";
 import { enumToLabel, formatRange } from "@/utils/profileUtils";
+import { formatDescriptionToHtml } from "@/utils/formatDescription";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBriefcase } from '../../../../../../utils/icons';
 
@@ -50,7 +51,10 @@ const ExperienceSection = ({ data }) => {
                         {formatRange(detail?.startDate, detail?.endDate, detail?.isCurrent)}
                       </p>
                       {detail?.description && (
-                        <p className="text-xs text-gray-700 leading-5">{detail.description}</p>
+                        <div
+                          className="text-xs text-gray-700 leading-5 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-1 [&_li]:my-0.5 [&_strong]:font-semibold [&_a]:text-primary [&_a]:underline"
+                          dangerouslySetInnerHTML={{ __html: formatDescriptionToHtml(detail.description) }}
+                        />
                       )}
                     </div>
                   ))}

@@ -3,6 +3,7 @@ import { Checkbox, DatePicker, Form, Input, Select } from "antd";
 import dayjs from "dayjs";
 import ProfileSectionModal from "@/components/ProfileSectionModal";
 import SimpleTextEditor from "@/components/SimpleTextEditor";
+import { formatDescriptionToHtml } from "@/utils/formatDescription";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '../../../../utils/icons';
 
@@ -47,6 +48,7 @@ const ExperienceFormModal = ({
     if (merged.roles && merged.roles.length > 0) {
       merged.roles = merged.roles.map((role) => ({
         ...role,
+        description: formatDescriptionToHtml(role?.description),
         startMonth: role.startMonth ? dayjs(role.startMonth) : null,
         endMonth: role.endMonth ? dayjs(role.endMonth) : null,
       }));

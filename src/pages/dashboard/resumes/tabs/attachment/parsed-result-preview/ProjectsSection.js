@@ -1,5 +1,6 @@
 import React from "react";
 import { enumToLabel, formatRange, getValidLink } from "@/utils/profileUtils";
+import { formatDescriptionToHtml } from "@/utils/formatDescription";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowUpRightFromSquare, faRocket } from '../../../../../../utils/icons';
 
@@ -30,7 +31,10 @@ const ProjectsSection = ({ data }) => {
               )}
             </div>
             {project?.description && (
-              <p className="text-xs text-gray-500 mb-2 line-clamp-2">{project.description}</p>
+              <div
+                className="text-xs text-gray-500 mb-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-1 [&_li]:my-0.5 [&_strong]:font-semibold [&_a]:text-primary [&_a]:underline"
+                dangerouslySetInnerHTML={{ __html: formatDescriptionToHtml(project.description) }}
+              />
             )}
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs font-mono text-primary bg-primary/5 px-2 py-0.5 rounded">
