@@ -209,7 +209,7 @@ const ProfessionalTemplate = ({
                                         {...SectionHeadingOptions}
                                         headerExtension={<HeaderChildren />}
                                         onAdd={() => addItem('education', {
-                                            institution: "Institution Name", degree: "BACHELOR", majorField: "Major", gpa: 0, startDate: "", endDate: "", isCurrent: false
+                                            institution: "Institution Name", degree: "BACHELOR", majorField: "Major", gpa: 1, startDate: "", endDate: "", isCurrent: false
                                         })}
                                     >
                                         <div className="flex flex-col gap-6 print:block print:space-y-6">
