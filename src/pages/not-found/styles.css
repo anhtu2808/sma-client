@@ -1,0 +1,355 @@
+/* ─── Container ─── */
+.notfound-container {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 40%, #1a1a2e 100%);
+    font-family: 'Inter', 'Interdisplay', Arial, sans-serif;
+}
+
+/* ─── Canvas ─── */
+.notfound-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* ─── Gradient Orbs ─── */
+.notfound-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: 0;
+    animation: orbFloat 8s ease-in-out infinite;
+}
+
+.notfound-orb-1 {
+    width: 400px;
+    height: 400px;
+    background: rgba(255, 107, 53, 0.12);
+    top: -100px;
+    right: -100px;
+    animation-delay: 0s;
+}
+
+.notfound-orb-2 {
+    width: 300px;
+    height: 300px;
+    background: rgba(249, 115, 22, 0.08);
+    bottom: -50px;
+    left: -80px;
+    animation-delay: -3s;
+}
+
+.notfound-orb-3 {
+    width: 250px;
+    height: 250px;
+    background: rgba(255, 107, 53, 0.06);
+    top: 40%;
+    left: 50%;
+    animation-delay: -5s;
+}
+
+@keyframes orbFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -20px) scale(1.05); }
+    66% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+/* ─── Content Wrapper ─── */
+.notfound-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+    max-width: 600px;
+    animation: fadeInUp 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ─── 404 Code ─── */
+.notfound-code-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.notfound-code-digit {
+    font-size: 8rem;
+    font-weight: 800;
+    line-height: 1;
+    background: linear-gradient(135deg, #FF6B35 0%, #F97316 50%, #FF8C5A 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: digitPulse 3s ease-in-out infinite;
+    text-shadow: none;
+    user-select: none;
+}
+
+.notfound-digit-1 {
+    animation-delay: 0s;
+}
+
+.notfound-digit-2 {
+    animation-delay: 0.3s;
+}
+
+@keyframes digitPulse {
+    0%, 100% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(1.05); filter: brightness(1.2); }
+}
+
+/* ─── Planet (the 0 in 404) ─── */
+.notfound-planet {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notfound-planet-body {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FF6B35 0%, #E55A2B 60%, #CC4A1E 100%);
+    position: relative;
+    box-shadow:
+        0 0 40px rgba(255, 107, 53, 0.4),
+        0 0 80px rgba(255, 107, 53, 0.2),
+        inset -10px -10px 30px rgba(0, 0, 0, 0.3),
+        inset 5px 5px 20px rgba(255, 255, 255, 0.1);
+    animation: planetRotate 6s ease-in-out infinite;
+}
+
+.notfound-planet-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 140px;
+    height: 30px;
+    border: 3px solid rgba(255, 107, 53, 0.4);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) rotateX(75deg) rotateZ(-15deg);
+    animation: ringOrbit 4s linear infinite;
+}
+
+@keyframes planetRotate {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(10deg); }
+}
+
+@keyframes ringOrbit {
+    from { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(0deg); }
+    to { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(360deg); }
+}
+
+/* ─── Floating Astronaut / Rocket ─── */
+.notfound-astronaut {
+    position: absolute;
+    top: 10%;
+    right: 15%;
+    animation: float 6s ease-in-out infinite;
+    z-index: 3;
+}
+
+.notfound-rocket-icon {
+    font-size: 2.5rem;
+    color: #FF6B35;
+    filter: drop-shadow(0 0 12px rgba(255, 107, 53, 0.5));
+    transform: rotate(-45deg);
+    animation: rocketGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
+    25% { transform: translateY(-20px) translateX(10px) rotate(3deg); }
+    50% { transform: translateY(-10px) translateX(-5px) rotate(-2deg); }
+    75% { transform: translateY(-25px) translateX(-10px) rotate(2deg); }
+}
+
+@keyframes rocketGlow {
+    from { filter: drop-shadow(0 0 12px rgba(255, 107, 53, 0.3)); }
+    to { filter: drop-shadow(0 0 24px rgba(255, 107, 53, 0.7)); }
+}
+
+/* ─── Text ─── */
+.notfound-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #F1F5F9;
+    margin: 0 0 1rem;
+    letter-spacing: -0.02em;
+}
+
+.notfound-description {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #94A3B8;
+    margin: 0 0 2rem;
+    max-width: 460px;
+}
+
+/* ─── Buttons ─── */
+.notfound-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+}
+
+.notfound-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-size: 0.938rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.notfound-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.notfound-btn-primary {
+    background: linear-gradient(135deg, #FF6B35 0%, #E55A2B 100%);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+}
+
+.notfound-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(255, 107, 53, 0.45);
+}
+
+.notfound-btn-primary:active {
+    transform: translateY(0);
+}
+
+.notfound-btn-secondary {
+    background: rgba(255, 255, 255, 0.06);
+    color: #CBD5E1;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.notfound-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 107, 53, 0.3);
+    color: #FF6B35;
+    transform: translateY(-2px);
+}
+
+.notfound-btn-secondary:active {
+    transform: translateY(0);
+}
+
+/* ─── Hint Badge ─── */
+.notfound-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: #475569;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    backdrop-filter: blur(10px);
+    animation: fadeIn 1s 0.6s both;
+}
+
+.notfound-hint-code {
+    color: #FF6B35;
+    font-weight: 600;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+.notfound-hint-divider {
+    opacity: 0.3;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 640px) {
+    .notfound-code-digit {
+        font-size: 5rem;
+    }
+
+    .notfound-planet {
+        width: 80px;
+        height: 80px;
+    }
+
+    .notfound-planet-body {
+        width: 65px;
+        height: 65px;
+    }
+
+    .notfound-planet-ring {
+        width: 95px;
+        height: 22px;
+    }
+
+    .notfound-title {
+        font-size: 1.35rem;
+    }
+
+    .notfound-description {
+        font-size: 0.9rem;
+    }
+
+    .notfound-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .notfound-btn {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .notfound-astronaut {
+        top: 5%;
+        right: 10%;
+    }
+
+    .notfound-rocket-icon {
+        font-size: 1.8rem;
+    }
+}

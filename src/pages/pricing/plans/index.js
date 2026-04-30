@@ -18,8 +18,6 @@ const mapPlanToCard = (plan, currentPlanId) => {
 
   const name = plan?.name || "Plan";
   const code = name ? name.toUpperCase().replace(/\s+/g, "_") : `PLAN_${plan?.id ?? ""}`;
-
-  // Kiểm tra current plan dựa trên ID truyền từ PricingPage xuống
   const isCurrent = currentPlanId != null ? plan?.id === currentPlanId : Boolean(plan?.isCurrent);
 
   const description = plan?.description || "";
@@ -122,9 +120,25 @@ const Plans = ({ plans = [], currentPlanId = null, onOpenPaymentModal }) => {
     });
   }, [plans]);
 
+  const currentLevel = useMemo(() => {
+    const currentPlan = plans.find(p => p.id === currentPlanId || p.isCurrent);
+    return currentPlan?.planLevel ?? 0;
+  }, [plans, currentPlanId]);
   const mappedPlans = useMemo(() => {
-    return sortedPlans.map((plan) => mapPlanToCard(plan, currentPlanId));
-  }, [sortedPlans, currentPlanId]);
+    return sortedPlans.map((plan) => {
+      const cardData = mapPlanToCard(plan, currentPlanId);
+
+      const isCurrent = plan.id === currentPlanId || plan.isCurrent;
+      const isDowngrade = !isCurrent && plan.planLevel < currentLevel;
+
+      return {
+        ...cardData,
+        current: isCurrent,
+        isDowngrade: isDowngrade,
+        cta: isCurrent ? "Current Plan" : `${plan.name}`,
+      };
+    });
+  }, [sortedPlans, currentPlanId, currentLevel]);
 
   useEffect(() => {
     if (mappedPlans.length === 0) return;
