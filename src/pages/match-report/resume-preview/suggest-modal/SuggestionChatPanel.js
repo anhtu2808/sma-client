@@ -307,6 +307,68 @@ const AnsweredQuestionCard = ({ question, answer }) => {
   );
 };
 
+const ConstrainedAnswer = ({ options, answer, onChange, disabled }) => {
+  const matchesOption = options.includes(answer.content);
+  const initialOther = !!answer.content && !matchesOption;
+  const [isOther, setIsOther] = useState(initialOther);
+
+  useEffect(() => {
+    if (answer.content && options.includes(answer.content)) {
+      setIsOther(false);
+    }
+  }, [answer.content, options]);
+
+  const optionClass = (selected) =>
+    `rounded-full border px-2.5 py-1 text-xs font-semibold transition-colors disabled:opacity-60 ${
+      selected
+        ? 'border-orange-500 bg-orange-100 text-orange-700'
+        : 'border-orange-300 text-orange-700 hover:bg-orange-50'
+    }`;
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap gap-1.5">
+        {options.map((opt) => (
+          <button
+            key={opt}
+            type="button"
+            onClick={() => {
+              setIsOther(false);
+              onChange(opt);
+            }}
+            disabled={disabled}
+            className={optionClass(!isOther && answer.content === opt)}
+          >
+            {opt}
+          </button>
+        ))}
+        <button
+          type="button"
+          onClick={() => {
+            setIsOther(true);
+            onChange('');
+          }}
+          disabled={disabled}
+          className={optionClass(isOther)}
+        >
+          Other
+        </button>
+      </div>
+      {isOther && (
+        <input
+          type="text"
+          value={answer.content || ''}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="Type your own answer…"
+          disabled={disabled}
+          autoFocus
+          className="w-full rounded border border-neutral-200 bg-white px-2 py-1.5 text-sm leading-snug focus:border-orange-300 focus:outline-none disabled:opacity-60"
+        />
+      )}
+    </div>
+  );
+};
+
 const BatchQuestionCard = ({ question, answer, onChange, onSkip, disabled }) => {
   const kind = question.questionKind || 'DESCRIBE';
   const options = Array.isArray(question.options) ? question.options : [];
@@ -349,33 +411,12 @@ const BatchQuestionCard = ({ question, answer, onChange, onSkip, disabled }) => 
       {!skipped && (
         <>
           {isConstrained && effectiveOptions.length > 0 ? (
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-wrap gap-1.5">
-                {effectiveOptions.map((opt) => (
-                  <button
-                    key={opt}
-                    type="button"
-                    onClick={() => onChange(opt)}
-                    disabled={disabled}
-                    className={`rounded-full border px-2.5 py-1 text-xs font-semibold transition-colors disabled:opacity-60 ${
-                      answer.content === opt
-                        ? 'border-orange-500 bg-orange-100 text-orange-700'
-                        : 'border-orange-300 text-orange-700 hover:bg-orange-50'
-                    }`}
-                  >
-                    {opt}
-                  </button>
-                ))}
-              </div>
-              <input
-                type="text"
-                value={answer.content || ''}
-                onChange={(e) => onChange(e.target.value)}
-                placeholder="Or type your own answer…"
-                disabled={disabled}
-                className="w-full rounded border border-neutral-200 bg-white px-2 py-1.5 text-sm leading-snug focus:border-orange-300 focus:outline-none disabled:opacity-60"
-              />
-            </div>
+            <ConstrainedAnswer
+              options={effectiveOptions}
+              answer={answer}
+              onChange={onChange}
+              disabled={disabled}
+            />
           ) : (
             <textarea
               value={answer.content || ''}

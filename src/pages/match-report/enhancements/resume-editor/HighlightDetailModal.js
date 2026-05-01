@@ -415,7 +415,7 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
               disabled={!chatActions.canSubmit || chatActions.isSending}
               className="rounded bg-primary px-4 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {chatActions.isSending ? 'Sending...' : 'Send all'}
+              {chatActions.isSending ? 'Sending...' : 'Send'}
             </button>
           ) : (
             !isPositiveStatus && (

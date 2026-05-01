@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { forwardRef, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Tooltip } from "antd";
 import { setActiveCriteriaId } from "@/store/slices/matchingReportSlice";
@@ -18,7 +18,7 @@ const getScoreBarColor = (score) => {
   return "bg-emerald-400";
 };
 
-const Tab = ({ tab }) => {
+const Tab = forwardRef(({ tab }, ref) => {
   const dispatch = useDispatch();
   const activeCriteriaId = useSelector((state) => state.matchingReport.ui.activeCriteriaId);
 
@@ -31,9 +31,10 @@ const Tab = ({ tab }) => {
 
   return (
     <button
+      ref={ref}
       type="button"
       onClick={() => dispatch(setActiveCriteriaId(tab.id))}
-      className={`relative flex flex-1 flex-col gap-1.5 border-r border-neutral-200 px-3 py-2 text-left transition-colors last:border-r-0 ${
+      className={`relative flex h-full w-[150px] shrink-0 flex-col justify-center gap-1.5 border-r border-neutral-200 px-2.5 py-2 text-left transition-colors last:border-r-0 ${
         isActive ? "bg-neutral-100" : "hover:bg-neutral-50"
       }`}
     >
@@ -80,6 +81,6 @@ const Tab = ({ tab }) => {
       </Tooltip>
     </button>
   );
-};
+});
 
 export default Tab;
