@@ -36,16 +36,26 @@ const SuggestionCard = ({
 
   const canFixInEditor = !!fixInEditor && !!context && !!text && isTextFoundInEditor;
   const isFixingThis = fixingDetailId === detailId;
-  const isApplied = useMemo(
-    () =>
-      idsToMark.length > 0 &&
-      idsToMark.every((id) =>
-        matchData?.criteriaScores
-          ?.flatMap((criteria) => criteria.details || [])
-          .some((detail) => detail.id === id && detail.isFixed)
-      ),
-    [idsToMark, matchData?.criteriaScores]
-  );
+  const isApplied = useMemo(() => {
+    if (suggestion?.isApplied) return true;
+    if (suggestion?.id == null) return false;
+    const allDetails = matchData?.criteriaScores?.flatMap((criteria) => criteria.details || []) ?? [];
+    let ownerDetail = null;
+    for (const detail of allDetails) {
+      const found = detail.suggestions?.find((s) => s.id === suggestion.id);
+      if (found) {
+        if (found.isApplied) return true;
+        ownerDetail = detail;
+        break;
+      }
+    }
+    // Backend persists only detail.isFixed — restore-from-reload fallback.
+    if (ownerDetail?.isFixed) {
+      const anyMarked = ownerDetail.suggestions?.some((s) => s.isApplied);
+      if (!anyMarked) return true;
+    }
+    return false;
+  }, [suggestion?.id, suggestion?.isApplied, matchData?.criteriaScores]);
 
   // Strip HTML tags to get plain text for clipboard
   const getPlainText = (html) => {
@@ -72,6 +82,7 @@ const SuggestionCard = ({
 
     await applySuggestion({
       detailId,
+      suggestionId: suggestion?.id,
       context,
       suggestionText: text,
       detailIds: idsToMark,

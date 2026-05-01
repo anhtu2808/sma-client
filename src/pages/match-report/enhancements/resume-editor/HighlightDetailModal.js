@@ -27,6 +27,7 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
   const [isApplying, setIsApplying] = useState(false);
   const [activeIdx, setActiveIdx] = useState(0);
   const [chatFinalSuggestion, setChatFinalSuggestion] = useState(null);
+  const [chatActions, setChatActions] = useState(null);
   const { applySuggestion } = useContext(EditorContext);
   const matchData = useSelector((state) => state.matchingReport.data);
 
@@ -48,13 +49,15 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
   }, [detail, matchData?.criteriaScores]);
   const anchorDetailId = siblings[0]?.id ?? null;
 
-  // Sync carousel index to whichever sibling matches the incoming `detail` prop
-  // (sidebar click → jump to that sibling; editor tag click → first sibling).
   useEffect(() => {
     if (!detail || siblings.length === 0) return;
     const idx = siblings.findIndex((s) => s.id === detail.id);
     setActiveIdx(idx >= 0 ? idx : 0);
   }, [detail?.id, siblings]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    setChatFinalSuggestion(null);
+  }, [detail?.contextId, detail?.id]);
 
   useEffect(() => {
     if (!open) {
@@ -188,11 +191,21 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
     };
   }, [open, onClose]);
 
-  if (!open || !detail) return null;
-
   const activeSibling = siblings[activeIdx] ?? detail;
   const activeDetail = activeSibling ?? detail;
-  const hasStoredSuggestions = Array.isArray(activeDetail.suggestions) && activeDetail.suggestions.length > 0;
+  const labelMatchedSuggestions = useMemo(() => {
+    const list = Array.isArray(activeDetail?.suggestions) ? activeDetail.suggestions : [];
+    const dl = (activeDetail?.label || "").trim().toLowerCase();
+    if (!dl) return list;
+    return list.filter((s) => {
+      const cov = (s?.coveredLabels || []).map((c) => (c || "").trim().toLowerCase());
+      return cov.length === 0 || cov.includes(dl);
+    });
+  }, [activeDetail]);
+
+  if (!open || !detail) return null;
+
+  const hasStoredSuggestions = labelMatchedSuggestions.length > 0;
   const hasChatFinal = !!chatFinalSuggestion?.suggestion;
   const hasSuggestions = hasStoredSuggestions || hasChatFinal;
   const isPositiveStatus =
@@ -235,8 +248,9 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
   };
 
   const handleApply = async () => {
-    const firstSuggestion =
-      activeDetail.suggestions?.[0]?.suggestion ?? chatFinalSuggestion?.suggestion;
+    const firstSuggestionObj = labelMatchedSuggestions?.[0] ?? activeDetail.suggestions?.[0];
+    const firstSuggestion = firstSuggestionObj?.suggestion ?? chatFinalSuggestion?.suggestion;
+    const firstSuggestionId = firstSuggestionObj?.id ?? chatFinalSuggestion?.id;
     if (!firstSuggestion || !applySuggestion || !activeDetail.context) return;
 
     setIsApplying(true);
@@ -245,6 +259,7 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
     onClose();
     await applySuggestion({
       detailId: activeDetail.id,
+      suggestionId: firstSuggestionId,
       context: activeDetail.context,
       suggestionText: firstSuggestion,
       detailIds: siblings.map((s) => s.id),
@@ -347,7 +362,7 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
         {hasStoredSuggestions && !isPositiveStatus && (
           <Suggestions
             itemKey={activeDetail.id}
-            suggestions={activeDetail.suggestions}
+            suggestions={labelMatchedSuggestions}
             isFocused={false}
             compact
             canRegenerate={canRegenerate}
@@ -368,12 +383,23 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
                   setChatFinalSuggestion(data.finalSuggestion);
                 }
               }}
+              onActionsChange={setChatActions}
             />
           </div>
         )}
       </div>
 
-      <div className="flex items-center justify-end border-t border-neutral-100 px-4 py-2">
+      <div className="flex items-center justify-between border-t border-neutral-100 px-4 py-2">
+        {chatActions ? (
+          <button
+            type="button"
+            onClick={chatActions.skipAll}
+            disabled={chatActions.isSkipping || chatActions.isSending}
+            className="rounded px-2 py-1 text-xs font-medium text-neutral-500 transition-colors hover:bg-neutral-100 disabled:opacity-60"
+          >
+            Skip all — let AI handle it
+          </button>
+        ) : <span />}
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -382,15 +408,26 @@ const HighlightDetailModal = ({ detail, open, onClose }) => {
           >
             Cancel
           </button>
-          {!isPositiveStatus && (
+          {chatActions ? (
             <button
               type="button"
-              disabled={isApplying || !hasSuggestions}
-              onClick={handleApply}
-              className="rounded bg-primary px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={chatActions.submit}
+              disabled={!chatActions.canSubmit || chatActions.isSending}
+              className="rounded bg-primary px-4 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isApplying ? 'Applying...' : 'Apply'}
+              {chatActions.isSending ? 'Sending...' : 'Send'}
             </button>
+          ) : (
+            !isPositiveStatus && (
+              <button
+                type="button"
+                disabled={isApplying || !hasSuggestions}
+                onClick={handleApply}
+                className="rounded bg-primary px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isApplying ? 'Applying...' : 'Apply'}
+              </button>
+            )
           )}
         </div>
       </div>

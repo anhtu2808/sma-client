@@ -10,7 +10,8 @@ import {
 import SkillFormModal from "@/pages/dashboard/profile/skills/SkillFormModal";
 import { formatYearsOfExperience } from "@/utils/profileUtils";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBrain, faPenToSquare, faPlus, faTrash } from '../../../../utils/icons';
+import { Sparkles } from 'lucide-react';
+import { faPenToSquare, faPlus, faTrash } from '../../../../utils/icons';
 
 const Skills = () => {
   const { data: profile } = useCandidateDashboardProfileQuery();
@@ -174,7 +175,7 @@ const Skills = () => {
       <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="bg-orange-50 dark:bg-orange-900/20 p-2 rounded-lg text-primary">
-            <FontAwesomeIcon icon={faBrain} />
+            <Sparkles size={18} />
           </div>
           <h2 className="text-lg font-bold text-gray-900 dark:text-white">Skills</h2>
         </div>

@@ -205,16 +205,34 @@ const matchingReportSlice = createSlice({
       const { contextId, suggestion } = action.payload || {};
       if (!state.data || !Number.isFinite(Number(contextId)) || !suggestion) return;
       const ctxId = Number(contextId);
+      const covered = (suggestion.coveredLabels || [])
+        .map((s) => (s || "").trim().toLowerCase())
+        .filter(Boolean);
       state.data.criteriaScores?.forEach((criteria) => {
         criteria.details?.forEach((detail) => {
-          if (detail.contextId === ctxId) {
-            detail.suggestions = Array.isArray(detail.suggestions) ? [...detail.suggestions] : [];
-            const exists = detail.suggestions.some((s) => s.id === suggestion.id);
-            if (!exists) {
-              detail.suggestions.push(suggestion);
-            }
+          if (detail.contextId !== ctxId) return;
+          const detailLabel = (detail.label || "").trim().toLowerCase();
+          if (covered.length > 0 && !covered.includes(detailLabel)) return;
+          detail.suggestions = Array.isArray(detail.suggestions) ? [...detail.suggestions] : [];
+          const exists = detail.suggestions.some((s) => s.id === suggestion.id);
+          if (!exists) {
+            detail.suggestions.push(suggestion);
           }
         });
+      });
+    },
+
+    markSuggestionApplied: (state, action) => {
+      const { detailId, suggestionId } = action.payload || {};
+      if (!state.data || detailId == null || suggestionId == null) return;
+
+      state.data.criteriaScores.forEach((criteria) => {
+        const detail = criteria.details.find((d) => d.id === detailId);
+        if (!detail || !Array.isArray(detail.suggestions)) return;
+        const suggestion = detail.suggestions.find((s) => s.id === suggestionId);
+        if (suggestion) {
+          suggestion.isApplied = true;
+        }
       });
     },
 
@@ -252,6 +270,7 @@ export const {
   applySuggestionState,
   addSuggestionToContext,
   updateSuggestion,
+  markSuggestionApplied,
   updateScoresAfterFixed,
   revertScoresAfterUnfixed,
   setHighlightEnabled,

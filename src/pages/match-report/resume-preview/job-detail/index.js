@@ -4,7 +4,8 @@ import { useLazyGetJobByIdQuery } from "@/apis/jobApi";
 import Loading from "@/components/Loading";
 import { formatSalary } from "@/utils/salaryUtils";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowTrendUp, faBrain, faBuilding, faCheck, faCircleCheck, faClipboard, faClock, faCreditCard, faFileLines, faGift, faLocationDot } from '../../../../utils/icons';
+import { Sparkles } from 'lucide-react';
+import { faArrowTrendUp, faBuilding, faCheck, faCircleCheck, faClipboard, faClock, faCreditCard, faFileLines, faGift, faLocationDot } from '../../../../utils/icons';
 
 const JobDetail = () => {
   const jobId = useSelector((state) => state.matchingReport.data?.jobId);
@@ -130,7 +131,7 @@ const JobDetail = () => {
       {job.skills?.length > 0 && (
         <div className="mt-6">
           <h2 className="flex items-center gap-2 font-heading text-lg font-semibold text-neutral-900">
-            <FontAwesomeIcon icon={faBrain} className="text-primary" />
+            <Sparkles size={18} className="text-primary" />
             Skills
           </h2>
           <div className="mt-3 flex flex-wrap gap-2">

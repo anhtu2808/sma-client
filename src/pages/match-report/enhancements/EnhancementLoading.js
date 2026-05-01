@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import Lottie from "lottie-react";
 import aiLoadingAnimation from "@/assets/lottie/ai-loading.json";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBrain, faCircleCheck, faFileLines, faWandMagicSparkles } from '../../../utils/icons';
+import { Sparkles } from 'lucide-react';
+import { faCircleCheck, faFileLines, faWandMagicSparkles } from '../../../utils/icons';
 
 const ENHANCEMENT_STEPS = [
   { icon: faFileLines, label: "Reading your resume", delay: 0 },
-  { icon: faBrain, label: "Analyzing job requirements match", delay: 3000 },
+  { icon: Sparkles, isLucide: true, label: "Analyzing job requirements match", delay: 3000 },
   { icon: faWandMagicSparkles, label: "Generating improvement suggestions", delay: 7000 },
 ];
 
@@ -97,6 +98,8 @@ const EnhancementLoading = () => {
                   >
                     {isVisible && !isActive ? (
                       <FontAwesomeIcon icon={faCircleCheck} className="text-[20px]" />
+                    ) : step.isLucide ? (
+                      <step.icon size={20} />
                     ) : (
                       <FontAwesomeIcon icon={step.icon} className="text-[20px]" />
                     )}

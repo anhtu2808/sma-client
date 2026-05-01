@@ -341,12 +341,13 @@ const ResumeEditor = ({
   );
 
   const applySuggestion = useCallback(
-    async ({ detailId, context, suggestionText, detailIds }) => {
+    async ({ detailId, suggestionId, context, suggestionText, detailIds }) => {
       suppressAutosaveRef.current = true;
       if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
       try {
         const result = await applySuggestionFix({
           detailId,
+          suggestionId,
           context,
           suggestionText,
           detailIds,

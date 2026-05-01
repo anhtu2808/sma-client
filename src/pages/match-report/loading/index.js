@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import Lottie from "lottie-react";
 import aiLoadingAnimation from "@/assets/lottie/ai-loading.json";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBrain, faBriefcase, faChartSimple, faCircleCheck, faFileLines, faWandMagicSparkles } from '../../../utils/icons';
+import { Sparkles } from 'lucide-react';
+import { faBriefcase, faChartSimple, faCircleCheck, faFileLines, faWandMagicSparkles } from '../../../utils/icons';
 
 const ANALYSIS_STEPS = [
   { icon: faFileLines, label: "Parsing resume content", delay: 0 },
   { icon: faBriefcase, label: "Analyzing job requirements", delay: 2500 },
-  { icon: faBrain, label: "Evaluating skill alignment", delay: 5500 },
+  { icon: Sparkles, isLucide: true, label: "Evaluating skill alignment", delay: 5500 },
   { icon: faChartSimple, label: "Calculating match score", delay: 8500 },
   { icon: faWandMagicSparkles, label: "Generating insights", delay: 11500 },
 ];
@@ -103,6 +104,8 @@ const MatchingLoading = ({ status = "WAITING" }) => {
                   >
                     {isVisible && !isActive ? (
                       <FontAwesomeIcon icon={faCircleCheck} className="text-[20px]" />
+                    ) : step.isLucide ? (
+                      <step.icon size={20} />
                     ) : (
                       <FontAwesomeIcon icon={step.icon} className="text-[20px]" />
                     )}

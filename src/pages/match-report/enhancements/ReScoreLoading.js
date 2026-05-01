@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import Lottie from "lottie-react";
 import aiLoadingAnimation from "@/assets/lottie/ai-loading.json";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBrain, faChartSimple, faCircleCheck, faFileLines, faWandMagicSparkles } from '../../../utils/icons';
+import { Sparkles } from 'lucide-react';
+import { faChartSimple, faCircleCheck, faFileLines, faWandMagicSparkles } from '../../../utils/icons';
 
 const RESCORE_STEPS = [
   { icon: faFileLines, label: "Saving your changes", delay: 0 },
-  { icon: faBrain, label: "Re-scoring your resume", delay: 2500 },
+  { icon: Sparkles, isLucide: true, label: "Re-scoring your resume", delay: 2500 },
   { icon: faChartSimple, label: "Analyzing new match score", delay: 6000 },
   { icon: faWandMagicSparkles, label: "Updating improvement suggestions", delay: 10000 },
 ];
@@ -98,6 +99,8 @@ const ReScoreLoading = () => {
                   >
                     {isVisible && !isActive ? (
                       <FontAwesomeIcon icon={faCircleCheck} className="text-[20px]" />
+                    ) : step.isLucide ? (
+                      <step.icon size={20} />
                     ) : (
                       <FontAwesomeIcon icon={step.icon} className="text-[20px]" />
                     )}

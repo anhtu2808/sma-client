@@ -1,11 +1,13 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBrain, faBolt, faUserShield } from '../../../utils/icons';
+import { Sparkles } from 'lucide-react';
+import { faBolt, faUserShield } from '../../../utils/icons';
 
 const FeaturesSection = () => {
     const features = [
         {
-            icon: faBrain,
+            icon: Sparkles,
+            isLucide: true,
             title: 'Expert Matching',
             description: 'Our algorithm analyzes thousands of data points to match candidates not just on skills, but on culture fit and career goals.',
             color: 'orange',
@@ -52,7 +54,11 @@ const FeaturesSection = () => {
                             className="group bg-white dark:bg-surface-dark p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-xl hover:border-primary/20 dark:hover:border-primary/20 transition duration-300"
                         >
                             <div className={`w-14 h-14 ${feature.iconBg} ${feature.iconColor} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition duration-300`}>
-                                <FontAwesomeIcon icon={feature.icon} className="text-3xl" />
+                                {feature.isLucide ? (
+                                    <feature.icon size={30} />
+                                ) : (
+                                    <FontAwesomeIcon icon={feature.icon} className="text-3xl" />
+                                )}
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{feature.title}</h3>
                             <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{feature.description}</p>

@@ -285,3 +285,14 @@
   -webkit-box-decoration-break: clone;
 }
 
+.version-diff .diff-too-large {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  color: #92400e;
+  font-size: 12px;
+  font-weight: 500;
+}
+
