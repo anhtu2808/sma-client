@@ -1,5 +1,6 @@
 import { getErrorMessage } from '@/constant/attachment';
 import {
+  markSuggestionApplied,
   setDetailContext,
   setDetailFixed,
   setDetailPinnedRange,
@@ -22,6 +23,7 @@ const getDetailById = (criteriaScores, detailId) =>
 
 export const applySuggestionFix = async ({
   detailId,
+  suggestionId,
   context,
   suggestionText,
   detailIds,
@@ -65,11 +67,20 @@ export const applySuggestionFix = async ({
       detailIds: idsToMark,
       enhancementId,
       content,
+      suggestionId,
     }).unwrap();
 
-    idsToMark.forEach((id) => {
+    const actuallyFixed = Array.isArray(response?.fixedDetailIds) && response.fixedDetailIds.length > 0
+      ? response.fixedDetailIds
+      : idsToMark;
+
+    actuallyFixed.forEach((id) => {
       dispatch(setDetailFixed({ detailId: id }));
     });
+
+    if (suggestionId != null) {
+      dispatch(markSuggestionApplied({ detailId, suggestionId }));
+    }
 
     if (response) {
       dispatch(
