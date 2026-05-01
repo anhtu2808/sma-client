@@ -35,7 +35,6 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
   const {
     data: resumes = [],
     isLoading: isLoadingResumes,
-    isFetching: isFetchingResumes,
   } = useGetCandidateResumesQuery(
     { type: RESUME_TYPES.ORIGINAL, jobId: hasValidJobId ? normalizedJobId : undefined },
     { skip: !open }
@@ -47,11 +46,15 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
   const [startMatchingDetail, { isLoading: isStartingMatching }] = useStartMatchingDetailMutation();
   const [deleteCandidateResume] = useDeleteCandidateResumeMutation();
 
-  const isResumesLoading = isLoadingResumes || isFetchingResumes;
+  const isResumesLoading = isLoadingResumes;
 
   useEffect(() => {
     if (!open) {
       setSelectedResumeId(null);
+      return;
+    }
+
+    if (selectedResumeId != null) {
       return;
     }
 
@@ -60,13 +63,8 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
       return mode === "new" || mode === "retry";
     });
 
-    if (selectableResumes.length > 0 && (!selectedResumeId || !selectableResumes.some((r) => r.id === selectedResumeId))) {
+    if (selectableResumes.length > 0) {
       setSelectedResumeId(selectableResumes[0].id);
-      return;
-    }
-
-    if (selectableResumes.length === 0 && selectedResumeId != null) {
-      setSelectedResumeId(null);
     }
   }, [open, resumes, selectedResumeId]);
 
@@ -106,7 +104,7 @@ const CheckMatchModal = ({ open, onClose, jobId, jobName }) => {
         parseCandidateResume({ resumeId: createdResume.id });
       }
       setSelectedResumeId(createdResume?.id ?? null);
-      toastMessage.success("Resume uploaded successfully. Parsing started automatically.");
+      toastMessage.success("Resume uploaded successfully");
     } catch (error) {
       toastMessage.error(getErrorMessage(error, "Upload resume failed"));
     } finally {

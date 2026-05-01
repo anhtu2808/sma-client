@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { getParseStatusView, normalizeParseStatus } from "@/constant/attachment";
 import {
@@ -10,6 +10,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashCan } from '../../../utils/icons';
 import { Sparkles } from 'lucide-react';
 import { formatScore } from '@/utils/formatScore';
+
+const AnimatedDots = () => {
+  const [count, setCount] = useState(1);
+  useEffect(() => {
+    const id = setInterval(() => setCount((c) => (c % 3) + 1), 400);
+    return () => clearInterval(id);
+  }, []);
+  return <span className="inline-block w-3 text-left">{".".repeat(count)}</span>;
+};
 
 const ResumeOption = ({
   resume,
@@ -37,7 +46,7 @@ const ResumeOption = ({
   const scoreStatusView = (() => {
     switch (evaluationStatus) {
       case "FINISH":
-        return { label: "Scored", className: "bg-amber-100 text-amber-700" };
+        return null;
       case "FAIL":
         return { label: "Score failed", className: "bg-red-100 text-red-700" };
       case "WAITING":
@@ -80,6 +89,11 @@ const ResumeOption = ({
             <h4 className="text-base font-semibold text-gray-900 truncate">
               {resume.resumeName || resume.fileName || `Resume #${resume.id}`}
             </h4>
+            {hasFinishedScore && evaluationHistoryScore != null && (
+              <span className="inline-flex items-center rounded-md border-2 border-emerald-400 bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-700">
+                Score {formatScore(evaluationHistoryScore, 2)}
+              </span>
+            )}
             {scoreStatusView && (
               <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-semibold ${scoreStatusView.className}`}>
                 {scoreStatusView.label}
@@ -91,25 +105,22 @@ const ResumeOption = ({
             <span
               className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 font-medium ${statusView.className}`}
             >
-              {statusView.label}
+              {statusView.label.endsWith("...") ? (
+                <>
+                  {statusView.label.slice(0, -3)}
+                  <AnimatedDots />
+                </>
+              ) : (
+                statusView.label
+              )}
             </span>
-            {!hasFinishedScore && !isScoreProcessing && !canRetryScore && (
-              <>
-                <span className="text-gray-400">•</span>
-                <span>{resume.fileName || "No file name"}</span>
-              </>
-            )}
+            <span className="text-gray-400">•</span>
+            <span>{resume.fileName || "No file name"}</span>
             {resume.createdAt && (
               <>
                 <span className="text-gray-400">•</span>
                 <span className="text-gray-400">{dayjs(resume.createdAt).format("DD/MM/YYYY")}</span>
               </>
-            )}
-            {hasFinishedScore && evaluationHistoryScore != null && (
-              <span className="inline-flex items-center gap-1 rounded-md border-2 border-emerald-400 bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-700">
-                <span className="h-1.5 w-1.5 rounded-md bg-emerald-400" />
-                {formatScore(evaluationHistoryScore, 2)}%
-              </span>
             )}
           </div>
         </div>
