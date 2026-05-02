@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Button from "@/components/Button";
 import SideDecorator from "@/pages/login/side-decorator";
 import authService from "@/services/authService";
+import { markCandidateOnboardingPending } from "@/utils/candidateOnboardingStorage";
 
 const RESEND_COOLDOWN = 60;
 const OTP_LENGTH = 6;
@@ -83,8 +84,16 @@ const VerifyEmail = () => {
         try {
             setLoading(true);
             await authService.verifyEmail({ email, otp });
-            toastMessage.success("Email verified! You can now log in.");
-            navigate("/login");
+            const { isCandidate, user } = await authService.getCandidateAccess();
+            if (!isCandidate || !user?.id) {
+                toastMessage.error("This account is not authorized to access the candidate portal");
+                navigate("/login", { replace: true });
+                return;
+            }
+
+            markCandidateOnboardingPending(user.id);
+            toastMessage.success("Email verified! Let's finish your profile setup.");
+            navigate("/onboarding", { replace: true });
         } catch (error) {
             toastMessage.error(error.response?.data?.message || "Verification failed. Please try again.");
             setDigits(Array(OTP_LENGTH).fill(""));

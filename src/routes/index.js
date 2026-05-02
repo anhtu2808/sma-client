@@ -35,17 +35,20 @@ import CvPreview from "@/pages/cv-preview";
 import ToastTest from "@/pages/ui-kit/toast";
 import LegalPage from '@/pages/legal';
 import NotFound from '@/pages/not-found';
+import Onboarding from "@/pages/onboarding";
+import CandidateOnboardingGate from "@/routes/CandidateOnboardingGate";
 
 
 export const routes = createBrowserRouter(
     createRoutesFromElements(
-        <>
+        <Route element={<CandidateOnboardingGate />}>
             <Route>
                 <Route path="login" element={<Login />} />
                 <Route path="register" element={<Register />} />
                 <Route path="forgot-password" element={<ForgotPassword />} />
                 <Route path="reset-password" element={<ResetPassword />} />
                 <Route path="verify-email" element={<VerifyEmail />} />
+                <Route path="onboarding" element={<Onboarding />} />
             </Route>
             <Route element={<Layout />}>
                 <Route index element={<Home />} />
@@ -87,6 +90,6 @@ export const routes = createBrowserRouter(
             <Route path="checkout" element={<Checkout />} />
             <Route path="legal/:type" element={<LegalPage />} />
             <Route path="*" element={<NotFound />} />
-        </>
+        </Route>
     )
 );
