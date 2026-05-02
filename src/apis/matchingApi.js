@@ -58,12 +58,19 @@ export const matchingApi = api.injectEndpoints({
     }),
 
     markDetailAsFixedBatch: builder.mutation({
-      query: ({ detailIds, enhancementId, content }) => ({
+      query: ({ detailIds, enhancementId, content, suggestionId }) => ({
         url: `${API_VERSION}/criteria-score/details/mark-as-fixed-batch`,
         method: "PUT",
-        body: { detailIds, enhancementId, content },
+        body: { detailIds, enhancementId, content, suggestionId },
       }),
       transformResponse: (response) => response?.data ?? null,
+      invalidatesTags: (result, error, { enhancementId }) =>
+        enhancementId
+          ? [
+              { type: "Enhancement", id: enhancementId },
+              { type: "EnhancementVersions", id: enhancementId },
+            ]
+          : [],
     }),
 
     unmarkDetailAsFixed: builder.mutation({

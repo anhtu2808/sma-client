@@ -360,9 +360,18 @@ const Enhancements = () => {
     setExportModalOpen(true);
   }, [enhancement?.id, editorApi?.editor]);
 
-  const handleRestoreVersion = useCallback((response) => {
+  const handleRestoreVersion = useCallback(async (response) => {
     editorApi?.applyVersionResponse?.(response);
-  }, [editorApi]);
+    if (!evaluationId) return;
+    try {
+      const data = await triggerGetDetail({ evaluationId }).unwrap();
+      if (data) {
+        dispatch(setMatchingReportData(mapEvaluationToStore(data)));
+      }
+    } catch {
+      // ignore
+    }
+  }, [editorApi, evaluationId, triggerGetDetail, dispatch]);
 
   const handleRetry = useCallback(() => {
     if (!failedPhase) return;

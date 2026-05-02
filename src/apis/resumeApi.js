@@ -712,10 +712,10 @@ export const resumeApi = api.injectEndpoints({
         }),
 
         sendSuggestionConversationAnswer: builder.mutation({
-            query: ({ enhancementId, conversationId, content, questionKind }) => ({
+            query: ({ enhancementId, conversationId, content, questionKind, targetLabel, answers }) => ({
                 url: `${API_VERSION}/resume-enhancements/${enhancementId}/conversation/${conversationId}/answer`,
                 method: "POST",
-                body: { content, questionKind },
+                body: { content, questionKind, targetLabel, answers },
             }),
             transformResponse: (response) => response?.data ?? null,
             invalidatesTags: ["FeatureUsage"],
@@ -789,6 +789,7 @@ export const {
     useGetOrCreateEnhancementQuery,
     useUpdateEnhancementContentMutation,
     useGetEnhancementVersionsQuery,
+    useLazyGetEnhancementVersionsQuery,
     useLazyGetEnhancementVersionDetailQuery,
     useUndoEnhancementVersionMutation,
     useRedoEnhancementVersionMutation,

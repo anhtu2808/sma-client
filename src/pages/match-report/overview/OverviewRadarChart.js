@@ -41,9 +41,25 @@ const CustomTick = ({ payload, x, y, cx, cy, textAnchor }) => {
   );
 };
 
+const PROFILE_FLOW_ORDER = [
+  "hard skills",
+  "soft skills",
+  "education",
+  "experience",
+  "job title",
+  "job level",
+];
+
+const profileFlowRank = (name) => {
+  const idx = PROFILE_FLOW_ORDER.indexOf((name || "").toLowerCase().trim());
+  return idx === -1 ? PROFILE_FLOW_ORDER.length : idx;
+};
+
 const OverviewRadarChart = ({ criteriaScores = [] }) => {
   const radarData = criteriaScores
     .filter((cs) => cs.criteriaName)
+    .slice()
+    .sort((a, b) => profileFlowRank(a.criteriaName) - profileFlowRank(b.criteriaName))
     .map((cs) => ({
       criteriaName:
         cs.criteriaName.length > 20 ? cs.criteriaName.substring(0, 18) + "..." : cs.criteriaName,

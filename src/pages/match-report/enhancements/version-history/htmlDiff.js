@@ -1,8 +1,13 @@
 // Inline HTML diff utility.
-// Tokenizes HTML into tag tokens and word tokens, runs LCS on the token
-// sequence, then re-emits HTML with <ins class="diff-add"> / <del class="diff-del">
-// wrappers around added or removed words. Tag tokens flow through unchanged so
-// formatting (headings, lists, bold, etc.) is preserved.
+//
+// Strategy: keep the new version's tag skeleton intact (so the rendered HTML
+// is always well-formed and headings/lists/etc. close where they should),
+// then run LCS only on the text tokens between tags. Added text gets wrapped
+// in <ins class="diff-add">, removed text from the old version gets stitched
+// back in as <del class="diff-del"> next to the surrounding kept text.
+//
+// Tags from the old version are never emitted — only their inner text — so
+// the output structure mirrors `newHtml` exactly.
 
 const TOKEN_RE = /<[^>]+>|&[^;\s]+;|\s+|[^\s<&]+/g;
 
@@ -16,11 +21,6 @@ const tokenize = (html) => {
   }));
 };
 
-const tokensEqual = (a, b) => a.value === b.value;
-
-// Standard LCS table (O(n*m) time/space). Capped to avoid runaway cost on
-// huge documents — falls back to a coarse "replace whole block" diff above the
-// cap.
 const LCS_CELL_CAP = 1_500_000;
 
 const buildLcsTable = (a, b) => {
@@ -29,7 +29,7 @@ const buildLcsTable = (a, b) => {
   const table = Array.from({ length: n + 1 }, () => new Uint32Array(m + 1));
   for (let i = n - 1; i >= 0; i -= 1) {
     for (let j = m - 1; j >= 0; j -= 1) {
-      if (tokensEqual(a[i], b[j])) {
+      if (a[i].value === b[j].value) {
         table[i][j] = table[i + 1][j + 1] + 1;
       } else {
         table[i][j] = Math.max(table[i + 1][j], table[i][j + 1]);
@@ -40,16 +40,54 @@ const buildLcsTable = (a, b) => {
 };
 
 const wrap = (tag, className, tokens) => {
+  if (!tokens.length) return '';
   const text = tokens.map((t) => t.value).join('');
-  if (!text || /^\s*$/.test(text)) return text;
-  // Avoid wrapping pure tag runs — only wrap if there is at least one
-  // non-tag, non-whitespace character.
-  const hasContent = tokens.some((t) => !t.isTag && !t.isWhitespace);
+  if (!text) return '';
+  const hasContent = tokens.some((t) => !t.isWhitespace);
   if (!hasContent) return text;
   return `<${tag} class="${className}">${text}</${tag}>`;
 };
 
-const flushTags = (buffer) => buffer.map((t) => t.value).join('');
+// Walk LCS table to produce a merged stream of {type, token} items in order:
+//   - 'keep': token present in both (use newText token)
+//   - 'ins':  token only in new
+//   - 'del':  token only in old
+const buildMergedStream = (oldText, newText) => {
+  const stream = [];
+  if (!oldText.length) {
+    newText.forEach((t) => stream.push({ type: 'ins', token: t }));
+    return stream;
+  }
+  if (!newText.length) {
+    oldText.forEach((t) => stream.push({ type: 'del', token: t }));
+    return stream;
+  }
+  const table = buildLcsTable(oldText, newText);
+  let i = 0;
+  let j = 0;
+  while (i < oldText.length && j < newText.length) {
+    if (oldText[i].value === newText[j].value) {
+      stream.push({ type: 'keep', token: newText[j] });
+      i += 1;
+      j += 1;
+    } else if (table[i + 1][j] >= table[i][j + 1]) {
+      stream.push({ type: 'del', token: oldText[i] });
+      i += 1;
+    } else {
+      stream.push({ type: 'ins', token: newText[j] });
+      j += 1;
+    }
+  }
+  while (i < oldText.length) {
+    stream.push({ type: 'del', token: oldText[i] });
+    i += 1;
+  }
+  while (j < newText.length) {
+    stream.push({ type: 'ins', token: newText[j] });
+    j += 1;
+  }
+  return stream;
+};
 
 export const htmlDiff = (oldHtml, newHtml) => {
   const oldTokens = tokenize(oldHtml);
@@ -57,104 +95,89 @@ export const htmlDiff = (oldHtml, newHtml) => {
 
   if (!oldTokens.length) return newHtml || '';
   if (!newTokens.length) {
-    return wrap('del', 'diff-del', oldTokens);
+    const oldText = oldTokens.filter((t) => !t.isTag);
+    return wrap('del', 'diff-del', oldText);
   }
 
-  if ((oldTokens.length + 1) * (newTokens.length + 1) > LCS_CELL_CAP) {
-    // Document too large for fine-grained diff: show new content as-is with
-    // a banner marker. Caller can decide to render full content instead.
-    return newHtml || '';
+  const oldText = oldTokens.filter((t) => !t.isTag);
+  const newText = newTokens.filter((t) => !t.isTag);
+
+  if ((oldText.length + 1) * (newText.length + 1) > LCS_CELL_CAP) {
+    const banner =
+      '<div class="diff-too-large" role="note">' +
+      'Document is too large to render a fine-grained diff. Showing the latest version content only.' +
+      '</div>';
+    return banner + (newHtml || '');
   }
 
-  const table = buildLcsTable(oldTokens, newTokens);
+  const stream = buildMergedStream(oldText, newText);
 
-  let i = 0;
-  let j = 0;
   const out = [];
   let delBuf = [];
   let insBuf = [];
 
-  const flushPending = () => {
-    if (delBuf.length) {
-      out.push(wrap('del', 'diff-del', delBuf));
-      delBuf = [];
-    }
+  const flushIns = () => {
     if (insBuf.length) {
       out.push(wrap('ins', 'diff-add', insBuf));
       insBuf = [];
     }
   };
-
-  while (i < oldTokens.length && j < newTokens.length) {
-    const oldTok = oldTokens[i];
-    const newTok = newTokens[j];
-
-    if (tokensEqual(oldTok, newTok)) {
-      flushPending();
-      out.push(oldTok.value);
-      i += 1;
-      j += 1;
-      continue;
+  const flushDel = () => {
+    if (delBuf.length) {
+      out.push(wrap('del', 'diff-del', delBuf));
+      delBuf = [];
     }
+  };
 
-    // Pass through tag tokens transparently — they shouldn't be marked as
-    // additions/deletions on their own; word changes around them carry the
-    // visual signal.
-    if (oldTok.isTag && newTok.isTag) {
-      flushPending();
-      out.push(newTok.value);
-      i += 1;
-      j += 1;
-      continue;
+  let cursor = 0;
+  const drainLeadingDels = () => {
+    while (cursor < stream.length && stream[cursor].type === 'del') {
+      delBuf.push(stream[cursor].token);
+      cursor += 1;
     }
-    if (oldTok.isTag) {
-      flushPending();
-      out.push(oldTok.value);
-      i += 1;
-      continue;
-    }
-    if (newTok.isTag) {
-      flushPending();
-      out.push(newTok.value);
-      j += 1;
-      continue;
-    }
+  };
 
-    if (table[i + 1][j] >= table[i][j + 1]) {
-      delBuf.push(oldTok);
-      i += 1;
-    } else {
-      insBuf.push(newTok);
-      j += 1;
-    }
-  }
-
-  while (i < oldTokens.length) {
-    const tok = oldTokens[i];
+  for (let k = 0; k < newTokens.length; k += 1) {
+    const tok = newTokens[k];
     if (tok.isTag) {
-      flushPending();
+      flushIns();
+      drainLeadingDels();
+      flushDel();
+      out.push(tok.value);
+      continue;
+    }
+
+    drainLeadingDels();
+    const item = stream[cursor];
+    cursor += 1;
+
+    if (!item) {
+      out.push(tok.value);
+      continue;
+    }
+
+    if (item.type === 'keep') {
+      flushIns();
+      flushDel();
       out.push(tok.value);
     } else {
-      delBuf.push(tok);
-    }
-    i += 1;
-  }
-  while (j < newTokens.length) {
-    const tok = newTokens[j];
-    if (tok.isTag) {
-      flushPending();
-      out.push(tok.value);
-    } else {
+      flushDel();
       insBuf.push(tok);
     }
-    j += 1;
   }
-  flushPending();
+
+  while (cursor < stream.length) {
+    if (stream[cursor].type === 'del') {
+      delBuf.push(stream[cursor].token);
+    }
+    cursor += 1;
+  }
+  flushIns();
+  flushDel();
 
   return out.join('');
 };
 
 export default htmlDiff;
 
-// Exported for tests
-export const __test__ = { tokenize, flushTags };
+export const __test__ = { tokenize, buildMergedStream };

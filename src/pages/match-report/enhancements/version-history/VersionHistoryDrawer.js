@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import {
   useGetEnhancementVersionsQuery,
+  useLazyGetEnhancementVersionsQuery,
   useLazyGetEnhancementVersionDetailQuery,
   useRestoreEnhancementVersionMutation,
 } from '@/apis/resumeApi';
@@ -37,6 +38,7 @@ const VersionHistoryDrawer = ({ open, enhancementId, onClose, onRestore }) => {
     { enhancementId, page, size: PAGE_SIZE },
     { skip: !open || !enhancementId }
   );
+  const [getVersionsPage] = useLazyGetEnhancementVersionsQuery();
   const [getVersionDetail, { isFetching: isPreviewLoading }] = useLazyGetEnhancementVersionDetailQuery();
   const [restoreVersion, { isLoading: isRestoring }] = useRestoreEnhancementVersionMutation();
 
@@ -69,8 +71,34 @@ const VersionHistoryDrawer = ({ open, enhancementId, onClose, onRestore }) => {
     return data.number + 1 < data.totalPages;
   }, [data]);
 
-  const findPreviousMeta = (versionNumber) =>
-    versions.find((item) => item.versionNumber === versionNumber - 1);
+  const findPreviousMeta = (list, versionNumber) =>
+    list.find((item) => item.versionNumber === versionNumber - 1);
+
+  const ensurePreviousMeta = async (currentList, targetVersionNumber) => {
+    let list = currentList;
+    let prev = findPreviousMeta(list, targetVersionNumber);
+    if (prev) return prev;
+
+    let nextPage = page + 1;
+    let totalPages = data?.totalPages ?? nextPage;
+    while (!prev && nextPage < totalPages) {
+      const pageData = await getVersionsPage({
+        enhancementId,
+        page: nextPage,
+        size: PAGE_SIZE,
+      }).unwrap();
+      const incoming = pageData?.content ?? [];
+      list = [...list];
+      incoming.forEach((version) => {
+        if (!list.some((item) => item.id === version.id)) list.push(version);
+      });
+      setVersions(list);
+      totalPages = pageData?.totalPages ?? totalPages;
+      prev = findPreviousMeta(list, targetVersionNumber);
+      nextPage += 1;
+    }
+    return prev;
+  };
 
   const handleSelectVersion = async (versionId) => {
     setSelectedVersionId(versionId);
@@ -79,15 +107,19 @@ const VersionHistoryDrawer = ({ open, enhancementId, onClose, onRestore }) => {
       const detail = await getVersionDetail({ enhancementId, versionId }).unwrap();
       setSelectedVersion(detail);
 
-      const prevMeta = findPreviousMeta(detail.versionNumber);
-      if (prevMeta) {
+      if (detail.versionNumber > 1) {
         setIsLoadingPrevious(true);
         try {
-          const prevDetail = await getVersionDetail({
-            enhancementId,
-            versionId: prevMeta.id,
-          }).unwrap();
-          setPreviousVersion(prevDetail);
+          const prevMeta = await ensurePreviousMeta(versions, detail.versionNumber);
+          if (prevMeta) {
+            const prevDetail = await getVersionDetail({
+              enhancementId,
+              versionId: prevMeta.id,
+            }).unwrap();
+            setPreviousVersion(prevDetail);
+          } else {
+            setPreviousVersion(null);
+          }
         } catch {
           setPreviousVersion(null);
         } finally {
@@ -117,8 +149,7 @@ const VersionHistoryDrawer = ({ open, enhancementId, onClose, onRestore }) => {
     return htmlDiff(previousVersion.content || '', selectedVersion.content || '');
   }, [selectedVersion, previousVersion, showDiff]);
 
-  const isFirstVersion =
-    selectedVersion && !findPreviousMeta(selectedVersion.versionNumber);
+  const isFirstVersion = selectedVersion && selectedVersion.versionNumber === 1;
 
   return (
     <Drawer

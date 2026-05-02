@@ -185,7 +185,7 @@ const ExecutiveProfessionalTemplate = ({
                                     isLast={isLast}
                                     titleClassName="text-xl font-bold uppercase border-b-2 border-gray-800 pb-2 mb-4 text-gray-900"
                                     onAdd={() => addItem('education', {
-                                        institution: "Institution Name", degree: "BACHELOR", majorField: "Major", gpa: 0, startDate: "", endDate: "", isCurrent: false
+                                        institution: "Institution Name", degree: "BACHELOR", majorField: "Major", gpa: 1, startDate: "", endDate: "", isCurrent: false
                                     })}
                                 >
                                     <div className="flex flex-col gap-6 print:block print:space-y-6">
