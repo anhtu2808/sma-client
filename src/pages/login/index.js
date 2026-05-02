@@ -7,6 +7,10 @@ import SideDecorator from "@/pages/login/side-decorator";
 import googleIcon from "@/assets/svg/google-icon.svg";
 import authService from "@/services/authService";
 import { GoogleLogin } from "@react-oauth/google";
+import {
+  hasCandidateOnboardingPending,
+  markCandidateOnboardingPending,
+} from "@/utils/candidateOnboardingStorage";
 
 const sanitizeRedirectPath = (path) => {
   if (!path || typeof path !== "string") {
@@ -40,13 +44,17 @@ const Login = () => {
       const response = await authService.login({ email, password });
 
       if (response.data.code === 200) {
-        const isCandidate = await authService.verifyCandidateRole();
+        const { isCandidate, user } = await authService.getCandidateAccess();
         if (!isCandidate) {
           toastMessage.error("This account is not authorized to access the candidate portal");
           return;
         }
         toastMessage.success(response.data.message || "Login successfully");
-        navigate(redirectPath, { replace: true });
+        const nextPath =
+          user?.id && hasCandidateOnboardingPending(user.id)
+            ? "/onboarding"
+            : redirectPath;
+        navigate(nextPath, { replace: true });
       } else {
         toastMessage.error(response.data.message || "Login failed");
       }
@@ -68,13 +76,22 @@ const Login = () => {
       );
 
       if (res.data.code === 200) {
-        const isCandidate = await authService.verifyCandidateRole();
+        const { isCandidate, user } = await authService.getCandidateAccess();
         if (!isCandidate) {
           toastMessage.error("This account is not authorized to access the candidate portal");
           return;
         }
+
+        if (res.data?.data?.shouldStartOnboarding && user?.id) {
+          markCandidateOnboardingPending(user.id);
+        }
+
         toastMessage.success(res.data.message || "Login successfully");
-        navigate(redirectPath, { replace: true });
+        const nextPath =
+          user?.id && hasCandidateOnboardingPending(user.id)
+            ? "/onboarding"
+            : redirectPath;
+        navigate(nextPath, { replace: true });
       } else {
         toastMessage.error(res.data.message || "Login failed");
       }

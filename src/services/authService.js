@@ -9,17 +9,24 @@ const AuthAPI = axios.create({
   },
 });
 
+const storeAuthTokens = (response) => {
+    if (response.data?.data?.accessToken) {
+        localStorage.setItem('accessToken', response.data.data.accessToken);
+        localStorage.setItem('refreshToken', response.data.data.refreshToken);
+    }
+};
+
+const clearAuthTokens = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+};
+
 const authService = {
 
     login: async (credentials) => {
         try {
             const response = await AuthAPI.post('/auth/login', credentials);
-            
-            if (response.data?.data?.accessToken) {
-                localStorage.setItem('accessToken', response.data.data.accessToken);
-                localStorage.setItem('refreshToken', response.data.data.refreshToken);
-            }
-            
+            storeAuthTokens(response);
             return response;
         } catch (error) {
             throw error;
@@ -29,12 +36,7 @@ const authService = {
     registerAsCandidate: async (userData) => {
         try {
             const response = await AuthAPI.post('/candidate/auth/register', userData);
-            
-            if (response.data?.data?.accessToken) {
-                localStorage.setItem('accessToken', response.data.data.accessToken);
-                localStorage.setItem('refreshToken', response.data.data.refreshToken);
-            }
-            
+            storeAuthTokens(response);
             return response;
         } catch (error) {
             throw error;
@@ -44,35 +46,51 @@ const authService = {
     loginWithGoogle: async (idToken) => {
         try {
             const response = await AuthAPI.post('/candidate/auth/google-login', { idToken });
-            console.log(response);
-            if (response.data?.data?.accessToken) {
-                localStorage.setItem('accessToken', response.data.data.accessToken);
-                localStorage.setItem('refreshToken', response.data.data.refreshToken);
-            }
-            
+            storeAuthTokens(response);
             return response;
         } catch (error) {
             throw error;
         }
     },
 
-    verifyCandidateRole: async () => {
+    getCandidateMyInfo: async () => {
+        const token = localStorage.getItem('accessToken');
+        return AuthAPI.get('/candidate/me', {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+    },
+
+    getCandidateAccess: async () => {
         try {
-            const token = localStorage.getItem('accessToken');
-            const response = await AuthAPI.get('/candidate/me', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (response.data?.data?.user?.role !== 'CANDIDATE') {
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
-                return false;
+            const response = await authService.getCandidateMyInfo();
+            const user = response.data?.data?.user ?? null;
+            const isCandidate = user?.role === 'CANDIDATE';
+
+            if (!isCandidate) {
+                clearAuthTokens();
             }
-            return true;
+
+            return {
+                response,
+                candidate: response.data?.data ?? null,
+                user,
+                isCandidate,
+            };
         } catch (error) {
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            return false;
+            clearAuthTokens();
+            return {
+                response: null,
+                candidate: null,
+                user: null,
+                isCandidate: false,
+                error,
+            };
         }
+    },
+
+    verifyCandidateRole: async () => {
+        const { isCandidate } = await authService.getCandidateAccess();
+        return isCandidate;
     },
 
     logout: async () => {
@@ -80,8 +98,7 @@ const authService = {
             const refreshToken = localStorage.getItem('refreshToken');
             const response = await AuthAPI.post('/auth/logout', refreshToken);
             if (response.data?.data === true && response.data.code === 200) {
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
+                clearAuthTokens();
             }
             window.location.href = '/login';
         } catch (error) {
@@ -123,10 +140,7 @@ const authService = {
     verifyEmail: async ({ email, otp }) => {
         try {
             const response = await AuthAPI.post('/candidate/auth/verify-email', { email, otp });
-            if (response.data?.data?.accessToken) {
-                localStorage.setItem('accessToken', response.data.data.accessToken);
-                localStorage.setItem('refreshToken', response.data.data.refreshToken);
-            }
+            storeAuthTokens(response);
             return response;
         } catch (error) {
             throw error;
@@ -152,7 +166,9 @@ const authService = {
 
     getRefreshToken: () => {
         return localStorage.getItem('refreshToken');
-    }
+    },
+
+    clearTokens: clearAuthTokens,
 };
 
 export default authService;
