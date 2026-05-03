@@ -7,6 +7,10 @@ import SideDecorator from "@/pages/login/side-decorator";
 import googleIcon from "@/assets/svg/google-icon.svg";
 import authService from "@/services/authService";
 import { GoogleLogin } from "@react-oauth/google";
+import {
+  hasCandidateOnboardingPending,
+  markCandidateOnboardingPending,
+} from "@/utils/candidateOnboardingStorage";
 
 const Register = () => {
   const [fullName, setFullName] = useState("");
@@ -57,13 +61,22 @@ const Register = () => {
       );
 
       if (res.data.code === 200) {
-        const isCandidate = await authService.verifyCandidateRole();
+        const { isCandidate, user } = await authService.getCandidateAccess();
         if (!isCandidate) {
           toastMessage.error("This account is not authorized to access the candidate portal");
           return;
         }
+
+        if (res.data?.data?.shouldStartOnboarding && user?.id) {
+          markCandidateOnboardingPending(user.id);
+        }
+
         toastMessage.success(res.data.message || "Login successfully");
-        navigate("/");
+        const nextPath =
+          user?.id && hasCandidateOnboardingPending(user.id)
+            ? "/onboarding"
+            : "/";
+        navigate(nextPath, { replace: true });
       } else {
         toastMessage.error(res.data.message || "Login failed");
       }

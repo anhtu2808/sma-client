@@ -5,13 +5,10 @@ import {
   useDeleteCandidateResumeMutation,
   useGetCandidateResumesQuery,
   useLazyGetResumeParseStatusQuery,
-  useParseCandidateResumeMutation,
-  useSetResumeAsProfileMutation,
-  useUploadCandidateResumeMutation,
-  useUploadFilesMutation,
 } from "@/apis/resumeApi";
 import { useGetFeatureUsageQuery } from "@/apis/featureUsageApi";
 import { RESUME_TYPES } from "@/constant";
+import useCandidateResumeWorkflow from "@/hooks/useCandidateResumeWorkflow";
 import FilesList from "./files-list";
 import RenameResumeModal from "../../components/RenameResumeModal";
 // [FREE PARSING] Consent modal no longer needed - parsing is free and auto-triggered
@@ -59,12 +56,17 @@ const AttachmentsTab = () => {
   const { data: resumes = [], isLoading: isLoadingResumes } = useGetCandidateResumesQuery({
     type: RESUME_TYPES.ORIGINAL,
   });
-  const [uploadFiles, { isLoading: isUploadingFile }] = useUploadFilesMutation();
-  const [uploadCandidateResume, { isLoading: isSavingResume }] = useUploadCandidateResumeMutation();
-  const [parseCandidateResume] = useParseCandidateResumeMutation();
   const [triggerResumeParseStatus] = useLazyGetResumeParseStatusQuery();
   const [deleteCandidateResume] = useDeleteCandidateResumeMutation();
-  const [setResumeAsProfile, { isLoading: isSettingProfile }] = useSetResumeAsProfileMutation();
+  const {
+    uploadResumeAsset,
+    createUploadedResume,
+    startResumeParsing,
+    assignResumeAsProfile,
+    isUploadingAsset,
+    isCreatingResume,
+    isSettingResumeAsProfile,
+  } = useCandidateResumeWorkflow();
 
   const [settingProfileId, setSettingProfileId] = useState(null);
   const [parseStatusOverrides, setParseStatusOverrides] = useState({});
@@ -208,14 +210,12 @@ const AttachmentsTab = () => {
 //    });
 //  };
 
-  const createUploadedResume = async (payload) => uploadCandidateResume(payload).unwrap();
-
   const triggerResumeParsing = async (resumeId, { silentError = false } = {}) => {
     if (!resumeId) return false;
     setActiveParsingResumeId(resumeId);
 
     try {
-      await parseCandidateResume({ resumeId }).unwrap();
+      await startResumeParsing(resumeId);
       setParseStatusOverrides((prev) => ({ ...prev, [resumeId]: "PARTIAL" }));
       startPolling(resumeId);
       return true;
@@ -234,21 +234,7 @@ const AttachmentsTab = () => {
     if (!selectedFile) return;
 
     try {
-      const formData = new FormData();
-      formData.append("files", selectedFile);
-
-      const uploadResponses = await uploadFiles(formData).unwrap();
-      const uploadedFile = Array.isArray(uploadResponses) ? uploadResponses[0] : null;
-
-      if (!uploadedFile?.downloadUrl) {
-        throw new Error("Upload file failed");
-      }
-
-      const payload = {
-        resumeName: selectedFile.name,
-        fileName: uploadedFile.originalFileName || selectedFile.name,
-        resumeUrl: uploadedFile.downloadUrl,
-      };
+      const { payload } = await uploadResumeAsset(selectedFile);
 
       if (uploadExhausted) {
         setReplaceModal({ open: true, pendingUploadPayload: payload });
@@ -401,7 +387,7 @@ const AttachmentsTab = () => {
   };
 
   const closeSetProfileConfirm = () => {
-    if (isSettingProfile) return;
+    if (isSettingResumeAsProfile) return;
     setIsConfirmOpen(false);
     setConfirmResumeId(null);
   };
@@ -413,7 +399,7 @@ const AttachmentsTab = () => {
       setIsConfirmLoading(true);
       setSettingProfileId(confirmResumeId);
       const delay = new Promise((resolve) => setTimeout(resolve, 800));
-      await Promise.all([setResumeAsProfile({ resumeId: confirmResumeId }).unwrap(), delay]);
+      await Promise.all([assignResumeAsProfile(confirmResumeId), delay]);
       toastMessage.success("Set profile resume successfully");
       closeSetProfileConfirm();
     } catch (error) {
@@ -424,7 +410,7 @@ const AttachmentsTab = () => {
     }
   };
 
-  const isUploading = isUploadingFile || isSavingResume;
+  const isUploading = isUploadingAsset || isCreatingResume;
 
   return (
     <section className="space-y-6">
@@ -443,7 +429,7 @@ const AttachmentsTab = () => {
         pollingByResumeId={pollingByResumeId}
         activeParsingResumeId={activeParsingResumeId}
         deletingId={deletingId}
-        isSettingProfile={isSettingProfile}
+        isSettingProfile={isSettingResumeAsProfile}
         settingProfileId={settingProfileId}
         onOpenParseConsent={(resumeId) => triggerResumeParsing(resumeId)}
         onOpenSetProfileConfirm={openSetProfileConfirm}
@@ -495,7 +481,7 @@ const AttachmentsTab = () => {
             setIsConfirmLoading(true);
             setSettingProfileId(id);
             const delay = new Promise((resolve) => setTimeout(resolve, 800));
-            await Promise.all([setResumeAsProfile({ resumeId: id }).unwrap(), delay]);
+            await Promise.all([assignResumeAsProfile(id), delay]);
             toastMessage.success("Set profile resume successfully");
           } catch (error) {
             toastMessage.error(getErrorMessage(error, "Set profile resume failed"));
@@ -510,7 +496,7 @@ const AttachmentsTab = () => {
       <SetProfileConfirmModal
         open={isConfirmOpen}
         resumeId={confirmResumeId}
-        isSettingProfile={isSettingProfile}
+        isSettingProfile={isSettingResumeAsProfile}
         isConfirmLoading={isConfirmLoading}
         onCancel={closeSetProfileConfirm}
         onConfirm={handleConfirmSetProfile}

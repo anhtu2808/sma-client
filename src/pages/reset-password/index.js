@@ -8,6 +8,7 @@ import SideDecorator from "@/pages/forgot-password/side-decorator";
 import authService from "@/services/authService";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faKey, faLock } from '../../utils/icons';
+import { hasCandidateOnboardingPending } from "@/utils/candidateOnboardingStorage";
 
 const ResetPassword = () => {
     const location = useLocation();
@@ -47,13 +48,17 @@ const ResetPassword = () => {
             const response = await authService.login({ email, password: newPassword });
 
             if (response.data.code === 200) {
-                const isCandidate = await authService.verifyCandidateRole();
+                const { isCandidate, user } = await authService.getCandidateAccess();
                 if (!isCandidate) {
                     toastMessage.error("This account is not authorized to access the candidate portal");
                     return;
                 }
                 toastMessage.success("Password reset and logged in successfully");
-                navigate("/");
+                const nextPath =
+                    user?.id && hasCandidateOnboardingPending(user.id)
+                        ? "/onboarding"
+                        : "/";
+                navigate(nextPath, { replace: true });
             } else {
                 toastMessage.error(response.data.message || "Reset successful but login failed");
                 navigate("/login");
