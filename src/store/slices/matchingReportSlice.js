@@ -208,9 +208,19 @@ const matchingReportSlice = createSlice({
       const covered = (suggestion.coveredLabels || [])
         .map((s) => (s || "").trim().toLowerCase())
         .filter(Boolean);
+      const resolvedContext =
+        typeof suggestion.resolvedContext === "string" && suggestion.resolvedContext.trim()
+          ? suggestion.resolvedContext
+          : null;
       state.data.criteriaScores?.forEach((criteria) => {
         criteria.details?.forEach((detail) => {
           if (detail.contextId !== ctxId) return;
+          // Highlight anchor follows the EvaluationContext (1-N with details), so update
+          // detail.context for EVERY detail in this context regardless of coveredLabels —
+          // the editor needs the new HTML substring to render the highlight tag.
+          if (resolvedContext) {
+            detail.context = resolvedContext;
+          }
           const detailLabel = (detail.label || "").trim().toLowerCase();
           if (covered.length > 0 && !covered.includes(detailLabel)) return;
           detail.suggestions = Array.isArray(detail.suggestions) ? [...detail.suggestions] : [];

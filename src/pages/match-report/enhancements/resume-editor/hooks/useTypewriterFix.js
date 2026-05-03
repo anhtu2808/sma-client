@@ -81,21 +81,47 @@ const useTypewriterFix = () => {
             (outerNode?.type.name === 'listItem' || outerNode?.type.name === 'taskItem');
 
           if (isInListItem) {
-            // Extract the first <li>'s inner HTML as the replacement content.
-            const liEl = _tmpDiv.querySelector('li');
-            const innerHtml = liEl ? liEl.innerHTML.trim() : _tmpDiv.textContent.trim();
+            // Replace existing listItem's paragraph with first <li> content; if
+            // suggestion has multiple <li>, insert the rest as siblings inside
+            // the same list. Prevents losing extra bullets the AI provided.
+            const liEls = Array.from(_tmpDiv.querySelectorAll('li'));
+            const firstInner = liEls.length > 0
+              ? liEls[0].innerHTML.trim()
+              : _tmpDiv.textContent.trim();
 
-            // Replace only the content inside the existing paragraph, keeping the
-            // listItem/bulletList structure intact.
             const paraContentStart = resolved.start(depth);
             const paraContentEnd = resolved.end(depth);
+            const originalListItemEnd = resolved.after(depth - 1);
+            const listNode = depth > 1 ? resolved.node(depth - 2) : null;
+            const listTag = listNode?.type.name === 'orderedList' ? 'ol' : 'ul';
 
             const sizeBefore = editor.state.doc.content.size;
             editor
               .chain()
               .deleteRange({ from: paraContentStart, to: paraContentEnd })
-              .insertContentAt(paraContentStart, innerHtml, { updateSelection: false })
+              .insertContentAt(paraContentStart, firstInner, { updateSelection: false })
               .run();
+            const sizeAfterStep1 = editor.state.doc.content.size;
+
+            // Step 2 in a separate transaction so the insert position is
+            // resolved against the post-step-1 doc; using the original
+            // `listItemEnd` inside the same chain points into the now-shifted
+            // text and produces a nested bullet inside the first item.
+            if (liEls.length > 1) {
+              const step1Delta = sizeAfterStep1 - sizeBefore;
+              const newListItemEnd = originalListItemEnd + step1Delta;
+              const extraLisHtml = liEls.slice(1)
+                .map((li) => `<li>${li.innerHTML}</li>`)
+                .join('');
+              editor
+                .chain()
+                .insertContentAt(
+                  newListItemEnd,
+                  `<${listTag}>${extraLisHtml}</${listTag}>`,
+                  { updateSelection: false }
+                )
+                .run();
+            }
             const sizeAfter = editor.state.doc.content.size;
 
             const newLen = (paraContentEnd - paraContentStart) + (sizeAfter - sizeBefore);

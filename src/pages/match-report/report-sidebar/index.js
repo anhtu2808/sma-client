@@ -110,7 +110,7 @@ const ReportSidebar = () => {
                         style={{ width: `${Math.min(criteriaScore, 100)}%` }}
                       />
                     </div>
-                    <span className="text-sm font-semibold text-neutral-700 w-8 text-right">{criteriaScore}%</span>
+                    <span className="text-sm font-semibold text-neutral-700 w-14 text-right tabular-nums">{criteriaScore}/100</span>
                   </div>
                 </div>
                 {details.length > 0 && (
