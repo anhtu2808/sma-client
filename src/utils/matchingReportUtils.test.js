@@ -25,6 +25,48 @@ describe("mapEvaluationToStore", () => {
     ]);
     expect(state.data.criteriaScores[0].details[1].suggestions).toEqual([]);
   });
+
+  it("preserves full suggestion metadata from backend responses", () => {
+    const state = mapEvaluationToStore({
+      criteriaScores: [
+        {
+          id: 9,
+          details: [
+            {
+              id: 1,
+              suggestions: [
+                {
+                  id: 11,
+                  suggestion: "Backend suggestion",
+                  targetSection: "EXPERIENCE",
+                  suggestionType: "EXTEND",
+                  resolutionType: "ACTIONABLE",
+                  reason: "Adds grounded work-history evidence.",
+                  sourceEvidence: "Built APIs on AWS",
+                  requiresManualInput: false,
+                  coveredLabels: ["Docker"],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(state.data.criteriaScores[0].details[0].suggestions).toEqual([
+      expect.objectContaining({
+        id: 11,
+        suggestion: "Backend suggestion",
+        targetSection: "EXPERIENCE",
+        suggestionType: "EXTEND",
+        resolutionType: "ACTIONABLE",
+        reason: "Adds grounded work-history evidence.",
+        sourceEvidence: "Built APIs on AWS",
+        requiresManualInput: false,
+        coveredLabels: ["Docker"],
+      }),
+    ]);
+  });
 });
 
 describe("mapSuggestionsToStore", () => {
@@ -67,7 +109,16 @@ describe("mapSuggestionsToStore", () => {
         {
           id: 9002,
           context: "Kafka event streaming",
-          suggestions: [{ id: 77, suggestion: "Added Kafka-based event streaming" }],
+          suggestions: [
+            {
+              id: 77,
+              suggestion: "Added Kafka-based event streaming",
+              targetSection: "EXPERIENCE",
+              suggestionType: "EXTEND",
+              resolutionType: "ACTIONABLE",
+              coveredLabels: ["Kafka"],
+            },
+          ],
           details: [
             {
               id: 2,
@@ -98,10 +149,19 @@ describe("mapSuggestionsToStore", () => {
       }),
       expect.objectContaining({
         id: 2,
-        tagIndex: 2,
+        tagIndex: 1,
         status: "PARTIAL",
         context: "Kafka event streaming",
-        suggestions: [{ id: 77, suggestion: "Added Kafka-based event streaming" }],
+        suggestions: [
+          expect.objectContaining({
+            id: 77,
+            suggestion: "Added Kafka-based event streaming",
+            targetSection: "EXPERIENCE",
+            suggestionType: "EXTEND",
+            resolutionType: "ACTIONABLE",
+            coveredLabels: ["Kafka"],
+          }),
+        ],
       }),
     ]);
   });
@@ -160,8 +220,8 @@ describe("mapSuggestionsToStore", () => {
     });
 
     expect(state.data.criteriaScores[0].details).toEqual([
-      expect.objectContaining({ id: 1, tagIndex: 1 }),
-      expect.objectContaining({ id: 2, tagIndex: 1 }),
+      expect.objectContaining({ id: 1, tagIndex: 2 }),
+      expect.objectContaining({ id: 2, tagIndex: 2 }),
     ]);
   });
 

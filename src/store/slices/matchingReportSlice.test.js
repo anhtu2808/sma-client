@@ -47,6 +47,38 @@ describe("matchingReportSlice", () => {
     ]);
   });
 
+  it("merges full regenerated suggestion metadata while preserving client-only apply state", () => {
+    const state = createState();
+    state.data.criteriaScores[0].details[0].suggestions[0] = {
+      id: 101,
+      suggestion: "Old suggestion",
+      suggestionType: "REWRITE",
+      isApplied: true,
+    };
+
+    const nextState = reducer(
+      state,
+      updateSuggestion({
+        id: 101,
+        suggestion: "New suggestion",
+        targetSection: "EXPERIENCE",
+        suggestionType: "EXTEND",
+        resolutionType: "ACTIONABLE",
+        coveredLabels: ["Docker"],
+      })
+    );
+
+    expect(nextState.data.criteriaScores[0].details[0].suggestions[0]).toEqual({
+      id: 101,
+      suggestion: "New suggestion",
+      targetSection: "EXPERIENCE",
+      suggestionType: "EXTEND",
+      resolutionType: "ACTIONABLE",
+      coveredLabels: ["Docker"],
+      isApplied: true,
+    });
+  });
+
   it("setDetailFixed sets isFixed to true", () => {
     const nextState = reducer(createState(), setDetailFixed({ detailId: 10 }));
 
