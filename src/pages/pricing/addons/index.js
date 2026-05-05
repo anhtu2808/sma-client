@@ -1,73 +1,164 @@
+import { useState, useEffect } from "react";
 import Button from "@/components/Button";
 import formatCurrency from "@/utils/formatCurrency";
 
 const Addons = ({ quotaPlans = [], featurePlans = [], onOpenPaymentModal }) => {
-    if (quotaPlans.length === 0 && featurePlans.length === 0) return null;
+  const [selectedAddon, setSelectedAddon] = useState(null);
 
-    const renderAddonItem = (addon) => {
-        const prices = Array.isArray(addon?.planPrices) ? addon.planPrices : [];
-        const activePrice = prices.find((p) => p?.isActive !== false) || {};
-        const priceAmount = activePrice.salePrice ?? activePrice.originalPrice ?? 0;
-        const isAdded = Boolean(addon.isCurrent);
+  useEffect(() => {
+    if (!selectedAddon) {
+      if (quotaPlans.length > 0) {
+        setSelectedAddon(quotaPlans[0]);
+      } else if (featurePlans.length > 0) {
+        setSelectedAddon(featurePlans[0]);
+      }
+    }
+  }, [quotaPlans, featurePlans, selectedAddon]);
 
-        return (
-            <div key={addon.id} className="bg-white rounded-xl p-5 border border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 hover:shadow-md transition-all group">
-                <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                        <h4 className="font-bold text-gray-900 group-hover:text-primary transition-colors">{addon.name}</h4>
-                        {isAdded && <span className="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded font-bold uppercase">Active</span>}
-                    </div>
-                    <p className="text-xs text-gray-500">{addon.description}</p>
-                </div>
+  if (quotaPlans.length === 0 && featurePlans.length === 0) return null;
 
-                <div className="flex items-center gap-4 shrink-0">
-                    <span className="text-sm font-bold text-gray-900">
-                        {priceAmount > 0 ? `+${formatCurrency(priceAmount)}` : "Free"}
-                    </span>
-                    <Button
-                        mode={isAdded ? "secondary" : "primary"}
-                        className="!py-1.5 !px-6 !text-xs !font-bold rounded-lg"
-                        onClick={() => onOpenPaymentModal({
-                            ...addon,
-                            basePriceLabel: formatCurrency(priceAmount),
-                            priceId: activePrice.id,
-                            durations: []
-                        }, null)}
-                    >
-                        {isAdded ? "Active" : "Buy Now"}
-                    </Button>
-                </div>
-            </div>
-        );
+  const getAddonPrice = (addon) => {
+    const prices = Array.isArray(addon?.planPrices) ? addon.planPrices : [];
+    const priceObj = prices.find((p) => p?.isActive !== false) || {};
+    return {
+      priceAmount: priceObj.salePrice ?? priceObj.originalPrice ?? 0,
+      priceObj,
     };
+  };
+
+  const handleAddonClick = (addon) => {
+    const { priceAmount, priceObj } = getAddonPrice(addon);
+    const addonPlan = {
+      ...addon,
+      basePriceLabel: formatCurrency(priceAmount),
+      baseUnit: "",
+      priceId: priceObj.id,
+      durations: [],
+    };
+    onOpenPaymentModal(addonPlan, null);
+  };
+
+  const renderNavList = (title, items) => {
+    if (!items || items.length === 0) return null;
+    return (
+      <div className="mb-6">
+        <h3 className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-3 px-3 bg-gray-50 py-2 rounded-md">
+          {title}
+        </h3>
+        <div className="space-y-1">
+          {items.map((addon) => {
+            const isSelected = selectedAddon?.id === addon.id;
+            const { priceAmount } = getAddonPrice(addon);
+            return (
+              <div
+                key={addon.id}
+                onClick={() => setSelectedAddon(addon)}
+                className={`cursor-pointer border-l-4 p-3 rounded-r-md transition-all ${isSelected
+                  ? "border-orange-500 bg-orange-50 shadow-sm"
+                  : "border-transparent hover:bg-gray-50"
+                  }`}
+              >
+                <div className="flex flex-col">
+                  <span className={`text-sm font-semibold ${isSelected ? 'text-orange-600' : 'text-gray-700'}`}>
+                    {addon.name}
+                  </span>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs text-gray-500 font-medium">
+                      {priceAmount > 0 ? formatCurrency(priceAmount) : "Free"}
+                    </span>
+                    {addon.isCurrent && (
+                      <span className="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-bold uppercase">
+                        Active
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  const renderSelectedDetails = () => {
+    if (!selectedAddon) return null;
+    const { priceAmount } = getAddonPrice(selectedAddon);
+    const usageLimits = selectedAddon?.usageLimits || [];
+    const isAdded = Boolean(selectedAddon.isCurrent);
 
     return (
-        <div className="bg-gray-50/50 rounded-3xl p-8 border border-gray-100 space-y-8">
-            <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-primary"></span>Add-ons
-            </h2>
-
-            <div className="grid grid-cols-1 gap-6">
-                {quotaPlans.length > 0 && (
-                    <div className="space-y-4">
-                        <h3 className="text-xs font-bold text-gray-400 ml-1">Usage Quotas</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {quotaPlans.map(renderAddonItem)}
-                        </div>
-                    </div>
-                )}
-
-                {featurePlans.length > 0 && (
-                    <div className="space-y-4">
-                        <h3 className="text-xs font-bold text-gray-400 ml-1 uppercase">Premium Features</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {featurePlans.map(renderAddonItem)}
-                        </div>
-                    </div>
-                )}
-            </div>
+      <div className="bg-white rounded-xl flex flex-col h-full border border-gray-100 shadow-sm">
+        <div className="p-6 border-b border-gray-100 flex justify-between items-start">
+          <h2 className="text-2xl font-bold text-gray-900">{selectedAddon.name}</h2>
         </div>
+
+        <div className="p-6 flex-1 space-y-8">
+          <div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Product Description:</h3>
+            <p className="text-lg text-gray-600 leading-relaxed">
+              {selectedAddon.description || "No description available."}
+            </p>
+          </div>
+
+          {selectedAddon.planDetails && (
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Plan Details:</h3>
+              <div
+                className="text-lg text-gray-600 leading-relaxed prose max-w-none"
+                dangerouslySetInnerHTML={{ __html: selectedAddon.planDetails }}
+              />
+            </div>
+          )}
+
+          {usageLimits.length > 0 && (
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3 bg-gray-50 p-2 rounded">Includes:</h3>
+              <ul className="space-y-4">
+                {usageLimits.map((limit, i) => (
+                  <li key={i} className="flex items-center gap-4 text-lg text-gray-600">
+                    <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path d="M5 13l4 4L19 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <span>{limit.featureName}: <strong>+{limit.maxQuota}</strong></span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+
+        <div className="p-6 border-t border-gray-100 flex justify-between gap-4 bg-gray-50/50 rounded-b-xl">
+          <span className="self-center text-xl font-bold text-orange-600">
+            Total: {priceAmount > 0 ? formatCurrency(priceAmount) : "Free"}
+          </span>
+          <Button
+            mode={isAdded ? "secondary" : "primary"}
+            size="lg"
+            className="min-w-[160px]"
+            onClick={() => handleAddonClick(selectedAddon)}
+          >
+            {isAdded ? "Manage Plan" : "Buy Now"}
+          </Button>
+        </div>
+      </div>
     );
+  };
+
+  return (
+    <div className="flex flex-col md:flex-row gap-6 items-stretch min-h-[500px] md:h-[calc(100vh-260px)]">
+      {/* Left Sidebar Navigation */}
+      <div className="w-full md:w-1/3 shrink-0 bg-white rounded-xl border border-gray-200 p-2 shadow-sm overflow-y-auto max-h-[800px] scrollbar-thin">
+        {renderNavList("Usage Quotas", quotaPlans)}
+        {renderNavList("Premium Features", featurePlans)}
+      </div>
+
+      {/* Right Details Pane */}
+      <div className="w-full md:w-2/3 flex-1">
+        {renderSelectedDetails()}
+      </div>
+    </div>
+  );
 };
 
 export default Addons;
