@@ -7,6 +7,14 @@ export type CandidateLevel = "SENIOR" | "MID" | "JUNIOR";
 export interface SuggestionItem {
   id: number;
   suggestion: string;
+  targetSection?: string | null;
+  suggestionType?: string | null;
+  resolutionType?: string | null;
+  reason?: string | null;
+  sourceEvidence?: string | null;
+  requiresManualInput?: boolean;
+  coveredLabels?: string[];
+  isApplied?: boolean;
 }
 
 export interface DetailItem {
@@ -81,10 +89,42 @@ const normalizeSuggestions = (suggestions?: SuggestionItem[] | null): Suggestion
 
   return suggestions
     .filter((suggestion): suggestion is SuggestionItem => suggestion != null)
-    .map((suggestion) => ({
-      id: Number(suggestion.id),
-      suggestion: typeof suggestion.suggestion === "string" ? suggestion.suggestion : "",
-    }))
+    .map((suggestion) => {
+      const normalizedSuggestion: SuggestionItem = {
+        id: Number(suggestion.id),
+        suggestion: typeof suggestion.suggestion === "string" ? suggestion.suggestion : "",
+      };
+
+      if (typeof suggestion.targetSection === "string") {
+        normalizedSuggestion.targetSection = suggestion.targetSection;
+      }
+      if (typeof suggestion.suggestionType === "string") {
+        normalizedSuggestion.suggestionType = suggestion.suggestionType;
+      }
+      if (typeof suggestion.resolutionType === "string") {
+        normalizedSuggestion.resolutionType = suggestion.resolutionType;
+      }
+      if (typeof suggestion.reason === "string") {
+        normalizedSuggestion.reason = suggestion.reason;
+      }
+      if (typeof suggestion.sourceEvidence === "string") {
+        normalizedSuggestion.sourceEvidence = suggestion.sourceEvidence;
+      }
+      if (typeof suggestion.requiresManualInput === "boolean") {
+        normalizedSuggestion.requiresManualInput = suggestion.requiresManualInput;
+      }
+      if (Array.isArray(suggestion.coveredLabels)) {
+        normalizedSuggestion.coveredLabels = suggestion.coveredLabels
+          .filter((label): label is string => typeof label === "string")
+          .map((label) => label.trim())
+          .filter(Boolean);
+      }
+      if (typeof suggestion.isApplied === "boolean") {
+        normalizedSuggestion.isApplied = suggestion.isApplied;
+      }
+
+      return normalizedSuggestion;
+    })
     .filter((suggestion) => Number.isFinite(suggestion.id));
 };
 
