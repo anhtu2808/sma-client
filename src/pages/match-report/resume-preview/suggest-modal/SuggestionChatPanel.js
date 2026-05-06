@@ -47,6 +47,7 @@ const SuggestionChatPanel = ({
   const [batchAnswers, setBatchAnswers] = useState({});
   const startedKeyRef = useRef(null);
   const bottomAnchorRef = useRef(null);
+  const lastAnsweredRef = useRef(null);
   const completedNotifiedRef = useRef(null);
 
   useEffect(() => {
@@ -139,18 +140,34 @@ const SuggestionChatPanel = ({
 
   useEffect(() => {
     requestAnimationFrame(() => {
-      let node = bottomAnchorRef.current?.parentElement;
-      while (node) {
-        const style = window.getComputedStyle(node);
+      const anchor = lastAnsweredRef.current ?? bottomAnchorRef.current;
+      if (!anchor) return;
+
+      let scrollParent = anchor.parentElement;
+      while (scrollParent) {
+        const style = window.getComputedStyle(scrollParent);
         const overflowY = style.overflowY;
         const canScroll =
           (overflowY === 'auto' || overflowY === 'scroll') &&
-          node.scrollHeight > node.clientHeight;
-        if (canScroll) {
-          node.scrollTop = node.scrollHeight;
-          break;
-        }
-        node = node.parentElement;
+          scrollParent.scrollHeight > scrollParent.clientHeight;
+        if (canScroll) break;
+        scrollParent = scrollParent.parentElement;
+      }
+      if (!scrollParent) return;
+
+      if (lastAnsweredRef.current) {
+        const parentRect = scrollParent.getBoundingClientRect();
+        const anchorRect = lastAnsweredRef.current.getBoundingClientRect();
+        const delta = anchorRect.top - parentRect.top - 8;
+        scrollParent.scrollTo({
+          top: scrollParent.scrollTop + delta,
+          behavior: 'smooth',
+        });
+      } else {
+        scrollParent.scrollTo({
+          top: scrollParent.scrollHeight,
+          behavior: 'smooth',
+        });
       }
     });
   }, [answeredPairs.length, pendingKey, status]);
@@ -222,8 +239,13 @@ const SuggestionChatPanel = ({
     <div className="flex flex-col gap-3 rounded-lg border border-neutral-200 bg-neutral-50 p-3">
       {answeredPairs.length > 0 && (
         <div className="flex flex-col gap-2">
-          {answeredPairs.map(({ ai, user }) => (
-            <AnsweredQuestionCard key={ai.id} question={ai} answer={user} />
+          {answeredPairs.map(({ ai, user }, idx) => (
+            <div
+              key={ai.id}
+              ref={idx === answeredPairs.length - 1 ? lastAnsweredRef : null}
+            >
+              <AnsweredQuestionCard question={ai} answer={user} />
+            </div>
           ))}
         </div>
       )}

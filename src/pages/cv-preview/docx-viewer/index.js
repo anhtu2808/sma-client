@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { renderAsync } from "docx-preview";
+import * as mammoth from "mammoth/mammoth.browser";
 import ViewerLoading from "../components/ViewerLoading";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload, faFileLines } from '../../../utils/icons';
@@ -8,9 +8,10 @@ const DocxViewer = ({ fileUrl, fileName }) => {
   const containerRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [html, setHtml] = useState("");
 
   const loadDocx = useCallback(async () => {
-    if (!fileUrl || !containerRef.current) return;
+    if (!fileUrl) return;
 
     setLoading(true);
     setError(null);
@@ -22,19 +23,21 @@ const DocxViewer = ({ fileUrl, fileName }) => {
       }
       const arrayBuffer = await response.arrayBuffer();
 
-      // Clear previous content
-      containerRef.current.innerHTML = "";
+      const result = await mammoth.convertToHtml(
+        { arrayBuffer },
+        {
+          styleMap: [
+            "p[style-name='Title'] => h1.cv-title",
+            "p[style-name='Subtitle'] => h2.cv-subtitle",
+            "p[style-name='Heading 1'] => h2.cv-heading",
+            "p[style-name='Heading 2'] => h3.cv-heading",
+            "p[style-name='Heading 3'] => h4.cv-heading",
+          ],
+          ignoreEmptyParagraphs: true,
+        }
+      );
 
-      await renderAsync(arrayBuffer, containerRef.current, null, {
-        className: "docx-preview-content",
-        inWrapper: true,
-        ignoreWidth: false,
-        ignoreHeight: true,
-        ignoreFonts: false,
-        breakPages: true,
-        useBase64URL: true,
-      });
-
+      setHtml(result.value || "<p>(empty document)</p>");
       setLoading(false);
     } catch (err) {
       console.error("DOCX render error:", err);
@@ -73,27 +76,91 @@ const DocxViewer = ({ fileUrl, fileName }) => {
     <div className="flex flex-col h-full">
       {loading && <ViewerLoading />}
       <div
-        ref={containerRef}
-        className={`flex-1 overflow-auto bg-neutral-100 dark:bg-neutral-950 ${
-          loading ? "hidden" : ""
-        }`}
+        className={`flex-1 overflow-auto bg-neutral-100 dark:bg-neutral-950 ${loading ? "hidden" : ""}`}
         style={{ minHeight: 0 }}
-      />
+      >
+        <div className="docx-mammoth-page">
+          <div
+            ref={containerRef}
+            className="docx-mammoth-content"
+            dangerouslySetInnerHTML={{ __html: html }}
+          />
+        </div>
+      </div>
       <style>{`
-        .docx-preview-content {
-          padding: 20px;
+        .docx-mammoth-page {
+          max-width: 880px;
+          margin: 24px auto;
+          background: #ffffff;
+          padding: 56px 64px;
+          box-shadow: 0 2px 14px rgba(0, 0, 0, 0.08);
+          border-radius: 6px;
+          color: #1f2937;
+          line-height: 1.6;
+          font-size: 14.5px;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
-        .docx-preview-content .docx-wrapper {
-          background: white;
-          max-width: 900px;
-          margin: 0 auto;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        .docx-mammoth-content h1,
+        .docx-mammoth-content h2,
+        .docx-mammoth-content h3,
+        .docx-mammoth-content h4 {
+          color: #111827;
+          font-weight: 700;
+          margin: 1.2em 0 0.5em;
+          line-height: 1.3;
+        }
+        .docx-mammoth-content h1 { font-size: 1.8rem; }
+        .docx-mammoth-content h2 { font-size: 1.35rem; color: #1e3a8a; }
+        .docx-mammoth-content h3 { font-size: 1.15rem; }
+        .docx-mammoth-content h4 { font-size: 1rem; }
+        .docx-mammoth-content p {
+          margin: 0.5em 0;
+          word-break: break-word;
+        }
+        .docx-mammoth-content ul,
+        .docx-mammoth-content ol {
+          margin: 0.5em 0 0.8em 1.5em;
+          padding-left: 1em;
+        }
+        .docx-mammoth-content li {
+          margin: 0.25em 0;
+        }
+        .docx-mammoth-content a {
+          color: #2563eb;
+          text-decoration: underline;
+          word-break: break-all;
+        }
+        .docx-mammoth-content table {
+          border-collapse: collapse;
+          width: 100%;
+          margin: 1em 0;
+          table-layout: auto;
+        }
+        .docx-mammoth-content th,
+        .docx-mammoth-content td {
+          border: 1px solid #e5e7eb;
+          padding: 8px 12px;
+          text-align: left;
+          word-break: break-word;
+          vertical-align: top;
+        }
+        .docx-mammoth-content th {
+          background: #f9fafb;
+          font-weight: 600;
+        }
+        .docx-mammoth-content img {
+          max-width: 100%;
+          height: auto;
           border-radius: 4px;
         }
-        .docx-preview-content .docx-wrapper > section.docx {
-          padding: 40px 60px;
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
-          margin-bottom: 20px;
+        .docx-mammoth-content strong { font-weight: 700; }
+        .docx-mammoth-content em { font-style: italic; }
+        @media (max-width: 768px) {
+          .docx-mammoth-page {
+            margin: 12px;
+            padding: 28px 20px;
+            font-size: 14px;
+          }
         }
       `}</style>
     </div>
