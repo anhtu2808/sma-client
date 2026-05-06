@@ -5,6 +5,7 @@ import Plans from "./plans";
 import Addons from "./addons";
 import Loading from "@/components/Loading";
 import PaymentModal from "@/pages/checkout/components/PaymentModal";
+import { Tabs, ConfigProvider } from "antd";
 
 const PricingPage = () => {
   const { data: mainRes, isLoading: isMainLoading, refetch: refetchMain } = useGetPlansQuery({
@@ -64,17 +65,11 @@ const PricingPage = () => {
 
   if (isMainLoading) return <Loading />;
 
-  return (
-    <div className="bg-white min-h-screen py-16 px-6">
-      <div className="max-w-7xl mx-auto flex flex-col gap-12">
-        <section className="text-center">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
-            Choose the right plan for your career
-          </h1>
-          <p className="text-gray-500 text-lg">Upgrade to unlock premium features and boost your profile</p>
-        </section>
-
-        {/* Section 1: Subscription Plans */}
+  const items = [
+    {
+      key: '1',
+      label: 'Main Plans',
+      children: (
         <div className="w-full">
           <Plans
             plans={mainPlansData}
@@ -82,8 +77,12 @@ const PricingPage = () => {
             onOpenPaymentModal={handleOpenPaymentModal}
           />
         </div>
-
-        {/* Section 2: Add-ons */}
+      ),
+    },
+    {
+      key: '2',
+      label: 'Extras',
+      children: (
         <div className="w-full">
           {(isQuotaLoading || isFeatureLoading) ? (
             <div className="text-center py-10">Loading addons...</div>
@@ -95,6 +94,22 @@ const PricingPage = () => {
             />
           )}
         </div>
+      ),
+    },
+  ];
+
+  return (
+    <div className="bg-white min-h-screen py-10 px-6">
+      <div className="max-w-7xl mx-auto flex flex-col gap-6">
+        <ConfigProvider
+          theme={{
+            token: {
+              colorPrimary: '#ff6b00',
+            },
+          }}
+        >
+          <Tabs defaultActiveKey="1" items={items} />
+        </ConfigProvider>
 
         <PaymentModal
           isOpen={isPaymentModalOpen}

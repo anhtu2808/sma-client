@@ -1,8 +1,7 @@
-import { Col, Row } from "antd";
+import { ConfigProvider, Tabs } from "antd";
 import { useMemo } from "react";
 import { useGetPlansQuery } from "@/apis/planApi";
 import { PLAN_TARGETS, PLAN_TYPES } from "@/constant/plan";
-import Button from "@/components/Button";
 import Plans from "@/pages/dashboard/billings/plans";
 import Addons from "@/pages/dashboard/billings/addons";
 import Loading from "@/components/Loading";
@@ -18,9 +17,15 @@ const BillingPlans = () => {
     planTarget: PLAN_TARGETS.CANDIDATE,
   });
 
+  const { data: addonsFeature = [], isLoading: isAddonsFeatureLoading, refetch: refetchAddonsFeature } = useGetPlansQuery({
+    planType: PLAN_TYPES.ADDONS_FEATURE,
+    planTarget: PLAN_TARGETS.CANDIDATE,
+  });
+
   const handleRefetch = () => {
     refetchPlans();
     refetchAddons();
+    refetchAddonsFeature();
   };
 
   const currentPlan = useMemo(() => {
@@ -28,27 +33,48 @@ const BillingPlans = () => {
     return plans.find((plan) => plan?.isCurrent) || null;
   }, [plans]);
   const currentPlanId = currentPlan?.id ?? null;
-  const currentPlanName = currentPlan?.name;
 
-  const currentAddons = useMemo(() => {
-    if (!Array.isArray(addons)) return [];
-    return addons.filter((addon) => addon?.isCurrent);
-  }, [addons]);
-
-  if (isPlansLoading || isAddonsLoading) {
+  if (isPlansLoading || isAddonsLoading || isAddonsFeatureLoading) {
     return <Loading className="h-[50vh]" />
   }
 
-  return (
-    <Row gutter={[24, 24]}>
-      <Col span={24}>
-        <Plans plans={plans} currentPlanId={currentPlanId} onPaymentSuccess={handleRefetch} />
-      </Col>
-      <Col span={24}>
-        <Addons plans={addons} currentPlanId={currentPlanId} onPaymentSuccess={handleRefetch} />
-      </Col>
+  const items = [
+    {
+      key: '1',
+      label: 'Main Plans',
+      children: (
+        <div className="w-full mt-4">
+          <Plans plans={plans} currentPlanId={currentPlanId} onPaymentSuccess={handleRefetch} />
+        </div>
+      ),
+    },
+    {
+      key: '2',
+      label: 'Extras',
+      children: (
+        <div className="w-full mt-4">
+          <Addons
+            quotaPlans={addons}
+            featurePlans={addonsFeature}
+            onPaymentSuccess={handleRefetch}
+          />
+        </div>
+      ),
+    },
+  ];
 
-    </Row>
+  return (
+    <div className="flex flex-col gap-6">
+      <ConfigProvider
+        theme={{
+          token: {
+            colorPrimary: '#ff6b00',
+          },
+        }}
+      >
+        <Tabs defaultActiveKey="1" items={items} />
+      </ConfigProvider>
+    </div>
   );
 };
 
