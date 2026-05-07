@@ -52,45 +52,43 @@ const CoverLetter = ({ contactInfo, onChange, stepNumber, jobId, selectedResumeI
         runGenerate();
     };
 
+    const aiButton = (
+        <button
+            type="button"
+            onClick={handleAiClick}
+            disabled={!canGenerate}
+            title={selectedResumeId ? 'Draft this cover letter with AI' : 'Select a resume first'}
+            className={`group inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] font-semibold transition-all duration-150
+                ${canGenerate
+                    ? 'text-orange-600 hover:text-orange-700 hover:bg-orange-50 active:bg-orange-100'
+                    : 'text-gray-400 cursor-not-allowed'}
+            `}
+        >
+            {isGenerating ? (
+                <Loader2 size={13} className="animate-spin" />
+            ) : (
+                <Sparkles
+                    size={13}
+                    className={canGenerate ? 'transition-transform duration-300 group-hover:rotate-12' : ''}
+                />
+            )}
+            <span>{isGenerating ? 'Drafting…' : 'Write with AI'}</span>
+        </button>
+    );
+
     return (
         <StepWrapper
             icon={<Edit3 size={18} />}
             title="Cover Letter"
             step={stepNumber}
         >
-            <div className="mb-3 flex items-center justify-between gap-3 flex-wrap">
-                <p className="text-xs text-gray-500">
-                    {selectedResumeId
-                        ? 'Let AI draft a personalized cover letter from the selected resume and the job description.'
-                        : 'Select a resume in step 01 to enable the AI assistant.'}
-                </p>
-                <button
-                    type="button"
-                    onClick={handleAiClick}
-                    disabled={!canGenerate}
-                    className={`group relative inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold tracking-wide transition-all duration-200
-                        ${canGenerate
-                            ? 'text-white bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0'
-                            : 'text-gray-400 bg-gray-100 cursor-not-allowed'}
-                    `}
-                >
-                    {isGenerating ? (
-                        <Loader2 size={14} className="animate-spin" />
-                    ) : (
-                        <Sparkles
-                            size={14}
-                            className={canGenerate ? 'transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110' : ''}
-                        />
-                    )}
-                    <span>{isGenerating ? 'Drafting…' : 'Write with AI'}</span>
-                </button>
-            </div>
             <SimpleTextEditor
                 value={contactInfo.coverLetter}
                 onChange={(html) => onChange({ target: { name: 'coverLetter', value: html } })}
                 placeholder="Tell the recruiter why you're the best fit for this role..."
                 showCount
                 maxLength={5000}
+                toolbarRight={aiButton}
             />
         </StepWrapper>
     );

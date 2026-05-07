@@ -21,6 +21,13 @@
     gap: 8px;
 }
 
+.simple-text-editor__toolbar-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .ste-btn {
     border: 1px solid transparent;
     background: transparent;

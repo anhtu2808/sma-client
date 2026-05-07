@@ -16,6 +16,7 @@ const SimpleTextEditor = ({
     fontWeight = 400,
     fontSize = 16,
     lineHeight = 1.6,
+    toolbarRight = null,
 }) => {
     const editorRef = useRef(null);
     const hasInitialized = useRef(false);
@@ -150,6 +151,11 @@ const SimpleTextEditor = ({
                 >
                     <FontAwesomeIcon icon={faList} />
                 </button>
+                {toolbarRight && (
+                    <div className="simple-text-editor__toolbar-right">
+                        {toolbarRight}
+                    </div>
+                )}
             </div>
             <div
                 ref={editorRef}
