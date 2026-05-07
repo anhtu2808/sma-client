@@ -10,7 +10,8 @@ const stripHtml = (html) => (html || '').replace(/<[^>]*>/g, '').trim();
 
 const CoverLetter = ({ contactInfo, onChange, stepNumber, jobId, selectedResumeId }) => {
     const [generateCoverLetter, { isLoading: isGenerating }] = useGenerateCoverLetterMutation();
-    const canGenerate = Boolean(jobId) && Boolean(selectedResumeId) && !isGenerating;
+    const hasResume = Boolean(selectedResumeId);
+    const canGenerate = Boolean(jobId) && hasResume && !isGenerating;
 
     const runGenerate = async () => {
         try {
@@ -37,7 +38,12 @@ const CoverLetter = ({ contactInfo, onChange, stepNumber, jobId, selectedResumeI
     };
 
     const handleAiClick = () => {
-        if (!canGenerate) return;
+        if (isGenerating) return;
+        if (!hasResume) {
+            toast.info('Please select a resume first before using AI to write your cover letter.');
+            return;
+        }
+        if (!jobId) return;
         const hasExisting = stripHtml(contactInfo.coverLetter).length > 0;
         if (hasExisting) {
             Modal.confirm({
@@ -56,12 +62,14 @@ const CoverLetter = ({ contactInfo, onChange, stepNumber, jobId, selectedResumeI
         <button
             type="button"
             onClick={handleAiClick}
-            disabled={!canGenerate}
-            title={selectedResumeId ? 'Draft this cover letter with AI' : 'Select a resume first'}
+            disabled={isGenerating}
+            title={hasResume ? 'Draft this cover letter with AI' : 'Please select a resume first'}
             className={`group inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] font-semibold transition-all duration-150
-                ${canGenerate
-                    ? 'text-orange-600 hover:text-orange-700 hover:bg-orange-50 active:bg-orange-100'
-                    : 'text-gray-400 cursor-not-allowed'}
+                ${isGenerating
+                    ? 'text-gray-400 cursor-not-allowed'
+                    : hasResume
+                        ? 'text-orange-600 hover:text-orange-700 hover:bg-orange-50 active:bg-orange-100'
+                        : 'text-orange-400 hover:text-orange-500 hover:bg-orange-50/60'}
             `}
         >
             {isGenerating ? (
@@ -69,7 +77,7 @@ const CoverLetter = ({ contactInfo, onChange, stepNumber, jobId, selectedResumeI
             ) : (
                 <Sparkles
                     size={13}
-                    className={canGenerate ? 'transition-transform duration-300 group-hover:rotate-12' : ''}
+                    className="transition-transform duration-300 group-hover:rotate-12"
                 />
             )}
             <span>{isGenerating ? 'Drafting…' : 'Write with AI'}</span>
