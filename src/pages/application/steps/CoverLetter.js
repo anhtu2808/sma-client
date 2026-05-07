@@ -1,9 +1,8 @@
 import React from 'react';
 import { Modal } from 'antd';
-import { Edit3, Sparkles } from 'lucide-react';
+import { Edit3, Sparkles, Loader2 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import SimpleTextEditor from '@/components/SimpleTextEditor';
-import Button from '@/components/Button';
 import StepWrapper from './StepWrapper';
 import { useGenerateCoverLetterMutation } from '@/apis/applicationApi';
 
@@ -65,15 +64,26 @@ const CoverLetter = ({ contactInfo, onChange, stepNumber, jobId, selectedResumeI
                         ? 'Let AI draft a personalized cover letter from the selected resume and the job description.'
                         : 'Select a resume in step 01 to enable the AI assistant.'}
                 </p>
-                <Button
-                    mode="secondary"
-                    shape="rounded"
+                <button
+                    type="button"
                     onClick={handleAiClick}
                     disabled={!canGenerate}
-                    iconRight={<Sparkles size={18} className="text-current" />}
+                    className={`group relative inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold tracking-wide transition-all duration-200
+                        ${canGenerate
+                            ? 'text-white bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0'
+                            : 'text-gray-400 bg-gray-100 cursor-not-allowed'}
+                    `}
                 >
-                    {isGenerating ? 'Drafting...' : 'Ask AI to write'}
-                </Button>
+                    {isGenerating ? (
+                        <Loader2 size={14} className="animate-spin" />
+                    ) : (
+                        <Sparkles
+                            size={14}
+                            className={canGenerate ? 'transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110' : ''}
+                        />
+                    )}
+                    <span>{isGenerating ? 'Drafting…' : 'Write with AI'}</span>
+                </button>
             </div>
             <SimpleTextEditor
                 value={contactInfo.coverLetter}
