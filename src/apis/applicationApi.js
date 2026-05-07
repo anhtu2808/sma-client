@@ -16,9 +16,20 @@ export const applicationApi = api.injectEndpoints({
             ],
         }),
 
+        generateCoverLetter: builder.mutation({
+            query: ({ jobId, resumeId }) => ({
+                url: `${API_VERSION}/applications/cover-letter/generate`,
+                method: "POST",
+                body: { jobId, resumeId },
+            }),
+            transformResponse: (response) => response?.data?.coverLetter ?? "",
+            invalidatesTags: ["FeatureUsage"],
+        }),
+
     }),
 });
 
 export const {
     useApplyJobMutation,
+    useGenerateCoverLetterMutation,
 } = applicationApi;

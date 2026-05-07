@@ -374,6 +374,8 @@ const Application = () => {
                             contactInfo={contactInfo}
                             onChange={handleInputChange}
                             stepNumber={questions.length > 0 ? "04" : "03"}
+                            jobId={jobId}
+                            selectedResumeId={selectedResumeId}
                         />
 
                         <SubmitCTA isApplying={isApplying} />
